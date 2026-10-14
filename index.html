@@ -81,7 +81,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
 /* Feed */
 .scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 63px; overflow-y: auto; overscroll-behavior: contain;
-  padding: 12px 27px; scrollbar-width: none }
+  padding: 64px 27px 84px; scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
 .fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
 .fade.top { top: calc(64px + var(--band)); height: 64px }
@@ -102,12 +102,14 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .masonry { display: flex; gap: 16px; align-items: flex-start }
 .col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px }
 .tile { position: relative; margin: 0; background: var(--tile); border-radius: 24px; overflow: hidden }
+.tile .art { position: absolute; inset: 0 }
+.tile .count { font-size: 12px; font-weight: 500; color: var(--text); background: rgb(255 255 255 / .85); padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums }
 .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block }
-.tile figcaption { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; gap: 12px;
+.tile .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--ink);
   font-size: 13px; font-weight: 500; letter-spacing: -0.26px; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
-.tile figcaption i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
+.tile .cap i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
 .tile:hover figcaption { opacity: 1; transform: none }
-@media (hover: none) { .tile figcaption { opacity: 1; transform: none } }
+@media (hover: none) { .tile .cap { opacity: 1; transform: none } }
 #ruler { position: absolute; right: 0; top: calc(86px + var(--band)); height: calc(100% - 163px - var(--band)); width: 140px; touch-action: none; cursor: ns-resize }
 #ruler line { stroke-linecap: round }
 
@@ -115,7 +117,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-top .time { top: auto; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); right: 50%; transform: translateX(50%) }
 .mode-top .hero, .mode-top .sheet { left: 50%; top: calc(var(--band) + (100% - var(--band)) * .46); transform: translate(-50%, -50%); width: min(400px, calc(100% - 32px)) }
 .mode-top .socials { left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); justify-content: center; width: max-content; max-width: calc(100% - 32px) }
-.mode-top .scroller { left: 0; right: 0; top: var(--band); bottom: 0; padding: 12px 16px 32px }
+.mode-top .scroller { left: 0; right: 0; top: var(--band); bottom: 0; padding: 64px 16px 84px }
 .mode-top #ruler { display: none }
 
 /* Phones: the dial sits at the bottom edge and turns under a fixed needle */
@@ -149,7 +151,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom .socials { position: static; transform: none; width: auto; margin-top: 34px; gap: 10px }
 .mode-bottom .socials a { font-size: 13px; padding: 6px 12px; border-radius: 8px }
 .mode-bottom .sheet { left: 29px; right: 29px; top: calc(96px + env(safe-area-inset-top, 0px)); transform: none; width: auto }
-.mode-bottom .scroller { left: 0; right: 0; top: calc(72px + env(safe-area-inset-top, 0px)); bottom: calc(100% - var(--dial-top)); padding: 12px 16px 24px }
+.mode-bottom .scroller { left: 0; right: 0; top: calc(72px + env(safe-area-inset-top, 0px)); bottom: calc(100% - var(--dial-top)); padding: 64px 16px 84px }
 .mode-bottom .fade { left: 0; right: 0 }
 .mode-bottom .fade.top { top: calc(72px + env(safe-area-inset-top, 0px)) }
 .mode-bottom .fade.bottom { bottom: calc(100% - var(--dial-top)) }
@@ -628,15 +630,26 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
   }
 
-  // ---------- Feed: irregular masonry ----------
-  const FEED = [
-    { t: 'Coins on a ribbon', r: 3 / 2 }, { t: 'Red padlock', r: 4 / 5 }, { t: 'Soft light study', r: 16 / 10 },
-    { t: 'Pawn in an archway', r: 4 / 5 }, { t: 'Vase in window light', r: 2 / 3 }, { t: 'Coins on a ribbon II', r: 4 / 5 },
-    { t: 'Window shadow', r: 3 / 2 }, { t: 'Torus study', r: 1 }, { t: 'Terracotta still life', r: 2 / 3 },
-    { t: 'Evening room', r: 16 / 9 }, { t: 'Wireframe sphere', r: 1 }, { t: 'Arch series', r: 3 / 4 },
-    { t: 'Gold coin close-up', r: 4 / 5 }, { t: 'Ribbon loop', r: 3 / 2 }, { t: 'Glass orb', r: 4 / 5 },
-    { t: 'Shadow play', r: 16 / 10 }, { t: 'Clay vessel', r: 3 / 4 }, { t: 'Lilac ribbon', r: 3 / 2 }
-  ];
+  // ---------- Designs: projects come from content/designs.json (the CMS will edit that file) ----------
+  // Each project: title (required), images (one or more), and optional role, description and tags.
+  // The grid shows each project's first image; the rest (and the text) are kept for a future project page.
+  // If the file can't be read (e.g. opening index.html straight from disk), DESIGNS_FALLBACK is used instead.
+  const DESIGNS_FALLBACK = {"projects": [{"title": "Kusnap", "role": "Head of Design · Marketplace", "description": "A peer-to-peer marketplace I designed from early stage to 50,000+ users.\n\nPlaceholder copy: add a sentence on the problem, your role and the outcome.", "tags": ["Product", "Brand", "Mobile"], "images": [{"caption": "Home feed", "ratio": 1.5}, {"caption": "Listing flow", "ratio": 0.8}, {"caption": "Checkout", "ratio": 1}, {"caption": "Brand system", "ratio": 1.6}]}, {"title": "Pingmart", "role": "Founder · Commerce", "description": "WhatsApp-native multi-vendor commerce.", "tags": ["Product", "WhatsApp"], "images": [{"caption": "Storefront", "ratio": 0.8}, {"caption": "Order chat", "ratio": 0.8}, {"caption": "Vendor dashboard", "ratio": 1.6}]}, {"title": "ShareBuddy", "role": "Founder · Fintech", "description": "Social bill-splitting and group wallets.", "tags": ["Product", "Brand"], "images": [{"caption": "Split a bill", "ratio": 1.6}, {"caption": "Group wallet", "ratio": 0.8}, {"caption": "Mascot", "ratio": 1}, {"caption": "Onboarding", "ratio": 0.8}, {"caption": "App icon", "ratio": 1}]}, {"title": "Kauri", "role": "Concept · Brand", "description": "A cowrie-inspired payments brand for African SMEs moving money between cities.", "tags": ["Brand", "Identity"], "images": [{"caption": "Logo", "ratio": 0.8}, {"caption": "Colour and type", "ratio": 1.6}, {"caption": "Card", "ratio": 1.6}]}, {"title": "LineCraft", "role": "Figma plugin", "images": [{"caption": "Zig zag", "ratio": 1}, {"caption": "Chevron", "ratio": 1}, {"caption": "Plugin UI", "ratio": 0.8}]}, {"title": "MeshCraft", "role": "Figma plugin", "description": "3D wireframe shapes, drawn as editable vectors.", "tags": ["Tooling", "3D"], "images": [{"caption": "Sphere", "ratio": 0.75}, {"caption": "Torus", "ratio": 1}, {"caption": "Hyperboloid", "ratio": 1}, {"caption": "Plugin UI", "ratio": 0.8}]}, {"title": "OSCA Festival", "role": "Design Lead · Event", "description": "Brand and experience for Africa's largest open source festival.", "tags": ["Brand", "Event"], "images": [{"caption": "Key visual", "ratio": 1.5}, {"caption": "Stage design", "ratio": 0.8}, {"caption": "Badges", "ratio": 1}]}, {"title": "CHAOSS", "images": [{"caption": "Metrics view", "ratio": 0.667}]}, {"title": "Recorder Studio", "role": "Tool · Motion", "description": "Turns HTML interaction prototypes into social videos.", "tags": ["Tooling", "Video"], "images": [{"caption": "Timeline", "ratio": 1.78}, {"caption": "Export", "ratio": 1.6}, {"caption": "Result", "ratio": 0.8}]}]};
+  let PROJECTS = DESIGNS_FALLBACK.projects;
+  const PALETTES = [['#EDE7DF', '#C9A98A'], ['#E6EAF2', '#8FA3C7'], ['#EFE6EC', '#C79BB3'], ['#E5EFEA', '#86B49C'], ['#F1ECE2', '#D2A45B'], ['#E9E8F1', '#9A92CC']];
+  const SHAPES = ['<circle cx="50" cy="50" r="22"/>', '<rect x="28" y="28" width="44" height="44" rx="10"/>', '<path d="M50 24l26 46H24z"/>',
+    '<path d="M24 62c10-24 42-24 52 0" fill="none" stroke-width="7" stroke-linecap="round"/>'];
+  function placeholder(seed) {
+    const [a, b] = PALETTES[seed % PALETTES.length];
+    const div = document.createElement('div'); div.className = 'art';
+    div.style.background = `linear-gradient(140deg, ${a}, ${a} 55%, ${b}22)`;
+    div.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" aria-hidden="true"><g fill="${b}" stroke="${b}" opacity=".85" transform="translate(0 -4)">${SHAPES[seed % SHAPES.length]}</g></svg>`;
+    return div;
+  }
+  fetch('content/designs.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).then(d => {
+    if (d && Array.isArray(d.projects) && d.projects.length) { PROJECTS = d.projects; if (active && active.id === 'designs') { buildFeed(true); sizeRuler(); } else cols = 0; }
+  }).catch(() => {});
+
   const masonry = document.getElementById('masonry'), scroller = document.getElementById('scroller');
   let cols = 0;
   function buildFeed(force) {
@@ -647,17 +660,21 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     cols = n; masonry.innerHTML = '';
     const colEls = [], h = [];
     for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'col'; masonry.appendChild(c); colEls.push(c); h.push(0); }
-    FEED.forEach((it, i) => {
+    PROJECTS.forEach((pr, i) => {
+      const imgs = Array.isArray(pr.images) && pr.images.length ? pr.images : [{}];
+      const cover = pr.cover || imgs[0], r = +cover.ratio > 0 ? +cover.ratio : 4 / 5;
       const k = h.indexOf(Math.min(...h));
       const fig = document.createElement('figure');
-      fig.className = 'tile'; fig.style.aspectRatio = it.r;
-      if (it.src) { const im = new Image(); im.src = it.src; im.alt = it.t; im.loading = 'lazy'; fig.appendChild(im); }
-      const cap = document.createElement('figcaption');
-      const name = document.createElement('span'); name.textContent = it.t;
-      const num = document.createElement('i'); num.textContent = String(i + 1).padStart(2, '0');
-      cap.append(name, num); fig.appendChild(cap);
+      fig.className = 'tile'; fig.style.aspectRatio = r;
+      if (cover.src) { const im = new Image(); im.src = cover.src; im.alt = pr.title || ''; im.loading = 'lazy'; im.decoding = 'async'; fig.appendChild(im); }
+      else fig.appendChild(placeholder(i));
+      const cap = document.createElement('figcaption'); cap.className = 'cap';
+      const name = document.createElement('span'); name.textContent = pr.title || 'Untitled';
+      cap.appendChild(name);
+      if (imgs.length > 1) { const c = document.createElement('span'); c.className = 'count'; c.textContent = `${imgs.length} images`; cap.appendChild(c); }
+      fig.appendChild(cap);
       colEls[k].appendChild(fig);
-      h[k] += 1 / it.r + 0.04;
+      h[k] += 1 / r + 0.05;
     });
   }
 

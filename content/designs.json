@@ -1,0 +1,100 @@
+{
+  "projects": [
+    {
+      "title": "Kusnap",
+      "role": "Head of Design · Marketplace",
+      "description": "A peer-to-peer marketplace I designed from early stage to 50,000+ users.\n\nPlaceholder copy: add a sentence on the problem, your role and the outcome.",
+      "tags": ["Product", "Brand", "Mobile"],
+      "images": [
+        { "caption": "Home feed", "ratio": 1.5 },
+        { "caption": "Listing flow", "ratio": 0.8 },
+        { "caption": "Checkout", "ratio": 1 },
+        { "caption": "Brand system", "ratio": 1.6 }
+      ]
+    },
+    {
+      "title": "Pingmart",
+      "role": "Founder · Commerce",
+      "description": "WhatsApp-native multi-vendor commerce.",
+      "tags": ["Product", "WhatsApp"],
+      "images": [
+        { "caption": "Storefront", "ratio": 0.8 },
+        { "caption": "Order chat", "ratio": 0.8 },
+        { "caption": "Vendor dashboard", "ratio": 1.6 }
+      ]
+    },
+    {
+      "title": "ShareBuddy",
+      "role": "Founder · Fintech",
+      "description": "Social bill-splitting and group wallets.",
+      "tags": ["Product", "Brand"],
+      "images": [
+        { "caption": "Split a bill", "ratio": 1.6 },
+        { "caption": "Group wallet", "ratio": 0.8 },
+        { "caption": "Mascot", "ratio": 1 },
+        { "caption": "Onboarding", "ratio": 0.8 },
+        { "caption": "App icon", "ratio": 1 }
+      ]
+    },
+    {
+      "title": "Kauri",
+      "role": "Concept · Brand",
+      "description": "A cowrie-inspired payments brand for African SMEs moving money between cities.",
+      "tags": ["Brand", "Identity"],
+      "images": [
+        { "caption": "Logo", "ratio": 0.8 },
+        { "caption": "Colour and type", "ratio": 1.6 },
+        { "caption": "Card", "ratio": 1.6 }
+      ]
+    },
+    {
+      "title": "LineCraft",
+      "role": "Figma plugin",
+      "images": [
+        { "caption": "Zig zag", "ratio": 1 },
+        { "caption": "Chevron", "ratio": 1 },
+        { "caption": "Plugin UI", "ratio": 0.8 }
+      ]
+    },
+    {
+      "title": "MeshCraft",
+      "role": "Figma plugin",
+      "description": "3D wireframe shapes, drawn as editable vectors.",
+      "tags": ["Tooling", "3D"],
+      "images": [
+        { "caption": "Sphere", "ratio": 0.75 },
+        { "caption": "Torus", "ratio": 1 },
+        { "caption": "Hyperboloid", "ratio": 1 },
+        { "caption": "Plugin UI", "ratio": 0.8 }
+      ]
+    },
+    {
+      "title": "OSCA Festival",
+      "role": "Design Lead · Event",
+      "description": "Brand and experience for Africa's largest open source festival.",
+      "tags": ["Brand", "Event"],
+      "images": [
+        { "caption": "Key visual", "ratio": 1.5 },
+        { "caption": "Stage design", "ratio": 0.8 },
+        { "caption": "Badges", "ratio": 1 }
+      ]
+    },
+    {
+      "title": "CHAOSS",
+      "images": [
+        { "caption": "Metrics view", "ratio": 0.667 }
+      ]
+    },
+    {
+      "title": "Recorder Studio",
+      "role": "Tool · Motion",
+      "description": "Turns HTML interaction prototypes into social videos.",
+      "tags": ["Tooling", "Video"],
+      "images": [
+        { "caption": "Timeline", "ratio": 1.78 },
+        { "caption": "Export", "ratio": 1.6 },
+        { "caption": "Result", "ratio": 0.8 }
+      ]
+    }
+  ]
+}

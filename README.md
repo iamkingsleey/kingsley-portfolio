@@ -36,3 +36,30 @@ A CMS for uploading content is planned as the next phase.
 - Sounds play only on real taps and drags, never on their own.
 - Respects reduced-motion settings: the dial and pages switch without animation.
 - Layout adapts: left-edge dial on laptops and desktops, dial on top for tablets, a row of station labels on phones.
+
+## Designs content (`content/designs.json`)
+
+The Designs grid is built from `content/designs.json`. The upcoming CMS will edit this file; until then you can edit it by hand.
+
+```json
+{
+  "projects": [
+    {
+      "title": "Kusnap",
+      "role": "Head of Design · Marketplace",
+      "description": "First paragraph.\n\nSecond paragraph.",
+      "tags": ["Product", "Brand"],
+      "images": [
+        { "src": "assets/designs/kusnap/01.jpg", "caption": "Home feed" },
+        { "src": "assets/designs/kusnap/02.jpg" }
+      ]
+    }
+  ]
+}
+```
+
+- **Required:** `title` and at least one image. `role`, `description`, `tags` and each image's `caption` are optional.
+- **Grid:** shows each project's first image as its cover, with an image count when there's more than one. The other images and the text are stored for a future project page.
+- **Image shape:** `ratio` (width ÷ height) sets the tile's shape; without it the tile is portrait (4:5).
+- **No `src` yet:** a soft placeholder shows instead.
+- Opening `index.html` straight from disk can't read the JSON file, so a built-in copy is used. Run `python3 -m http.server` to preview the real file.
