@@ -1096,42 +1096,17 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   // ---------- Typed name on Home ----------
   // After the loader, the name types out, then cycles through roles and settles back on the name.
   // Between roles it only deletes back to what they share ("a "), like someone editing a line.
-  // Sound: real keystrokes cut from a keyboard recording (assets/typing-keys.wav), played soft and low.
-  // Browsers only allow sound after a visitor's first click, so the first run may be silent.
   const TYPE_LINES = ["I'm Kingsley M.", 'a Product Designer', 'a Brand Designer', 'a Design Engineer', 'a 3D Designer'];
   const TYPE_FINAL = "I'm Kingsley M.";
-  const KEYS = {"key": [[0.0, 0.075], [0.095, 0.075], [0.19, 0.075], [0.285, 0.075], [0.38, 0.075], [0.4749, 0.075], [0.5699, 0.075], [0.6649, 0.075], [0.7599, 0.075], [0.8549, 0.075], [0.9499, 0.075], [1.0449, 0.075], [1.1399, 0.075], [1.2349, 0.075], [1.3298, 0.075], [1.4248, 0.075]], "back": [[1.5198, 0.0825], [1.6223, 0.0825], [1.7248, 0.0825]], "space": [[1.8272, 0.075], [1.9222, 0.075]]};   // [start, length] in seconds inside the sprite
   const typedEl = document.getElementById('typed'), caretEl = document.getElementById('caret');
-  let kctx = null, kbuf = null, kLast = -1;
-  function keysAudio() {
-    if (kctx) { if (kctx.state === 'suspended') kctx.resume(); return; }
-    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
-    kctx = new AC();
-    fetch('assets/typing-keys.wav').then(r => r.arrayBuffer()).then(a => kctx.decodeAudioData(a)).then(b => { kbuf = b; }).catch(() => {});
-  }
-  addEventListener('pointerdown', keysAudio, { once: true, capture: true });
-  addEventListener('keydown', keysAudio, { once: true, capture: true });
-  function keySound(kind) {
-    if (!kctx || !kbuf || kctx.state !== 'running') return;
-    const list = KEYS[kind];
-    let i = Math.floor(Math.random() * list.length);
-    if (list.length > 1 && i === kLast) i = (i + 1) % list.length;   // never the same key twice in a row
-    kLast = i;
-    const src = kctx.createBufferSource(); src.buffer = kbuf;
-    src.playbackRate.value = 0.93 + Math.random() * 0.06;             // a touch lower: rounder, calmer
-    const lp = kctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; lp.Q.value = 0.5;
-    const g = kctx.createGain(); g.gain.value = (kind === 'back' ? 0.16 : 0.22) * (0.88 + Math.random() * 0.24);
-    src.connect(lp).connect(g).connect(kctx.destination);
-    src.start(0, list[i][0], list[i][1]);
-  }
   const pause = ms => new Promise(r => setTimeout(r, ms));
   async function typeLine(from, to) {
     caretEl.classList.remove('idle');
     let keep = 0; while (keep < from.length && keep < to.length && from[keep] === to[keep]) keep++;
-    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); keySound('back'); await pause(34 + Math.random() * 18); }
+    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); await pause(34 + Math.random() * 18); }
     if (from.length > keep) await pause(160);
     for (let i = keep; i < to.length; i++) {
-      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1); keySound(ch === ' ' ? 'space' : 'key');
+      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1);
       await pause((ch === ' ' ? 120 : 62) + Math.random() * 70);   // uneven, human rhythm with a beat on spaces
     }
     caretEl.classList.add('idle');
