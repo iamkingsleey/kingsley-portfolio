@@ -26,6 +26,7 @@
   --content-left: 366px;
   --hero-left: 708px;
   --band: 0px;
+  --marker: #fff0a6;   /* highlighter on the bio */
   --flush: 80px;   /* one top line: the menu's Home, the first row of images and the ruler's active tick */
   color-scheme: light;
 }
@@ -232,6 +233,89 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom .side-nav { display: none }
 .inner.mode-bottom .scroller { left: 0; bottom: 0 } .inner.mode-bottom .fade { left: 0 }
 
+
+/* ---------- Home micro-interactions ---------- */
+/* Photo: tilts toward the cursor; on hover it briefly "tunes" through the work, like a TV catching a signal. */
+.avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto }
+.avatar .flick { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0 }
+.avatar .snow { position: absolute; inset: 0; background: var(--noise) 0 0 / 80px 80px; mix-blend-mode: multiply; opacity: 0; pointer-events: none }
+/* Name: click to type the next role; a small picture of that kind of work peeks beside the cursor. */
+h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
+.role-peek { position: fixed; left: 0; top: 0; z-index: 60; width: 64px; height: 80px; border-radius: 8px; overflow: hidden; pointer-events: none; opacity: 0;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 10px 24px rgb(0 0 0 / .14); transition: opacity .2s; background: var(--tile) }
+.role-peek img { width: 100%; height: 100%; object-fit: cover; display: block }
+.role-peek.show { opacity: 1 }
+/* Links: an underline drawn as a strip of dial ticks; the "x" beside a hovered link turns into a "+". */
+.links a { position: relative; transition: color .2s }
+.links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 6px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 12px) left bottom / 100% 6px no-repeat,
+              repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 4px) left bottom / 100% 3px no-repeat;
+  opacity: .55; clip-path: inset(0 100% 0 0); transition: clip-path .4s cubic-bezier(.65,0,.35,1) }
+.links a:hover::after, .links a:focus-visible::after { clip-path: inset(0 0 0 0) }
+.links > span { display: inline-block; transition: transform .35s cubic-bezier(.2,.8,.2,1), color .2s }
+.links a:hover + span, .links span:has(+ a:hover) { transform: rotate(45deg); color: var(--ink) }
+.links a.copied { color: var(--ink) }
+/* Bio: key phrases get a highlighter sweep; "Kusnap" opens a small card. */
+.hl { background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 92%, transparent 92%) no-repeat 0 0 / 0% 100%;
+  transition: background-size .55s cubic-bezier(.65,0,.35,1) }
+.bio p:hover .hl { background-size: 100% 100% }
+.bio p:hover .hl + .hl, .bio p:hover .hl:nth-of-type(2) { transition-delay: .12s }
+.ref { position: relative; cursor: default; text-decoration: underline dotted rgb(0 0 0 / .35); text-underline-offset: 3px }
+.ref-card { position: absolute; left: -12px; top: calc(100% + 10px); width: 228px; padding: 14px 16px; border-radius: 14px; background: var(--bg); z-index: 5;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(-6px); pointer-events: none;
+  transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1); display: grid; gap: 2px; font-weight: 400 }
+.ref:hover .ref-card, .ref:focus-within .ref-card { opacity: 1; transform: none }
+.ref-card b { font-weight: 600; color: var(--ink); font-size: 14px }
+.ref-card .k { font-size: 12px; color: var(--muted) }
+.ref-card .n { font: 600 26px/1.1 var(--body); letter-spacing: -0.8px; color: var(--ink); margin-top: 8px; font-variant-numeric: tabular-nums }
+/* Social pills: lean toward the cursor; a three-bar signal fills in on hover. */
+.socials a { display: inline-flex; align-items: center; translate: 0 0; transition: background .2s, translate .3s cubic-bezier(.2,.8,.2,1) }
+.sig { width: 0; height: 10px; margin-left: 0; opacity: 0; overflow: visible; transition: width .25s, margin .25s, opacity .2s }
+.sig rect { fill: currentColor; opacity: .2; transition: opacity .15s }
+.socials a:hover .sig, .socials a:focus-visible .sig { width: 11px; margin-left: 6px; opacity: 1 }
+.socials a:hover .sig rect { opacity: 1 }
+.socials a:hover .sig rect:nth-child(2) { transition-delay: .09s } .socials a:hover .sig rect:nth-child(3) { transition-delay: .18s }
+/* Lagos time: the colon ticks each second; hover shows day or night there, and availability. */
+.time { cursor: default; text-align: right }
+.mode-bottom .time { text-align: left }
+.time .colon { animation: tick 1s steps(1) infinite }
+@keyframes tick { 50% { opacity: .2 } }
+.t-more { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 6px; justify-items: end; white-space: nowrap; font-size: 13px; letter-spacing: -0.2px;
+  opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1) }
+.mode-bottom .t-more { right: auto; left: 0; justify-items: start }
+.time:hover .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
+.t-sky { display: inline-flex; align-items: center; gap: 6px; color: var(--muted) }
+.t-sky svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
+.t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px; border-radius: 999px; background: var(--pill); color: var(--text) }
+.t-avail i { width: 6px; height: 6px; border-radius: 50%; background: #2fb35b; box-shadow: 0 0 0 3px rgb(47 179 91 / .18) }
+/* Dial station preview: a small card beside a hovered station pill. */
+.peek { position: fixed; left: 0; top: 0; z-index: 130; width: 196px; padding: 12px; border-radius: 14px; background: var(--bg); pointer-events: none;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(4px) scale(.98); transform-origin: left center;
+  transition: opacity .18s, transform .25s cubic-bezier(.2,.8,.2,1) }
+.peek.show { opacity: 1; transform: none }
+.peek .ph { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px }
+.peek .ph span { font-weight: 400; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums }
+.peek .pg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px }
+.peek .pg img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 5px; display: block; background: var(--tile) }
+.peek .pl { display: grid; gap: 0; font-size: 12px }
+.peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
+/* Static between stations, and a faint moving grain on Home. */
+.static { position: fixed; inset: 0; z-index: 99; pointer-events: none; opacity: 0; background: var(--noise) 0 0 / 140px 140px; mix-blend-mode: multiply }
+.grain { position: absolute; inset: -40px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; opacity: .022; mix-blend-mode: multiply;
+  animation: grain .9s steps(5) infinite }
+@keyframes grain { 0% { transform: translate(0, 0) } 20% { transform: translate(-14px, 9px) } 40% { transform: translate(11px, -16px) } 60% { transform: translate(-8px, -6px) } 80% { transform: translate(15px, 12px) } }
+/* Secret station 99.9: type "kingsley" on Home. */
+.secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
+.secret[hidden] { display: none }
+.secret-card { width: min(380px, 100%); padding: 26px 26px 22px; border-radius: 22px; background: var(--bg); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 24px 60px rgb(0 0 0 / .16); display: grid; gap: 10px }
+.secret-card .f { font: 600 56px/1 var(--body); letter-spacing: -2px; color: var(--ink); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 8px }
+.secret-card .f small { font-size: 13px; letter-spacing: 0; font-weight: 500; color: var(--muted) }
+.secret-card .lbl { font-size: 12px; color: var(--muted); letter-spacing: .4px; text-transform: uppercase }
+.secret-card p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--text) }
+.secret-card button { justify-self: start; margin-top: 6px; font-size: 13px; padding: 6px 12px; border-radius: 8px; background: var(--pill) }
+.secret-card button:hover { background: var(--pill-hover) }
+@media (prefers-reduced-motion: reduce) { .grain, .time .colon { animation: none } .avatar { transition: none } }
+
 /* ---------- Loader: station counter that locks on 100 ---------- */
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
 .loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
@@ -310,18 +394,33 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 <div id="app">
   <section class="panel" data-station="home">
     <div class="trail" id="trail" aria-hidden="true"></div>
-    <div class="time" id="time">--:--, Lagos 🇳🇬</div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="time" id="time" tabindex="0"><span id="clock">--:--</span>, Lagos 🇳🇬
+      <div class="t-more"><span class="t-sky" id="tSky"></span><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span></div>
+    </div>
     <div class="hero">
-      <div class="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
-      <h1 class="typer" aria-label="Kingsley M."><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
-      <div class="links"><a href="#">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
+      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"><img class="flick" alt="" aria-hidden="true"><span class="snow" aria-hidden="true"></span></div>
+      <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
+      <div class="links"><a href="#" id="emailLink" data-email="">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
       <div class="bio">
-        <p>Senior product designer with experience designing from 0-1 at <br>e-commerce startups and enterprise.</p>
-        <p>Previously, I led design at Kusnap.</p>
+        <p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>
+        <p>Previously, I led design at <span class="ref" tabindex="0">Kusnap<span class="ref-card" role="tooltip"><b>Kusnap</b><span class="k">Peer-to-peer marketplace · Head of Design</span><span class="n">50,000+</span><span class="k">users, designed from early stage</span></span></span>.</p>
       </div>
     </div>
     <nav class="socials" aria-label="Social"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="#">Medium</a></nav>
   </section>
+  <div class="role-peek" id="rolePeek" aria-hidden="true"><img alt=""></div>
+  <div class="peek" id="peek" aria-hidden="true"></div>
+  <div class="static" id="static" aria-hidden="true"></div>
+  <div class="secret" id="secret" hidden role="dialog" aria-modal="true" aria-label="Secret station">
+    <div class="secret-card">
+      <span class="lbl">Secret station</span>
+      <div class="f">99.9<small>FM</small></div>
+      <p>You found the late-night frequency.</p>
+      <p>Off air: I taught myself Python and Node.js to build my own tools, and I lead design for Open Source Community Africa.</p>
+      <button type="button" id="secretClose">Tune back to Home</button>
+    </div>
+  </div>
 
   <section class="panel" data-station="designs" hidden aria-label="Designs">
     <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
@@ -687,6 +786,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
     swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
     kickPx();
+    if (prev && (prev.id === 'home' || s.id === 'home')) staticFlash();
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
@@ -951,13 +1051,14 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   addEventListener('resize', layout);
 
   // ---------- Live Lagos time ----------
-  const timeEl = document.getElementById('time');
+  const timeEl = document.getElementById('time'), clockEl = document.getElementById('clock');
   const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', hour: 'numeric', minute: '2-digit', hour12: true });
   function clock() {
     const parts = fmt.formatToParts(new Date());
     const h = parts.find(p => p.type === 'hour').value, m = parts.find(p => p.type === 'minute').value;
     const ap = (parts.find(p => p.type === 'dayPeriod') || { value: '' }).value.toLowerCase().replace(/[.\s]/g, '');
-    timeEl.textContent = `${h}:${m}${ap}, Lagos 🇳🇬`;
+    clockEl.innerHTML = `${h}<span class="colon">:</span>${m}${ap}`;
+    skyNow(+h % 12 + (ap === 'pm' ? 12 : 0));
     setTimeout(clock, 1000 - (Date.now() % 1000) + 5);
   }
 
@@ -1102,7 +1203,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   const TYPE_FINAL = "I'm Kingsley M.";
   const typedEl = document.getElementById('typed'), caretEl = document.getElementById('caret');
   const pause = ms => new Promise(r => setTimeout(r, ms));
+  let typeBusy = true;
   async function typeLine(from, to) {
+    typeBusy = true;
     caretEl.classList.remove('idle');
     let keep = 0; while (keep < from.length && keep < to.length && from[keep] === to[keep]) keep++;
     for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); await pause(34 + Math.random() * 18); }
@@ -1112,17 +1215,19 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       await pause((ch === ' ' ? 120 : 62) + Math.random() * 70);   // uneven, human rhythm with a beat on spaces
     }
     caretEl.classList.add('idle');
+    typeBusy = false;
   }
   let typedOnce = false;
   async function typeIntro() {
     if (typedOnce) return; typedOnce = true;
     // Only animate when Home is what the visitor is looking at; otherwise the name is simply there.
-    if (reduce || !active || active.id !== 'home') { typedEl.textContent = TYPE_FINAL; return; }
+    if (reduce || !active || active.id !== 'home') { typedEl.textContent = TYPE_FINAL; typeBusy = false; return; }
     typedEl.textContent = '';                  // cleared while the loader is still fading, so it never visibly erases
     await pause(380 + 350);
     let shown = '';
     for (const line of TYPE_LINES) { await typeLine(shown, line); shown = line; await pause(line === TYPE_LINES[0] ? 1700 : 1150); }
     await typeLine(shown, TYPE_FINAL);
+    typeBusy = false;
   }
   if (document.getElementById('loader')) document.addEventListener('loader:done', typeIntro, { once: true });
   else setTimeout(typeIntro, 300);
@@ -1178,6 +1283,183 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     });
     panels.home.addEventListener('pointerleave', () => { lx = null; });
   }
+
+  // ---------- Home micro-interactions ----------
+  // Small touches on the landing page. Hover effects need a mouse; everything respects reduced motion.
+  const EMAIL = document.getElementById('emailLink').dataset.email;   // set data-email on the email link
+  const AVAILABILITY = 'Open to new work';
+  const SECRET_CODE = 'kingsley';
+  const thumb = src => src.replace(/([^/]+)$/, 'thumbs/$1');
+  const designPics = () => PROJECTS.flatMap(pr => (pr.images || []).map(i => i.src).filter(Boolean));
+  const homeOn = () => active && active.id === 'home';
+  let lastActive = performance.now();
+  ['pointermove', 'pointerdown', 'keydown', 'wheel'].forEach(t => addEventListener(t, () => { lastActive = performance.now(); }, { passive: true }));
+
+  // Shared film-grain texture, made once on a small canvas.
+  (function makeNoise() {
+    const c = document.createElement('canvas'); c.width = c.height = 128;
+    const g = c.getContext('2d'), d = g.createImageData(128, 128);
+    for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255 | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    g.putImageData(d, 0, 0);
+    root.style.setProperty('--noise', `url(${c.toDataURL('image/png')})`);
+  })();
+
+  // Static between stations: a quick burst of grain when leaving or arriving at Home.
+  const staticEl = document.getElementById('static');
+  function staticFlash() {
+    if (reduce) return;
+    staticEl.getAnimations().forEach(a => a.cancel());
+    staticEl.animate([
+      { opacity: 0, backgroundPosition: '0 0' }, { opacity: .32, backgroundPosition: '37px 11px', offset: .25 },
+      { opacity: .18, backgroundPosition: '-21px 46px', offset: .55 }, { opacity: 0, backgroundPosition: '13px -29px' }
+    ], { duration: 420, easing: 'steps(6)' });
+  }
+
+  // Lagos sky and availability under the time.
+  const sky = document.getElementById('tSky');
+  document.getElementById('tAvail').textContent = AVAILABILITY;
+  const SUN = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>';
+  const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 9.6A5.5 5.5 0 0 1 6.4 3a5.5 5.5 0 1 0 6.6 6.6z"/></svg>';
+  let skyState = '';
+  function skyNow(h24) {
+    const day = h24 >= 6 && h24 < 19, k = day ? 'day' : 'night';
+    if (k === skyState) return; skyState = k;
+    sky.innerHTML = (day ? SUN : MOON) + `<span>GMT+1 · ${day ? 'daytime' : 'night'} in Lagos</span>`;
+  }
+  timeEl.addEventListener('click', () => timeEl.classList.toggle('open'));   // taps on phones
+
+  // Copy email: the word swaps to "copied" for a moment.
+  const emailLink = document.getElementById('emailLink');
+  emailLink.addEventListener('click', e => {
+    e.preventDefault();
+    if (!EMAIL) { swapWord(emailLink, 'add email'); return; }
+    const done = () => { swapWord(emailLink, 'copied ✓'); play('pop', e.isTrusted); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(EMAIL).then(done, () => { location.href = 'mailto:' + EMAIL; });
+    else location.href = 'mailto:' + EMAIL;
+  });
+  function swapWord(a, word) {
+    if (a._t) clearTimeout(a._t); else a._orig = a.textContent;
+    a.textContent = word; a.classList.add('copied');
+    a._t = setTimeout(() => { a.textContent = a._orig; a.classList.remove('copied'); a._t = 0; }, 1500);
+  }
+
+  // Name: click types the next role; hovering shows a picture for the role on screen.
+  const typerEl = document.getElementById('typer'), peekRole = document.getElementById('rolePeek'), peekImg = peekRole.firstChild;
+  const CYCLE = [...TYPE_LINES];
+  const ROLE_PIC = { "I'm Kingsley M.": 'assets/headshot.jpg', 'a Product Designer': thumb('assets/designs/debit-card-with-colorful-objects.jpg'),
+    'a Brand Designer': thumb('assets/designs/card-holder-with-colorful-stickers.jpg'), 'a Design Engineer': thumb('assets/designs/paper-plane-with-coin.jpg'),
+    'a 3D Designer': thumb('assets/designs/3d-tumbler-render.jpg') };
+  typerEl.addEventListener('click', async e => {
+    if (typeBusy) return;
+    const cur = typedEl.textContent, i = CYCLE.indexOf(cur);
+    play('pop', e.isTrusted);
+    await typeLine(cur, CYCLE[(i + 1) % CYCLE.length]);
+    setPeekRole();
+  });
+  function setPeekRole() { const src = ROLE_PIC[typedEl.textContent]; if (src && !peekImg.src.endsWith(src)) peekImg.src = src; return !!src; }
+
+  if (finePointer && !reduce) {
+    typerEl.addEventListener('pointermove', e => {
+      if (!setPeekRole()) { peekRole.classList.remove('show'); return; }
+      peekRole.style.transform = `translate(${e.clientX + 18}px, ${e.clientY - 90}px) rotate(4deg)`;
+      peekRole.classList.add('show');
+    });
+    typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
+
+    // Photo: tilt toward the cursor, and tune through the work on hover.
+    const avatar = document.getElementById('avatar'), flick = avatar.querySelector('.flick'), snow = avatar.querySelector('.snow');
+    addEventListener('pointermove', e => {
+      if (!homeOn() || e.pointerType !== 'mouse') return;
+      const r = avatar.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      const k = Math.max(0, 1 - Math.hypot(dx, dy) / 700);
+      avatar.style.transform = `perspective(320px) rotateY(${(dx / 40 * k).toFixed(2)}deg) rotateX(${(-dy / 40 * k).toFixed(2)}deg)`;
+    }, { passive: true });
+    let tuning = false;
+    avatar.addEventListener('pointerenter', async () => {
+      if (tuning) return; tuning = true;
+      const pics = designPics();
+      for (let i = 0; i < 4 && pics.length; i++) {
+        flick.src = thumb(pics[Math.floor(Math.random() * pics.length)]);
+        flick.style.opacity = 1; snow.style.opacity = .45 - i * .08;
+        await pause(70 + i * 15);
+        flick.style.opacity = i % 2 ? 0 : .6;
+        await pause(40);
+      }
+      flick.style.opacity = 0; snow.style.opacity = 0;
+      setTimeout(() => { tuning = false; }, 600);
+    });
+
+    // Social pills lean toward the cursor.
+    const pillsS = [...document.querySelectorAll('.socials a')];
+    addEventListener('pointermove', e => {
+      if (!homeOn() || e.pointerType !== 'mouse') return;
+      pillsS.forEach(a => {
+        const r = a.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), d = Math.hypot(dx, dy);
+        const k = d < 90 ? (1 - d / 90) * .32 : 0;
+        a.style.translate = `${(dx * k).toFixed(1)}px ${(dy * k).toFixed(1)}px`;
+      });
+    }, { passive: true });
+
+    // Dial station preview: what's on that page, beside the hovered pill.
+    const peek = document.getElementById('peek');
+    const listOf = id => [...panels[id].querySelectorAll('.list b')].map(b => b.textContent);
+    STATIONS.forEach(st => {
+      if (st.id === 'home') return;
+      const b = pills[st.id];
+      b.addEventListener('pointerenter', () => {
+        if (!homeOn() || dragging) return;
+        let body;
+        if (st.id === 'designs') body = '<div class="pg">' + designPics().slice(0, 3).map(src => `<img src="${thumb(src)}" alt="">`).join('') + '</div>';
+        else body = '<div class="pl">' + listOf(st.id).slice(0, 3).map(t => `<div>${t}</div>`).join('') + '</div>';
+        peek.innerHTML = `<div class="ph">${st.name}<span>${st.f.toFixed(1)} MHz</span></div>${body}`;
+        const r = b.getBoundingClientRect();
+        let x = r.right + 12, y = r.top + r.height / 2 - 60;
+        if (x + 200 > innerWidth) x = r.left - 208;
+        peek.style.left = Math.max(8, x) + 'px'; peek.style.top = Math.max(8, Math.min(innerHeight - 140, y)) + 'px';
+        peek.classList.add('show');
+      });
+      b.addEventListener('pointerleave', () => peek.classList.remove('show'));
+      b.addEventListener('click', () => peek.classList.remove('show'));
+    });
+  }
+  // Signal bars on the social pills.
+  document.querySelectorAll('.socials a').forEach(a => a.insertAdjacentHTML('beforeend',
+    '<svg class="sig" viewBox="0 0 11 10" aria-hidden="true"><rect x="0" y="6" width="2.6" height="4" rx=".6"/><rect x="4.2" y="3" width="2.6" height="7" rx=".6"/><rect x="8.4" y="0" width="2.6" height="10" rx=".6"/></svg>'));
+
+  // Dial idle drift: after a quiet spell on Home, the needle wanders a hair off and back.
+  if (!reduce) setInterval(() => {
+    const now = performance.now();
+    if (!homeOn() || dragging || tween || secretOpen || now - lastActive < 7000 || now - (window._drift || 0) < 9000) return;
+    window._drift = now;
+    const home = ang(active.f);
+    setTarget(home + (Math.random() < .5 ? -2.4 : 2.4));
+    setTimeout(() => { if (homeOn() && !dragging && !secretOpen) setTarget(home); }, 700);
+  }, 1000);
+
+  // Secret station: type "kingsley" on Home to tune to 99.9.
+  const secret = document.getElementById('secret');
+  let typedKeys = '', secretOpen = false;
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+    typedKeys = (typedKeys + e.key.toLowerCase()).slice(-SECRET_CODE.length);
+    if (typedKeys === SECRET_CODE && homeOn() && !secretOpen) openSecret(e.isTrusted);
+  });
+  function openSecret(trusted) {
+    secretOpen = true; typedKeys = '';
+    setTarget(ang(99.9)); light(null);
+    play('pop', trusted);
+    secret.hidden = false;
+    if (!reduce) secret.firstElementChild.animate([{ opacity: 0, transform: 'translateY(10px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: EASE });
+    document.getElementById('secretClose').focus({ preventScroll: true });
+  }
+  function closeSecret() {
+    if (!secretOpen) return;
+    secretOpen = false; secret.hidden = true;
+    setTarget(ang(active.f)); light(active);
+  }
+  document.getElementById('secretClose').addEventListener('click', closeSecret);
+  secret.addEventListener('click', e => { if (e.target === secret) closeSecret(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeSecret(); });
 
   // ---------- Start ----------
   layout();
