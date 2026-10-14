@@ -106,6 +106,43 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-top .socials { left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); justify-content: center; width: max-content; max-width: calc(100% - 32px) }
 .mode-top .scroller { left: 0; right: 0; top: var(--band); bottom: 0; padding: 12px 16px 32px }
 .mode-top #ruler { display: none }
+
+/* Phones: the dial sits at the bottom edge and turns under a fixed needle */
+.menu-btn { position: fixed; top: calc(28px + env(safe-area-inset-top, 0px)); right: max(22px, env(safe-area-inset-right, 0px)); width: 24px; height: 24px;
+  display: none; pointer-events: auto; z-index: 120 }
+.mode-bottom .menu-btn { display: block }
+.menu-btn span { position: absolute; right: 2px; height: 1.5px; border-radius: 2px; background: var(--ink);
+  transition: transform .32s cubic-bezier(.65,0,.35,1), opacity .2s }
+.menu-btn span:nth-child(1) { top: 6px; width: 20px }
+.menu-btn span:nth-child(2) { top: 11.25px; width: 12px }
+.menu-btn span:nth-child(3) { top: 16.5px; width: 20px }
+.menu-open .menu-btn span:nth-child(1) { transform: translateY(5.25px) rotate(45deg) }
+.menu-open .menu-btn span:nth-child(2) { opacity: 0 }
+.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5.25px) rotate(-45deg) }
+.menu { position: fixed; inset: 0; z-index: 110; background: var(--bg); pointer-events: auto; display: flex; flex-direction: column; justify-content: center;
+  padding: calc(96px + env(safe-area-inset-top, 0px)) max(29px, env(safe-area-inset-right, 0px)) calc(56px + env(safe-area-inset-bottom, 0px)) max(29px, env(safe-area-inset-left, 0px)) }
+.menu[hidden] { display: none }
+.menu-list { list-style: none; margin: 0; padding: 0 }
+.menu-item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid #eeeeee;
+  font: 600 32px/1.1 var(--body); letter-spacing: -0.96px; color: #b5b5b5; text-align: left; transition: color .2s }
+.menu-item.on { color: var(--ink) }
+.menu-item .freq { font: 400 13px/1 var(--body); letter-spacing: 0; color: var(--muted); font-variant-numeric: tabular-nums }
+
+.mode-bottom .pill { transition: background .2s, color .2s, opacity .12s; will-change: transform }
+.mode-bottom .time { top: calc(32px + env(safe-area-inset-top, 0px)); left: max(28px, env(safe-area-inset-left, 0px)); right: auto; bottom: auto; transform: none }
+.mode-bottom .hero { left: 29px; right: 29px; top: clamp(96px, 22.7vh, 240px); transform: none; width: auto; max-width: 370px }
+.mode-bottom .avatar { width: 95px; height: 95px; margin-bottom: 0 }
+.mode-bottom h1 { font-size: 50px; line-height: 1.4 }
+.mode-bottom .links { margin-top: 0 }
+.mode-bottom .bio { font-size: 15px; line-height: 1.2; margin-top: 11px; max-width: 316px }
+.mode-bottom .socials { position: static; transform: none; width: auto; margin-top: 34px; gap: 10px }
+.mode-bottom .socials a { font-size: 13px; padding: 6px 12px; border-radius: 8px }
+.mode-bottom .sheet { left: 29px; right: 29px; top: calc(96px + env(safe-area-inset-top, 0px)); transform: none; width: auto }
+.mode-bottom .scroller { left: 0; right: 0; top: calc(72px + env(safe-area-inset-top, 0px)); bottom: calc(100% - var(--dial-top)); padding: 12px 16px 24px }
+.mode-bottom .fade { left: 0; right: 0 }
+.mode-bottom .fade.top { top: calc(72px + env(safe-area-inset-top, 0px)) }
+.mode-bottom .fade.bottom { bottom: calc(100% - var(--dial-top)) }
+.mode-bottom #ruler { display: none }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
 </style>
@@ -177,6 +214,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     <circle id="hit"></circle>
   </svg>
   <div id="pills"></div>
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+  <div class="menu" id="menu" hidden role="dialog" aria-label="Menu"><ul class="menu-list" id="menuList"></ul></div>
   <div id="tuner" tabindex="0" role="slider" aria-label="Navigation dial" aria-valuemin="94" aria-valuemax="102"
     aria-valuenow="98" aria-valuetext="Home" style="position:absolute;left:0;top:50%;width:1px;height:1px;pointer-events:auto"></div>
 </div>
@@ -220,12 +259,20 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       root.style.setProperty('--content-left', contentLeft + 'px');
       root.style.setProperty('--hero-left', Math.round(Math.max(0.41 * vw, contentLeft + 40)) + 'px');
       root.style.setProperty('--band', '0px');
+    } else if (vw < 600) {
+      // Phones: centre sits below the bottom edge (from the 428 x 926 mobile frame).
+      const S = 0.705 * Math.min(1.15, vw / 428);
+      M = { mode: 'bottom', S, cx: vw / 2, cy: vh + 118.7 * S / 0.705, hx: 0, hy: -1, px: -1, py: 0, tin: 272 };
+      root.style.setProperty('--band', '0px');
+      root.style.setProperty('--dial-top', Math.round(M.cy - 377 * S - 30) + 'px');
     } else {
       const S = 0.834 * Math.min(1, (vw - 8) / 600);
       M = { mode: 'top', S, cx: vw / 2, cy: -79 * S, hx: 0, hy: 1, px: -1, py: 0 };
       root.style.setProperty('--band', Math.round(343 * S) + 'px');
     }
+    M.tin = M.tin || 300;                    // where ticks start, in dial units
     root.classList.toggle('mode-top', M.mode === 'top');
+    root.classList.toggle('mode-bottom', M.mode === 'bottom');
   }
   const pt = (r, deg) => {
     const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
@@ -261,22 +308,14 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   const PILL_GAP = 12;                       // px between the longest tick and a pill
   function placePills() {
     const clear = TICK_REACH * M.S + PILL_GAP;
-    // Phones: the dial is too small to ring with labels, so they sit in a row just
-    // below the longest ticks, in the same left-to-right order as on the dial.
-    if (M.mode === 'top' && innerWidth < 600) {
-      const order = [...STATIONS].sort((a, b) => b.f - a.f), gap = 6;
-      order.forEach(s => { pills[s.id].style.transform = 'none'; });
-      const widths = order.map(s => pills[s.id].offsetWidth);
-      const total = widths.reduce((a, b) => a + b, 0) + gap * (order.length - 1);
-      let x = Math.max(8, (innerWidth - total) / 2);
-      const y = M.cy + clear + 4;
-      order.forEach((s, i) => { const b = pills[s.id]; b.style.left = x + 'px'; b.style.top = y + 'px'; x += widths[i] + gap; });
-      root.style.setProperty('--band', Math.round(y + pills.home.offsetHeight + 16) + 'px');
-      return;
-    }
+    STATIONS.forEach(s => {           // measure once; read back each frame on phones
+      const b = pills[s.id];
+      b.style.transform = 'none'; b.style.opacity = ''; b.style.pointerEvents = '';
+      b._w = b.offsetWidth; b._h = b.offsetHeight;
+    });
+    if (M.mode === 'bottom') { placeBottomPills(); return; }
     STATIONS.forEach(s => {
       const a = ang(s.f), b = pills[s.id];
-      b.style.transform = 'none';
       const w = b.offsetWidth, h = b.offsetHeight;
       let r = TICK_REACH, x = 0, y = 0;
       for (let i = 0; i < 200; i++) {
@@ -302,6 +341,27 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     });
   }
 
+  // Phones: labels ride the turning ring, tilted along it. At most two show: at rest the
+  // active station plus its right-hand neighbour; while turning, the two nearest the needle.
+  const R_PILL = 377;
+  function visiblePair() {
+    if (!dragging && !tween && active) {
+      const i = STATIONS.indexOf(active);
+      return [active, STATIONS[i - 1] || STATIONS[i + 1]];
+    }
+    return [...STATIONS].sort((a, b) => Math.abs(ang(a.f) - cur) - Math.abs(ang(b.f) - cur)).slice(0, 2);
+  }
+  function placeBottomPills() {
+    const show = visiblePair();
+    STATIONS.forEach(s => {
+      const b = pills[s.id], a = ang(s.f) - cur, [x, y] = pt(R_PILL, a), on = show.includes(s);
+      b.style.left = '0px'; b.style.top = '0px';
+      b.style.transform = `translate3d(${(x - b._w / 2).toFixed(1)}px, ${(y - b._h / 2).toFixed(1)}px, 0) rotate(${(-a).toFixed(2)}deg)`;
+      b.style.opacity = on ? 1 : 0; b.style.pointerEvents = on ? 'auto' : 'none';
+      b.tabIndex = on ? 0 : -1;
+    });
+  }
+
   // The wave is always on around the needle; dragging gives it a slight boost.
   const WAVE_REST = 1, WAVE_DRAG = 1.15;
   // One easing for every station change: needle and page move together.
@@ -318,22 +378,26 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     const S = M.S;
     disc.setAttribute('cx', M.cx); disc.setAttribute('cy', M.cy); disc.setAttribute('r', 246.5 * S);
     ring.setAttribute('cx', M.cx); ring.setAttribute('cy', M.cy); ring.setAttribute('r', 264.5 * S); ring.setAttribute('stroke-width', 1.5 * S);
-    hit.setAttribute('cx', M.cx); hit.setAttribute('cy', M.cy); hit.setAttribute('r', 340 * S);
+    hit.setAttribute('cx', M.cx); hit.setAttribute('cy', M.cy); hit.setAttribute('r', (M.mode === 'bottom' ? 420 : 340) * S);
+    const turning = M.mode === 'bottom';     // phones turn the ring; elsewhere the needle turns
     for (const t of ticks) {
       const d = Math.abs(t.a - cur) / 2.7;              // distance in 0.2 MHz steps
       const b = bump(d) * amp;
       const len = Math.round((t.major ? 28 + b * 12 : 12 + b * 26) * 10) / 10;
-      const key = len + (t.major && t.st === lit ? 'a' : '');
+      const sa = turning ? t.a - cur : t.a;   // angle on screen
+      const key = len + (t.major && t.st === lit ? 'a' : '') + (turning ? '|' + sa.toFixed(2) : '');
       if (!force && t.key === key) continue;   // skip unchanged ticks to keep frames light
       t.key = key;
-      const [x1, y1] = pt(300, t.a), [x2, y2] = pt(300 + len, t.a);
+      const [x1, y1] = pt(M.tin, sa), [x2, y2] = pt(M.tin + len, sa);
       t.el.setAttribute('x1', x1); t.el.setAttribute('y1', y1); t.el.setAttribute('x2', x2); t.el.setAttribute('y2', y2);
       if (t.major) t.el.setAttribute('stroke-width', ((t.st && t.st === lit) || !t.st ? 3 : 2) * S);
       else { t.el.setAttribute('stroke-width', 1.5 * S); t.el.setAttribute('stroke-opacity', (0.38 + 0.5 * b).toFixed(3)); }
     }
-    const [nx1, ny1] = pt(190.5, cur), [nx2, ny2] = pt(226.5, cur);
+    const na = turning ? 0 : cur;
+    const [nx1, ny1] = pt(190.5, na), [nx2, ny2] = pt(226.5, na);
     needle.setAttribute('x1', nx1); needle.setAttribute('y1', ny1); needle.setAttribute('x2', nx2); needle.setAttribute('y2', ny2);
     needle.setAttribute('stroke-width', 3 * S);
+    if (turning) placeBottomPills();
   }
   function loop() {
     let moving = false;
@@ -359,22 +423,27 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   }
   const nearest = deg => STATIONS.reduce((a, b) => Math.abs(ang(b.f) - deg) < Math.abs(ang(a.f) - deg) ? b : a);
 
-  function angleFrom(e) {
+  const LIM = ang(102) + 8;
+  const clampA = d => Math.max(-LIM, Math.min(LIM, d));
+  function rawAngle(e) {
     const vx = e.clientX - M.cx, vy = e.clientY - M.cy;
-    const deg = Math.atan2(vx * M.px + vy * M.py, vx * M.hx + vy * M.hy) * 180 / Math.PI;
-    const lim = ang(102) + 8;
-    return Math.max(-lim, Math.min(lim, deg));
+    return Math.atan2(vx * M.px + vy * M.py, vx * M.hx + vy * M.hy) * 180 / Math.PI;
   }
+  const angleFrom = e => clampA(rawAngle(e));
+  let grabA = 0, grabCur = 0;               // phones: where the swipe started
   const layer = document.getElementById('dialLayer');
   hit.addEventListener('pointerdown', e => {
     if (!e.isPrimary) return;
     dragging = true; layer.classList.add('dragging'); ampTarget = WAVE_DRAG;
     hit.setPointerCapture(e.pointerId);
+    grabA = rawAngle(e); grabCur = cur;
     move(e); kick();
   });
   function move(e) {
     if (!dragging) return;
-    cur = angleFrom(e); target = cur; tween = null;
+    // Phones: swiping turns the ring, so the station under your finger moves toward the middle.
+    cur = M.mode === 'bottom' ? clampA(grabCur - (rawAngle(e) - grabA)) : angleFrom(e);
+    target = cur; tween = null;
     if (light(nearest(cur))) play('detent', e.isTrusted);
   }
   hit.addEventListener('pointermove', move);
@@ -390,6 +459,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     const i = STATIONS.indexOf(active);
     const fwd = M.mode === 'left' ? ['ArrowDown', 'ArrowRight'] : ['ArrowLeft', 'ArrowUp'];
     const back = M.mode === 'left' ? ['ArrowUp', 'ArrowLeft'] : ['ArrowRight', 'ArrowDown'];
+    if (menuOpen) return;
     const d = fwd.includes(e.key) ? 1 : back.includes(e.key) ? -1 : 0;
     if (!d) return;
     e.preventDefault();
@@ -451,7 +521,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   function buildFeed(force) {
     const w = masonry.clientWidth;
     if (!w) return;
-    const n = w >= 900 ? 3 : w >= 520 ? 2 : 1;
+    const n = w >= 900 ? 3 : w >= 340 ? 2 : 1;
     if (n === cols && !force) return;
     cols = n; masonry.innerHTML = '';
     const colEls = [], h = [];
@@ -528,8 +598,62 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   ruler.addEventListener('pointerup', stopScrub); ruler.addEventListener('pointercancel', stopScrub);
 
   // ---------- Layout ----------
+  // ---------- Phone menu: the full list of stations ----------
+  const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu'), menuList = document.getElementById('menuList');
+  let menuOpen = false;
+  const menuItems = STATIONS.map(s => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'menu-item';
+    const name = document.createElement('span'); name.textContent = s.name;
+    const freq = document.createElement('span'); freq.className = 'freq'; freq.textContent = s.f.toFixed(1);
+    b.append(name, freq);
+    b.addEventListener('click', e => { setMenu(false, false); tuneTo(s, e.isTrusted); });
+    li.appendChild(b); menuList.appendChild(li);
+    return { s, b };
+  });
+  function setMenu(open, sound) {
+    if (open === menuOpen) return;
+    menuOpen = open;
+    root.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu.getAnimations().forEach(a => a.cancel());
+    if (sound) play(open ? 'open' : 'close', true);
+    if (open) {
+      menuItems.forEach(({ s, b }) => b.classList.toggle('on', s === active));
+      menu.hidden = false;
+      if (!reduce) {
+        menu.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: EASE });
+        menuItems.forEach(({ b }, i) => b.animate(
+          [{ opacity: 0, transform: 'translate3d(0,14px,0)' }, { opacity: 1, transform: 'none' }],
+          { duration: 420, delay: 40 + i * 35, easing: EASE, fill: 'backwards' }));
+      }
+      (menuItems.find(m => m.s === active) || menuItems[0]).b.focus({ preventScroll: true });
+    } else {
+      if (reduce) { menu.hidden = true; return; }
+      menu.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: EASE }).onfinish = () => { if (!menuOpen) menu.hidden = true; };
+    }
+  }
+  menuBtn.addEventListener('click', e => setMenu(!menuOpen, e.isTrusted));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) { setMenu(false, e.isTrusted); menuBtn.focus(); } });
+
+  // ---------- Layout ----------
+  const socials = document.querySelector('.socials'), hero = document.querySelector('.hero'), homePanel = panels.home;
   function layout() {
-    measure(); placePills(); drawDial(true);
+    measure();
+    // Phones keep the social links in the flow under the bio; larger screens pin them low.
+    if (M.mode === 'bottom' && socials.parentNode !== hero) hero.appendChild(socials);
+    if (M.mode !== 'bottom' && socials.parentNode !== homePanel) homePanel.appendChild(socials);
+    if (M.mode !== 'bottom') setMenu(false, false);
+    placePills(); drawDial(true);
+    // Phones: start the intro around 23% down, but lift it on short screens so the
+    // social links always stay clear of the dial labels.
+    hero.style.top = '';
+    if (M.mode === 'bottom') {
+      const want = Math.min(Math.max(96, innerHeight * 0.227), 240);
+      const dialTop = M.cy - R_PILL * M.S - 24;
+      hero.style.top = Math.round(Math.max(72, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';
+    }
     if (active && active.id === 'feed') { buildFeed(); sizeRuler(); }
   }
   addEventListener('resize', layout);
@@ -546,13 +670,13 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   }
 
   // ---------- Start ----------
-  measure(); placePills();
+  layout();
   const start = STATIONS.find(s => s.id === location.hash.slice(1)) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
   clock();
   // Pill widths change once Geist loads, so re-check the spacing then.
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePills);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 })();
 </script>
 </body>
