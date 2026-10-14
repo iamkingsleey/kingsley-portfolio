@@ -149,7 +149,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .dock-label { font-size: 13px; color: var(--muted); letter-spacing: -0.26px; margin: 0 }
 /* The row is already as tall as the dock at full magnification, so hovering never changes the
    page's layout: the dock grows upward into reserved space and nothing else moves. */
-.dock-row { height: 96px; display: flex; align-items: flex-end }
+.dock-row { height: 104px; display: flex; align-items: flex-end }
 /* The shelf keeps its resting height; magnified icons rise out of its top edge, like the Mac dock. */
 .dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 0 16px 14px; height: 80px; overflow: visible; border-radius: 22px; background: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 12px 32px rgb(0 0 0 / .08); max-width: 100% }
@@ -659,14 +659,16 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       im.onload = () => { b.style.background = 'transparent'; b.querySelector('svg').remove(); b.prepend(im); };
       im.src = t.src;
     }
-    b.addEventListener('click', e => play('pop', e.isTrusted));
     dock.appendChild(b);
     return b;
   });
   // Magnify: tiles near the cursor grow, like a desktop dock. They grow in real size, so the
   // row widens and the 12px gap between tiles is kept even at full magnification.
   if (!reduce && matchMedia('(hover: hover)').matches) {
-    const BASE = 52, MAX = 68, REACH = 110;
+    const BASE = 52, MAX = 76, REACH = 124;
+    // Each icon has its own note from a pentatonic scale, so sweeping the dock plays a soft run.
+    const NOTES = [784, 880, 1047, 1175, 1319, 1568, 1760, 2093];
+    let lastTile = -1, lastSoundAt = 0;
     let centres = [];
     dock.addEventListener('pointerenter', () => {
       // Measure resting centres once so growing tiles don't chase the cursor.
@@ -674,12 +676,19 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       centres = toolEls.map(el => { const r = el.getBoundingClientRect(); return r.left + r.width / 2; });
     });
     dock.addEventListener('pointermove', e => {
+      // Soft pop when the cursor arrives on a new icon (not while it moves within one).
+      const over = toolEls.findIndex(el => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right; });
+      if (over !== -1 && over !== lastTile) {
+        const now = performance.now();
+        if (e.isTrusted && window.Popkit && now - lastSoundAt > 45) { Popkit.play('hover', { f: NOTES[over % NOTES.length] }); lastSoundAt = now; }
+      }
+      if (over !== -1) lastTile = over;
       toolEls.forEach((el, i) => {
         const k = Math.max(0, 1 - Math.abs(e.clientX - centres[i]) / REACH);
         el.style.setProperty('--size', (BASE + (MAX - BASE) * k * k * (3 - 2 * k)).toFixed(1) + 'px');
       });
     });
-    dock.addEventListener('pointerleave', () => toolEls.forEach(el => el.style.removeProperty('--size')));
+    dock.addEventListener('pointerleave', () => { lastTile = -1; toolEls.forEach(el => el.style.removeProperty('--size')); });
   }
 
   // ---------- Phone menu: the full list of stations ----------

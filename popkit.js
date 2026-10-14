@@ -73,6 +73,12 @@
     },
     // Detent: the faint click of a dial passing a notch while dragging.
     // The original light tick with a touch of low body underneath.
+    // Hover: a tiny, soft bubble. Pass { f } to pitch it, so a row of items can play a scale.
+    hover: function (o) {
+      var f = (o && o.f) || 1047;
+      tone({ f0: f * 0.78, f1: f * 1.12, glide: 0.03, dur: 0.075, gain: 0.1 });
+      tone({ f0: f * 2, dur: 0.03, gain: 0.018, type: 'triangle' });
+    },
     detent: function () {
       tick({ freq: 5000, dur: 0.014, gain: 0.09, q: 2 });
       tone({ f0: 1900, dur: 0.025, gain: 0.04, type: 'triangle' });
@@ -140,9 +146,9 @@
     }
   };
 
-  function play(name) {
+  function play(name, opt) {
     if (muted || !sounds[name] || !ensure()) return;
-    sounds[name]();
+    sounds[name](opt);
   }
 
   // Wire up [data-sound] elements. Only trusted pointer/keyboard
