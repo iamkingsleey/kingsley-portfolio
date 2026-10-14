@@ -62,6 +62,12 @@ button { font: inherit; background: none; border: 0; padding: 0; color: inherit;
 .avatar { width: 94px; height: 94px; border-radius: 50%; overflow: hidden; background: var(--photo); margin-bottom: 14px }
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block }
 h1 { font: 400 50px/1.05 var(--display); color: var(--ink); letter-spacing: -1px; margin: 0 }
+/* Typed name: one line that never wraps, with a horizontal cursor on the baseline (solid while typing, blinking at rest). */
+h1.typer { white-space: nowrap; display: flex; align-items: baseline; min-height: 1.05em }
+.caret { display: inline-block; width: .42em; height: .075em; min-height: 3px; background: var(--ink); margin-left: .06em; border-radius: 1px; transform: translateY(-.04em) }
+.caret.idle { animation: blink 1.05s steps(1) infinite }
+@keyframes blink { 50% { opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .caret.idle { animation: none } }
 .links { display: flex; gap: 9px; font-size: 16px; font-weight: 500; letter-spacing: -0.32px; margin-top: 8px }
 .links a:hover { color: var(--ink) }
 .bio { display: grid; gap: 14px; margin-top: 14px; font-size: 14px; font-weight: 500; letter-spacing: -0.28px; line-height: 1.3 }
@@ -156,7 +162,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom .time { top: calc(32px + env(safe-area-inset-top, 0px)); left: max(28px, env(safe-area-inset-left, 0px)); right: auto; bottom: auto; transform: none }
 .mode-bottom .hero { left: 29px; right: 29px; top: clamp(96px, 22.7vh, 240px); transform: none; width: auto; max-width: 370px }
 .mode-bottom .avatar { width: 95px; height: 95px; margin-bottom: 0 }
-.mode-bottom h1 { font-size: 50px; line-height: 1.4 }
+.mode-bottom h1 { font-size: clamp(32px, 10vw, 50px); line-height: 1.4 }   /* the longest role still fits on one line */
 .mode-bottom .links { margin-top: 0 }
 .mode-bottom .bio { font-size: 15px; line-height: 1.2; margin-top: 11px; max-width: 316px }
 .mode-bottom .socials { position: static; transform: none; width: auto; margin-top: 34px; gap: 10px }
@@ -270,6 +276,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (done) return; done = true;
     setTimeout(function () {
       loader.classList.add('done');
+      document.dispatchEvent(new Event('loader:done'));   // Home's typed name starts here
       setTimeout(function () { loader.remove(); }, 500);
     }, reduce ? 0 : 320);
   }
@@ -296,7 +303,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     <div class="time" id="time">--:--, Lagos 🇳🇬</div>
     <div class="hero">
       <div class="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
-      <h1>Kingsley M.</h1>
+      <h1 class="typer" aria-label="Kingsley M."><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
       <div class="links"><a href="#">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
       <div class="bio">
         <p>Senior product designer with experience designing from 0-1 at <br>e-commerce startups and enterprise.</p>
@@ -1077,6 +1084,63 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       if (p < 1) rip.raf = requestAnimationFrame(draw); else endRipple();
     })(t0);
   }
+
+  // ---------- Typed name on Home ----------
+  // After the loader, the name types out, then cycles through roles and settles back on the name.
+  // Between roles it only deletes back to what they share ("a "), like someone editing a line.
+  // Sound: real keystrokes cut from a keyboard recording (assets/typing-keys.wav), played soft and low.
+  // Browsers only allow sound after a visitor's first click, so the first run may be silent.
+  const TYPE_LINES = ["I'm Kingsley M.", 'a Product Designer', 'a Brand Designer', 'a Design Engineer', 'a 3D Designer'];
+  const TYPE_FINAL = "I'm Kingsley M.";
+  const KEYS = {"key": [[0.0, 0.075], [0.095, 0.075], [0.19, 0.075], [0.285, 0.075], [0.38, 0.075], [0.4749, 0.075], [0.5699, 0.075], [0.6649, 0.075], [0.7599, 0.075], [0.8549, 0.075], [0.9499, 0.075], [1.0449, 0.075], [1.1399, 0.075], [1.2349, 0.075], [1.3298, 0.075], [1.4248, 0.075]], "back": [[1.5198, 0.0825], [1.6223, 0.0825], [1.7248, 0.0825]], "space": [[1.8272, 0.075], [1.9222, 0.075]]};   // [start, length] in seconds inside the sprite
+  const typedEl = document.getElementById('typed'), caretEl = document.getElementById('caret');
+  let kctx = null, kbuf = null, kLast = -1;
+  function keysAudio() {
+    if (kctx) { if (kctx.state === 'suspended') kctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    kctx = new AC();
+    fetch('assets/typing-keys.wav').then(r => r.arrayBuffer()).then(a => kctx.decodeAudioData(a)).then(b => { kbuf = b; }).catch(() => {});
+  }
+  addEventListener('pointerdown', keysAudio, { once: true, capture: true });
+  addEventListener('keydown', keysAudio, { once: true, capture: true });
+  function keySound(kind) {
+    if (!kctx || !kbuf || kctx.state !== 'running') return;
+    const list = KEYS[kind];
+    let i = Math.floor(Math.random() * list.length);
+    if (list.length > 1 && i === kLast) i = (i + 1) % list.length;   // never the same key twice in a row
+    kLast = i;
+    const src = kctx.createBufferSource(); src.buffer = kbuf;
+    src.playbackRate.value = 0.93 + Math.random() * 0.06;             // a touch lower: rounder, calmer
+    const lp = kctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; lp.Q.value = 0.5;
+    const g = kctx.createGain(); g.gain.value = (kind === 'back' ? 0.16 : 0.22) * (0.88 + Math.random() * 0.24);
+    src.connect(lp).connect(g).connect(kctx.destination);
+    src.start(0, list[i][0], list[i][1]);
+  }
+  const pause = ms => new Promise(r => setTimeout(r, ms));
+  async function typeLine(from, to) {
+    caretEl.classList.remove('idle');
+    let keep = 0; while (keep < from.length && keep < to.length && from[keep] === to[keep]) keep++;
+    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); keySound('back'); await pause(34 + Math.random() * 18); }
+    if (from.length > keep) await pause(160);
+    for (let i = keep; i < to.length; i++) {
+      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1); keySound(ch === ' ' ? 'space' : 'key');
+      await pause((ch === ' ' ? 120 : 62) + Math.random() * 70);   // uneven, human rhythm with a beat on spaces
+    }
+    caretEl.classList.add('idle');
+  }
+  let typedOnce = false;
+  async function typeIntro() {
+    if (typedOnce) return; typedOnce = true;
+    // Only animate when Home is what the visitor is looking at; otherwise the name is simply there.
+    if (reduce || !active || active.id !== 'home') { typedEl.textContent = TYPE_FINAL; return; }
+    typedEl.textContent = '';                  // cleared while the loader is still fading, so it never visibly erases
+    await pause(380 + 350);
+    let shown = '';
+    for (const line of TYPE_LINES) { await typeLine(shown, line); shown = line; await pause(line === TYPE_LINES[0] ? 1700 : 1150); }
+    await typeLine(shown, TYPE_FINAL);
+  }
+  if (document.getElementById('loader')) document.addEventListener('loader:done', typeIntro, { once: true });
+  else setTimeout(typeIntro, 300);
 
   // ---------- Start ----------
   layout();
