@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <style>
-/* Layout: the tuning dial sits on the left edge as fixed nav; each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
+/* Layout: the tuning dial sits on the left edge of Home; inner pages swap it for a side menu (a rail with the current page as a tag); each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
 :root {
   --bg: #ffffff;
   --ink: #000000;
@@ -80,8 +80,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .list i { font-style: normal; color: var(--muted); font-size: 13px }
 
 /* Feed */
-.scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 63px; overflow-y: auto; overscroll-behavior: contain;
-  padding: 64px 27px 84px; scrollbar-width: none }
+.scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: 64px 27px 64px; scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
 .fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
 .fade.top { top: calc(64px + var(--band)); height: 64px }
@@ -186,6 +186,32 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
 
+/* ---------- Inner pages: the dial steps aside for a side menu ----------
+   A rail runs down the left edge; the current page is a black tag that grows out of it. */
+.dial-fade { transition: opacity .3s cubic-bezier(.65,0,.35,1), visibility 0s 0s }
+.inner .dial-fade { opacity: 0; visibility: hidden; transition: opacity .25s cubic-bezier(.65,0,.35,1), visibility 0s .25s }
+.inner #hit { pointer-events: none }
+.side-nav { position: fixed; left: 0; top: 0; bottom: 0; width: 136px; z-index: 100; pointer-events: none; opacity: 0; visibility: hidden;
+  transition: opacity .25s cubic-bezier(.65,0,.35,1), visibility 0s .25s }
+.inner .side-nav { opacity: 1; visibility: visible; transition: opacity .35s cubic-bezier(.65,0,.35,1) .1s, visibility 0s }
+.side-nav .rail { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--ink) }
+.side-nav .tag { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible }
+.side-nav .tag path { fill: var(--ink) }
+.nav-list { position: absolute; left: 40px; top: calc(80px + env(safe-area-inset-top, 0px)); list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; pointer-events: auto }
+.nav-item { position: relative; display: block; height: 24px; padding: 0 10px; border-radius: 7px; font-size: 14px; line-height: 24px; letter-spacing: -0.28px;
+  color: #c2c2c2; white-space: nowrap; transition: color .2s }
+.nav-item:hover { color: var(--text) }
+.nav-item.on { color: #fff }
+.nav-item:focus-visible { outline-offset: 1px }
+/* Without the dial, the grid and pages move in toward the menu. */
+.inner .scroller, .inner .fade { left: 136px }
+.inner.mode-top .scroller { left: 140px; right: 16px; top: 64px; bottom: 0; padding: 64px 0 84px }
+.inner.mode-top .fade { left: 140px; right: 16px } .inner.mode-top .fade.top { top: 64px } .inner.mode-top .fade.bottom { bottom: 0 }
+.inner.mode-top .sheet { left: 160px; right: 24px; top: 47%; transform: translateY(-50%); width: auto; max-width: 520px }
+/* Phones: no side menu; the menu button lists every page and the grid runs to the bottom. */
+.mode-bottom .side-nav { display: none }
+.inner.mode-bottom .scroller { left: 0; bottom: 0 } .inner.mode-bottom .fade { left: 0 }
+
 /* ---------- Loader: station counter that locks on 100 ---------- */
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
 .loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
@@ -277,7 +303,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
   <section class="panel" data-station="designs" hidden aria-label="Designs">
     <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
-    <div class="fade top" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="fade bottom" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="fade top" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <svg id="ruler" aria-hidden="true"></svg>
   </section>
 
@@ -323,19 +349,24 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 </div>
 
 <div class="dial-layer" id="dialLayer">
-  <svg id="dialSvg" aria-hidden="true">
+  <svg id="dialSvg" class="dial-fade" aria-hidden="true">
     <circle id="ring" fill="none" stroke="var(--ring)"></circle>
     <circle id="disc" fill="var(--disc)"></circle>
     <g id="ticks"></g>
     <line id="needle" class="needle"></line>
     <circle id="hit"></circle>
   </svg>
-  <div id="pills"></div>
+  <div id="pills" class="dial-fade"></div>
   <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
   <div class="menu" id="menu" hidden role="dialog" aria-label="Menu"><ul class="menu-list" id="menuList"></ul></div>
   <div id="tuner" tabindex="0" role="slider" aria-label="Navigation dial" aria-valuemin="94" aria-valuemax="102"
     aria-valuenow="98" aria-valuetext="Home" style="position:absolute;left:0;top:50%;width:1px;height:1px;pointer-events:auto"></div>
 </div>
+<nav class="side-nav" id="sideNav" aria-label="Pages">
+  <span class="rail" aria-hidden="true"></span>
+  <svg class="tag" aria-hidden="true"><path id="navTag"></path></svg>
+  <ul class="nav-list" id="navList"></ul>
+</nav>
 
 <script src="popkit.js"></script>
 <script>
@@ -588,7 +619,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   const panels = {};
   document.querySelectorAll('.panel').forEach(p => panels[p.dataset.station] = p);
   // Pages only ever use layers 1 (leaving) and 2 (arriving); the dial sits at 100.
-  function swap(from, to, dir) {
+  function swap(from, to, dir, o) {
     Object.values(panels).forEach(p => p.getAnimations().forEach(a => a.cancel()));
     Object.values(panels).forEach(p => { if (p !== from && p !== to) p.hidden = true; });
     if (from) from.style.zIndex = 1;
@@ -598,10 +629,10 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (!from || reduce) { if (from) from.hidden = true; return; }
     // The new page opens as a circle growing out of the dial's ring while both pages
     // turn slightly around the dial's centre. No blur, short timing, one easing.
-    const ox = M.cx, oy = M.cy, origin = `${ox}px ${oy}px`;
+    const ox = o.x, oy = o.y, origin = `${ox}px ${oy}px`;
     from.style.transformOrigin = origin; to.style.transformOrigin = origin;
     const far = Math.ceil(Math.hypot(Math.max(Math.abs(innerWidth - ox), Math.abs(ox)), Math.max(oy, innerHeight - oy))) + 8;
-    const start = Math.round(264.5 * M.S);
+    const start = Math.round(o.r);
     // The leaving page only fades (cheap for big pages like Feed); the arriving one carries the motion.
     // Layer hints only while moving; cleared after so the browser repaints the page normally.
     from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
@@ -614,7 +645,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       fade.cancel(); from.style.willChange = '';
     };
     const reveal = to.animate([
-      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * 3}deg)` },
+      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg)` },
       { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg)' }
     ], { duration: DUR, easing: EASE });
     const settle = () => {
@@ -630,7 +661,12 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     play('pop', sound);
     if (prev === s) return;
     active = s;
-    swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1);
+    setInner(s); moveTag(s, !!prev);
+    // Pages to and from Home open out of the dial; between inner pages they open out of the menu tag.
+    let o = { x: M.cx, y: M.cy, r: 264.5 * M.S, rot: 3 };
+    const g = prev && prev.id !== 'home' && s.id !== 'home' && tagFor(s);
+    if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
+    swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
@@ -839,6 +875,52 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   menuBtn.addEventListener('click', e => setMenu(!menuOpen, e.isTrusted));
   addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) { setMenu(false, e.isTrusted); menuBtn.focus(); } });
 
+  // ---------- Side menu on inner pages ----------
+  const navEl = document.getElementById('sideNav'), navList = document.getElementById('navList'), tagPath = document.getElementById('navTag');
+  const NAV_ORDER = ['home', 'designs', 'engineering', 'projects', 'skills'];
+  const navBtns = {};
+  NAV_ORDER.forEach(id => {
+    const s = STATIONS.find(x => x.id === id), li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'nav-item'; b.textContent = s.name;
+    b.addEventListener('click', e => tuneTo(s, e.isTrusted));
+    li.appendChild(b); navList.appendChild(li); navBtns[id] = b;
+  });
+  function setInner(s) {
+    const inner = s.id !== 'home';
+    root.classList.toggle('inner', inner);
+    document.getElementById('tuner').tabIndex = inner ? -1 : 0;
+  }
+  // Where the tag sits for a page: the menu item's box, in page coordinates (the menu is pinned at 0,0).
+  function tagFor(s) {
+    const b = navBtns[s.id];
+    if (!b || !b.offsetWidth) return null;
+    return { x: b.offsetLeft + navList.offsetLeft, y: b.offsetTop + navList.offsetTop + b.offsetHeight / 2, w: b.offsetWidth, h: b.offsetHeight };
+  }
+  // The tag is one shape: a thin line from the rail that flares into a rounded pill.
+  function drawTag(g) {
+    const t = 1, f = 14, X = g.x, W = g.w, H = g.h / 2, y = g.y, r = Math.min(7, H);
+    tagPath.setAttribute('d',
+      `M0 ${y - t}L${X - f} ${y - t}C${X - f * .35} ${y - t} ${X - 2} ${y - H} ${X + 5} ${y - H}` +
+      `L${X + W - r} ${y - H}Q${X + W} ${y - H} ${X + W} ${y - H + r}L${X + W} ${y + H - r}Q${X + W} ${y + H} ${X + W - r} ${y + H}` +
+      `L${X + 5} ${y + H}C${X - 2} ${y + H} ${X - f * .35} ${y + t} ${X - f} ${y + t}L0 ${y + t}Z`);
+  }
+  let tag = null, tagRaf = 0;
+  function markNav(s) { Object.entries(navBtns).forEach(([id, b]) => { b.classList.toggle('on', id === s.id); if (id === s.id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+  function moveTag(s, animate) {
+    const g = tagFor(s);
+    if (!g) { markNav(s); return; }
+    cancelAnimationFrame(tagRaf);
+    if (!tag || !animate || reduce) { tag = g; drawTag(g); markNav(s); return; }
+    const from = tag, t0 = performance.now(); let marked = false;
+    (function step(now) {
+      const p = Math.min(1, (now - t0) / 460), e = easeInOut(p);
+      tag = { x: from.x + (g.x - from.x) * e, y: from.y + (g.y - from.y) * e, w: from.w + (g.w - from.w) * e, h: g.h };
+      drawTag(tag);
+      if (!marked && p > .5) { marked = true; markNav(s); }   // label turns white as the tag arrives
+      if (p < 1) tagRaf = requestAnimationFrame(step);
+    })(t0);
+  }
+
   // ---------- Layout ----------
   const socials = document.querySelector('.socials'), hero = document.querySelector('.hero'), homePanel = panels.home;
   function layout() {
@@ -856,6 +938,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       const dialTop = M.cy - R_PILL * M.S - 24;
       hero.style.top = Math.round(Math.max(72, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';
     }
+    if (active) moveTag(active, false);
     if (active && active.id === 'designs') { buildFeed(); sizeRuler(); }
   }
   addEventListener('resize', layout);

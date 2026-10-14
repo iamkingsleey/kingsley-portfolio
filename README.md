@@ -18,7 +18,8 @@ python3 -m http.server 8000
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | Current design (iteration 2): left-edge dial, dial-born page reveal, Feed with a scroll ruler |
+| `index.html` | Current design (iteration 3): dial on Home only; inner pages use a side menu (a rail on the left edge with the current page as a black tag) |
+| `iteration-2/` | Second iteration: the dial on every page |
 | `iteration-1/` | First iteration: top dial, Feed masonry, image trail on Home |
 | `popkit.js` | UI sounds made in code with Web Audio (pop on tap, detent while dragging). No audio files |
 | `assets/` | Headshot and other images |
