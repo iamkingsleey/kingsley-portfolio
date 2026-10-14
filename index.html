@@ -52,7 +52,7 @@ button { font: inherit; background: none; border: 0; padding: 0; color: inherit;
 .pill.on { background: var(--ink); color: #fff }
 
 /* ---------- Station layers ---------- */
-.panel { position: fixed; inset: 0; background: var(--bg); will-change: transform, opacity; backface-visibility: hidden }
+.panel { position: fixed; inset: 0; background: var(--bg) }
 .panel[hidden] { display: none }
 
 /* Home */
@@ -81,7 +81,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
 /* Feed */
 .scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 63px; overflow-y: auto; overscroll-behavior: contain;
-  padding: 12px 27px; scrollbar-width: none; contain: layout paint }
+  padding: 12px 27px; scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
 .fade { position: absolute; left: var(--content-left); right: 145px; height: 14px; pointer-events: none; z-index: 1 }
 .fade.top { top: calc(64px + var(--band)); background: linear-gradient(var(--bg), rgb(255 255 255 / 0)) }
@@ -486,14 +486,26 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     const far = Math.ceil(Math.hypot(Math.max(Math.abs(innerWidth - ox), Math.abs(ox)), Math.max(oy, innerHeight - oy))) + 8;
     const start = Math.round(264.5 * M.S);
     // The leaving page only fades (cheap for big pages like Feed); the arriving one carries the motion.
-    from.animate([
+    // Layer hints only while moving; cleared after so the browser repaints the page normally.
+    from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
+    const fade = from.animate([
       { opacity: 1 },
       { opacity: 0 }
-    ], { duration: DUR * .8, easing: EASE, fill: 'forwards' }).onfinish = () => { if (active && panels[active.id] !== from) from.hidden = true; };
-    to.animate([
+    ], { duration: DUR * .8, easing: EASE, fill: 'forwards' });
+    fade.onfinish = () => {
+      if (active && panels[active.id] !== from) from.hidden = true;
+      fade.cancel(); from.style.willChange = '';
+    };
+    const reveal = to.animate([
       { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * 3}deg)` },
       { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg)' }
     ], { duration: DUR, easing: EASE });
+    const settle = () => {
+      to.style.willChange = ''; to.style.clipPath = ''; to.style.transform = ''; to.style.opacity = '';
+      // Nudge a fresh paint of the arrived page (works around a Safari blank-layer bug).
+      to.style.visibility = 'hidden'; void to.offsetHeight; to.style.visibility = '';
+    };
+    reveal.onfinish = settle; reveal.oncancel = () => { to.style.willChange = ''; };
   }
   function tuneTo(s, sound) {
     const prev = active;
