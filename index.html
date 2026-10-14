@@ -113,7 +113,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tile .count b { font-weight: 500 }
 .tile .count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: none }
 @media (max-width: 599px) { .tile .cap { left: 8px; right: 8px; bottom: 8px; gap: 6px; font-size: 12px } .tile .count { font-size: 11px; padding: 3px 7px } .tile .count .lbl { display: none } .tile .count svg { display: block } .tile .cap > span:first-child { padding: 3px 8px } }
-.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.12 }   /* headroom for the inner parallax */
+.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.12 }
+.tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.12; pointer-events: none }   /* headroom for the inner parallax */
 @media (prefers-reduced-motion: reduce) { .tile img { scale: 1 } }
 .tile .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--ink);
   font-size: 13px; font-weight: 500; letter-spacing: -0.26px; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
@@ -949,9 +950,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   // following both the cursor and the scroll. Navigation (dial, side menu, ruler) never moves.
   // Uses the CSS `translate` property so it stacks on top of any existing transforms.
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  let pxX = 0, pxY = 0, pxTX = 0, pxTY = 0, pxRaf = 0, shocks = [];
-  // Click shockwave on Designs: speed in px/ms, push in px, ring period and fade in ms.
-  const SHOCK = { speed: 1.5, amp: 16, w: 2 * Math.PI / 380, decay: 300 };
+  let pxX = 0, pxY = 0, pxTX = 0, pxTY = 0, pxRaf = 0;
   const COL_DEPTH = [9, 16, 11, 18];
   const layerCache = {};
   function layersFor(id) {
@@ -975,28 +974,12 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (active.id === 'designs') {
       const vh = innerHeight;
       [...masonry.children].forEach((c, i) => { const d = COL_DEPTH[i % COL_DEPTH.length]; tr(c, -pxX * d, -pxY * d); });
-      const now = performance.now();
-      shocks = shocks.filter(k => now - k.t0 < k.life);
       masonry.querySelectorAll('.tile').forEach(fig => {
-        // Shockwave: each tile is pushed away from the click as the wavefront reaches it, then springs back.
-        let sx = 0, sy = 0;
-        for (const k of shocks) {
-          const e = k.map.get(fig); if (!e) continue;
-          const tau = now - k.t0 - e.d / SHOCK.speed;
-          if (tau <= 0) continue;
-          const a = SHOCK.amp * e.fall * Math.exp(-tau / SHOCK.decay) * Math.sin(tau * SHOCK.w);
-          sx += e.ux * a; sy += e.uy * a;
-        }
-        tr(fig, sx, sy);
         const im = fig.querySelector('img'); if (!im) return;
         const r = fig.getBoundingClientRect();
         if (r.bottom < -40 || r.top > vh + 40) return;          // off screen: leave it
         const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
-        // The picture lags behind its frame (moves against the push), kept inside the zoom headroom.
-        const mx = 0.055 * r.width, my = 0.055 * r.height;
-        const ix = Math.max(-mx, Math.min(mx, -pxX * 0.018 * r.width - sx * 0.45));
-        const iy = Math.max(-my, Math.min(my, (-rel * 0.035 - pxY * 0.018) * r.height - sy * 0.45));
-        tr(im, ix, iy);
+        tr(im, -pxX * 0.018 * r.width, (-rel * 0.035 - pxY * 0.018) * r.height);
       });
     } else layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d));
   }
@@ -1005,7 +988,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     const settled = Math.abs(pxTX - pxX) < 0.0015 && Math.abs(pxTY - pxY) < 0.0015;
     if (settled) { pxX = pxTX; pxY = pxTY; }
     applyPx();
-    pxRaf = settled && !shocks.length ? 0 : requestAnimationFrame(pxFrame);
+    pxRaf = settled ? 0 : requestAnimationFrame(pxFrame);
   }
   function kickPx() { if (!reduce && !pxRaf) pxRaf = requestAnimationFrame(pxFrame); }
   if (!reduce) {
@@ -1018,22 +1001,81 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     }
     scroller.addEventListener('scroll', kickPx, { passive: true });
     addEventListener('resize', kickPx);
-    // A click anywhere on the grid sends a wave outward from that point.
+    // Clicking a picture sends a ripple through that picture, outward from the click point.
     scroller.addEventListener('click', e => {        // click, not press: a scroll on touch never fires it
       if (e.button > 0) return;
-      const map = new Map(); let far = 0;
-      masonry.querySelectorAll('.tile').forEach(fig => {
-        const r = fig.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > innerHeight) return;
-        const dx = r.left + r.width / 2 - e.clientX, dy = r.top + r.height / 2 - e.clientY, d = Math.hypot(dx, dy);
-        far = Math.max(far, d);
-        map.set(fig, { d, ux: d > 1 ? dx / d : 0, uy: d > 1 ? dy / d : -1, fall: 1 / (1 + d / 700) });
-      });
-      shocks.push({ t0: performance.now(), map, life: far / SHOCK.speed + SHOCK.decay * 6 });
-      if (shocks.length > 4) shocks.shift();
+      const fig = e.target.closest('.tile');
+      if (!fig) return;
       play('pop', e.isTrusted);
-      kickPx();
+      ripple(fig, e.clientX, e.clientY);
     });
+  }
+
+  // ---------- Image ripple ----------
+  // A WebGL canvas is laid over the clicked picture (same size, zoom and parallax offset) and redraws
+  // it with a ring of displacement travelling out from the click, plus a faint highlight on the ring.
+  // Only one picture ripples at a time; the canvas is removed when the ring has faded.
+  const RIPPLE = { ms: 1150, speed: 0.75, amp: 16, width: 34 };   // duration, px per ms, push px, ring width px
+  const VERT = 'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  const FRAG = `precision mediump float;varying vec2 uv;uniform sampler2D tex;uniform vec2 size,c,cover;uniform float r,amp,wid,fade;
+    void main(){
+      vec2 px=uv*size, v=px-c; float d=length(v);
+      float band=exp(-pow((d-r)/wid,2.));
+      float band2=exp(-pow((d-r+wid*2.2)/(wid*.8),2.))*.45;      // a softer trailing ring
+      float off=amp*(band-band2)*fade;
+      vec2 q=(px-(d>0.?v/d:vec2(0.))*off)/size;
+      vec2 t=vec2(.5)+(q-vec2(.5))*cover;                          // object-fit: cover
+      vec4 col=texture2D(tex,clamp(t,0.,1.));
+      col.rgb+=.07*band*fade;
+      gl_FragColor=col;
+    }`;
+  let rip = null;
+  function endRipple() { if (!rip) return; cancelAnimationFrame(rip.raf); rip.cv.remove(); rip = null; }
+  function ripple(fig, x, y) {
+    const im = fig.querySelector('img');
+    if (!im || reduce) return;
+    const bounce = () => im.animate([{ scale: 1.12 }, { scale: 1.085 }, { scale: 1.135 }, { scale: 1.12 }], { duration: 520, easing: 'ease-out' });
+    if (!im.complete || !im.naturalWidth) return bounce();
+    endRipple();
+    const cv = document.createElement('canvas'); cv.className = 'ripple';
+    const gl = cv.getContext('webgl', { premultipliedAlpha: false });
+    if (!gl) return bounce();
+    const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+    const pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return bounce();
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+    ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); }
+    catch (_) { return bounce(); }                                 // e.g. opened straight from disk
+    // Size the canvas to the picture's box (before zoom) and place the click in that box's pixels.
+    const W = fig.clientWidth, H = fig.clientHeight, dpr = Math.min(2, devicePixelRatio || 1);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    gl.viewport(0, 0, cv.width, cv.height);
+    const ir = im.getBoundingClientRect();                       // zoomed, shifted picture on screen
+    const cx = (x - ir.left) / ir.width * W, cy = (y - ir.top) / ir.height * H;
+    const ia = im.naturalWidth / im.naturalHeight, ba = W / H;
+    const U = n => gl.getUniformLocation(pr, n);
+    gl.uniform2f(U('size'), W, H); gl.uniform2f(U('c'), cx, cy);
+    gl.uniform2f(U('cover'), ia > ba ? ba / ia : 1, ia > ba ? 1 : ia / ba);
+    gl.uniform1f(U('amp'), RIPPLE.amp); gl.uniform1f(U('wid'), RIPPLE.width);
+    const uR = U('r'), uF = U('fade');
+    fig.insertBefore(cv, im.nextSibling);
+    rip = { cv, raf: 0 };
+    const t0 = performance.now();
+    (function draw(now) {
+      if (!rip || rip.cv !== cv) return;
+      const t = now - t0, p = Math.min(1, t / RIPPLE.ms);
+      cv.style.translate = im.style.translate;                  // ride along with the parallax
+      gl.uniform1f(uR, t * RIPPLE.speed); gl.uniform1f(uF, Math.pow(1 - p, 1.6));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (p < 1) rip.raf = requestAnimationFrame(draw); else endRipple();
+    })(t0);
   }
 
   // ---------- Start ----------
