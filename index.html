@@ -150,7 +150,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 /* The row is already as tall as the dock at full magnification, so hovering never changes the
    page's layout: the dock grows upward into reserved space and nothing else moves. */
 .dock-row { height: 96px; display: flex; align-items: flex-end }
-.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 14px 16px; border-radius: 22px; background: #fff;
+/* The shelf keeps its resting height; magnified icons rise out of its top edge, like the Mac dock. */
+.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 0 16px 14px; height: 80px; overflow: visible; border-radius: 22px; background: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 12px 32px rgb(0 0 0 / .08); max-width: 100% }
 .tool { position: relative; border-radius: 14px; display: grid; place-items: center; flex: none;
   --size: 52px; width: var(--size); height: var(--size); transition: width .16s cubic-bezier(.2,.8,.2,1), height .16s cubic-bezier(.2,.8,.2,1);
@@ -161,7 +162,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tool .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; pointer-events: none;
   font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; opacity: 0; transition: opacity .15s, transform .15s }
 .tool:hover .tip, .tool:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
-@media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 8px; padding: 10px 12px; border-radius: 18px } .tool { --size: 44px; border-radius: 12px } }
+@media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 8px; padding: 0 12px 10px; height: 64px; border-radius: 18px } .tool { --size: 44px; border-radius: 12px } }
 @media (prefers-reduced-motion: reduce) { .tool { transition: none } }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
