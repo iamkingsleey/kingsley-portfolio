@@ -223,6 +223,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .nav-dash.ready { transition: transform .45s cubic-bezier(.65,0,.35,1) }
 /* Without the dial, the grid and pages move in toward the menu. */
 .inner .scroller, .inner .fade { left: 150px }
+/* Laptops and desktops: the grid takes more of the width (less empty space by the menu and the ruler). */
+.inner:not(.mode-top):not(.mode-bottom) .scroller { right: 84px; padding-left: 12px; padding-right: 16px }
 .inner.mode-top .scroller { left: 168px; right: 16px; top: 0; bottom: 0; padding: var(--flush) 0 var(--flush) }
 .inner.mode-top .fade { left: 168px; right: 16px } .inner.mode-top .fade.top { top: 64px } .inner.mode-top .fade.bottom { bottom: 0 }
 .inner.mode-top .sheet { left: 184px; right: 24px; top: 47%; transform: translateY(-50%); width: auto; max-width: 520px }
