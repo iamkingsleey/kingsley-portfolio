@@ -143,6 +143,23 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom .fade.top { top: calc(72px + env(safe-area-inset-top, 0px)) }
 .mode-bottom .fade.bottom { bottom: calc(100% - var(--dial-top)) }
 .mode-bottom #ruler { display: none }
+
+/* Tools dock on Skills: a light shelf of app tiles that swell under the cursor */
+.dock-wrap { margin-top: 56px }
+.dock-label { font-size: 13px; color: var(--muted); letter-spacing: -0.26px; margin: 0 0 14px }
+.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 14px 16px; border-radius: 22px; background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 12px 32px rgb(0 0 0 / .08); max-width: 100% }
+.tool { position: relative; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; flex: none;
+  transform-origin: 50% 100%; transition: transform .18s cubic-bezier(.2,.8,.2,1); will-change: transform;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04), 0 2px 6px rgb(0 0 0 / .08) }
+.tool svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round }
+.tool svg .solid { fill: #fff; stroke: none }
+.tool img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover }
+.tool .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; pointer-events: none;
+  font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; opacity: 0; transition: opacity .15s, transform .15s }
+.tool:hover .tip, .tool:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
+@media (max-width: 599px) { .dock-wrap { margin-top: 40px } .dock { gap: 8px; padding: 10px 12px; border-radius: 18px } .tool { width: 44px; height: 44px; border-radius: 12px } .tool svg { width: 20px; height: 20px } }
+@media (prefers-reduced-motion: reduce) { .tool { transition: none } }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
 </style>
@@ -164,7 +181,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     <nav class="socials" aria-label="Social"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="#">Medium</a></nav>
   </section>
 
-  <section class="panel" data-station="feed" hidden aria-label="Feed">
+  <section class="panel" data-station="designs" hidden aria-label="Designs">
     <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
     <div class="fade top"></div><div class="fade bottom"></div>
     <svg id="ruler" aria-hidden="true"></svg>
@@ -193,14 +210,19 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     </div>
   </section>
 
-  <section class="panel" data-station="contact" hidden>
+  <section class="panel" data-station="skills" hidden>
     <div class="sheet">
-      <h2>Contact</h2>
+      <h2>Skills</h2>
       <ul class="list">
-        <li><b>Email</b><i>Best for work</i><a class="sub" href="#">Add your address</a></li>
-        <li><b>Resume</b><i>PDF</i><a class="sub" href="#">Download</a></li>
-        <li><b>Based in</b><i>WAT, UTC+1</i><span>Lagos, Nigeria</span></li>
+        <li><b>Brand Design</b></li>
+        <li><b>Product Design</b></li>
+        <li><b>Digital Illustration</b></li>
+        <li><b>3D Design</b></li>
       </ul>
+      <div class="dock-wrap">
+        <p class="dock-label">Tools I use</p>
+        <div class="dock" id="dock" role="list" aria-label="Tools"></div>
+      </div>
     </div>
   </section>
 </div>
@@ -229,10 +251,10 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   const play = (n, trusted) => { if (trusted && window.Popkit) Popkit.play(n); };
 
   const STATIONS = [
-    { f: 94,  id: 'contact',     name: 'Contact' },
+    { f: 94,  id: 'skills',      name: 'Skills' },
     { f: 96,  id: 'engineering', name: 'Engineering' },
     { f: 98,  id: 'home',        name: 'Home' },
-    { f: 100, id: 'feed',        name: 'Feed' },
+    { f: 100, id: 'designs',     name: 'Designs' },
     { f: 102, id: 'projects',    name: 'Projects' }
   ];
   const STEP = 13.5;                       // degrees per MHz
@@ -477,7 +499,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (from) from.style.zIndex = 1;
     to.hidden = false; to.style.zIndex = 2;
     // Do any layout work before the motion starts so no frame of the transition stalls.
-    if (to === panels.feed) { buildFeed(); sizeRuler(); }
+    if (to === panels.designs) { buildFeed(); sizeRuler(); }
     if (!from || reduce) { if (from) from.hidden = true; return; }
     // The new page opens as a circle growing out of the dial's ring while both pages
     // turn slightly around the dial's centre. No blur, short timing, one easing.
@@ -610,6 +632,43 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   ruler.addEventListener('pointerup', stopScrub); ruler.addEventListener('pointercancel', stopScrub);
 
   // ---------- Layout ----------
+  // ---------- Tools dock ----------
+  // To use official icons, add the files below to assets/tools/; until then each tile shows a simple placeholder.
+  const TOOLS = [
+    { name: 'Adobe Illustrator', bg: '#F2A541', src: 'assets/tools/illustrator.png', icon: '<path d="M4 20l4-1 10-10-3-3L5 16z"/><path d="M14 7l3 3"/>' },
+    { name: 'Adobe Photoshop',   bg: '#4C8DF6', src: 'assets/tools/photoshop.png',   icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/>' },
+    { name: 'Claude',            bg: '#E7735A', src: 'assets/tools/claude.png',      icon: '<path class="solid" d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>' },
+    { name: 'Blender',           bg: '#58C26A', src: 'assets/tools/blender.png',     icon: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/>' },
+    { name: 'Figma',             bg: '#9B6BF2', src: 'assets/tools/figma.png',       icon: '<path d="M8 3v18M16 3v18M3 8h18M3 16h18"/>' },
+    { name: 'ChatGPT',           bg: '#2F2F2F', src: 'assets/tools/chatgpt.png',     icon: '<path d="M4 5h16v11H9l-5 4z"/>' }
+  ];
+  const dock = document.getElementById('dock');
+  const toolEls = TOOLS.map(t => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tool'; b.setAttribute('role', 'listitem'); b.setAttribute('aria-label', t.name);
+    b.style.background = t.bg;
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${t.icon}</svg><span class="tip">${t.name}</span>`;
+    if (t.src) {                       // official icon, if the file exists
+      const im = new Image(); im.alt = '';
+      im.onload = () => { b.style.background = 'transparent'; b.querySelector('svg').remove(); b.prepend(im); };
+      im.src = t.src;
+    }
+    b.addEventListener('click', e => play('pop', e.isTrusted));
+    dock.appendChild(b);
+    return b;
+  });
+  // Magnify: tiles near the cursor grow and lift, like a desktop dock.
+  if (!reduce && matchMedia('(hover: hover)').matches) {
+    dock.addEventListener('pointermove', e => {
+      toolEls.forEach(el => {
+        const r = el.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2));
+        const k = Math.max(0, 1 - d / 120);
+        el.style.transform = `translateY(${(-8 * k).toFixed(1)}px) scale(${(1 + 0.32 * k).toFixed(3)})`;
+      });
+    });
+    dock.addEventListener('pointerleave', () => toolEls.forEach(el => { el.style.transform = ''; }));
+  }
+
   // ---------- Phone menu: the full list of stations ----------
   const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu'), menuList = document.getElementById('menuList');
   let menuOpen = false;
@@ -666,7 +725,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
       const dialTop = M.cy - R_PILL * M.S - 24;
       hero.style.top = Math.round(Math.max(72, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';
     }
-    if (active && active.id === 'feed') { buildFeed(); sizeRuler(); }
+    if (active && active.id === 'designs') { buildFeed(); sizeRuler(); }
   }
   addEventListener('resize', layout);
 
@@ -683,7 +742,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
   // ---------- Start ----------
   layout();
-  const start = STATIONS.find(s => s.id === location.hash.slice(1)) || STATIONS[2];
+  const OLD_IDS = { feed: 'designs', contact: 'skills' };   // old links still land somewhere sensible
+  const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
+  const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
   clock();
