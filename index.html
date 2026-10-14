@@ -166,9 +166,80 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 @media (prefers-reduced-motion: reduce) { .tool { transition: none } }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
+
+/* ---------- Loader: station counter that locks on 100 ---------- */
+.loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
+.loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
+.ld-inner { width: min(560px, 100%); display: grid; justify-items: center; gap: 22px; padding-bottom: 4vh }
+.ld-num { font: 600 76px/1 var(--body); letter-spacing: -2.4px; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 3ch; text-align: center }
+.ld-strip { width: 100%; height: 72px; display: block; overflow: visible }
+.ld-strip line { stroke: var(--ink); stroke-linecap: round }
+.ld-strip text { font: 500 11px var(--body); fill: var(--muted); letter-spacing: .2px }
+@media (max-width: 599px) { .ld-num { font-size: 60px; letter-spacing: -1.8px } }
 </style>
 </head>
 <body>
+<div class="loader" id="loader" role="status" aria-live="polite" aria-label="Loading">
+  <div class="ld-inner"><div class="ld-num" id="ldNum">0</div><svg class="ld-strip" id="ldStrip" aria-hidden="true"></svg></div>
+</div>
+<script>
+// Loader: the number follows real loading progress (page parsed, fonts ready, everything loaded)
+// and the tick strip slides under a fixed needle. It locks on 100, holds a beat, then fades out.
+(function () {
+  var loader = document.getElementById('loader'), num = document.getElementById('ldNum'), svg = document.getElementById('ldStrip');
+  var NS = 'http://www.w3.org/2000/svg', reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PROFILE = [104, 89, 86, 82, 77, 70, 63, 56, 49, 42, 36, 31, 26, 23, 20, 17, 16, 15, 14, 13, 13, 12];
+  function prof(d) { d = Math.abs(d); if (d >= PROFILE.length - 1) return 12; var i = Math.floor(d), t = d - i; return PROFILE[i] + (PROFILE[i + 1] - PROFILE[i]) * t; }
+  var ticks = [], labels = [], GAP = 9;
+  for (var i = 0; i <= 100; i++) {
+    var l = document.createElementNS(NS, 'line'); svg.appendChild(l); ticks.push(l);
+    if (i % 10 === 0) { var tx = document.createElementNS(NS, 'text'); tx.setAttribute('text-anchor', 'middle'); tx.textContent = i; svg.appendChild(tx); labels.push([i, tx]); }
+  }
+  var needle = document.createElementNS(NS, 'line'); svg.appendChild(needle);
+  function draw(v) {
+    var W = svg.clientWidth || 320, cx = W / 2, base = 46;
+    for (var i = 0; i <= 100; i++) {
+      var x = cx + (i - v) * GAP, d = Math.abs(i - v), b = (prof(d * .8) - 12) / 92, major = i % 10 === 0;
+      var L = (major ? 14 : 7) + b * 18, fade = Math.max(0, Math.min(1, Math.min(x - 4, W - 4 - x) / 48));
+      var t = ticks[i];
+      t.setAttribute('x1', x); t.setAttribute('x2', x); t.setAttribute('y1', base); t.setAttribute('y2', base - L);
+      t.setAttribute('stroke-width', major ? 1.6 : 1.1); t.setAttribute('stroke-opacity', ((.3 + .6 * b) * fade).toFixed(3));
+    }
+    labels.forEach(function (p) { var x = cx + (p[0] - v) * GAP; p[1].setAttribute('x', x); p[1].setAttribute('y', base + 20); p[1].setAttribute('opacity', Math.max(0, Math.min(1, Math.min(x - 12, W - 12 - x) / 48)).toFixed(3)); });
+    needle.setAttribute('x1', cx); needle.setAttribute('x2', cx); needle.setAttribute('y1', base + 2); needle.setAttribute('y2', base - 40); needle.setAttribute('stroke-width', 2.5);
+    num.textContent = Math.round(v);
+  }
+  // Progress checkpoints from real events; between them the target creeps forward so it never stalls.
+  var target = 8, shown = 0, done = false, start = performance.now(), MIN = 1100, MAX = 8000;
+  function bump(v) { target = Math.max(target, v); }
+  if (document.readyState !== 'loading') bump(45); else document.addEventListener('DOMContentLoaded', function () { bump(45); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { bump(75); });
+  function loaded() { bump(100); }
+  if (document.readyState === 'complete') loaded(); else window.addEventListener('load', loaded);
+  function finish() {
+    if (done) return; done = true;
+    setTimeout(function () {
+      loader.classList.add('done');
+      setTimeout(function () { loader.remove(); }, 500);
+    }, reduce ? 0 : 320);
+  }
+  var last = performance.now();
+  function frame(now) {
+    var dt = Math.min(64, now - last); last = now;
+    var elapsed = Math.max(0, now - start);             // frame clock can start a hair before the loader
+    if (elapsed > MAX) target = 100;                         // never trap a visitor on a slow asset
+    var soft = target < 100 ? Math.min(target + 12, 97) : 100; // creep toward the next checkpoint
+    var goal = elapsed < MIN && target === 100 ? Math.min(100, 100 * elapsed / MIN) : soft;
+    shown += (goal - shown) * (reduce ? 1 : Math.min(1, dt / 220));
+    if (target === 100 && goal === 100 && 100 - shown < .4) shown = 100;
+    shown = Math.max(0, Math.min(100, shown));
+    draw(shown);
+    if (shown >= 100) { finish(); return; }
+    requestAnimationFrame(frame);
+  }
+  draw(0); requestAnimationFrame(frame);
+})();
+</script>
 
 <div id="app">
   <section class="panel" data-station="home">
