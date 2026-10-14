@@ -1129,7 +1129,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   // Moving the mouse over Home drops a card every few pixels along the path, cycling through every
   // Designs image (small copies from assets/designs/thumbs, falling back to the full image).
   // Each card pops in, holds briefly, then blurs, shrinks and fades. Mouse only; off for reduced motion.
-  if (!reduce && finePointer) {
+  // Switched off for now: set TRAIL_ON to true to bring it back (thumbnails stay in assets/designs/thumbs).
+  const TRAIL_ON = false;
+  if (TRAIL_ON && !reduce && finePointer) {
     const trail = document.getElementById('trail');
     const POOL = 16, GAP = 26, LIFE = 1150;
     const cards = [];
