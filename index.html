@@ -98,6 +98,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .fade i:nth-child(4) { --b: 12px; --s1: 75%; --s2: 100%; --s3: 101%; --s4: 102% }
 .fade::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--dir), rgb(255 255 255 / 0) 10%, rgb(255 255 255 / .55) 60%, var(--bg) 100%) }
 .mode-top .fade { left: 0; right: 0 } .mode-top .fade.bottom { bottom: 0 }
+/* The top edge is a solid white band: images scroll up under it and disappear cleanly. */
+.fade.top { background: var(--bg) } .fade.top::after { content: none }
 .scroller::-webkit-scrollbar { display: none }
 .masonry { display: flex; gap: 16px; align-items: flex-start }
 .col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px }
@@ -303,7 +305,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
   <section class="panel" data-station="designs" hidden aria-label="Designs">
     <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
-    <div class="fade top" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="fade top" aria-hidden="true"></div>
     <svg id="ruler" aria-hidden="true"></svg>
   </section>
 
@@ -697,7 +699,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   function buildFeed(force) {
     const w = masonry.clientWidth;
     if (!w) return;
-    const n = w >= 900 ? 3 : w >= 340 ? 2 : 1;
+    const n = w >= 860 ? 4 : w >= 600 ? 3 : w >= 340 ? 2 : 1;
     if (n === cols && !force) return;
     cols = n; masonry.innerHTML = '';
     const colEls = [], h = [];
