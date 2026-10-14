@@ -57,8 +57,8 @@ button { font: inherit; background: none; border: 0; padding: 0; color: inherit;
 .panel[hidden] { display: none }
 
 /* Home */
-.time { position: absolute; top: calc(56px + env(safe-area-inset-top, 0px)); right: max(64px, env(safe-area-inset-right, 0px)); font-size: 16px; letter-spacing: -0.32px; color: var(--time) }
-.hero { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(440px, calc(100% - var(--hero-left) - 24px)) }
+.time { position: absolute; z-index: 1; top: calc(56px + env(safe-area-inset-top, 0px)); right: max(64px, env(safe-area-inset-right, 0px)); font-size: 16px; letter-spacing: -0.32px; color: var(--time) }
+.hero { position: absolute; z-index: 1; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(440px, calc(100% - var(--hero-left) - 24px)) }
 .avatar { width: 94px; height: 94px; border-radius: 50%; overflow: hidden; background: var(--photo); margin-bottom: 14px }
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block }
 h1 { font: 400 50px/1.05 var(--display); color: var(--ink); letter-spacing: -1px; margin: 0 }
@@ -72,9 +72,16 @@ h1.typer { white-space: nowrap; display: flex; align-items: baseline; min-height
 .links a:hover { color: var(--ink) }
 .bio { display: grid; gap: 14px; margin-top: 14px; font-size: 14px; font-weight: 500; letter-spacing: -0.28px; line-height: 1.3 }
 .bio p { margin: 0 }
-.socials { position: absolute; left: var(--hero-left); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 8px }
+.socials { position: absolute; z-index: 1; left: var(--hero-left); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 8px }
 .socials a { font-size: 13px; padding: 5px 10px; border-radius: 6px; background: var(--pill); transition: background .2s }
 .socials a:hover { background: var(--pill-hover); color: var(--ink) }
+
+/* Image trail on Home: small cards of the Designs work spill out behind the cursor, newest sharp on top,
+   older ones blurring and fading away. Sits under the text; never catches the pointer. */
+.trail { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: strict }
+.trail .card { position: absolute; left: 0; top: 0; width: 84px; height: 105px; border-radius: 6px; overflow: hidden; opacity: 0;
+  background: var(--tile); box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 8px 22px rgb(0 0 0 / .1) }
+.trail .card img { width: 100%; height: 100%; object-fit: cover; display: block }
 
 /* Text stations */
 .sheet { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(520px, calc(100% - var(--hero-left) - 24px)) }
@@ -300,6 +307,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
 <div id="app">
   <section class="panel" data-station="home">
+    <div class="trail" id="trail" aria-hidden="true"></div>
     <div class="time" id="time">--:--, Lagos 🇳🇬</div>
     <div class="hero">
       <div class="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
@@ -1141,6 +1149,56 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   }
   if (document.getElementById('loader')) document.addEventListener('loader:done', typeIntro, { once: true });
   else setTimeout(typeIntro, 300);
+
+  // ---------- Image trail on Home ----------
+  // Moving the mouse over Home drops a card every few pixels along the path, cycling through every
+  // Designs image (small copies from assets/designs/thumbs, falling back to the full image).
+  // Each card pops in, holds briefly, then blurs, shrinks and fades. Mouse only; off for reduced motion.
+  if (!reduce && finePointer) {
+    const trail = document.getElementById('trail');
+    const POOL = 16, GAP = 26, LIFE = 1150;
+    const cards = [];
+    for (let i = 0; i < POOL; i++) {
+      const c = document.createElement('div'); c.className = 'card';
+      const im = document.createElement('img'); im.alt = ''; im.decoding = 'async';
+      im.onerror = () => { if (im.dataset.full && im.src.indexOf('/thumbs/') !== -1) im.src = im.dataset.full; };
+      c.appendChild(im); trail.appendChild(c); cards.push(c);
+    }
+    let pics = [], picIdx = 0, slot = 0, z = 1, lx = null, ly = null;
+    const loadPics = () => {
+      pics = [];
+      PROJECTS.forEach(pr => (pr.images || []).forEach(im => { if (im.src) pics.push(im.src); }));
+      pics.forEach(src => { const i = new Image(); i.src = src.replace(/([^/]+)$/, 'thumbs/$1'); });   // warm the cache
+    };
+    function drop(x, y) {
+      if (!pics.length) loadPics();
+      if (!pics.length) return;
+      const c = cards[slot]; slot = (slot + 1) % POOL;
+      const im = c.firstChild, full = pics[picIdx]; picIdx = (picIdx + 1) % pics.length;
+      im.dataset.full = full; im.src = full.replace(/([^/]+)$/, 'thumbs/$1');
+      c.getAnimations().forEach(a => a.cancel());
+      c.style.zIndex = z++;
+      const at = `translate3d(${(x - 42).toFixed(1)}px, ${(y - 52).toFixed(1)}px, 0)`;
+      c.animate([
+        { opacity: 0, transform: at + ' scale(.82)', filter: 'blur(0px)' },
+        { opacity: 1, transform: at + ' scale(1)', filter: 'blur(0px)', offset: .1 },
+        { opacity: 1, transform: at + ' scale(1)', filter: 'blur(0px)', offset: .32 },
+        { opacity: 0, transform: at + ' scale(.9)', filter: 'blur(10px)' }
+      ], { duration: LIFE, easing: 'cubic-bezier(.33,0,.2,1)', fill: 'forwards' });
+    }
+    panels.home.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || !active || active.id !== 'home' || dragging) { lx = null; return; }
+      const r = panels.home.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (lx === null) { lx = x; ly = y; return; }
+      const d = Math.hypot(x - lx, y - ly);
+      if (d < GAP) return;
+      // Fast moves fill the gap with several cards so the trail stays continuous.
+      const n = Math.min(4, Math.floor(d / GAP));
+      for (let i = 1; i <= n; i++) drop(lx + (x - lx) * i / n, ly + (y - ly) * i / n);
+      lx = x; ly = y;
+    });
+    panels.home.addEventListener('pointerleave', () => { lx = null; });
+  }
 
   // ---------- Start ----------
   layout();
