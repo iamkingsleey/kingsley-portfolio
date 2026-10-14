@@ -965,7 +965,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   // following both the cursor and the scroll. Navigation (dial, side menu, ruler) never moves.
   // Uses the CSS `translate` property so it stacks on top of any existing transforms.
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  let pxX = 0, pxY = 0, pxTX = 0, pxTY = 0, pxRaf = 0;
+  let pxX = 0, pxY = 0, pxTX = 0, pxTY = 0, pxRaf = 0, shocks = [];
+  // Click shockwave on Designs: speed in px/ms, push in px, ring period and fade in ms.
+  const SHOCK = { speed: 1.5, amp: 16, w: 2 * Math.PI / 380, decay: 300 };
   const COL_DEPTH = [9, 16, 11, 18];
   const layerCache = {};
   function layersFor(id) {
@@ -989,12 +991,28 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     if (active.id === 'designs') {
       const vh = innerHeight;
       [...masonry.children].forEach((c, i) => { const d = COL_DEPTH[i % COL_DEPTH.length]; tr(c, -pxX * d, -pxY * d); });
+      const now = performance.now();
+      shocks = shocks.filter(k => now - k.t0 < k.life);
       masonry.querySelectorAll('.tile').forEach(fig => {
+        // Shockwave: each tile is pushed away from the click as the wavefront reaches it, then springs back.
+        let sx = 0, sy = 0;
+        for (const k of shocks) {
+          const e = k.map.get(fig); if (!e) continue;
+          const tau = now - k.t0 - e.d / SHOCK.speed;
+          if (tau <= 0) continue;
+          const a = SHOCK.amp * e.fall * Math.exp(-tau / SHOCK.decay) * Math.sin(tau * SHOCK.w);
+          sx += e.ux * a; sy += e.uy * a;
+        }
+        tr(fig, sx, sy);
         const im = fig.querySelector('img'); if (!im) return;
         const r = fig.getBoundingClientRect();
         if (r.bottom < -40 || r.top > vh + 40) return;          // off screen: leave it
         const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
-        tr(im, -pxX * 0.018 * r.width, (-rel * 0.035 - pxY * 0.018) * r.height);
+        // The picture lags behind its frame (moves against the push), kept inside the zoom headroom.
+        const mx = 0.055 * r.width, my = 0.055 * r.height;
+        const ix = Math.max(-mx, Math.min(mx, -pxX * 0.018 * r.width - sx * 0.45));
+        const iy = Math.max(-my, Math.min(my, (-rel * 0.035 - pxY * 0.018) * r.height - sy * 0.45));
+        tr(im, ix, iy);
       });
     } else layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d));
   }
@@ -1003,7 +1021,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     const settled = Math.abs(pxTX - pxX) < 0.0015 && Math.abs(pxTY - pxY) < 0.0015;
     if (settled) { pxX = pxTX; pxY = pxTY; }
     applyPx();
-    pxRaf = settled ? 0 : requestAnimationFrame(pxFrame);
+    pxRaf = settled && !shocks.length ? 0 : requestAnimationFrame(pxFrame);
   }
   function kickPx() { if (!reduce && !pxRaf) pxRaf = requestAnimationFrame(pxFrame); }
   if (!reduce) {
@@ -1016,6 +1034,22 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
     }
     scroller.addEventListener('scroll', kickPx, { passive: true });
     addEventListener('resize', kickPx);
+    // A click anywhere on the grid sends a wave outward from that point.
+    scroller.addEventListener('click', e => {        // click, not press: a scroll on touch never fires it
+      if (e.button > 0) return;
+      const map = new Map(); let far = 0;
+      masonry.querySelectorAll('.tile').forEach(fig => {
+        const r = fig.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > innerHeight) return;
+        const dx = r.left + r.width / 2 - e.clientX, dy = r.top + r.height / 2 - e.clientY, d = Math.hypot(dx, dy);
+        far = Math.max(far, d);
+        map.set(fig, { d, ux: d > 1 ? dx / d : 0, uy: d > 1 ? dy / d : -1, fall: 1 / (1 + d / 700) });
+      });
+      shocks.push({ t0: performance.now(), map, life: far / SHOCK.speed + SHOCK.decay * 6 });
+      if (shocks.length > 4) shocks.shift();
+      play('pop', e.isTrusted);
+      kickPx();
+    });
   }
 
   // ---------- Start ----------
