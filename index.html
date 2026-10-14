@@ -83,9 +83,20 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 63px; overflow-y: auto; overscroll-behavior: contain;
   padding: 12px 27px; scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
-.fade { position: absolute; left: var(--content-left); right: 145px; height: 14px; pointer-events: none; z-index: 1 }
-.fade.top { top: calc(64px + var(--band)); background: linear-gradient(var(--bg), rgb(255 255 255 / 0)) }
-.fade.bottom { bottom: 63px; background: linear-gradient(rgb(255 255 255 / 0), var(--bg)) }
+.fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
+.fade.top { top: calc(64px + var(--band)); height: 64px }
+.fade.bottom { bottom: 63px }
+/* Progressive blur edge: content blurs more and fades to white the closer it gets to the edge.
+   Four stacked blur layers, each masked to a band, then a white wash on top. Reuse .fade on any scroll edge. */
+.fade i { position: absolute; inset: 0; -webkit-backdrop-filter: blur(var(--b)); backdrop-filter: blur(var(--b));
+  -webkit-mask-image: linear-gradient(var(--dir), transparent var(--s1), #000 var(--s2), #000 var(--s3), transparent var(--s4));
+  mask-image: linear-gradient(var(--dir), transparent var(--s1), #000 var(--s2), #000 var(--s3), transparent var(--s4)) }
+.fade.bottom { --dir: to bottom } .fade.top { --dir: to top }
+.fade i:nth-child(1) { --b: 1px;  --s1: 0%;  --s2: 25%; --s3: 50%;  --s4: 75% }
+.fade i:nth-child(2) { --b: 3px;  --s1: 25%; --s2: 50%; --s3: 75%;  --s4: 100% }
+.fade i:nth-child(3) { --b: 6px;  --s1: 50%; --s2: 75%; --s3: 100%; --s4: 101% }
+.fade i:nth-child(4) { --b: 12px; --s1: 75%; --s2: 100%; --s3: 101%; --s4: 102% }
+.fade::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--dir), rgb(255 255 255 / 0) 10%, rgb(255 255 255 / .55) 60%, var(--bg) 100%) }
 .mode-top .fade { left: 0; right: 0 } .mode-top .fade.bottom { bottom: 0 }
 .scroller::-webkit-scrollbar { display: none }
 .masonry { display: flex; gap: 16px; align-items: flex-start }
@@ -258,7 +269,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
   <section class="panel" data-station="designs" hidden aria-label="Designs">
     <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
-    <div class="fade top"></div><div class="fade bottom"></div>
+    <div class="fade top" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="fade bottom" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <svg id="ruler" aria-hidden="true"></svg>
   </section>
 
