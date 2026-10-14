@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kingsley M.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
+<style>
+/* Layout: the tuning dial sits on the left edge as fixed nav; each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --text: #3b3b3b;
+  --muted: #8c8c8c;
+  --time: #7d7d7d;
+  --ring: #e4e4e4;
+  --disc: #f2f2f2;
+  --pill: #f2f2f2;
+  --pill-hover: #e8e8e8;
+  --tile: #f3f3f3;
+  --photo: #aaa9aa;
+  --display: "Jockey One", "Arial Narrow", Impact, sans-serif;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --content-left: 366px;
+  --hero-left: 708px;
+  --band: 0px;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { height: 100%; overflow: hidden }
+body { background: var(--bg); color: var(--text); font-family: var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 }
+a { color: inherit; text-decoration: none }
+button { font: inherit; background: none; border: 0; padding: 0; color: inherit; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
+
+/* ---------- Dial (fixed, always on top) ---------- */
+.dial-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; touch-action: none }
+#dialSvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible }
+#hit { fill: transparent; pointer-events: all; cursor: grab }
+.dragging #hit { cursor: grabbing }
+.t-minor { stroke: var(--ink); stroke-linecap: round }
+.t-major { stroke: var(--muted); stroke-linecap: round; transition: stroke .2s }
+.t-major.on { stroke: var(--ink) }
+.needle { stroke: var(--ink); stroke-linecap: round }
+
+.pill { position: absolute; pointer-events: auto; font-size: 14px; line-height: 16px; padding: 6px 12px; border-radius: 8px;
+  background: var(--pill); color: var(--text); white-space: nowrap; transition: background .2s, color .2s }
+.pill:hover { background: var(--pill-hover) }
+.pill.on { background: var(--ink); color: #fff }
+
+/* ---------- Station layers ---------- */
+.panel { position: fixed; inset: 0; background: var(--bg); will-change: transform, opacity; backface-visibility: hidden }
+.panel[hidden] { display: none }
+
+/* Home */
+.time { position: absolute; top: calc(56px + env(safe-area-inset-top, 0px)); right: max(64px, env(safe-area-inset-right, 0px)); font-size: 16px; letter-spacing: -0.32px; color: var(--time) }
+.hero { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(440px, calc(100% - var(--hero-left) - 24px)) }
+.avatar { width: 94px; height: 94px; border-radius: 50%; overflow: hidden; background: var(--photo); margin-bottom: 14px }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block }
+h1 { font: 400 50px/1.05 var(--display); color: var(--ink); letter-spacing: -1px; margin: 0 }
+.links { display: flex; gap: 9px; font-size: 16px; font-weight: 500; letter-spacing: -0.32px; margin-top: 8px }
+.links a:hover { color: var(--ink) }
+.bio { display: grid; gap: 14px; margin-top: 14px; font-size: 14px; font-weight: 500; letter-spacing: -0.28px; line-height: 1.3 }
+.bio p { margin: 0 }
+.socials { position: absolute; left: var(--hero-left); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 8px }
+.socials a { font-size: 13px; padding: 5px 10px; border-radius: 6px; background: var(--pill); transition: background .2s }
+.socials a:hover { background: var(--pill-hover); color: var(--ink) }
+
+/* Text stations */
+.sheet { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(520px, calc(100% - var(--hero-left) - 24px)) }
+h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px; margin: 0 }
+.list { list-style: none; margin: 22px 0 0; padding: 0; display: grid }
+.list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; padding: 14px 0; border-top: 1px solid #eeeeee; font-size: 14px; letter-spacing: -0.28px }
+.list li:last-child { border-bottom: 1px solid #eeeeee }
+.list b { color: var(--ink); font-weight: 500; font-size: 16px; letter-spacing: -0.32px }
+.list span, .list .sub { color: var(--muted); grid-column: 1 / -1 }
+.list i { font-style: normal; color: var(--muted); font-size: 13px }
+
+/* Feed */
+.scroller { position: absolute; left: var(--content-left); right: 145px; top: calc(64px + var(--band)); bottom: 63px; overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 27px; scrollbar-width: none; contain: layout paint }
+/* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
+.fade { position: absolute; left: var(--content-left); right: 145px; height: 14px; pointer-events: none; z-index: 1 }
+.fade.top { top: calc(64px + var(--band)); background: linear-gradient(var(--bg), rgb(255 255 255 / 0)) }
+.fade.bottom { bottom: 63px; background: linear-gradient(rgb(255 255 255 / 0), var(--bg)) }
+.mode-top .fade { left: 0; right: 0 } .mode-top .fade.bottom { bottom: 0 }
+.scroller::-webkit-scrollbar { display: none }
+.masonry { display: flex; gap: 16px; align-items: flex-start }
+.col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px }
+.tile { position: relative; margin: 0; background: var(--tile); border-radius: 24px; overflow: hidden }
+.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block }
+.tile figcaption { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; gap: 12px;
+  font-size: 13px; font-weight: 500; letter-spacing: -0.26px; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
+.tile figcaption i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
+.tile:hover figcaption { opacity: 1; transform: none }
+@media (hover: none) { .tile figcaption { opacity: 1; transform: none } }
+#ruler { position: absolute; right: 0; top: calc(86px + var(--band)); height: calc(100% - 163px - var(--band)); width: 140px; touch-action: none; cursor: ns-resize }
+#ruler line { stroke-linecap: round }
+
+/* Narrow screens: the dial moves to the top edge */
+.mode-top .time { top: auto; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); right: 50%; transform: translateX(50%) }
+.mode-top .hero, .mode-top .sheet { left: 50%; top: calc(var(--band) + (100% - var(--band)) * .46); transform: translate(-50%, -50%); width: min(400px, calc(100% - 32px)) }
+.mode-top .socials { left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); justify-content: center; width: max-content; max-width: calc(100% - 32px) }
+.mode-top .scroller { left: 0; right: 0; top: var(--band); bottom: 0; padding: 12px 16px 32px }
+.mode-top #ruler { display: none }
+@media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
+@media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <section class="panel" data-station="home">
+    <div class="time" id="time">--:--, Lagos 🇳🇬</div>
+    <div class="hero">
+      <div class="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
+      <h1>Kingsley M.</h1>
+      <div class="links"><a href="#">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
+      <div class="bio">
+        <p>Senior product designer with experience designing from 0-1 at <br>e-commerce startups and enterprise.</p>
+        <p>Previously, I led design at Kusnap.</p>
+      </div>
+    </div>
+    <nav class="socials" aria-label="Social"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="#">Medium</a></nav>
+  </section>
+
+  <section class="panel" data-station="feed" hidden aria-label="Feed">
+    <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
+    <div class="fade top"></div><div class="fade bottom"></div>
+    <svg id="ruler" aria-hidden="true"></svg>
+  </section>
+
+  <section class="panel" data-station="projects" hidden>
+    <div class="sheet">
+      <h2>Projects</h2>
+      <ul class="list">
+        <li><b>Kusnap</b><i>Head of Design</i><span>Peer-to-peer marketplace, designed from early stage to 50,000+ users.</span></li>
+        <li><b>Pingmart</b><i>Founder</i><span>WhatsApp-native multi-vendor commerce.</span></li>
+        <li><b>ShareBuddy</b><i>Founder</i><span>Social bill-splitting and group wallets.</span></li>
+        <li><b>Kauri</b><i>Concept</i><span>A cowrie-inspired payments brand for African SMEs.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" data-station="engineering" hidden>
+    <div class="sheet">
+      <h2>Engineering</h2>
+      <ul class="list">
+        <li><b>LineCraft</b><i>Figma plugin</i><span>Generative line and pattern tools for vectors.</span></li>
+        <li><b>MeshCraft</b><i>Figma plugin</i><span>3D wireframe shapes, drawn as editable vectors.</span></li>
+        <li><b>Recorder Studio</b><i>Playwright</i><span>Turns HTML interaction prototypes into social videos.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" data-station="contact" hidden>
+    <div class="sheet">
+      <h2>Contact</h2>
+      <ul class="list">
+        <li><b>Email</b><i>Best for work</i><a class="sub" href="#">Add your address</a></li>
+        <li><b>Resume</b><i>PDF</i><a class="sub" href="#">Download</a></li>
+        <li><b>Based in</b><i>WAT, UTC+1</i><span>Lagos, Nigeria</span></li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<div class="dial-layer" id="dialLayer">
+  <svg id="dialSvg" aria-hidden="true">
+    <circle id="ring" fill="none" stroke="var(--ring)"></circle>
+    <circle id="disc" fill="var(--disc)"></circle>
+    <g id="ticks"></g>
+    <line id="needle" class="needle"></line>
+    <circle id="hit"></circle>
+  </svg>
+  <div id="pills"></div>
+  <div id="tuner" tabindex="0" role="slider" aria-label="Navigation dial" aria-valuemin="94" aria-valuemax="102"
+    aria-valuenow="98" aria-valuetext="Home" style="position:absolute;left:0;top:50%;width:1px;height:1px;pointer-events:auto"></div>
+</div>
+
+<script src="popkit.js"></script>
+<script>
+(function () {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const play = (n, trusted) => { if (trusted && window.Popkit) Popkit.play(n); };
+
+  const STATIONS = [
+    { f: 94,  id: 'contact',     name: 'Contact' },
+    { f: 96,  id: 'engineering', name: 'Engineering' },
+    { f: 98,  id: 'home',        name: 'Home' },
+    { f: 100, id: 'feed',        name: 'Feed' },
+    { f: 102, id: 'projects',    name: 'Projects' }
+  ];
+  const STEP = 13.5;                       // degrees per MHz
+  const ang = f => (f - 98) * STEP;        // 98 faces the content; higher turns clockwise
+
+  // Length profile shared by the dial and the Feed ruler: index 0 is the active line.
+  const PROFILE = [104, 89, 86, 82, 77, 70, 63, 56, 49, 42, 36, 31, 26, 23, 20, 17, 16, 15, 14, 13, 13, 12];
+  function prof(d) {
+    d = Math.abs(d);
+    if (d >= PROFILE.length - 1) return 12;
+    const i = Math.floor(d), t = d - i;
+    return PROFILE[i] + (PROFILE[i + 1] - PROFILE[i]) * t;
+  }
+  const bump = d => (prof(d) - 12) / 92;   // 0..1
+
+  // ---------- Geometry ----------
+  let M = {};
+  function measure() {
+    const vw = innerWidth, vh = innerHeight;
+    if (vw >= 900) {
+      const S = 0.97 * Math.min(1.1, Math.max(0.68, vh / 1065));
+      M = { mode: 'left', S, cx: -91.75 * S, cy: 0.479 * vh, hx: 1, hy: 0, px: 0, py: 1 };
+      const contentLeft = Math.round(M.cx + 470 * S);
+      root.style.setProperty('--content-left', contentLeft + 'px');
+      root.style.setProperty('--hero-left', Math.round(Math.max(0.41 * vw, contentLeft + 40)) + 'px');
+      root.style.setProperty('--band', '0px');
+    } else {
+      const S = 0.834 * Math.min(1, (vw - 8) / 600);
+      M = { mode: 'top', S, cx: vw / 2, cy: -79 * S, hx: 0, hy: 1, px: -1, py: 0 };
+      root.style.setProperty('--band', Math.round(343 * S) + 'px');
+    }
+    root.classList.toggle('mode-top', M.mode === 'top');
+  }
+  const pt = (r, deg) => {
+    const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [M.cx + r * M.S * (c * M.hx + s * M.px), M.cy + r * M.S * (c * M.hy + s * M.py)];
+  };
+
+  // ---------- Dial ----------
+  const svg = document.getElementById('dialSvg');
+  const ticksG = document.getElementById('ticks');
+  const ticks = [];
+  for (let k = 0; k <= 100; k++) {
+    const f = 88 + k / 5, major = k % 10 === 0;
+    const l = document.createElementNS(SVGNS, 'line');
+    l.setAttribute('class', major ? 't-major' : 't-minor');
+    ticksG.appendChild(l);
+    const st = major ? STATIONS.find(s => s.f === Math.round(f)) : null;
+    ticks.push({ el: l, a: ang(f), major, st });
+  }
+  const needle = document.getElementById('needle');
+  const hit = document.getElementById('hit');
+  const disc = document.getElementById('disc'), ring = document.getElementById('ring');
+
+  const pillsEl = document.getElementById('pills'), pills = {};
+  STATIONS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'pill'; b.textContent = s.name;
+    b.addEventListener('click', e => tuneTo(s, e.isTrusted));
+    pillsEl.appendChild(b); pills[s.id] = b;
+  });
+  // Each pill sits on its station's ray, pushed out until the whole pill clears the
+  // longest a tick can ever reach (wave at drag strength) plus a gap.
+  const TICK_REACH = 300 + 12 + 26 * 1.15;   // dial units
+  const PILL_GAP = 12;                       // px between the longest tick and a pill
+  function placePills() {
+    const clear = TICK_REACH * M.S + PILL_GAP;
+    // Phones: the dial is too small to ring with labels, so they sit in a row just
+    // below the longest ticks, in the same left-to-right order as on the dial.
+    if (M.mode === 'top' && innerWidth < 600) {
+      const order = [...STATIONS].sort((a, b) => b.f - a.f), gap = 6;
+      order.forEach(s => { pills[s.id].style.transform = 'none'; });
+      const widths = order.map(s => pills[s.id].offsetWidth);
+      const total = widths.reduce((a, b) => a + b, 0) + gap * (order.length - 1);
+      let x = Math.max(8, (innerWidth - total) / 2);
+      const y = M.cy + clear + 4;
+      order.forEach((s, i) => { const b = pills[s.id]; b.style.left = x + 'px'; b.style.top = y + 'px'; x += widths[i] + gap; });
+      root.style.setProperty('--band', Math.round(y + pills.home.offsetHeight + 16) + 'px');
+      return;
+    }
+    STATIONS.forEach(s => {
+      const a = ang(s.f), b = pills[s.id];
+      b.style.transform = 'none';
+      const w = b.offsetWidth, h = b.offsetHeight;
+      let r = TICK_REACH, x = 0, y = 0;
+      for (let i = 0; i < 200; i++) {
+        [x, y] = pt(r, a);                  // pill centre
+        const nx = Math.max(x - w / 2, Math.min(M.cx, x + w / 2));
+        const ny = Math.max(y - h / 2, Math.min(M.cy, y + h / 2));
+        if (Math.hypot(nx - M.cx, ny - M.cy) >= clear) break;
+        r += 1;
+      }
+      // On narrow screens keep the pill on screen: pin it inside the edges, then slide it
+      // away from the dial (downward) until it clears the ticks again.
+      const minX = 8 + w / 2, maxX = innerWidth - 8 - w / 2;
+      if (x < minX || x > maxX) {
+        x = Math.max(minX, Math.min(maxX, x));
+        for (let i = 0; i < 400; i++) {
+          const nx = Math.max(x - w / 2, Math.min(M.cx, x + w / 2));
+          const ny = Math.max(y - h / 2, Math.min(M.cy, y + h / 2));
+          if (Math.hypot(nx - M.cx, ny - M.cy) >= clear) break;
+          y += M.mode === 'top' ? 1 : 0; x += M.mode === 'left' ? 1 : 0;
+        }
+      }
+      b.style.left = (x - w / 2) + 'px'; b.style.top = (y - h / 2) + 'px';
+    });
+  }
+
+  // The wave is always on around the needle; dragging gives it a slight boost.
+  const WAVE_REST = 1, WAVE_DRAG = 1.15;
+  // One easing for every station change: needle and page move together.
+  const EASE = 'cubic-bezier(.65,0,.35,1)', DUR = 560;
+  const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  let cur = 0, target = 0, tween = null, amp = WAVE_REST, ampTarget = WAVE_REST, dragging = false, raf = 0;
+  function setTarget(a) {
+    target = a;
+    tween = reduce ? null : { from: cur, to: a, t0: performance.now() };
+    if (reduce) cur = a;
+    kick();
+  }
+  function drawDial(force) {
+    const S = M.S;
+    disc.setAttribute('cx', M.cx); disc.setAttribute('cy', M.cy); disc.setAttribute('r', 246.5 * S);
+    ring.setAttribute('cx', M.cx); ring.setAttribute('cy', M.cy); ring.setAttribute('r', 264.5 * S); ring.setAttribute('stroke-width', 1.5 * S);
+    hit.setAttribute('cx', M.cx); hit.setAttribute('cy', M.cy); hit.setAttribute('r', 340 * S);
+    for (const t of ticks) {
+      const d = Math.abs(t.a - cur) / 2.7;              // distance in 0.2 MHz steps
+      const b = bump(d) * amp;
+      const len = Math.round((t.major ? 28 + b * 12 : 12 + b * 26) * 10) / 10;
+      const key = len + (t.major && t.st === lit ? 'a' : '');
+      if (!force && t.key === key) continue;   // skip unchanged ticks to keep frames light
+      t.key = key;
+      const [x1, y1] = pt(300, t.a), [x2, y2] = pt(300 + len, t.a);
+      t.el.setAttribute('x1', x1); t.el.setAttribute('y1', y1); t.el.setAttribute('x2', x2); t.el.setAttribute('y2', y2);
+      if (t.major) t.el.setAttribute('stroke-width', ((t.st && t.st === lit) || !t.st ? 3 : 2) * S);
+      else { t.el.setAttribute('stroke-width', 1.5 * S); t.el.setAttribute('stroke-opacity', (0.38 + 0.5 * b).toFixed(3)); }
+    }
+    const [nx1, ny1] = pt(190.5, cur), [nx2, ny2] = pt(226.5, cur);
+    needle.setAttribute('x1', nx1); needle.setAttribute('y1', ny1); needle.setAttribute('x2', nx2); needle.setAttribute('y2', ny2);
+    needle.setAttribute('stroke-width', 3 * S);
+  }
+  function loop() {
+    let moving = false;
+    if (!dragging && tween) {
+      const p = Math.min(1, (performance.now() - tween.t0) / DUR);
+      cur = tween.from + (tween.to - tween.from) * easeInOut(p);
+      if (p < 1) moving = true; else { cur = tween.to; tween = null; }
+    }
+    amp += (ampTarget - amp) * (reduce ? 1 : 0.16);
+    if (Math.abs(ampTarget - amp) < 0.003) amp = ampTarget; else moving = true;
+    drawDial();
+    raf = moving || dragging ? requestAnimationFrame(loop) : 0;
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+  let active = null, lit = null;
+  function light(s) {
+    if (lit === s) return false;
+    lit = s;
+    STATIONS.forEach(o => pills[o.id].classList.toggle('on', o === s));
+    ticks.forEach(t => t.st && t.el.classList.toggle('on', t.st === s));
+    return true;
+  }
+  const nearest = deg => STATIONS.reduce((a, b) => Math.abs(ang(b.f) - deg) < Math.abs(ang(a.f) - deg) ? b : a);
+
+  function angleFrom(e) {
+    const vx = e.clientX - M.cx, vy = e.clientY - M.cy;
+    const deg = Math.atan2(vx * M.px + vy * M.py, vx * M.hx + vy * M.hy) * 180 / Math.PI;
+    const lim = ang(102) + 8;
+    return Math.max(-lim, Math.min(lim, deg));
+  }
+  const layer = document.getElementById('dialLayer');
+  hit.addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return;
+    dragging = true; layer.classList.add('dragging'); ampTarget = WAVE_DRAG;
+    hit.setPointerCapture(e.pointerId);
+    move(e); kick();
+  });
+  function move(e) {
+    if (!dragging) return;
+    cur = angleFrom(e); target = cur; tween = null;
+    if (light(nearest(cur))) play('detent', e.isTrusted);
+  }
+  hit.addEventListener('pointermove', move);
+  function end(e) {
+    if (!dragging) return;
+    dragging = false; layer.classList.remove('dragging'); ampTarget = WAVE_REST;
+    tuneTo(nearest(cur), e.isTrusted);
+  }
+  hit.addEventListener('pointerup', end);
+  hit.addEventListener('pointercancel', end);
+
+  document.getElementById('tuner').addEventListener('keydown', e => {
+    const i = STATIONS.indexOf(active);
+    const fwd = M.mode === 'left' ? ['ArrowDown', 'ArrowRight'] : ['ArrowLeft', 'ArrowUp'];
+    const back = M.mode === 'left' ? ['ArrowUp', 'ArrowLeft'] : ['ArrowRight', 'ArrowDown'];
+    const d = fwd.includes(e.key) ? 1 : back.includes(e.key) ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const n = STATIONS[Math.max(0, Math.min(STATIONS.length - 1, i + d))];
+    if (n !== active) tuneTo(n, e.isTrusted);
+  });
+
+  // ---------- Station change with a dial-born reveal ----------
+  const panels = {};
+  document.querySelectorAll('.panel').forEach(p => panels[p.dataset.station] = p);
+  // Pages only ever use layers 1 (leaving) and 2 (arriving); the dial sits at 100.
+  function swap(from, to, dir) {
+    Object.values(panels).forEach(p => p.getAnimations().forEach(a => a.cancel()));
+    Object.values(panels).forEach(p => { if (p !== from && p !== to) p.hidden = true; });
+    if (from) from.style.zIndex = 1;
+    to.hidden = false; to.style.zIndex = 2;
+    // Do any layout work before the motion starts so no frame of the transition stalls.
+    if (to === panels.feed) { buildFeed(); sizeRuler(); }
+    if (!from || reduce) { if (from) from.hidden = true; return; }
+    // The new page opens as a circle growing out of the dial's ring while both pages
+    // turn slightly around the dial's centre. No blur, short timing, one easing.
+    const ox = M.cx, oy = M.cy, origin = `${ox}px ${oy}px`;
+    from.style.transformOrigin = origin; to.style.transformOrigin = origin;
+    const far = Math.ceil(Math.hypot(Math.max(Math.abs(innerWidth - ox), Math.abs(ox)), Math.max(oy, innerHeight - oy))) + 8;
+    const start = Math.round(264.5 * M.S);
+    // The leaving page only fades (cheap for big pages like Feed); the arriving one carries the motion.
+    from.animate([
+      { opacity: 1 },
+      { opacity: 0 }
+    ], { duration: DUR * .8, easing: EASE, fill: 'forwards' }).onfinish = () => { if (active && panels[active.id] !== from) from.hidden = true; };
+    to.animate([
+      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * 3}deg)` },
+      { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg)' }
+    ], { duration: DUR, easing: EASE });
+  }
+  function tuneTo(s, sound) {
+    const prev = active;
+    setTarget(ang(s.f)); light(s);
+    play('pop', sound);
+    if (prev === s) return;
+    active = s;
+    swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1);
+    const t = document.getElementById('tuner');
+    t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
+    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+  }
+
+  // ---------- Feed: irregular masonry ----------
+  const FEED = [
+    { t: 'Coins on a ribbon', r: 3 / 2 }, { t: 'Red padlock', r: 4 / 5 }, { t: 'Soft light study', r: 16 / 10 },
+    { t: 'Pawn in an archway', r: 4 / 5 }, { t: 'Vase in window light', r: 2 / 3 }, { t: 'Coins on a ribbon II', r: 4 / 5 },
+    { t: 'Window shadow', r: 3 / 2 }, { t: 'Torus study', r: 1 }, { t: 'Terracotta still life', r: 2 / 3 },
+    { t: 'Evening room', r: 16 / 9 }, { t: 'Wireframe sphere', r: 1 }, { t: 'Arch series', r: 3 / 4 },
+    { t: 'Gold coin close-up', r: 4 / 5 }, { t: 'Ribbon loop', r: 3 / 2 }, { t: 'Glass orb', r: 4 / 5 },
+    { t: 'Shadow play', r: 16 / 10 }, { t: 'Clay vessel', r: 3 / 4 }, { t: 'Lilac ribbon', r: 3 / 2 }
+  ];
+  const masonry = document.getElementById('masonry'), scroller = document.getElementById('scroller');
+  let cols = 0;
+  function buildFeed(force) {
+    const w = masonry.clientWidth;
+    if (!w) return;
+    const n = w >= 900 ? 3 : w >= 520 ? 2 : 1;
+    if (n === cols && !force) return;
+    cols = n; masonry.innerHTML = '';
+    const colEls = [], h = [];
+    for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'col'; masonry.appendChild(c); colEls.push(c); h.push(0); }
+    FEED.forEach((it, i) => {
+      const k = h.indexOf(Math.min(...h));
+      const fig = document.createElement('figure');
+      fig.className = 'tile'; fig.style.aspectRatio = it.r;
+      if (it.src) { const im = new Image(); im.src = it.src; im.alt = it.t; im.loading = 'lazy'; fig.appendChild(im); }
+      const cap = document.createElement('figcaption');
+      const name = document.createElement('span'); name.textContent = it.t;
+      const num = document.createElement('i'); num.textContent = String(i + 1).padStart(2, '0');
+      cap.append(name, num); fig.appendChild(cap);
+      colEls[k].appendChild(fig);
+      h[k] += 1 / it.r + 0.04;
+    });
+  }
+
+  // ---------- Feed: graduated ruler tracks the scroll position ----------
+  const ruler = document.getElementById('ruler');
+  let rLines = [], rH = 0, rPos = 0, rTarget = 0, rRaf = 0;
+  const RW = 140, GAP = 12, EDGE = 13;
+  function sizeRuler() {
+    rH = ruler.getBoundingClientRect().height;
+    if (!rH) return;
+    const n = Math.max(2, Math.floor((rH - 12) / GAP) + 1);
+    ruler.setAttribute('viewBox', `0 0 ${RW} ${rH}`);
+    if (n !== rLines.length) {
+      ruler.innerHTML = ''; rLines = [];
+      for (let i = 0; i < n; i++) { const l = document.createElementNS(SVGNS, 'line'); ruler.appendChild(l); rLines.push(l); }
+    }
+    syncTarget(); rPos = rTarget; drawRuler();
+  }
+  function syncTarget() {
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    const p = max > 0 ? scroller.scrollTop / max : 0;
+    rTarget = p * (rLines.length - 1);
+  }
+  let lastIdx = -1;
+  function drawRuler() {
+    const cxr = RW - EDGE, idx = Math.round(rPos);
+    rLines.forEach((l, i) => {
+      const d = Math.abs(i - rPos), on = i === idx;
+      const L = on ? 104 : prof(d), b = (L - 12) / 92, y = 6 + i * GAP;
+      l.setAttribute('x1', cxr - L / 2); l.setAttribute('x2', cxr + L / 2);
+      l.setAttribute('y1', y); l.setAttribute('y2', y);
+      l.setAttribute('stroke', '#000');
+      l.setAttribute('stroke-width', on ? 3.5 : 2);
+      l.setAttribute('stroke-opacity', on ? 1 : (0.2 + 0.4 * b).toFixed(3));
+    });
+  }
+  function rulerLoop() {
+    rPos += (rTarget - rPos) * (reduce ? 1 : 0.22);
+    if (Math.abs(rTarget - rPos) < 0.002) rPos = rTarget;
+    drawRuler();
+    rRaf = rPos !== rTarget ? requestAnimationFrame(rulerLoop) : 0;
+  }
+  scroller.addEventListener('scroll', () => { syncTarget(); if (!rRaf) rRaf = requestAnimationFrame(rulerLoop); }, { passive: true });
+
+  // Drag or tap the ruler to scrub through the feed.
+  let scrubbing = false, lastSound = 0;
+  function scrubTo(e) {
+    const r = ruler.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (e.clientY - r.top - 6) / ((rLines.length - 1) * GAP)));
+    scroller.scrollTop = p * (scroller.scrollHeight - scroller.clientHeight);
+    const idx = Math.round(p * (rLines.length - 1));
+    const now = performance.now();
+    if (idx !== lastIdx && now - lastSound > 45) { if (lastIdx !== -1) play('detent', e.isTrusted); lastSound = now; }
+    lastIdx = idx;
+  }
+  ruler.addEventListener('pointerdown', e => { scrubbing = true; lastIdx = -1; ruler.setPointerCapture(e.pointerId); play('pop', e.isTrusted); scrubTo(e); });
+  ruler.addEventListener('pointermove', e => { if (scrubbing) scrubTo(e); });
+  const stopScrub = () => { scrubbing = false; };
+  ruler.addEventListener('pointerup', stopScrub); ruler.addEventListener('pointercancel', stopScrub);
+
+  // ---------- Layout ----------
+  function layout() {
+    measure(); placePills(); drawDial(true);
+    if (active && active.id === 'feed') { buildFeed(); sizeRuler(); }
+  }
+  addEventListener('resize', layout);
+
+  // ---------- Live Lagos time ----------
+  const timeEl = document.getElementById('time');
+  const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', hour: 'numeric', minute: '2-digit', hour12: true });
+  function clock() {
+    const parts = fmt.formatToParts(new Date());
+    const h = parts.find(p => p.type === 'hour').value, m = parts.find(p => p.type === 'minute').value;
+    const ap = (parts.find(p => p.type === 'dayPeriod') || { value: '' }).value.toLowerCase().replace(/[.\s]/g, '');
+    timeEl.textContent = `${h}:${m}${ap}, Lagos 🇳🇬`;
+    setTimeout(clock, 1000 - (Date.now() % 1000) + 5);
+  }
+
+  // ---------- Start ----------
+  measure(); placePills();
+  const start = STATIONS.find(s => s.id === location.hash.slice(1)) || STATIONS[2];
+  cur = target = ang(start.f); light(start); drawDial();
+  tuneTo(start, false);
+  clock();
+  // Pill widths change once Geist loads, so re-check the spacing then.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePills);
+})();
+</script>
+</body>
+</html>

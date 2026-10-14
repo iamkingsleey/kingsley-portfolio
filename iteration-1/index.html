@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kingsley M. Iteration 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Inter:wght@600&display=swap">
+<style>
+/* Layout: an FM tuning dial in a frosted header is the nav; the tuned station fills the page below; socials at the foot. */
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --text: #484848;
+  --muted: #8c8c8c;
+  --time: #7d7d7d;
+  --ring: #e4e4e4;
+  --disc: #f2f2f2;
+  --tile: #f4f4f4;
+  --photo: #aaa9aa;
+  --display: "Jockey One", "Arial Narrow", Impact, sans-serif;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --num: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --s: 1; /* dial scale, set from viewport width */
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { background: var(--bg); color: var(--text); font-family: var(--body); overflow-x: hidden;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 }
+a { color: inherit; text-decoration: none }
+a:hover { color: var(--ink) }
+button { font: inherit; background: none; border: 0; padding: 0; color: inherit; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px }
+
+.page { min-height: 100%; display: flex; flex-direction: column; align-items: center }
+
+/* ---------- Header + dial ---------- */
+.top { position: absolute; top: 0; left: 0; right: 0; height: calc(343px * var(--s)); z-index: 10; overflow: hidden; background: var(--bg) }
+.dial-space { height: calc(343px * var(--s)); flex: none; width: 100% }
+.dial { position: absolute; left: 50%; top: 0; width: 760px; height: 760px; transform-origin: 0 0;
+  transform: translate(calc(-380px * var(--s)), calc(-459px * var(--s))) scale(var(--s)); touch-action: none; user-select: none; -webkit-user-select: none }
+.dial svg { position: absolute; inset: 0; width: 760px; height: 760px; overflow: visible }
+.hit { fill: transparent; cursor: grab }
+.dial.dragging .hit, .dial.dragging { cursor: grabbing }
+.minor { stroke: var(--ink); stroke-opacity: .45; stroke-width: 1.5 }
+.major { stroke: var(--ink); stroke-width: 3 }
+.major.station { stroke: var(--muted); stroke-width: 2; transition: stroke .2s, stroke-width .2s }
+.major.station.on { stroke: var(--ink); stroke-width: 3 }
+.num { font: 600 20px/1 var(--num); fill: var(--ink); fill-opacity: .8 }
+.needle { fill: var(--ink); pointer-events: none }
+.time { font: 400 16px/1 var(--body); fill: var(--time); letter-spacing: -0.32px; pointer-events: none }
+
+.station-label { position: absolute; font-size: 20px; line-height: 1; padding: 8px 10px; white-space: nowrap; color: var(--muted);
+  opacity: .8; transition: color .2s; font-weight: 400 }
+.station-label:hover { color: #5e5e5e }
+.station-label.on { color: var(--ink); font-weight: 600 }
+
+/* ---------- Content ---------- */
+main { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2 }
+
+/* Image trail: drops images along the cursor path on Home, behind the content */
+.trail { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden }
+.trail img { position: absolute; left: 0; top: 0; display: block; opacity: 0; will-change: transform, opacity; box-shadow: 0 10px 30px rgb(0 0 0 / .08) }
+.panel { width: 654px; max-width: 100%; animation: tune-in .32s ease both }
+.panel[aria-hidden="true"] { display: none }
+@keyframes tune-in { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+.panel.centered { margin-block: auto; padding-block: 40px 56px }
+
+.about { display: flex; gap: 39px; align-items: flex-start }
+.photo { width: 159px; height: 194px; border-radius: 999px; overflow: hidden; background: var(--photo); flex: none }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block }
+.copy { min-width: 0; display: grid; gap: 28px; width: 456px; max-width: 100% }
+.id { display: grid; gap: 2px }
+h1 { font: 400 50px/normal var(--display); color: var(--ink); letter-spacing: -1px; margin: 0 }
+h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px; margin: 0 }
+.links { display: flex; gap: 9px; font-size: 16px; font-weight: 500; letter-spacing: -0.32px; flex-wrap: wrap }
+.bio { display: grid; gap: 14px; font-size: 14px; font-weight: 500; letter-spacing: -0.28px; line-height: 1.3 }
+.bio p { margin: 0 }
+
+.list { list-style: none; margin: 22px 0 0; padding: 0; display: grid }
+.list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; padding: 14px 0; border-top: 1px solid #eeeeee; font-size: 14px; letter-spacing: -0.28px }
+.list li:last-child { border-bottom: 1px solid #eeeeee }
+.list b { color: var(--ink); font-weight: 500; font-size: 16px; letter-spacing: -0.32px }
+.list span { color: var(--muted); grid-column: 1 / -1 }
+.list i { font-style: normal; color: var(--muted); font-size: 13px }
+
+/* Feed: balanced masonry, portrait and landscape mixed */
+.panel.wide { width: 1592px; padding-block: calc(128px * var(--s) / .834) 72px }
+.masonry { display: flex; gap: 16px; align-items: flex-start }
+.col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px }
+.tile { position: relative; margin: 0; background: var(--tile); overflow: hidden; cursor: default }
+.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease }
+.tile:hover img { transform: scale(1.02) }
+.tile figcaption { position: absolute; left: 14px; bottom: 12px; right: 14px; display: flex; justify-content: space-between; gap: 12px;
+  font-size: 13px; font-weight: 500; letter-spacing: -0.26px; color: var(--text); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
+.tile figcaption i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
+.tile:hover figcaption, .tile:focus-within figcaption { opacity: 1; transform: none }
+@media (hover: none) { .tile figcaption { opacity: 1; transform: none } }
+
+footer { display: flex; gap: 32px; font-size: 16px; font-weight: 500; letter-spacing: -0.32px; padding-block: 0 calc(52px + env(safe-area-inset-bottom, 0px)); flex-wrap: wrap; justify-content: center }
+
+@media (max-width: 720px) {
+  .about { flex-direction: column; align-items: center; text-align: center; gap: 24px }
+  .about .id { justify-items: center }
+  .links { justify-content: center }
+  h1 { font-size: 42px }
+  h2 { font-size: 28px }
+  footer { gap: 20px }
+  .panel.wide { padding-block: 32px 48px }
+}
+@media (prefers-reduced-motion: reduce) { .panel { animation: none } .station-label, .major.station, .tile img, .tile figcaption { transition: none } }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="top">
+    <div class="dial" id="dial">
+      <svg id="svg" viewBox="-380 -380 760 760" aria-hidden="true">
+        <circle class="hit" r="335" id="hit"></circle>
+        <g id="ticks"></g>
+        <g id="nums"></g>
+        <circle r="264.5" fill="none" stroke="var(--ring)" stroke-width="1.5" pointer-events="none"></circle>
+        <circle r="246.5" fill="var(--disc)" pointer-events="none"></circle>
+        <text class="time" id="time" x="0" y="127" text-anchor="middle" dominant-baseline="middle">--:--, Lagos 🇳🇬</text>
+        <g id="needleG"><rect class="needle" x="-1.5" y="190.5" width="3" height="36" rx="1"></rect></g>
+      </svg>
+      <div id="labels"></div>
+      <div id="tuner" tabindex="0" role="slider" aria-label="Navigation dial" aria-valuemin="94" aria-valuemax="102"
+        aria-valuenow="98" aria-valuetext="Home" style="position:absolute;left:380px;top:560px;width:1px;height:1px"></div>
+    </div>
+  </header>
+  <div class="dial-space"></div>
+  <div class="trail" id="trail" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel centered" data-station="home" aria-hidden="false">
+      <div class="about">
+        <div class="photo"><img src="assets/headshot.jpg" alt="Kingsley M." width="159" height="194"></div>
+        <div class="copy">
+          <div class="id">
+            <h1>Kingsley M.</h1>
+            <div class="links"><a href="#">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
+          </div>
+          <div class="bio">
+            <p>Senior product designer with experience designing from 0-1 at<br>e-commerce startups and enterprise.</p>
+            <p>Previously, I led design at Kusnap.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel wide" data-station="feed" aria-hidden="true" aria-label="Feed">
+      <div class="masonry" id="masonry"></div>
+    </section>
+
+    <section class="panel centered" data-station="projects" aria-hidden="true">
+      <h2>Projects</h2>
+      <ul class="list">
+        <li><b>Kusnap</b><i>Head of Design</i><span>Peer-to-peer marketplace, designed from early stage to 50,000+ users.</span></li>
+        <li><b>Pingmart</b><i>Founder</i><span>WhatsApp-native multi-vendor commerce.</span></li>
+        <li><b>ShareBuddy</b><i>Founder</i><span>Social bill-splitting and group wallets.</span></li>
+        <li><b>Kauri</b><i>Concept</i><span>A cowrie-inspired payments brand for African SMEs.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel centered" data-station="engineering" aria-hidden="true">
+      <h2>Engineering</h2>
+      <ul class="list">
+        <li><b>LineCraft</b><i>Figma plugin</i><span>Generative line and pattern tools for vectors.</span></li>
+        <li><b>MeshCraft</b><i>Figma plugin</i><span>3D wireframe shapes, drawn as editable vectors.</span></li>
+        <li><b>Recorder Studio</b><i>Playwright</i><span>Turns HTML interaction prototypes into social videos.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel centered" data-station="contact" aria-hidden="true">
+      <h2>Contact</h2>
+      <ul class="list">
+        <li><b>Email</b><i>Best for work</i><a href="#" style="grid-column:1/-1;color:var(--muted)">Add your address</a></li>
+        <li><b>Resume</b><i>PDF</i><a href="#" style="grid-column:1/-1;color:var(--muted)">Download</a></li>
+        <li><b>Based in</b><i>WAT, UTC+1</i><span>Lagos, Nigeria</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer id="socials"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="#">Medium</a></footer>
+</div>
+
+<script src="../popkit.js"></script>
+<script>
+(function () {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const STEP = 13.5;                    // degrees per MHz
+  const ang = f => (f - 98) * STEP;     // 98 sits at 6 o'clock; higher goes left
+  const pt = (r, deg) => { const a = deg * Math.PI / 180; return [-r * Math.sin(a), r * Math.cos(a)]; };
+  const STATIONS = [
+    { f: 94,  id: 'contact',     name: 'Contact' },
+    { f: 96,  id: 'engineering', name: 'Engineering' },
+    { f: 98,  id: 'home',        name: 'Home' },
+    { f: 100, id: 'feed',        name: 'Feed' },
+    { f: 102, id: 'projects',    name: 'Projects' }
+  ];
+  const dial = document.getElementById('dial');
+  const needle = document.getElementById('needleG');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Ticks: 88–108 MHz, 0.2 MHz apart; majors every 2 MHz.
+  const ticks = document.getElementById('ticks'), nums = document.getElementById('nums');
+  const stationTick = {};
+  for (let k = 0; k <= 100; k++) {
+    const f = 88 + k / 5, major = k % 10 === 0, a = ang(f);
+    const [x1, y1] = pt(300, a), [x2, y2] = pt(major ? 328 : 312, a);
+    const l = document.createElementNS(SVGNS, 'line');
+    l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+    l.setAttribute('class', major ? 'major' : 'minor');
+    ticks.appendChild(l);
+    if (major) {
+      const st = STATIONS.find(s => s.f === Math.round(f));
+      if (st) { l.classList.add('station'); stationTick[st.id] = l; }
+      else {
+        const [nx, ny] = pt(352, a);
+        const t = document.createElementNS(SVGNS, 'text');
+        t.setAttribute('class', 'num'); t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'middle');
+        t.setAttribute('transform', `translate(${nx} ${ny}) rotate(180)`);
+        t.textContent = Math.round(f);
+        nums.appendChild(t);
+      }
+    }
+  }
+
+  // Station labels as real buttons.
+  const labels = document.getElementById('labels'), btn = {};
+  STATIONS.forEach(s => {
+    const a = ang(s.f), [x, y] = pt(345, a);
+    const b = document.createElement('button');
+    b.className = 'station-label'; b.textContent = s.name; b.dataset.id = s.id;
+    const side = Math.abs(a) < 1 ? 0 : (a > 0 ? -1 : 1);   // -1 left, 1 right
+    b.style.left = (380 + x + (side === -1 ? 10 : side === 1 ? -10 : 0)) + 'px';
+    b.style.top = (380 + y) + 'px';
+    b.style.transform = side === 0 ? 'translate(-50%,-50%)' : side === -1 ? 'translate(-100%,-50%)' : 'translate(0,-50%)';
+    b.addEventListener('click', e => tuneTo(s, e.isTrusted));
+    labels.appendChild(b); btn[s.id] = b;
+  });
+
+  // Feed: mixed portrait and landscape, balanced into columns left to right.
+  // Add `src` to any item to show an image; ratio is width / height.
+  const FEED = [
+    { t: 'Coins on a ribbon', r: 3 / 2 },
+    { t: 'Red padlock', r: 4 / 5 },
+    { t: 'Soft light study', r: 16 / 10 },
+    { t: 'Pawn in an archway', r: 4 / 5 },
+    { t: 'Vase in window light', r: 4 / 5 },
+    { t: 'Coins on a ribbon II', r: 4 / 5 },
+    { t: 'Window shadow', r: 3 / 2 },
+    { t: 'Torus study', r: 1 },
+    { t: 'Terracotta still life', r: 2 / 3 },
+    { t: 'Evening room', r: 16 / 9 },
+    { t: 'Wireframe sphere', r: 1 },
+    { t: 'Arch series', r: 3 / 4 },
+    { t: 'Gold coin close-up', r: 4 / 5 },
+    { t: 'Ribbon loop', r: 3 / 2 },
+    { t: 'Glass orb', r: 4 / 5 },
+    { t: 'Shadow play', r: 16 / 10 }
+  ];
+  const masonry = document.getElementById('masonry');
+  let cols = 0;
+  function buildFeed() {
+    const w = masonry.clientWidth || Math.min(1592, innerWidth - 32);
+    const n = w >= 1200 ? 4 : w >= 860 ? 3 : w >= 520 ? 2 : 1;
+    if (n === cols) return;
+    cols = n; masonry.innerHTML = '';
+    const colEls = [], heights = [];
+    for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'col'; masonry.appendChild(c); colEls.push(c); heights.push(0); }
+    FEED.forEach((it, i) => {
+      const k = heights.indexOf(Math.min(...heights));
+      const fig = document.createElement('figure');
+      fig.className = 'tile'; fig.style.aspectRatio = it.r;
+      if (it.src) { const im = new Image(); im.src = it.src; im.alt = it.t; im.loading = 'lazy'; fig.appendChild(im); }
+      const cap = document.createElement('figcaption');
+      cap.innerHTML = `<span></span><i>${String(i + 1).padStart(2, '0')}</i>`;
+      cap.firstChild.textContent = it.t;
+      fig.appendChild(cap);
+      colEls[k].appendChild(fig);
+      heights[k] += 1 / it.r + 0.04;
+    });
+  }
+
+  // Scale the dial for narrow screens.
+  function fit() {
+    // 0.834 is the dial's size in the Figma file relative to the original build.
+    const s = 0.834 * Math.min(1, (window.innerWidth - 8) / 600);
+    document.documentElement.style.setProperty('--s', s.toFixed(4));
+    if (active && active.id === 'feed') buildFeed();
+  }
+  addEventListener('resize', fit);
+
+  // Needle motion: a light spring toward the target angle.
+  let cur = 0, vel = 0, target = 0, raf = 0;
+  function draw() { needle.setAttribute('transform', `rotate(${cur})`); }
+  function animate() {
+    cancelAnimationFrame(raf);
+    if (reduce) { cur = target; vel = 0; draw(); return; }
+    const step = () => {
+      vel = (vel + (target - cur) * 0.14) * 0.72;
+      cur += vel;
+      if (Math.abs(target - cur) < 0.02 && Math.abs(vel) < 0.02) { cur = target; draw(); return; }
+      draw(); raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
+
+  let active = null, lit = null;
+  function light(s) {
+    if (lit === s) return false;
+    lit = s;
+    STATIONS.forEach(o => {
+      btn[o.id].classList.toggle('on', o === s);
+      stationTick[o.id].classList.toggle('on', o === s);
+    });
+    return true;
+  }
+  function tuneTo(s, sound) {
+    target = ang(s.f); animate(); light(s);
+    if (sound && window.Popkit) Popkit.play('pop');
+    if (active === s) return;
+    active = s;
+    document.querySelectorAll('.panel').forEach(p => p.setAttribute('aria-hidden', p.dataset.station !== s.id));
+    if (s.id === 'feed') buildFeed();
+    if (s.id !== 'home' && typeof clearTrail === 'function') clearTrail();
+    document.getElementById('socials').hidden = s.id === 'feed';
+    window.scrollTo(0, 0);
+    const t = document.getElementById('tuner');
+    t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
+    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+  }
+  const nearest = deg => STATIONS.reduce((a, b) => Math.abs(ang(b.f) - deg) < Math.abs(ang(a.f) - deg) ? b : a);
+
+  // Drag the needle anywhere on the dial.
+  const hit = document.getElementById('hit');
+  let dragging = false;
+  function angleFrom(e) {
+    const r = hit.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const lim = ang(102) + 8;
+    return Math.max(-lim, Math.min(lim, Math.atan2(-dx, dy) * 180 / Math.PI));
+  }
+  hit.addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return;
+    dragging = true; dial.classList.add('dragging');
+    hit.setPointerCapture(e.pointerId);
+    cancelAnimationFrame(raf);
+    move(e);
+  });
+  function move(e) {
+    if (!dragging) return;
+    cur = angleFrom(e); target = cur; vel = 0; draw();
+    if (light(nearest(cur)) && e.isTrusted && window.Popkit) Popkit.play('detent');
+  }
+  hit.addEventListener('pointermove', move);
+  function end(e) {
+    if (!dragging) return;
+    dragging = false; dial.classList.remove('dragging');
+    tuneTo(nearest(cur), e.isTrusted);
+  }
+  hit.addEventListener('pointerup', end);
+  hit.addEventListener('pointercancel', end);
+
+  // Keyboard: left/right step between stations as they sit on screen.
+  document.getElementById('tuner').addEventListener('keydown', e => {
+    const i = STATIONS.indexOf(active);
+    const d = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const n = STATIONS[Math.max(0, Math.min(STATIONS.length - 1, i + d))];
+    if (n !== active) tuneTo(n, e.isTrusted);
+  });
+
+  // Image trail on Home. Swap TRAIL_IMAGES for your own files whenever you like.
+  const TRAIL_IMAGES = Array.from({ length: 12 }, (_, i) => `assets/trail/trail-${String(i + 1).padStart(2, '0')}.jpg`);
+  const trail = document.getElementById('trail');
+  const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const pool = TRAIL_IMAGES.map(src => { const im = new Image(); im.src = src; return im; });
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  let next = 0, lastX = null, lastY = null;
+  const SPACING = 90, MAX_LIVE = 10;
+  function dropImage(x, y, dx, dy) {
+    const src = pool[next++ % pool.length];
+    if (!src.complete || !src.naturalWidth) return;
+    const ratio = src.naturalWidth / src.naturalHeight;
+    const w = Math.round(160 * Math.sqrt(ratio)), h = Math.round(w / ratio);
+    const im = document.createElement('img');
+    im.src = src.src; im.alt = ''; im.width = w; im.height = h;
+    trail.appendChild(im);
+    while (trail.children.length > MAX_LIVE) trail.firstChild.remove();
+    const r = (Math.random() - .5) * 10;
+    const x0 = x - w / 2, y0 = y - h / 2;
+    const drift = Math.hypot(dx, dy) || 1, mx = dx / drift * 24, my = dy / drift * 24;
+    const a = im.animate([
+      { opacity: 0, transform: `translate(${x0}px,${y0}px) rotate(${r}deg) scale(.55)` },
+      { opacity: 1, transform: `translate(${x0 + mx * .4}px,${y0 + my * .4}px) rotate(${r}deg) scale(1)`, offset: .22 },
+      { opacity: 1, transform: `translate(${x0 + mx * .7}px,${y0 + my * .7}px) rotate(${r}deg) scale(1)`, offset: .6 },
+      { opacity: 0, transform: `translate(${x0 + mx}px,${y0 + my}px) rotate(${r}deg) scale(.8)` }
+    ], { duration: 1150, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards' });
+    a.onfinish = () => im.remove();
+  }
+  if (canHover && !reduce) {
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || !active || active.id !== 'home' || dragging) { lastX = null; return; }
+      if (e.clientY + scrollY < document.querySelector('.top').offsetHeight) { lastX = null; return; }
+      if (lastX === null) { lastX = e.clientX; lastY = e.clientY; return; }
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      if (Math.hypot(dx, dy) < SPACING) return;
+      dropImage(e.clientX, e.clientY, dx, dy);
+      lastX = e.clientX; lastY = e.clientY;
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => { lastX = null; });
+  }
+  function clearTrail() { trail.replaceChildren(); lastX = null; }
+
+  // Start on the station named in the link, or Home.
+  fit();
+  const hash = location.hash.slice(1) === 'about' ? 'home' : location.hash.slice(1);
+  const start = STATIONS.find(s => s.id === hash) || STATIONS[2];
+  cur = target = ang(start.f); draw(); tuneTo(start, false);
+
+  // Live Lagos time.
+  const timeEl = document.getElementById('time');
+  const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', hour: 'numeric', minute: '2-digit', hour12: true });
+  function tick() {
+    const parts = fmt.formatToParts(new Date());
+    const h = parts.find(p => p.type === 'hour').value, m = parts.find(p => p.type === 'minute').value;
+    const ap = (parts.find(p => p.type === 'dayPeriod') || { value: '' }).value.toLowerCase().replace(/\./g, '').replace(/\s/g, '');
+    timeEl.textContent = `${h}:${m}${ap}, Lagos 🇳🇬`;
+    setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
