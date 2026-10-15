@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
-  var BUILD = "202610151908";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610151914";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -59,7 +59,7 @@ button { font: inherit; background: none; border: 0; padding: 0; color: inherit;
 .t-minor { stroke: var(--ink); stroke-linecap: round }
 .t-major { stroke: var(--muted); stroke-linecap: round; transition: stroke .2s }
 .t-major.on { stroke: var(--ink) }
-.needle { stroke: var(--ink); stroke-linecap: round }
+.needle { stroke: #ff4a1c; stroke-linecap: round }   /* the dial's main tick: the same red as the Designs needle */
 
 .pill { position: absolute; pointer-events: auto; font-size: 14px; line-height: 16px; padding: 6px 12px; border-radius: 8px;
   background: var(--pill); color: var(--text); white-space: nowrap; transition: background .2s, color .2s }
