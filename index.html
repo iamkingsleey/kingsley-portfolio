@@ -331,6 +331,9 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .secret-card button:hover { background: var(--pill-hover) }
 @media (prefers-reduced-motion: reduce) { .time .colon { animation: none } .avatar { transition: none } }
 
+/* Page reveal ring: a hairline circle that traces the edge of the opening page. */
+.reveal-ring { position: fixed; left: 0; top: 0; width: 0; height: 0; border: 1.5px solid var(--ink); border-radius: 50%; z-index: 99; pointer-events: none; opacity: 0 }
+
 /* ---------- Loader: station counter that locks on 100 ---------- */
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
 .loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
@@ -769,24 +772,38 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     // The leaving page only fades (cheap for big pages like Feed); the arriving one carries the motion.
     // Layer hints only while moving; cleared after so the browser repaints the page normally.
     from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
+    // The reveal is slower than the needle so the circle reads clearly: the old page stays visible and sinks
+    // back a little while the new one opens over it, and a thin ring traces the circle's edge as it grows.
+    const REV = 900;
+    from.style.willChange = 'opacity, transform';
     const fade = from.animate([
-      { opacity: 1 },
-      { opacity: 0 }
-    ], { duration: DUR * .8, easing: EASE, fill: 'forwards' });
+      { opacity: 1, transform: 'scale(1)' },
+      { opacity: .85, transform: 'scale(.975)', offset: .6 },
+      { opacity: 0, transform: 'scale(.96)' }
+    ], { duration: REV, easing: EASE, fill: 'forwards' });
     fade.onfinish = () => {
       if (active && panels[active.id] !== from) from.hidden = true;
       fade.cancel(); from.style.willChange = '';
     };
     const reveal = to.animate([
-      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg)` },
-      { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg)' }
-    ], { duration: DUR, easing: EASE });
+      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg) scale(1.04)` },
+      { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg) scale(1)' }
+    ], { duration: REV, easing: EASE });
+    revealRing(ox, oy, start, far, REV);
     const settle = () => {
       to.style.willChange = ''; to.style.clipPath = ''; to.style.transform = ''; to.style.opacity = '';
       // Nudge a fresh paint of the arrived page (works around a Safari blank-layer bug).
       to.style.visibility = 'hidden'; void to.offsetHeight; to.style.visibility = '';
     };
     reveal.onfinish = settle; reveal.oncancel = () => { to.style.willChange = ''; };
+  }
+  // Thin ring that rides the edge of the page reveal.
+  const ringEl = document.createElement('div'); ringEl.className = 'reveal-ring'; ringEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(ringEl);
+  function revealRing(x, y, r0, r1, dur) {
+    ringEl.getAnimations().forEach(a => a.cancel());
+    const k = (r, o) => ({ left: `${x - r}px`, top: `${y - r}px`, width: `${2 * r}px`, height: `${2 * r}px`, opacity: o });
+    ringEl.animate([k(r0, 0), k(r0 + (r1 - r0) * .04, .9), k(r0 + (r1 - r0) * .55, .55), k(r1, 0)].map((f, i) => (f.offset = [0, .06, .5, 1][i], f)),
+      { duration: dur, easing: EASE });
   }
   function tuneTo(s, sound) {
     const prev = active;
