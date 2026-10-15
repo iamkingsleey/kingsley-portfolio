@@ -224,7 +224,7 @@ body.open .sdial { opacity: 1; pointer-events: auto }
 /* ---------- Category static ---------- */
 canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(100% - 96px); z-index: 7; pointer-events: none; opacity: 0; image-rendering: pixelated; mix-blend-mode: multiply }
 /* ---------- Opening a project that has its own page ---------- */
-.pagecover { position: fixed; inset: 0; z-index: 90; background: var(--bg); pointer-events: none; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .64s cubic-bezier(.65,0,.35,1) }
+.pagecover { position: fixed; inset: 0; z-index: 90; background: var(--bg); pointer-events: none; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .42s cubic-bezier(.55,0,.45,1) }
 .pagecover.on { clip-path: circle(150vmax at var(--rx, 50%) var(--ry, 50%)) }
 /* ---------- See everything ---------- */
 .allbtn { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--pill); font-size: 13px; font-weight: 500; color: var(--ink); transition: background .2s, color .2s }
@@ -1174,17 +1174,17 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const from = slots[i].getBoundingClientRect();
     if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
     const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
-    const f = flyEl(from, rp && rp.cv, still(items[i]));
-    broadcast(x, y);
+    const f = flyEl(from, rp && rp.cv, still(items[i]));   // the picture itself ripples from the tap (no ring lines)
     try { sessionStorage.setItem('km-enter', JSON.stringify({ x: x / innerWidth, y: y / innerHeight })); sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
     const cov = document.createElement('div'); cov.className = 'pagecover';
     cov.style.setProperty('--rx', x + 'px'); cov.style.setProperty('--ry', y + 'px'); document.body.appendChild(cov);
-    await wait(rp && !reduce ? 260 : 0);
+    await wait(rp && !reduce ? 300 : 0);                      // let the ripple read on the picture
     requestAnimationFrame(() => cov.classList.add('on'));
-    await wait(reduce ? 0 : 640);
+    await wait(reduce ? 0 : 400);                             // the circle needs only to cover the screen
     location.href = items[i].page;
     setTimeout(() => { f.remove(); cov.remove(); busy = false; }, 1500);
   }
+  if (PROJECT_PAGE) setTimeout(() => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = PROJECT_PAGE; document.head.appendChild(l); }, 1500);
   addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover').forEach(c => c.remove()); busy = false; } });
   async function openDetail(i, x, y) {
     if (items[i] && items[i].page && !busy) return goPage(i, x, y);
