@@ -13,14 +13,15 @@
   'use strict';
   var KEY = 'km-tune', LEG = .6;   // share of the count done before the page switches
   var reduce = root.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* the blur sits on the overlay (backdrop-filter), never on <body>: a filter on <body> would make every fixed
+       element on the page (station readout, dials, rulers) jump to the body's own position while it is applied */
   var css = '' +
-    'html.tuning body{filter:blur(16px);transition:filter .45s cubic-bezier(.65,0,.35,1)}' +
-    'html.tuning.tuned body{filter:blur(0)}' +
-    '.tuner{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .35s cubic-bezier(.65,0,.35,1)}' +
-    '.tuner::before{content:"";position:absolute;inset:0;background:var(--bg,#0b0b0b);opacity:.62}' +
+
+    '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .35s cubic-bezier(.65,0,.35,1)}' +
+    '.tuner::before{content:"";position:absolute;inset:0;background:rgb(11 11 11 / .6);background:color-mix(in srgb,var(--bg,#0b0b0b) 62%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}' +
     '.tuner.on{opacity:1}' +
     '.tuner.now{transition:none}' +
-    '.tuner .tin{position:relative;display:grid;justify-items:center;gap:8px;width:min(560px,88vw);padding-bottom:6vh}' +
+    '.tuner .tin{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);display:grid;justify-items:center;gap:8px;width:min(560px,88vw)}' +
     '.tuner .tlb{font:500 10.5px "Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.6px;text-transform:uppercase;color:var(--muted,#7a7a7a)}' +
     '.tuner .tfq{font:600 84px/1 Geist,ui-sans-serif,system-ui,-apple-system,sans-serif;letter-spacing:-2.5px;color:var(--ink,#fff);font-variant-numeric:tabular-nums}' +
     '.tuner .tnm{font:500 15px Geist,ui-sans-serif,system-ui,-apple-system,sans-serif;letter-spacing:-.2px;color:var(--ink,#fff);min-height:1.2em;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
