@@ -7,14 +7,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
-<script src="tuner.js"></script>
 <script>
-  var BUILD = "202610152232";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610152239";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
+<script src="tuner.js"></script>
 <style>
 /* Layout: the tuning dial sits on the left edge of Home; inner pages swap it for a side menu (a rail with the current page as a tag); each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
 :root {
