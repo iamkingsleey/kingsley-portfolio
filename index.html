@@ -7,8 +7,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
+<script src="tuner.js"></script>
 <script>
-  var BUILD = "202610152228";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610152232";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -921,6 +922,7 @@ h1.typer { position: relative }
     let o = { x: M.cx, y: M.cy, r: 264.5 * M.S };
     const g = prev && prev.id !== 'home' && tagFor(STATIONS.find(x => x.id === 'designs'));
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2 };
+    if (window.Tuner) { Tuner.go({ from: 98, to: 100, name: 'Designs', href: 'designs.html?v=' + BUILD }); return; }   // readout to the middle, page blurs
     if (reduce) { location.href = 'designs.html?v=' + BUILD; return; }
     const cover = document.createElement('div'); cover.className = 'leave'; document.body.appendChild(cover);
     const far = Math.ceil(Math.hypot(Math.max(o.x, innerWidth - o.x), Math.max(o.y, innerHeight - o.y))) + 8;

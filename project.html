@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Project · Kingsley M.</title>
+<script src="tuner.js"></script>
 <script>
   // theme from Home's toggle (dark if never chosen); the page opens as a circle from where you tapped
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
@@ -229,7 +230,7 @@ figure { margin: 0 }
 </style>
 </head>
 <body>
-<div class="station"><a class="back" href="designs.html?v=202610152228" id="back"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="fq"></span><span class="nm" id="nm"></span></div>
+<div class="station"><a class="back" href="designs.html?v=202610152232" id="back"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="fq"></span><span class="nm" id="nm"></span></div>
 <main class="wrap" id="page"></main>
 <div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
 
@@ -252,6 +253,7 @@ figure { margin: 0 }
   const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const idx = t => all.findIndex(x => x.t === t);
   const pad = i => String(i + 1).padStart(2, '0');
+  const FQ = i => +(100 + (i + 1) / 10).toFixed(1);
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
   let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}   // Home's sound switch
@@ -300,7 +302,7 @@ figure { margin: 0 }
     const it = all[cur], c = COPY[it.cat], nx = all[(cur + 1) % all.length];
     const others = all.filter((x, j) => j !== cur && x.cat === it.cat).concat(all.filter(x => x.cat !== it.cat));
     const g = k => others[k % others.length];
-    $('fq').textContent = pad(cur); $('nm').textContent = it.t;
+    $('fq').textContent = FQ(cur).toFixed(1);   // each piece has its own station just above Designs' 100.0 $('nm').textContent = it.t;
     const words = t => t.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
     const fact = (k, v, dl) => `<div class="fact rv" style="--dl:${dl}s"><dt class="mono">${k}</dt><dd>${v}</dd></div><i class="rule" style="--dl:${dl + .1}s"></i>`;
     page.innerHTML = `
@@ -362,7 +364,9 @@ figure { margin: 0 }
   $('back').addEventListener('click', e => {
     if (reduce || e.metaKey || e.ctrlKey) return;
     e.preventDefault(); snd('pop');
-    const href = e.currentTarget.href, r = e.currentTarget.getBoundingClientRect();
+    const href = e.currentTarget.href;
+    if (window.Tuner) { Tuner.go({ from: FQ(cur), to: 100, name: 'Designs', href }); return; }
+    const r = e.currentTarget.getBoundingClientRect();
     cover(r.left + r.width / 2, r.top + r.height / 2, () => { location.href = href; });
   });
   addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('.pagecover').forEach(c => c.remove()); });

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Designs · Kingsley M.</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script src="tuner.js"></script>
 <script>
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
@@ -958,6 +959,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   $('back').addEventListener('click', () => {
     if (openIdx >= 0) { tap(); closeDetail(); return; }
     if (leaving) return; leaving = true; tap();
+    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'index.html#home' }); return; }   // the readout moves to the middle and tunes down
     const station = $('station'), fq = $('fq'), nm = $('nm');
     station.classList.add('tune-out'); document.body.classList.add('leaving');
     const t0 = performance.now(), dur = reduce ? 0 : 700;
@@ -1184,6 +1186,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
     const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
     const f = flyEl(from, rp && rp.cv, still(items[i]));   // the picture itself ripples from the tap (no ring lines)
+    if (window.Tuner) {                                       // then the page blurs and the readout tunes to the piece's station
+      try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+      await wait(rp && !reduce ? 260 : 0);
+      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: items[i].page });
+      setTimeout(() => { f.remove(); busy = false; }, 2000);
+      return;
+    }
     try { sessionStorage.setItem('km-enter', JSON.stringify({ x: x / innerWidth, y: y / innerHeight })); sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
     const cov = document.createElement('div'); cov.className = 'pagecover';
     cov.style.setProperty('--rx', x + 'px'); cov.style.setProperty('--ry', y + 'px'); document.body.appendChild(cov);
