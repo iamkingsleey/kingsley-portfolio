@@ -260,6 +260,20 @@ html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
 .fxsw button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
 body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
 @media (max-width: 899px) { .fxsw { left: 16px; right: 16px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); flex-wrap: wrap } .fxsw button { padding: 4px 8px; font-size: 11px } }
+
+/* ---------- Radio physics preview ---------- */
+.fmwave { position: fixed; left: 0; right: 0; width: 100%; height: 30px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 13; pointer-events: none }
+.noisefloor { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(100% - 96px); z-index: 7; pointer-events: none; opacity: 0; mix-blend-mode: overlay; image-rendering: pixelated }
+.bcast { position: fixed; z-index: 30; width: 0; height: 0; border-radius: 50%; pointer-events: none; border: 1.5px solid var(--ink);
+  transform: translate(-50%, -50%); animation: bcast 1.2s cubic-bezier(.2,.7,.3,1) both }
+@keyframes bcast { from { width: 0; height: 0; opacity: .6 } to { width: 220vmax; height: 220vmax; opacity: 0 } }
+.phys { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); bottom: calc(132px + env(safe-area-inset-bottom, 0px)); z-index: 16; display: flex; flex-wrap: wrap; gap: 4px; max-width: min(620px, calc(100vw - 32px)); align-items: center; font-size: 12px }
+.phys > span { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-right: 6px }
+.phys button { padding: 4px 9px; border-radius: 999px; color: var(--muted); font-weight: 500; background: var(--pill) }
+.phys button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+.phys button.all { background: none; text-decoration: underline; text-underline-offset: 3px }
+body.open .phys, body.all .phys, body.open .fmwave { opacity: 0; pointer-events: none }
+@media (max-width: 899px) { .phys { left: 16px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)) } .phys button { font-size: 11px; padding: 3px 7px } }
 </style>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
@@ -592,6 +606,8 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
       const L = left + ox, T = cy - h / 2 + oy;
       const bx = { src, left: L, top: T, w, h, cw: scw, ch: sch, cx0: sx, cy0: sy, white: slots[i].classList.contains('white') };
       boxes.push(bx);
+      diffract(i, L, T, w, h, src, sx, sy, scw, sch);
+      fx.filter = cardFilter(i);
       if (PMODE.tilt) {                                      // card turns toward the cursor (columns get taller on the near side)
         const cols = Math.ceil(w / 4), d = Math.min(1, Math.abs(i - p));
         const tx = mx * (1 - d * .5), ty = my * (1 - d * .5);
@@ -628,7 +644,10 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
           fx.moveTo(a0, cy + (T - cy) * k0); fx.lineTo(a1, cy + (T - cy) * k1); fx.lineTo(a1, cy + (T + h - cy) * k1); fx.lineTo(a0, cy + (T + h - cy) * k0); fx.closePath(); fx.stroke();
         } else { fx.strokeStyle = THEME.edge; fx.lineWidth = 1; fx.strokeRect(L + .5, T + .5, w - 1, h - 1); }
       }
+      fx.filter = 'none';
+      cardFX(i, L, T, w, h);
     }
+    rowFX();
     if (reduce || EDGE !== 'fold') return;
     // Mirror fold: a fold line sits BAND px in from each edge. Past it, the screen shows the (already warped)
     // picture just inside the fold, flipped and stretched a touch, so pieces fold into a false duplicate.
@@ -680,7 +699,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
       active = a; setCaption(a);
       if (prevCat && prevCat !== items[a].cat) { scanDir = a > prevIdx ? 1 : -1; stationJump(items[a].cat); }
     }
-    drawField(L0, L1, t); present();
+    drawField(L0, L1, t); present(); overlaysFX();
     drawStatic();
     // bassFollow(openIdx >= 0 || ovOpen ? 0 : Math.abs(p - prev));   // movement hum: off for now, sound TBD
     // caption tracks the active piece and fades while it is between stops
@@ -719,6 +738,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
       const x = cx + (v - p) * SP, d = Math.abs(v - p) * 5;
       let L = d < PROFILE.length - 1 ? PROFILE[Math.floor(d)] + (PROFILE[Math.floor(d) + 1] - PROFILE[Math.floor(d)]) * (d % 1) : 9;
       if (major) L = Math.max(L, 20);
+      L = tickFX(L, v, x);
       l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', 66); l.setAttribute('y2', 66 - L);
       l.setAttribute('stroke', THEME.ink); l.setAttribute('stroke-width', major ? 2 : 1.2);
       l.setAttribute('stroke-opacity', x < -10 || x > W + 10 ? 0 : (major ? .55 : .18) + Math.max(0, 1 - d / 10) * .35);
@@ -1111,6 +1131,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
     const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
     const f = flyEl(from, rp && rp.cv, still(items[i]));
+    broadcast(x, y);
     flyIdx = i;
     await wait(rp ? 280 : 0);                                     // let the first ring travel before it moves
     render(i); openIdx = i; detail.scrollTop = 0;
@@ -1411,6 +1432,155 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     const b = e.target.closest('button'); if (!b) return;
     EDGE = b.dataset.e;
     $('edgesw').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+
+  // =================================================================================================
+  // Radio physics preview. Each effect can be switched on and off in the panel (bottom left).
+  // =================================================================================================
+  // chosen: 1 FM wave, 4 Doppler, 5 Signal falloff, 7 Standing wave, 8 Broadcast ring, 9 Noise floor, 10 Spectrum
+  const PHY = { fm: 1, resonance: 0, interference: 0, doppler: 1, falloff: 1, diffraction: 0, standing: 1, broadcast: 1, noise: 1, spectrum: 1 };
+  const PHY_NAMES = { fm: 'FM wave', resonance: 'Resonance', interference: 'Interference', doppler: 'Doppler', falloff: 'Signal falloff',
+    diffraction: 'Diffraction', standing: 'Standing wave', broadcast: 'Broadcast ring', noise: 'Noise floor', spectrum: 'Spectrum' };
+  const speedAmt = () => Math.min(1, Math.abs(vel) * 30);
+  // grain tile shared by falloff and noise floor
+  const grain = document.createElement('canvas'); grain.width = grain.height = 160;
+  const gx = grain.getContext('2d');
+  function regrain() {
+    const im = gx.createImageData(160, 160), d = im.data;
+    for (let k = 0; k < d.length; k += 4) { const v = Math.random() * 255 | 0; d[k] = d[k + 1] = d[k + 2] = v; d[k + 3] = 255; }
+    gx.putImageData(im, 0, 0);
+  }
+  regrain();
+  let grainPat = null;
+
+  // 2 Resonance + 5 Signal falloff: pieces fill in on a sharp peak as they near the needle
+  function cardFilter(i) {
+    if (reduce) return 'none';
+    const d = Math.min(3, Math.abs(i - p));
+    let f = '';
+    if (PHY.resonance) {
+      const q = 1 / (1 + (d * 2.2) ** 2);                // resonance curve: sharp peak at the needle
+      f += `saturate(${(.35 + .65 * q).toFixed(3)}) `;
+    }
+    if (PHY.falloff) f += `contrast(${(1 - .22 * Math.min(1, d / 2)).toFixed(3)}) brightness(${(1 - .12 * Math.min(1, d / 2)).toFixed(3)}) `;
+    return f || 'none';
+  }
+  // 6 Diffraction: near the screen edge the picture spreads past its frame as a soft glow
+  function diffract(i, L, T, w, h, src, sx, sy, scw, sch) {
+    if (!PHY.diffraction || reduce) return;
+    const e = Math.max(0, Math.max(W * .14 - L, (L + w) - W * .86)) / (W * .14);
+    if (e <= 0) return;
+    const k = Math.min(1, e);
+    fx.save(); fx.filter = `blur(${(10 + 16 * k).toFixed(1)}px)`; fx.globalAlpha = .55 * k;
+    const g = 18 * k;
+    fx.drawImage(src, sx, sy, scw, sch, L - g, T - g, w + g * 2, h + g * 2);
+    fx.restore();
+  }
+  // 4 Doppler + 5 falloff grain, drawn over each piece
+  function cardFX(i, L, T, w, h) {
+    if (reduce) return;
+    const rel = i - p;
+    if (PHY.doppler && Math.abs(vel) > .0005 && Math.abs(rel) > .05) {
+      const toward = rel * vel > 0;                     // moving toward the needle?
+      const a = Math.min(.32, Math.abs(vel) * 9) * Math.min(1, Math.abs(rel));
+      fx.save(); fx.globalCompositeOperation = 'soft-light'; fx.globalAlpha = a;
+      fx.fillStyle = toward ? '#3d7bff' : '#ff6a2b'; fx.fillRect(L, T, w, h); fx.restore();
+    }
+    if (PHY.falloff) {
+      const d = Math.min(2, Math.abs(rel));
+      if (d > .15) {
+        if (!grainPat) grainPat = fx.createPattern(grain, 'repeat');
+        fx.save(); fx.globalCompositeOperation = 'overlay'; fx.globalAlpha = .14 * d; fx.fillStyle = grainPat; fx.fillRect(L, T, w, h); fx.restore();
+      }
+    }
+  }
+  // 3 Interference: two sets of fine lines with slightly different spacing; their beat makes moving moiré bands
+  function rowFX() {
+    if (!PHY.interference || reduce) return;
+    const a = speedAmt(); if (a < .02) return;
+    const [w0, h0] = sizes[Math.round(p)] || [400, 500], top = cy - h0 / 2, hh = h0;
+    fx.save(); fx.globalAlpha = .22 * a; fx.strokeStyle = THEME.ink; fx.lineWidth = 1;
+    const ph = p * 60;
+    fx.beginPath();
+    for (let x = -(ph % 6); x < W; x += 6) { fx.moveTo(x, top); fx.lineTo(x, top + hh); }
+    for (let x = -((ph * 1.08) % 6.4); x < W; x += 6.4) { fx.moveTo(x, top); fx.lineTo(x, top + hh); }
+    fx.stroke(); fx.restore();
+  }
+  // 7 Standing wave (ruler rings on settle) + 10 Spectrum (peaks at categories while moving)
+  function tickFX(L, v, x) {
+    if (reduce) return L;
+    if (PHY.standing) {
+      const t = performance.now() - settleAt;
+      if (t < 1100) L += 9 * Math.sin((v - p) * Math.PI * 1.25) * Math.cos(t / 38) * Math.exp(-t / 320);
+    }
+    if (PHY.spectrum) {
+      const a = speedAmt();
+      if (a > .02) {
+        let pk = 0;
+        for (const ci of firstOf) pk = Math.max(pk, Math.exp(-((v - ci) ** 2) / .06));
+        L += a * (34 * pk + 6 * Math.random() * Math.exp(-((v - p) ** 2) / 4));
+      }
+    }
+    return Math.max(4, L);
+  }
+  // 1 FM wave above the ruler + 9 noise floor over the row
+  const fm = document.createElement('canvas'); fm.className = 'fmwave'; fm.setAttribute('aria-hidden', 'true'); document.body.appendChild(fm);
+  const fmx = fm.getContext('2d');
+  const nf = document.createElement('canvas'); nf.className = 'noisefloor'; nf.setAttribute('aria-hidden', 'true'); nf.width = 480; nf.height = 300; document.body.appendChild(nf);
+  const nfx = nf.getContext('2d');
+  let fmPhase = 0, fmFreq = 0;
+  function overlaysFX() {
+    // FM wave
+    const dpr = Math.min(2, devicePixelRatio || 1), fw = innerWidth, fh = 30;
+    if (fm.width !== Math.round(fw * dpr)) { fm.width = Math.round(fw * dpr); fm.height = Math.round(fh * dpr); }
+    fmx.setTransform(dpr, 0, 0, dpr, 0, 0); fmx.clearRect(0, 0, fw, fh);
+    if (PHY.fm && !reduce && openIdx < 0) {
+      const a = speedAmt();
+      fmFreq += ((.018 + a * .11) - fmFreq) * .08;     // carrier speeds up with scroll speed (frequency modulation)
+      fmPhase += .05 + a * .5;
+      fmx.beginPath();
+      for (let x = 0; x <= fw; x += 2) {
+        const env = Math.exp(-(((x - fw / 2) / (fw * .33)) ** 2));
+        const y = fh / 2 + Math.sin(x * fmFreq - fmPhase) * (2 + 7 * a) * env;
+        x ? fmx.lineTo(x, y) : fmx.moveTo(x, y);
+      }
+      fmx.strokeStyle = THEME.ink; fmx.globalAlpha = .25 + .45 * a; fmx.lineWidth = 1.2; fmx.stroke(); fmx.globalAlpha = 1;
+    }
+    // noise floor: faint grain while between pieces
+    const between = Math.abs(p - Math.round(p)) * 2;
+    if (PHY.noise && !reduce && openIdx < 0 && between > .02) {
+      const im = nfx.createImageData(nf.width, nf.height), d = im.data;
+      for (let k = 0; k < d.length; k += 4) { const v = Math.random() * 255 | 0; d[k] = d[k + 1] = d[k + 2] = v; d[k + 3] = 255; }
+      nfx.putImageData(im, 0, 0);
+      nf.style.opacity = (.1 * Math.min(1, between * 1.5)).toFixed(3);
+    } else nf.style.opacity = '0';
+    if (PHY.falloff && Math.random() < .2) { regrain(); grainPat = null; }
+  }
+  // 8 Broadcast: opening a project sends rings out from the tap across the page
+  function broadcast(x, y) {
+    if (!PHY.broadcast || reduce) return;
+    for (let k = 0; k < 3; k++) {
+      const r = document.createElement('i'); r.className = 'bcast';
+      r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.animationDelay = (k * 140) + 'ms';
+      document.body.appendChild(r); setTimeout(() => r.remove(), 1400 + k * 140);
+    }
+  }
+  // panel
+  const ph = document.createElement('div'); ph.className = 'phys'; ph.setAttribute('role', 'group'); ph.setAttribute('aria-label', 'Radio physics (preview)');
+  ph.innerHTML = '<span>Radio physics</span>' + Object.keys(PHY).map((k, n) => `<button type="button" data-k="${k}" aria-pressed="true">${n + 1} ${PHY_NAMES[k]}</button>`).join('') +
+    '<button type="button" class="all" data-all="1">All off</button>';
+  // (preview panel not shown on the site)
+  ph.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.all) {
+      const on = b.textContent === 'All on';
+      Object.keys(PHY).forEach(k => PHY[k] = on ? 1 : 0);
+      ph.querySelectorAll('[data-k]').forEach(x => x.setAttribute('aria-pressed', on));
+      b.textContent = on ? 'All off' : 'All on';
+      return;
+    }
+    PHY[b.dataset.k] = PHY[b.dataset.k] ? 0 : 1;
+    b.setAttribute('aria-pressed', !!PHY[b.dataset.k]);
   });
   addEventListener('pageshow', e => { if (e.persisted) { document.body.classList.remove('leaving'); $('fq').textContent = '100.0'; $('nm').textContent = 'Designs'; leaving = false; } });
   addEventListener('resize', measure);
