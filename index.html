@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
-  var BUILD = "202610151756";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610151816";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -1462,7 +1462,7 @@ h1.typer { position: relative }
   let fmEnergy = 0, fmDir = 1, fmPhase = 0, fmFreq = .12, fmRaf = 0;
   function fmKick(d) { if (reduce) return; fmEnergy = Math.min(1.6, fmEnergy + .55); fmDir = d; if (!fmRaf) fmRaf = requestAnimationFrame(fmFrame); }
   function fmFrame() {
-    const dpr = Math.min(2, devicePixelRatio || 1), W = 150, H = 40;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = 90, H = 26;   // short and low
     const c = caretEl.getBoundingClientRect(), hr = typerEl.getBoundingClientRect();
     if (fmCv.width !== Math.round(W * dpr)) { fmCv.width = Math.round(W * dpr); fmCv.height = Math.round(H * dpr); fmCv.style.width = W + 'px'; fmCv.style.height = H + 'px'; }
     fmCv.style.transform = `translate(${(c.right - hr.left + 8).toFixed(1)}px, ${(c.top + c.height / 2 - hr.top - H / 2).toFixed(1)}px)`;
@@ -1475,7 +1475,7 @@ h1.typer { position: relative }
       fmCx.beginPath();
       for (let x = 0; x <= W; x += 1.5) {
         const env = Math.exp(-x / (W * .38)) * Math.min(1, x / 6);   // strongest at the cursor, fading out
-        const y = H / 2 + Math.sin(x * fmFreq - fmPhase) * (H * .42) * e * env;
+        const y = H / 2 + Math.sin(x * fmFreq - fmPhase) * (H * .34) * e * env;
         x ? fmCx.lineTo(x, y) : fmCx.moveTo(x, y);
       }
       fmCx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
