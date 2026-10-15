@@ -371,7 +371,7 @@ body.open .phys, body.all .phys, body.open .fmwave { opacity: 0; pointer-events:
     const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '');
     s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
     if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; s.appendChild(v); }
-    else { const im = new Image(); im.alt = ''; im.decoding = 'async'; if (i < 4) { im.fetchPriority = 'high'; im.src = it.src; } else im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
+    else { const im = new Image(); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
     row.appendChild(s);
     return s;
   });
@@ -430,6 +430,12 @@ body.open .phys, body.all .phys, body.open .fmwave { opacity: 0; pointer-events:
     return m + Math.floor(Math.random() * (N - 2 * m));
   })();
   let p = START, target = START, last = 0, vel = 0, active = -1;
+  // load the opening piece and its neighbours at full size straight away (the rest wait for page load),
+  // so the centre piece is sharp on first visit instead of showing its small preview
+  slots.forEach((sl, i) => {
+    const im = sl.querySelector('img[data-src]');
+    if (im && Math.abs(i - START) <= 2) { im.fetchPriority = i === START ? 'high' : 'auto'; im.src = im.dataset.src; im.removeAttribute('data-src'); }
+  });
   let hovering = false, hoverAmt = 0, moving = false, settleAt = -1e9, bounce = 0, bounceY = 1;
   const clamp = v => Math.max(0, Math.min(N - 1, v));
   function goTo(i) { target = clamp(i); }
