@@ -337,6 +337,8 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   //   year, client, role, tools, summary – shown in the caption and on the project page
   //   alt  – a second image (another angle) shown while hovering the piece on the needle
   //   loop – a short video loop played while hovering
+  //   featured: true – the page opens on this piece (later picked in the CMS). Without one, it opens on a
+  //                     random piece that has neighbours on both sides.
   const PROJECTS = {
     'Paper plane with coin': {}, 'Drink tumbler': {}, 'Safe with coins': {}, 'Pawn in an archway': {}, 'Award with ribbons': {},
     'Ruler picker': {},
@@ -345,7 +347,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   };
   const items = CATS.flatMap(c => A[c.k].map(x => {
     const pj = PROJECTS[x.t] || {};
-    return { ...x, cat: c.name, tools: pj.tools || (x.video ? 'Figma · Code' : c.tools), year: pj.year || '', client: pj.client || '', role: pj.role || '', summary: pj.summary || '', alt: pj.alt || '', loop: pj.loop || '' };
+    return { ...x, featured: !!pj.featured, cat: c.name, tools: pj.tools || (x.video ? 'Figma · Code' : c.tools), year: pj.year || '', client: pj.client || '', role: pj.role || '', summary: pj.summary || '', alt: pj.alt || '', loop: pj.loop || '' };
   }));
   const N = items.length;
 
@@ -402,7 +404,14 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   }
 
   // ---------- State ----------
-  let p = 0, target = 0, last = 0, vel = 0, active = -1;
+  // Opening piece: the featured one if set, else a random piece away from the ends, so the row is centred
+  // with work on both sides.
+  const START = (() => {
+    const f = items.findIndex(it => it.featured);
+    if (f >= 0) return f;
+    return N > 2 ? 1 + Math.floor(Math.random() * (N - 2)) : 0;
+  })();
+  let p = START, target = START, last = 0, vel = 0, active = -1;
   let hovering = false, hoverAmt = 0, moving = false, settleAt = -1e9, bounce = 0, bounceY = 1;
   const clamp = v => Math.max(0, Math.min(N - 1, v));
   function goTo(i) { target = clamp(i); }
@@ -720,7 +729,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   }
 
   // ---------- Input ----------
-  let lastTick = 0;
+  let lastTick = START;
   function maybeTick() { const r = Math.round(target); if (r !== lastTick) { lastTick = r; tick(); } }
   // Drag the dial: drag left to move forward, like turning a dial
   let dragging = null, lastX = 0, moved = false, downX = 0;
