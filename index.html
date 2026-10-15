@@ -131,12 +131,13 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tile .count b { font-weight: 500 }
 .tile .count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: none }
 @media (max-width: 599px) { .tile .cap { left: 8px; right: 8px; bottom: 8px; gap: 6px; font-size: 12px } .tile .count { font-size: 11px; padding: 3px 7px } .tile .count .lbl { display: none } .tile .count svg { display: block } .tile .cap > span:first-child { padding: 3px 8px } }
-.tile img, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.12 }
+/* Pictures are zoomed so they can travel inside their frames (inner pan, Medium: 14% of the frame each way). */
+.tile img, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.3 }
 /* Video tiles: clips play muted on a loop while on screen. Most are UI on white, so a hairline edge keeps them reading as cards. */
 .tile.is-video::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .07); pointer-events: none; z-index: 1 }
 .tile.is-video .cap { z-index: 2 }
-.tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.12; pointer-events: none }   /* headroom for the inner parallax */
-@media (prefers-reduced-motion: reduce) { .tile img { scale: 1 } }
+.tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.3; pointer-events: none }   /* headroom for the inner parallax */
+@media (prefers-reduced-motion: reduce) { .tile img, .tile video { scale: 1 } }
 .tile .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--ink);
   font-size: 13px; font-weight: 500; letter-spacing: -0.26px; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
 .tile .cap i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
@@ -1176,14 +1177,21 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   function applyPx() {
     if (!active) return;
     if (active.id === 'designs') {
-      const vh = innerHeight;
       [...masonry.children].forEach((c, i) => { const d = COL_DEPTH[i % COL_DEPTH.length]; tr(c, -pxX * d, -pxY * d); });
+      // Inner pan (Medium): each picture sits low in its frame below the middle of the view and high above it,
+      // so as you scroll it drifts through the frame more slowly than the frame moves, like looking through a window.
+      // It eases toward its target each frame, so it glides behind the scroll.
+      const vr = scroller.getBoundingClientRect(), mid = vr.top + vr.height / 2;
       masonry.querySelectorAll('.tile').forEach(fig => {
         const im = fig.querySelector('img, video'); if (!im) return;
         const r = fig.getBoundingClientRect();
-        if (r.bottom < -40 || r.top > vh + 40) return;          // off screen: leave it
-        const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
-        tr(im, -pxX * 0.018 * r.width, (-rel * 0.035 - pxY * 0.018) * r.height);
+        if (r.bottom < vr.top - 200 || r.top > vr.bottom + 200) return;   // well off screen: leave it
+        const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - mid) / (vr.height / 2 + r.height / 2)));
+        const lim = .148, ty = Math.max(-lim, Math.min(lim, -rel * PAN - pxY * .012)) * r.height, tx = -pxX * .012 * r.width;   // stays inside the zoom headroom
+        if (im._py === undefined) { im._py = ty; im._px = tx; }
+        im._py += (ty - im._py) * .14; im._px += (tx - im._px) * .14;
+        if (Math.abs(ty - im._py) > .15 || Math.abs(tx - im._px) > .15) panMoving = true;
+        tr(im, im._px, im._py);
       });
     } else {
       // On Home, vertical drift is halved so stacked layers (photo, name, links, bio) never run into each other.
@@ -1191,12 +1199,15 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d * ky));
     }
   }
+  const PAN = .14;          // inner pan strength: Medium
+  let panMoving = false;
   function pxFrame() {
     pxX += (pxTX - pxX) * 0.09; pxY += (pxTY - pxY) * 0.09;
     const settled = Math.abs(pxTX - pxX) < 0.0015 && Math.abs(pxTY - pxY) < 0.0015;
     if (settled) { pxX = pxTX; pxY = pxTY; }
+    panMoving = false;
     applyPx();
-    pxRaf = settled ? 0 : requestAnimationFrame(pxFrame);
+    pxRaf = settled && !panMoving ? 0 : requestAnimationFrame(pxFrame);
   }
   function kickPx() { if (!reduce && !pxRaf) pxRaf = requestAnimationFrame(pxFrame); }
   if (!reduce) {
@@ -1241,10 +1252,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   function endRipple() { if (!rip) return; cancelAnimationFrame(rip.raf); rip.cv.remove(); rip = null; }
   function ripple(fig, x, y) {
     const vid = fig.querySelector('video');
-    if (vid) { if (!reduce) vid.animate([{ scale: 1.12 }, { scale: 1.085 }, { scale: 1.135 }, { scale: 1.12 }], { duration: 520, easing: 'ease-out' }); return; }
+    if (vid) { if (!reduce) vid.animate([{ scale: 1.3 }, { scale: 1.26 }, { scale: 1.32 }, { scale: 1.3 }], { duration: 520, easing: 'ease-out' }); return; }
     const im = fig.querySelector('img');
     if (!im || reduce) return;
-    const bounce = () => im.animate([{ scale: 1.12 }, { scale: 1.085 }, { scale: 1.135 }, { scale: 1.12 }], { duration: 520, easing: 'ease-out' });
+    const bounce = () => im.animate([{ scale: 1.3 }, { scale: 1.26 }, { scale: 1.32 }, { scale: 1.3 }], { duration: 520, easing: 'ease-out' });
     if (!im.complete || !im.naturalWidth) return bounce();
     endRipple();
     const cv = document.createElement('canvas'); cv.className = 'ripple';
