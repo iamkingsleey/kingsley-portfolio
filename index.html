@@ -239,9 +239,8 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
 
 /* ---------- Home micro-interactions ---------- */
-/* Photo: tilts toward the cursor; on hover it briefly "tunes" through the work, like a TV catching a signal. */
+/* Photo: tilts toward the cursor, and squishes when pressed. */
 .avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation }
-.avatar .flick { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0 }
 /* Name: click to type the next role; a small picture of that kind of work peeks beside the cursor. */
 h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .role-peek { position: fixed; left: 0; top: 0; z-index: 60; width: 64px; height: 80px; border-radius: 8px; overflow: hidden; pointer-events: none; opacity: 0;
@@ -412,7 +411,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       <div class="t-more"><span class="t-sky" id="tSky"></span></div>
     </div>
     <div class="hero">
-      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"><img class="flick" alt="" aria-hidden="true"></div>
+      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
       <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
       <div class="links"><a href="#" id="emailLink" data-email="">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
       <div class="bio">
@@ -1374,28 +1373,14 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     });
     typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
 
-    // Photo: tilt toward the cursor, and tune through the work on hover.
-    const avatar = document.getElementById('avatar'), flick = avatar.querySelector('.flick');
+    // Photo: tilt toward the cursor.
+    const avatar = document.getElementById('avatar');
     addEventListener('pointermove', e => {
       if (!homeOn() || e.pointerType !== 'mouse') return;
       const r = avatar.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
       const k = Math.max(0, 1 - Math.hypot(dx, dy) / 700);
       avatar.style.transform = `perspective(320px) rotateY(${(dx / 40 * k).toFixed(2)}deg) rotateX(${(-dy / 40 * k).toFixed(2)}deg)`;
     }, { passive: true });
-    let tuning = false;
-    avatar.addEventListener('pointerenter', async () => {
-      if (tuning) return; tuning = true;
-      const pics = designPics();
-      for (let i = 0; i < 4 && pics.length; i++) {
-        flick.src = thumb(pics[Math.floor(Math.random() * pics.length)]);
-        flick.style.opacity = 1;
-        await pause(70 + i * 15);
-        flick.style.opacity = i % 2 ? 0 : .6;
-        await pause(40);
-      }
-      flick.style.opacity = 0;
-      setTimeout(() => { tuning = false; }, 600);
-    });
 
     // Social pills lean toward the cursor.
     const pillsS = [...document.querySelectorAll('.socials a')];
