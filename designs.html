@@ -338,7 +338,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   //   alt  – a second image (another angle) shown while hovering the piece on the needle
   //   loop – a short video loop played while hovering
   //   featured: true – the page opens on this piece (later picked in the CMS). Without one, it opens on a
-  //                     random piece that has neighbours on both sides.
+  //                     random piece in the middle stretch, so pieces and ruler fill both sides.
   const PROJECTS = {
     'Paper plane with coin': {}, 'Drink tumbler': {}, 'Safe with coins': {}, 'Pawn in an archway': {}, 'Award with ribbons': {},
     'Ruler picker': {},
@@ -409,7 +409,11 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   const START = (() => {
     const f = items.findIndex(it => it.featured);
     if (f >= 0) return f;
-    return N > 2 ? 1 + Math.floor(Math.random() * (N - 2)) : 0;
+    // far enough from both ends that the row has pieces on both sides and the ruler's ticks fill the
+    // screen edge to edge (its spacing is 120px per piece on desktop, 84px on phones)
+    const sp = innerWidth < 900 ? 84 : 120;
+    const m = Math.min(Math.floor((N - 1) / 2), Math.ceil((innerWidth / 2) / sp));
+    return m + Math.floor(Math.random() * (N - 2 * m));
   })();
   let p = START, target = START, last = 0, vel = 0, active = -1;
   let hovering = false, hoverAmt = 0, moving = false, settleAt = -1e9, bounce = 0, bounceY = 1;
