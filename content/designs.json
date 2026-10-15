@@ -10,6 +10,16 @@
       ]
     },
     {
+      "title": "Bill-split dial",
+      "images": [
+        {
+          "src": "assets/designs/ui-interaction.jpg",
+          "video": "assets/designs/videos/ui-interaction.mp4",
+          "ratio": 0.8
+        }
+      ]
+    },
+    {
       "title": "Tennis on court",
       "images": [
         {
@@ -86,6 +96,16 @@
       "images": [
         {
           "src": "assets/designs/safe-with-coins.jpg",
+          "ratio": 0.8
+        }
+      ]
+    },
+    {
+      "title": "Ruler picker",
+      "images": [
+        {
+          "src": "assets/designs/ruler-picker.jpg",
+          "video": "assets/designs/videos/ruler-picker.mp4",
           "ratio": 0.8
         }
       ]

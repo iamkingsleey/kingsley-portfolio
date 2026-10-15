@@ -131,7 +131,10 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tile .count b { font-weight: 500 }
 .tile .count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: none }
 @media (max-width: 599px) { .tile .cap { left: 8px; right: 8px; bottom: 8px; gap: 6px; font-size: 12px } .tile .count { font-size: 11px; padding: 3px 7px } .tile .count .lbl { display: none } .tile .count svg { display: block } .tile .cap > span:first-child { padding: 3px 8px } }
-.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.12 }
+.tile img, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.12 }
+/* Video tiles: clips play muted on a loop while on screen. Most are UI on white, so a hairline edge keeps them reading as cards. */
+.tile.is-video::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .07); pointer-events: none; z-index: 1 }
+.tile.is-video .cap { z-index: 2 }
 .tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.12; pointer-events: none }   /* headroom for the inner parallax */
 @media (prefers-reduced-motion: reduce) { .tile img { scale: 1 } }
 .tile .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--ink);
@@ -799,6 +802,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
     swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
     kickPx();
+    setTimeout(syncVideos, 60);
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
@@ -808,7 +812,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Each project: title (required), images (one or more), and optional role, description and tags.
   // The grid shows each project's first image; the rest (and the text) are kept for a future project page.
   // If the file can't be read (e.g. opening index.html straight from disk), DESIGNS_FALLBACK is used instead.
-  const DESIGNS_FALLBACK = {"projects": [{"title": "Tennis ball and rackets", "images": [{"src": "assets/designs/tennis-ball-and-racket.jpg", "ratio": 1.3333}]}, {"title": "Tennis on court", "images": [{"src": "assets/designs/tennis-and-racket.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, blue", "images": [{"src": "assets/designs/tennis-in-motion-blue-background.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, dark blue", "images": [{"src": "assets/designs/tennis-in-motion-dark-blue-background.jpg", "ratio": 0.8}]}, {"title": "Debit card, floating", "images": [{"src": "assets/designs/debit-card-with-colorful-objects1.jpg", "ratio": 1.5}]}, {"title": "Debit card with shapes", "images": [{"src": "assets/designs/debit-card-with-colorful-objects.jpg", "ratio": 0.8}]}, {"title": "Pink debit card", "images": [{"src": "assets/designs/debit-card.jpg", "ratio": 0.8}]}, {"title": "Red padlock", "images": [{"src": "assets/designs/red-lock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Orange padlock", "images": [{"src": "assets/designs/bright-orange-padlock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Safe with coins", "images": [{"src": "assets/designs/safe-with-coins.jpg", "ratio": 0.8}]}, {"title": "Card holder with stickers", "images": [{"src": "assets/designs/card-holder-with-colorful-stickers.jpg", "ratio": 1.5}]}, {"title": "Award with ribbons", "images": [{"src": "assets/designs/colorful-award-with-ribbons.jpg", "ratio": 0.8}]}, {"title": "Paper plane with coin", "images": [{"src": "assets/designs/paper-plane-with-coin.jpg", "ratio": 0.8}]}, {"title": "Drink tumbler", "images": [{"src": "assets/designs/3d-tumbler-render.jpg", "ratio": 0.8}]}, {"title": "Badge", "images": [{"src": "assets/designs/badge-on-a-orange-background.jpg", "ratio": 0.8}]}, {"title": "Price tag and coins", "images": [{"src": "assets/designs/price-tag-and-coins.jpg", "ratio": 0.8}]}, {"title": "Badge in a box", "images": [{"src": "assets/designs/batch-in-a-box.jpg", "ratio": 0.8}]}, {"title": "Pawn in an archway", "images": [{"src": "assets/designs/pawn-in-an-archway.jpg", "ratio": 0.8}]}]};
+  const DESIGNS_FALLBACK = {"projects": [{"title": "Tennis ball and rackets", "images": [{"src": "assets/designs/tennis-ball-and-racket.jpg", "ratio": 1.3333}]}, {"title": "Bill-split dial", "images": [{"src": "assets/designs/ui-interaction.jpg", "video": "assets/designs/videos/ui-interaction.mp4", "ratio": 0.8}]}, {"title": "Tennis on court", "images": [{"src": "assets/designs/tennis-and-racket.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, blue", "images": [{"src": "assets/designs/tennis-in-motion-blue-background.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, dark blue", "images": [{"src": "assets/designs/tennis-in-motion-dark-blue-background.jpg", "ratio": 0.8}]}, {"title": "Debit card, floating", "images": [{"src": "assets/designs/debit-card-with-colorful-objects1.jpg", "ratio": 1.5}]}, {"title": "Debit card with shapes", "images": [{"src": "assets/designs/debit-card-with-colorful-objects.jpg", "ratio": 0.8}]}, {"title": "Pink debit card", "images": [{"src": "assets/designs/debit-card.jpg", "ratio": 0.8}]}, {"title": "Red padlock", "images": [{"src": "assets/designs/red-lock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Orange padlock", "images": [{"src": "assets/designs/bright-orange-padlock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Safe with coins", "images": [{"src": "assets/designs/safe-with-coins.jpg", "ratio": 0.8}]}, {"title": "Ruler picker", "images": [{"src": "assets/designs/ruler-picker.jpg", "video": "assets/designs/videos/ruler-picker.mp4", "ratio": 0.8}]}, {"title": "Card holder with stickers", "images": [{"src": "assets/designs/card-holder-with-colorful-stickers.jpg", "ratio": 1.5}]}, {"title": "Award with ribbons", "images": [{"src": "assets/designs/colorful-award-with-ribbons.jpg", "ratio": 0.8}]}, {"title": "Paper plane with coin", "images": [{"src": "assets/designs/paper-plane-with-coin.jpg", "ratio": 0.8}]}, {"title": "Drink tumbler", "images": [{"src": "assets/designs/3d-tumbler-render.jpg", "ratio": 0.8}]}, {"title": "Badge", "images": [{"src": "assets/designs/badge-on-a-orange-background.jpg", "ratio": 0.8}]}, {"title": "Price tag and coins", "images": [{"src": "assets/designs/price-tag-and-coins.jpg", "ratio": 0.8}]}, {"title": "Badge in a box", "images": [{"src": "assets/designs/batch-in-a-box.jpg", "ratio": 0.8}]}, {"title": "Pawn in an archway", "images": [{"src": "assets/designs/pawn-in-an-archway.jpg", "ratio": 0.8}]}]};
   let PROJECTS = DESIGNS_FALLBACK.projects;
   const PALETTES = [['#EDE7DF', '#C9A98A'], ['#E6EAF2', '#8FA3C7'], ['#EFE6EC', '#C79BB3'], ['#E5EFEA', '#86B49C'], ['#F1ECE2', '#D2A45B'], ['#E9E8F1', '#9A92CC']];
   const SHAPES = ['<circle cx="50" cy="50" r="22"/>', '<rect x="28" y="28" width="44" height="44" rx="10"/>', '<path d="M50 24l26 46H24z"/>',
@@ -825,6 +829,19 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   }).catch(() => {});
 
   const masonry = document.getElementById('masonry'), scroller = document.getElementById('scroller');
+  // Videos play only while visible on the Designs page, and pause otherwise (saves battery and data).
+  const vidIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
+    const v = en.target;
+    if (en.isIntersecting && active && active.id === 'designs' && !reduce) { const p = v.play(); if (p) p.catch(() => {}); } else v.pause();
+  }), { root: null, threshold: .15 }) : null;
+  function watchVideo(v) { if (vidIO) vidIO.observe(v); }
+  function syncVideos() {
+    masonry.querySelectorAll('video').forEach(v => {
+      if (!active || active.id !== 'designs' || reduce) { v.pause(); return; }
+      const r = v.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < innerHeight) { const p = v.play(); if (p) p.catch(() => {}); }
+    });
+  }
   let cols = 0;
   function buildFeed(force) {
     const w = masonry.clientWidth;
@@ -840,7 +857,15 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       const k = h.indexOf(Math.min(...h));
       const fig = document.createElement('figure');
       fig.className = 'tile'; fig.style.aspectRatio = r;
-      if (cover.src) { const im = new Image(); im.src = cover.src; im.alt = pr.title || ''; im.loading = 'lazy'; im.decoding = 'async'; fig.appendChild(im); }
+      if (cover.video) {
+        // A clip: muted, looping, inline; the still frame (src) shows until it plays. Plays only while on screen.
+        const v = document.createElement('video');
+        v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-label', pr.title || '');
+        if (cover.src) v.poster = cover.src;
+        v.src = cover.video;
+        fig.classList.add('is-video'); fig.appendChild(v); watchVideo(v);
+      } else if (cover.src) { const im = new Image(); im.src = cover.src; im.alt = pr.title || ''; im.loading = 'lazy'; im.decoding = 'async'; fig.appendChild(im); }
       else fig.appendChild(placeholder(i));
       const cap = document.createElement('figcaption'); cap.className = 'cap';
       const name = document.createElement('span'); name.textContent = pr.title || 'Untitled';
@@ -1106,7 +1131,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       const vh = innerHeight;
       [...masonry.children].forEach((c, i) => { const d = COL_DEPTH[i % COL_DEPTH.length]; tr(c, -pxX * d, -pxY * d); });
       masonry.querySelectorAll('.tile').forEach(fig => {
-        const im = fig.querySelector('img'); if (!im) return;
+        const im = fig.querySelector('img, video'); if (!im) return;
         const r = fig.getBoundingClientRect();
         if (r.bottom < -40 || r.top > vh + 40) return;          // off screen: leave it
         const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
@@ -1167,6 +1192,8 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   let rip = null;
   function endRipple() { if (!rip) return; cancelAnimationFrame(rip.raf); rip.cv.remove(); rip = null; }
   function ripple(fig, x, y) {
+    const vid = fig.querySelector('video');
+    if (vid) { if (!reduce) vid.animate([{ scale: 1.12 }, { scale: 1.085 }, { scale: 1.135 }, { scale: 1.12 }], { duration: 520, easing: 'ease-out' }); return; }
     const im = fig.querySelector('img');
     if (!im || reduce) return;
     const bounce = () => im.animate([{ scale: 1.12 }, { scale: 1.085 }, { scale: 1.135 }, { scale: 1.12 }], { duration: 520, easing: 'ease-out' });
