@@ -301,7 +301,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
 /* Static between stations, and a faint moving grain on Home. */
 .static { position: fixed; inset: 0; z-index: 99; pointer-events: none; opacity: 0; background: var(--noise) 0 0 / 140px 140px; mix-blend-mode: multiply }
-.grain { position: absolute; inset: -40px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; opacity: .022; mix-blend-mode: multiply;
+.grain { position: absolute; inset: -40px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; opacity: .04; mix-blend-mode: multiply;
   animation: grain .9s steps(5) infinite }
 @keyframes grain { 0% { transform: translate(0, 0) } 20% { transform: translate(-14px, 9px) } 40% { transform: translate(11px, -16px) } 60% { transform: translate(-8px, -6px) } 80% { transform: translate(15px, 12px) } }
 /* Secret station 99.9: type "kingsley" on Home. */
@@ -1439,9 +1439,16 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Secret station: type "kingsley" on Home to tune to 99.9.
   const secret = document.getElementById('secret');
   let typedKeys = '', secretOpen = false;
+  // Also the classic Konami code: up up down down left right left right B A.
+  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konami = 0;
   addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
-    typedKeys = (typedKeys + e.key.toLowerCase()).slice(-SECRET_CODE.length);
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konami = k === KONAMI[konami] ? konami + 1 : (k === KONAMI[0] ? 1 : 0);
+    if (konami === KONAMI.length) { konami = 0; if (homeOn() && !secretOpen) { e.preventDefault(); openSecret(e.isTrusted); } return; }
+    if (e.key.length !== 1) return;
+    typedKeys = (typedKeys + k).slice(-SECRET_CODE.length);
     if (typedKeys === SECRET_CODE && homeOn() && !secretOpen) openSecret(e.isTrusted);
   });
   function openSecret(trusted) {
