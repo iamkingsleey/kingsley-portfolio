@@ -282,7 +282,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 /* Availability pill sits before the time, always visible; the dot pulses gently like an on-air light. */
 .time { cursor: default; display: flex; align-items: center; gap: 12px; white-space: nowrap }
 .mode-bottom .time { flex-direction: column; align-items: flex-start; gap: 8px }
-.mode-bottom .time .t-avail { order: 2 }
+.mode-bottom .time .t-cta { order: 2 }
 .time .colon { animation: tick 1s steps(1) infinite }
 @keyframes tick { 50% { opacity: .2 } }
 .t-more { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 6px; justify-items: end; white-space: nowrap; font-size: 13px; letter-spacing: -0.2px;
@@ -293,6 +293,14 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .t-now:hover ~ .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
 .t-sky { display: inline-flex; align-items: center; gap: 6px; color: var(--muted) }
 .t-sky svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
+/* Book a call: a round calendar button before the availability pill. */
+.t-cta { display: inline-flex; align-items: center; gap: 6px }
+.t-book { position: relative; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--text); transition: background .2s, color .2s, transform .25s cubic-bezier(.2,.8,.2,1) }
+.t-book:hover, .t-book:focus-visible { background: var(--ink); color: #fff; transform: translateY(-1px) }
+.t-book svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round }
+.t-book svg .d { fill: currentColor; stroke: none }
+.t-book .tip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translate(-50%, -3px); font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s }
+.t-book:hover .tip, .t-book:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
 .t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 999px; background: var(--pill); color: var(--text); font-size: 13px; letter-spacing: -0.2px }
 .t-avail i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #2fb35b }
 .t-avail i::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: rgb(47 179 91 / .35); animation: onair 2.4s ease-out infinite }
@@ -400,7 +408,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   <section class="panel" data-station="home">
     <div class="trail" id="trail" aria-hidden="true"></div>
     <canvas class="ripple-canvas" id="rippleCanvas" aria-hidden="true"></canvas>
-    <div class="time" id="time" tabindex="0"><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span><span class="t-now"><span id="clock">--:--</span>, Lagos 🇳🇬</span>
+    <div class="time" id="time" tabindex="0"><span class="t-cta"><a class="t-book" id="bookCall" href="#" target="_blank" rel="noopener" data-href="" aria-label="Book a call"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="2.2"/><path d="M2.5 6.8h11M5.5 2v3M10.5 2v3"/><circle class="d" cx="8" cy="10.2" r=".9"/></svg><span class="tip">Book a call</span></a><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span></span><span class="t-now"><span id="clock">--:--</span>, Lagos 🇳🇬</span>
       <div class="t-more"><span class="t-sky" id="tSky"></span></div>
     </div>
     <div class="hero">
@@ -1298,6 +1306,16 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Small touches on the landing page. Hover effects need a mouse; everything respects reduced motion.
   const EMAIL = document.getElementById('emailLink').dataset.email;   // set data-email on the email link
   const AVAILABILITY = 'Open to new work';
+  // Book a call: set data-href on the calendar button to your booking page (e.g. a Cal.com or Calendly link).
+  const book = document.getElementById('bookCall');
+  if (book.dataset.href) book.href = book.dataset.href;
+  book.addEventListener('click', e => {
+    play('pop', e.isTrusted);
+    if (book.dataset.href) return;                     // opens the booking page in a new tab
+    e.preventDefault();
+    const tip = book.querySelector('.tip'); tip.textContent = 'Booking link coming soon';
+    setTimeout(() => { tip.textContent = 'Book a call'; }, 1600);
+  });
   const SECRET_CODE = 'kingsley';
   const thumb = src => src.replace(/([^/]+)$/, 'thumbs/$1');
   const designPics = () => PROJECTS.flatMap(pr => (pr.images || []).map(i => i.src).filter(Boolean));
