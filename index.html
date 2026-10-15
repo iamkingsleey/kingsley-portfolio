@@ -932,7 +932,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       l.setAttribute('stroke-width', on ? 3.5 : 2);
       l.setAttribute('stroke-opacity', on ? 1 : (0.2 + 0.4 * b).toFixed(3));
     });
-    waveGrid();   // the grid follows the same wave
   }
   function rulerLoop() {
     rPos += (rTarget - rPos) * (reduce ? 1 : 0.22);
@@ -942,30 +941,33 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   }
   scroller.addEventListener('scroll', () => { syncTarget(); if (!rRaf) rRaf = requestAnimationFrame(rulerLoop); }, { passive: true });
 
-  // ---------- Designs: ruler-linked wave ----------
-  // The grid breathes with the ruler: tiles level with the ruler's active tick are full size, and tiles
-  // further from it shrink and soften along the same wave profile the ticks use. As you scroll, the active
-  // tick travels down the ruler and the wave travels through the grid with it. Off for reduced motion.
-  var bendItems = null, bendRaf = 0;
-  const WAVE = { min: .84, fadeTo: .62, spread: 30 };   // smallest scale, faintest opacity, px per profile step
-  function bendRemeasure() { bendItems = null; bendKick(); }
-  function bendKick() { if (!bendRaf && !reduce) bendRaf = requestAnimationFrame(() => { bendRaf = 0; waveGrid(); }); }
-  function waveGrid() {
-    if (!active || active.id !== 'designs' || reduce) return;
-    if (!bendItems) bendItems = [...masonry.querySelectorAll('.tile')].map(el => ({ el, mid: el.offsetTop + el.offsetHeight / 2, last: '' }));
-    const sr = scroller.getBoundingClientRect(), rr = ruler.getBoundingClientRect();
-    let yA;
-    if (rLines.length > 1 && rr.height) yA = rr.top + 6 + rPos * GAP;            // the active tick on screen
-    else { const max = scroller.scrollHeight - scroller.clientHeight; yA = sr.top + (max > 0 ? scroller.scrollTop / max : 0) * sr.height; }   // no ruler (phones): same idea
-    for (const f of bendItems) {
-      const y = sr.top + f.mid - scroller.scrollTop;
-      const b = bump(Math.abs(y - yA) / WAVE.spread);
-      const sc = WAVE.min + (1 - WAVE.min) * b, op = WAVE.fadeTo + (1 - WAVE.fadeTo) * b;
-      const key = sc.toFixed(3) + '|' + op.toFixed(2);
-      if (key !== f.last) { f.last = key; f.el.style.transform = `scale(${sc.toFixed(4)})`; f.el.style.opacity = op > .995 ? '' : op.toFixed(3); }
-    }
+  // ---------- Designs: speed stretch ----------
+  // At rest the grid is perfectly still and even. Scrolling fast stretches each image a little along the
+  // scroll (taller and slightly narrower), which also tightens the gaps; when scrolling stops, a spring
+  // brings them back with a small bounce. Slow, gentle scrolling barely shows it. Off for reduced motion.
+  const STRETCH = { gain: .04, max: .11, k: .16, damp: .7 };   // stretch per px/ms of speed, cap, spring stiffness, damping
+  let stTiles = null, stLastTop = 0, stLastT = 0, stVel = 0, stS = 0, stV = 0, stRaf = 0;
+  function bendRemeasure() { stTiles = null; }
+  function bendKick() {}
+  function stretchFrame(now) {
+    if (!stTiles) stTiles = [...masonry.querySelectorAll('.tile')];
+    const top = scroller.scrollTop, dt = Math.max(1, now - stLastT);
+    const raw = (top - stLastTop) / dt;                     // px per ms, signed
+    stLastTop = top; stLastT = now;
+    stVel += (raw - stVel) * .35;                           // smooth out uneven wheel events
+    const target = Math.min(STRETCH.max, Math.abs(stVel) * STRETCH.gain);
+    stV = stV * STRETCH.damp + (target - stS) * STRETCH.k;  // spring toward the target stretch
+    stS += stV;
+    const sy = 1 + stS, sx = 1 - stS * .35, origin = stVel >= 0 ? '50% 0%' : '50% 100%';   // grows away from the direction of travel
+    const tf = Math.abs(stS) < .0008 ? '' : `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+    for (const t of stTiles) { t.style.transformOrigin = origin; t.style.transform = tf; }
+    if (Math.abs(stS) < .0008 && Math.abs(stV) < .0008 && Math.abs(stVel) < .002) { stRaf = 0; stS = stV = stVel = 0; return; }
+    stRaf = requestAnimationFrame(stretchFrame);
   }
-  scroller.addEventListener('scroll', bendKick, { passive: true });
+  scroller.addEventListener('scroll', () => {
+    if (reduce || !active || active.id !== 'designs') return;
+    if (!stRaf) { stLastTop = scroller.scrollTop; stLastT = performance.now(); stRaf = requestAnimationFrame(stretchFrame); }
+  }, { passive: true });
   addEventListener('resize', bendRemeasure);
 
 
