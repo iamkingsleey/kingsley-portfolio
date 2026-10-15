@@ -101,7 +101,7 @@ canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-
 .px button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
 @media (hover: none), (max-width: 899px) { .px { display: none } }
 body.open .px { opacity: 0; pointer-events: none }
-.hint { position: fixed; right: max(48px, env(safe-area-inset-right, 0px)); bottom: calc(108px + env(safe-area-inset-bottom, 0px)); z-index: 15; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); display: flex; gap: 14px; align-items: center }
+.hint { position: fixed; right: max(48px, env(safe-area-inset-right, 0px)); bottom: calc(140px + env(safe-area-inset-bottom, 0px));   /* clear of the FM wave line above the ruler */ z-index: 15; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); display: flex; gap: 14px; align-items: center }
 .hint button { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--pill) }
 .hint button svg { width: 14px; height: 14px; fill: var(--ink); color: var(--ink) }
 
