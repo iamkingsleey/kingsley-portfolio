@@ -256,7 +256,7 @@ html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
 
 /* ---------- Scanline sweep ---------- */
 .sweep { position: fixed; left: 0; right: 0; top: 0; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); z-index: 15; pointer-events: none; overflow: hidden; opacity: 0 }
-.sw-line { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--ink); box-shadow: 0 0 14px 2px color-mix(in srgb, var(--ink) 35%, transparent) }
+.sw-line { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--ink) }
 .sw-trail { position: absolute; left: 0; top: 0; bottom: 0; width: 160px; opacity: .45; transform-origin: 0 0;
   background: repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1px 4px);
   -webkit-mask-image: linear-gradient(to right, transparent, #000); mask-image: linear-gradient(to right, transparent, #000) }
