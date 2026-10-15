@@ -240,7 +240,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 
 /* ---------- Home micro-interactions ---------- */
 /* Photo: tilts toward the cursor; on hover it briefly "tunes" through the work, like a TV catching a signal. */
-.avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto }
+.avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation }
 .avatar .flick { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0 }
 /* Name: click to type the next role; a small picture of that kind of work peeks beside the cursor. */
 h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
@@ -1430,6 +1430,30 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       b.addEventListener('click', () => peek.classList.remove('show'));
     });
   }
+  // Press and squish: pressing the photo squishes it like a soft button; letting go springs it back with a pop.
+  // Uses the separate `scale` property so it stacks with the tilt (transform) and parallax (translate).
+  (function squish() {
+    const av = document.getElementById('avatar');
+    let down = false;
+    av.addEventListener('pointerdown', e => {
+      if (e.button > 0) return;
+      down = true;
+      av.getAnimations().forEach(a => a.cancel());
+      av.animate([{ scale: '1' }, { scale: '0.88 0.86' }], { duration: reduce ? 0 : 110, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' });
+    });
+    const release = e => {
+      if (!down) return;
+      down = false;
+      av.getAnimations().forEach(a => a.cancel());
+      if (!reduce) av.animate([{ scale: '0.88 0.86' }, { scale: '1.08 1.1', offset: .35 }, { scale: '0.97 0.96', offset: .65 }, { scale: '1.01', offset: .85 }, { scale: '1' }],
+        { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      if (e.type === 'pointerup') play('pop', e.isTrusted);
+    };
+    av.addEventListener('pointerup', release);
+    av.addEventListener('pointerleave', release);
+    av.addEventListener('pointercancel', release);
+  })();
+
   // Signal bars on the social pills.
   document.querySelectorAll('.socials a').forEach(a => a.insertAdjacentHTML('beforeend',
     '<svg class="sig" viewBox="0 0 11 10" aria-hidden="true"><rect x="0" y="6" width="2.6" height="4" rx=".6"/><rect x="4.2" y="3" width="2.6" height="7" rx=".6"/><rect x="8.4" y="0" width="2.6" height="10" rx=".6"/></svg>'));
