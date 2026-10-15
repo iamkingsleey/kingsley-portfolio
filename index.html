@@ -776,6 +776,31 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     // The reveal is slower than the needle so the circle reads clearly: the old page stays visible and sinks
     // back a little while the new one opens over it, and a thin ring traces the circle's edge as it grows.
     const REV = 620;   // quick, but long enough for the circle and its ring to read
+    if (to === panels.home) {
+      // Back to Home is the reverse: the page you're on closes into the dial as a shrinking circle (with the
+      // ring tightening on its edge), while Home rises back into place underneath.
+      from.style.zIndex = 2; to.style.zIndex = 1;
+      from.style.willChange = 'clip-path, transform'; to.style.willChange = 'opacity, transform';
+      const close = from.animate([
+        { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg) scale(1)' },
+        { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg) scale(1.04)` }
+      ], { duration: REV, easing: EASE, fill: 'forwards' });
+      const rise = to.animate([
+        { opacity: 0, transform: 'scale(.96)' },
+        { opacity: .85, transform: 'scale(.975)', offset: .4 },
+        { opacity: 1, transform: 'scale(1)' }
+      ], { duration: REV, easing: EASE });
+      revealRing(ox, oy, far, start, REV);
+      close.onfinish = () => {
+        if (active && panels[active.id] !== from) from.hidden = true;
+        close.cancel(); from.style.willChange = ''; from.style.clipPath = ''; from.style.transform = '';
+      };
+      rise.onfinish = rise.oncancel = () => {
+        to.style.willChange = ''; to.style.transform = ''; to.style.opacity = '';
+        to.style.visibility = 'hidden'; void to.offsetHeight; to.style.visibility = '';
+      };
+      return;
+    }
     from.style.willChange = 'opacity, transform';
     const fade = from.animate([
       { opacity: 1, transform: 'scale(1)' },
@@ -802,9 +827,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   const ringEl = document.createElement('div'); ringEl.className = 'reveal-ring'; ringEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(ringEl);
   function revealRing(x, y, r0, r1, dur) {
     ringEl.getAnimations().forEach(a => a.cancel());
-    const k = (r, o) => ({ left: `${x - r}px`, top: `${y - r}px`, width: `${2 * r}px`, height: `${2 * r}px`, opacity: o });
-    ringEl.animate([k(r0, 0), k(r0 + (r1 - r0) * .04, .9), k(r0 + (r1 - r0) * .55, .55), k(r1, 0)].map((f, i) => (f.offset = [0, .06, .5, 1][i], f)),
-      { duration: dur, easing: EASE });
+    // Size uses the same easing as the circle's clip, so the ring sits exactly on its edge; opacity fades on its own track.
+    const k = r => ({ left: `${x - r}px`, top: `${y - r}px`, width: `${2 * r}px`, height: `${2 * r}px` });
+    ringEl.animate([k(r0), k(r1)], { duration: dur, easing: EASE });
+    ringEl.animate([{ opacity: 0 }, { opacity: .9, offset: .06 }, { opacity: .55, offset: .5 }, { opacity: 0 }], { duration: dur });
   }
   function tuneTo(s, sound) {
     const prev = active;
