@@ -1436,7 +1436,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     ov.querySelectorAll('.ov-t').forEach(t => t.classList.toggle('on', +t.dataset.i === active));
     document.body.classList.add('all');
     $('allBtn').setAttribute('aria-pressed', 'true');
-    setTimeout(() => { const on = ov.querySelector('.ov-t.on'); if (on) on.focus({ preventScroll: true }); }, 50);
+    setTimeout(() => { const on = ov.querySelector('.ov-t.on'); if (on) on.focus({ preventScroll: true, focusVisible: false }); }, 50);   // keyboard users land here; no ring for mouse users
   }
   function closeOverview(i) {
     if (!ovOpen) return; ovOpen = false;
@@ -1606,7 +1606,17 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   vrul.addEventListener('pointerup', vrEnd); vrul.addEventListener('pointercancel', vrEnd);
   vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
-  ov.addEventListener('click', e => { const t = e.target.closest('.ov-t'); if (t) { tap(); closeOverview(+t.dataset.i); } });
+  // a tile in the All view opens that piece's project page (tuning to its station); without one, back to the row
+  ov.addEventListener('click', e => {
+    const t = e.target.closest('.ov-t'); if (!t) return;
+    const i = +t.dataset.i; tap();
+    if (items[i].page && window.Tuner) {
+      try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: items[i].page });
+      return;
+    }
+    closeOverview(i);
+  });
   if ($('fxsw')) $('fxsw').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.fx === 'test') { stationJump(items[active].cat); return; }
