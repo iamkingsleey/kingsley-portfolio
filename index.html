@@ -1079,9 +1079,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     const p = panels[id], L = [];
     const add = (el, d) => el && L.push([el, d]);
     if (id === 'home') {
-      add(p.querySelector('.avatar'), 20); add(p.querySelector('h1'), 11); add(p.querySelector('.links'), 7);
-      p.querySelectorAll('.bio p').forEach((el, i) => add(el, 5 + i * 2));
-      add(document.querySelector('.socials'), 9);
+      // Home moves boldly: each layer drifts up to its depth in px when the cursor reaches the edge.
+      add(p.querySelector('.avatar'), 58); add(p.querySelector('h1'), 34); add(p.querySelector('.links'), 22);
+      p.querySelectorAll('.bio p').forEach((el, i) => add(el, 14 + i * 8));
+      add(document.querySelector('.socials'), 28); add(p.querySelector('.time'), 12);
     } else if (id !== 'designs') {
       add(p.querySelector('h2'), 14);
       p.querySelectorAll('.list li').forEach((el, i) => add(el, 4 + (i % 3) * 3));
@@ -1102,10 +1103,14 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
         const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
         tr(im, -pxX * 0.018 * r.width, (-rel * 0.035 - pxY * 0.018) * r.height);
       });
-    } else layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d));
+    } else {
+      // On Home, vertical drift is halved so stacked layers (photo, name, links, bio) never run into each other.
+      const ky = active.id === 'home' ? .5 : 1;
+      layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d * ky));
+    }
   }
   function pxFrame() {
-    pxX += (pxTX - pxX) * 0.075; pxY += (pxTY - pxY) * 0.075;
+    pxX += (pxTX - pxX) * 0.09; pxY += (pxTY - pxY) * 0.09;
     const settled = Math.abs(pxTX - pxX) < 0.0015 && Math.abs(pxTY - pxY) < 0.0015;
     if (settled) { pxX = pxTX; pxY = pxTY; }
     applyPx();
@@ -1240,7 +1245,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Designs image (small copies from assets/designs/thumbs, falling back to the full image).
   // Each card pops in, holds briefly, then blurs, shrinks and fades. Mouse only; off for reduced motion.
   // Switched off for now: set TRAIL_ON to true to bring it back (thumbnails stay in assets/designs/thumbs).
-  const TRAIL_ON = true;
+  const TRAIL_ON = false;
   if (TRAIL_ON && !reduce && finePointer) {
     const trail = document.getElementById('trail');
     const POOL = 16, GAP = 26, LIFE = 1150;
