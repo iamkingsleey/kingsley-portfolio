@@ -18,7 +18,9 @@ python3 -m http.server 8000
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | Current design (iteration 3): dial on Home only; inner pages use a side menu (a rail on the left edge with the current page as a black tag) |
+| `index.html` | Current design (v3): Home with the dial, plus Engineering, Projects and About behind a side menu. Light and dark mode (button bottom-right) |
+| `designs.html` | Designs page (v3): a horizontal row of work scrubbed by a ruler dial, an All grid, and a page per project |
+| `iteration-3/` | Third iteration: dial on Home, side menu, Designs as a masonry grid |
 | `iteration-2/` | Second iteration: the dial on every page |
 | `iteration-1/` | First iteration: top dial, Feed masonry, image trail on Home |
 | `popkit.js` | UI sounds made in code with Web Audio (pop on tap, detent while dragging). No audio files |
@@ -32,9 +34,17 @@ python3 -m http.server 8000
 
 A CMS for uploading content is planned as the next phase.
 
+## Designs page (`designs.html`)
+
+- **Pieces and files**: the `A` list near the top of the script in `designs.html` groups pieces by category (3D, Product, Brand, Motion). Each piece has a title `t`, an image `src` (or a `video` and its `poster`), its shape `r` (width ÷ height) and `dark` (true when the picture is dark, so titles over it turn white).
+- **Project details**: fill in the `PROJECTS` table in the same file (keyed by title). Every field is optional and hidden when empty: `year`, `client`, `role`, `tools`, `summary`, `alt` (a second image shown on hover) and `loop` (a short video shown on hover).
+- **Getting there**: tuning Home's dial (or the side menu) to Designs closes the page with a circle and opens `designs.html`. The `98.0 Home` button tunes back. Old `#designs` and `#feed` links forward to the new page.
+- **Theme**: both pages share the light/dark choice (saved in the browser as `km-theme`; first visit follows the system setting).
+
 ## Behaviour notes
 
-- Sounds play only on real taps and drags, never on their own.
+- Sounds play only on real taps and drags, never on their own. On the Designs page the only sound is a deep tick as each piece passes the needle.
+- The loading counter shows once per visit; coming back to Home from Designs skips it.
 - Respects reduced-motion settings: the dial and pages switch without animation.
 - Layout adapts: left-edge dial on laptops and desktops, dial on top for tablets, a row of station labels on phones.
 

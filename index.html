@@ -7,6 +7,12 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
+<script>
+  // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
 <style>
 /* Layout: the tuning dial sits on the left edge of Home; inner pages swap it for a side menu (a rail with the current page as a tag); each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
 :root {
@@ -27,6 +33,12 @@
   --hero-left: 708px;
   --band: 0px;
   --marker: #fff0a6;   /* highlighter on the bio */
+  --on-ink: #ffffff;   /* text on black chips */
+  --line: #eeeeee;     /* hairlines between list rows */
+  --card: #ffffff;     /* raised surfaces: dock, popovers */
+  --glass: rgb(255 255 255 / .85);
+  --scrim: rgb(255 255 255 / .72);
+  --edge: rgb(0 0 0 / .07);
   --flush: 80px;   /* one top line: the menu's Home, the first row of images and the ruler's active tick */
   color-scheme: light;
 }
@@ -51,7 +63,7 @@ button { font: inherit; background: none; border: 0; padding: 0; color: inherit;
 .pill { position: absolute; pointer-events: auto; font-size: 14px; line-height: 16px; padding: 6px 12px; border-radius: 8px;
   background: var(--pill); color: var(--text); white-space: nowrap; transition: background .2s, color .2s }
 .pill:hover { background: var(--pill-hover) }
-.pill.on { background: var(--ink); color: #fff }
+.pill.on { background: var(--ink); color: var(--on-ink) }
 
 /* ---------- Station layers ---------- */
 .panel { position: fixed; inset: 0; background: var(--bg) }
@@ -92,8 +104,8 @@ h1.typer { white-space: nowrap; display: flex; align-items: baseline; min-height
 .sheet { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(520px, calc(100% - var(--hero-left) - 24px)) }
 h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px; margin: 0 }
 .list { list-style: none; margin: 22px 0 0; padding: 0; display: grid }
-.list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; padding: 14px 0; border-top: 1px solid #eeeeee; font-size: 14px; letter-spacing: -0.28px }
-.list li:last-child { border-bottom: 1px solid #eeeeee }
+.list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 14px; letter-spacing: -0.28px }
+.list li:last-child { border-bottom: 1px solid var(--line) }
 .list b { color: var(--ink); font-weight: 500; font-size: 16px; letter-spacing: -0.32px }
 .list span, .list .sub { color: var(--muted); grid-column: 1 / -1 }
 .list i { font-style: normal; color: var(--muted); font-size: 13px }
@@ -115,7 +127,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .fade i:nth-child(2) { --b: 3px;  --s1: 25%; --s2: 50%; --s3: 75%;  --s4: 100% }
 .fade i:nth-child(3) { --b: 6px;  --s1: 50%; --s2: 75%; --s3: 100%; --s4: 101% }
 .fade i:nth-child(4) { --b: 12px; --s1: 75%; --s2: 100%; --s3: 101%; --s4: 102% }
-.fade::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--dir), rgb(255 255 255 / 0) 10%, rgb(255 255 255 / .55) 60%, var(--bg) 100%) }
+.fade::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--dir), transparent 10%, color-mix(in srgb, var(--bg) 55%, transparent) 60%, var(--bg) 100%) }
 .mode-top .fade { left: 0; right: 0 } .mode-top .fade.bottom { bottom: 0 }
 /* The top edge is a solid white band: images scroll up under it and disappear cleanly. */
 .fade.top { background: var(--bg) } .fade.top::after { content: none }
@@ -124,9 +136,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px }
 .tile { position: relative; margin: 0; background: var(--tile); border-radius: 24px; overflow: hidden }
 .tile .art { position: absolute; inset: 0 }
-.tile .count { font-size: 12px; font-weight: 500; color: var(--text); background: rgb(255 255 255 / .85); padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums }
+.tile .count { font-size: 12px; font-weight: 500; color: var(--text); background: var(--glass); padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums }
 /* Captions sit on photos, so both the title and the count get a soft white pill and stay on one line. */
-.tile .cap > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgb(255 255 255 / .85); padding: 3px 9px; border-radius: 999px }
+.tile .cap > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--glass); padding: 3px 9px; border-radius: 999px }
 .tile .count { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px }
 .tile .count b { font-weight: 500 }
 .tile .count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: none }
@@ -134,7 +146,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 /* Pictures are zoomed so they can travel inside their frames (inner pan, Medium: 14% of the frame each way). */
 .tile img, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.3 }
 /* Video tiles: clips play muted on a loop while on screen. Most are UI on white, so a hairline edge keeps them reading as cards. */
-.tile.is-video::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .07); pointer-events: none; z-index: 1 }
+.tile.is-video::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--edge); pointer-events: none; z-index: 1 }
 .tile.is-video .cap { z-index: 2 }
 .tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.3; pointer-events: none }   /* headroom for the inner parallax */
 @media (prefers-reduced-motion: reduce) { .tile img, .tile video { scale: 1 } }
@@ -169,7 +181,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
   padding: calc(96px + env(safe-area-inset-top, 0px)) max(29px, env(safe-area-inset-right, 0px)) calc(56px + env(safe-area-inset-bottom, 0px)) max(29px, env(safe-area-inset-left, 0px)) }
 .menu[hidden] { display: none }
 .menu-list { list-style: none; margin: 0; padding: 0 }
-.menu-item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid #eeeeee;
+.menu-item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid var(--line);
   font: 600 32px/1.1 var(--body); letter-spacing: -0.96px; color: #b5b5b5; text-align: left; transition: color .2s }
 .menu-item.on { color: var(--ink) }
 .menu-item .freq { font: 400 13px/1 var(--body); letter-spacing: 0; color: var(--muted); font-variant-numeric: tabular-nums }
@@ -214,7 +226,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
    page's layout: the dock grows upward into reserved space and nothing else moves. */
 .dock-row { height: 104px; display: flex; align-items: flex-end }
 /* The shelf keeps its resting height; magnified icons rise out of its top edge, like the Mac dock. */
-.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 0 16px 14px; height: 80px; overflow: visible; border-radius: 22px; background: #fff;
+.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 0 16px 14px; height: 80px; overflow: visible; border-radius: 22px; background: var(--card);
   box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 12px 32px rgb(0 0 0 / .08); max-width: 100% }
 .tool { position: relative; border-radius: 14px; display: grid; place-items: center; flex: none;
   --size: 52px; width: var(--size); height: var(--size); transition: width .16s cubic-bezier(.2,.8,.2,1), height .16s cubic-bezier(.2,.8,.2,1);
@@ -223,7 +235,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tool svg .solid { fill: #fff; stroke: none }
 .tool img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover }
 .tool .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; pointer-events: none;
-  font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; opacity: 0; transition: opacity .15s, transform .15s }
+  font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--on-ink); opacity: 0; transition: opacity .15s, transform .15s }
 .tool:hover .tip, .tool:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
 @media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 6px; padding: 0 10px 10px; height: 58px; border-radius: 16px } .tool { --size: 38px; border-radius: 10px } }
 @media (prefers-reduced-motion: reduce) { .tool { transition: none } }
@@ -283,7 +295,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   transition: background-size .55s cubic-bezier(.65,0,.35,1) }
 .bio p:hover .hl { background-size: 100% 100% }
 .bio p:hover .hl + .hl, .bio p:hover .hl:nth-of-type(2) { transition-delay: .12s }
-.ref { position: relative; cursor: default; text-decoration: underline dotted rgb(0 0 0 / .35); text-underline-offset: 3px }
+.ref { position: relative; cursor: default; text-decoration: underline dotted color-mix(in srgb, var(--ink) 35%, transparent); text-underline-offset: 3px }
 .ref-card { position: absolute; left: -12px; top: calc(100% + 10px); width: 228px; padding: 14px 16px; border-radius: 14px; background: var(--bg); z-index: 5;
   box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(-6px); pointer-events: none;
   transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1); display: grid; gap: 2px; font-weight: 400 }
@@ -316,10 +328,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 /* Book a call: a round calendar button before the availability pill. */
 .t-cta { display: inline-flex; align-items: center; gap: 6px }
 .t-book { position: relative; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--text); transition: background .2s, color .2s, transform .25s cubic-bezier(.2,.8,.2,1) }
-.t-book:hover, .t-book:focus-visible { background: var(--ink); color: #fff; transform: translateY(-1px) }
+.t-book:hover, .t-book:focus-visible { background: var(--ink); color: var(--on-ink); transform: translateY(-1px) }
 .t-book svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round }
 .t-book svg .d { fill: currentColor; stroke: none }
-.t-book .tip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translate(-50%, -3px); font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s }
+.t-book .tip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translate(-50%, -3px); font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--on-ink); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s }
 .t-book:hover .tip, .t-book:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
 .t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 999px; background: var(--pill); color: var(--text); font-size: 13px; letter-spacing: -0.2px }
 .t-avail i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #2fb35b }
@@ -336,9 +348,9 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .peek .pg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px }
 .peek .pg img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 5px; display: block; background: var(--tile) }
 .peek .pl { display: grid; gap: 0; font-size: 12px }
-.peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
+.peek .pl div { padding: 5px 0; border-top: 1px solid var(--line); color: var(--text) }
 /* Secret station 99.9: type "kingsley" on Home. */
-.secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
+.secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: var(--scrim); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
 .secret[hidden] { display: none }
 .secret-card { width: min(380px, 100%); padding: 26px 26px 22px; border-radius: 22px; background: var(--bg); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 24px 60px rgb(0 0 0 / .16); display: grid; gap: 10px }
 .secret-card .f { font: 600 56px/1 var(--body); letter-spacing: -2px; color: var(--ink); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 8px }
@@ -349,9 +361,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .secret-card button:hover { background: var(--pill-hover) }
 @media (prefers-reduced-motion: reduce) { .time .colon { animation: none } .avatar { transition: none } }
 
-/* Page reveal ring: a hairline circle that traces the edge of the opening page. */
-.reveal-ring { position: fixed; left: 0; top: 0; width: 0; height: 0; border: 1.5px solid var(--ink); border-radius: 50%; z-index: 99; pointer-events: none; opacity: 0 }
-
 /* ---------- Loader: station counter that locks on 100 ---------- */
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
 .loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
@@ -361,6 +370,21 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .ld-strip line { stroke: var(--ink); stroke-linecap: round }
 .ld-strip text { font: 500 11px var(--body); fill: var(--muted); letter-spacing: .2px }
 @media (max-width: 599px) { .ld-num { font-size: 60px; letter-spacing: -1.8px } }
+
+/* ---------- Dark mode ---------- */
+html[data-theme="dark"] {
+  --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --time: #8a8a8a; --ring: #2a2a2a; --disc: #1a1a1a;
+  --pill: #1c1c1c; --pill-hover: #262626; --tile: #161616; --photo: #333333; --marker: rgb(255 224 102 / .28);
+  --on-ink: #000000; --line: #222222; --card: #161616; --glass: rgb(11 11 11 / .8); --scrim: rgb(11 11 11 / .72); --edge: rgb(255 255 255 / .1);
+  color-scheme: dark;
+}
+/* Theme toggle: bottom-right on every page */
+.theme-btn { position: fixed; z-index: 150; right: max(24px, env(safe-area-inset-right, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--ink); transition: background .2s }
+.theme-btn:hover { background: var(--pill-hover) }
+.theme-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
+/* Leaving for the Designs page: the page closes over with a circle from the dial, then designs.html loads */
+.leave { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none }
 </style>
 </head>
 <body>
@@ -372,6 +396,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 // and the tick strip slides under a fixed needle. It locks on 100, holds a beat, then fades out.
 (function () {
   var loader = document.getElementById('loader'), num = document.getElementById('ldNum'), svg = document.getElementById('ldStrip');
+  try { if (sessionStorage.getItem('km-loaded')) { loader.remove(); return; } } catch (e) {}   // already seen this visit
   var NS = 'http://www.w3.org/2000/svg', reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PROFILE = [104, 89, 86, 82, 77, 70, 63, 56, 49, 42, 36, 31, 26, 23, 20, 17, 16, 15, 14, 13, 13, 12];
   function prof(d) { d = Math.abs(d); if (d >= PROFILE.length - 1) return 12; var i = Math.floor(d), t = d - i; return PROFILE[i] + (PROFILE[i + 1] - PROFILE[i]) * t; }
@@ -403,6 +428,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   if (document.readyState === 'complete') loaded(); else window.addEventListener('load', loaded);
   function finish() {
     if (done) return; done = true;
+    try { sessionStorage.setItem('km-loaded', '1'); } catch (e) {}
     setTimeout(function () {
       loader.classList.add('done');
       document.dispatchEvent(new Event('loader:done'));   // Home's typed name starts here
@@ -797,11 +823,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     // Layer hints only while moving; cleared after so the browser repaints the page normally.
     from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
     // The reveal is slower than the needle so the circle reads clearly: the old page stays visible and sinks
-    // back a little while the new one opens over it, and a thin ring traces the circle's edge as it grows.
-    const REV = 620;   // quick, but long enough for the circle and its ring to read
+    // back a little while the new one opens over it.
+    const REV = 620;   // quick, but long enough for the circle to read
     if (to === panels.home) {
-      // Back to Home is the reverse: the page you're on closes into the dial as a shrinking circle (with the
-      // ring tightening on its edge), while Home rises back into place underneath.
+      // Back to Home is the reverse: the page you're on closes into the dial as a shrinking circle while Home rises back into place underneath.
       from.style.zIndex = 2; to.style.zIndex = 1;
       from.style.willChange = 'clip-path, transform'; to.style.willChange = 'opacity, transform';
       const close = from.animate([
@@ -813,7 +838,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
         { opacity: .85, transform: 'scale(.975)', offset: .4 },
         { opacity: 1, transform: 'scale(1)' }
       ], { duration: REV, easing: EASE });
-      revealRing(ox, oy, far, start, REV);
       close.onfinish = () => {
         if (active && panels[active.id] !== from) from.hidden = true;
         close.cancel(); from.style.willChange = ''; from.style.clipPath = ''; from.style.transform = '';
@@ -838,7 +862,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg) scale(1.04)` },
       { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg) scale(1)' }
     ], { duration: REV, easing: EASE });
-    revealRing(ox, oy, start, far, REV);
     const settle = () => {
       to.style.willChange = ''; to.style.clipPath = ''; to.style.transform = ''; to.style.opacity = '';
       // Nudge a fresh paint of the arrived page (works around a Safari blank-layer bug).
@@ -846,18 +869,25 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     };
     reveal.onfinish = settle; reveal.oncancel = () => { to.style.willChange = ''; };
   }
-  // Thin ring that rides the edge of the page reveal.
-  const ringEl = document.createElement('div'); ringEl.className = 'reveal-ring'; ringEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(ringEl);
-  function revealRing(x, y, r0, r1, dur) {
-    ringEl.getAnimations().forEach(a => a.cancel());
-    // Size uses the same easing as the circle's clip, so the ring sits exactly on its edge; opacity fades on its own track.
-    const k = r => ({ left: `${x - r}px`, top: `${y - r}px`, width: `${2 * r}px`, height: `${2 * r}px` });
-    ringEl.animate([k(r0), k(r1)], { duration: dur, easing: EASE });
-    ringEl.animate([{ opacity: 0 }, { opacity: .9, offset: .06 }, { opacity: .55, offset: .5 }, { opacity: 0 }], { duration: dur });
+  function goDesigns(prev, sound) {
+    setTarget(ang(STATIONS.find(x => x.id === 'designs').f)); play('pop', sound);
+    if (prev && prev.id === 'home') emitRipple(true);
+    let o = { x: M.cx, y: M.cy, r: 264.5 * M.S };
+    const g = prev && prev.id !== 'home' && tagFor(STATIONS.find(x => x.id === 'designs'));
+    if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2 };
+    if (reduce) { location.href = 'designs.html'; return; }
+    const cover = document.createElement('div'); cover.className = 'leave'; document.body.appendChild(cover);
+    const far = Math.ceil(Math.hypot(Math.max(o.x, innerWidth - o.x), Math.max(o.y, innerHeight - o.y))) + 8;
+    const a = cover.animate([{ clipPath: `circle(${Math.round(o.r)}px at ${o.x}px ${o.y}px)` }, { clipPath: `circle(${far}px at ${o.x}px ${o.y}px)` }],
+      { duration: 520, easing: EASE, fill: 'forwards' });
+    a.onfinish = () => { location.href = 'designs.html'; };
   }
+  // Coming back from designs.html (bfcache): clear the cover
+  addEventListener('pageshow', () => document.querySelectorAll('.leave').forEach(c => c.remove()));
   function tuneTo(s, sound) {
     const prev = active;
-    if (prev && prev.id === 'home') emitRipple();                        // the wave leaves as the page turns
+    if (s.id === 'designs') { goDesigns(prev, sound); return; }
+    if (prev && prev.id === 'home') emitRipple(true);                    // the wave leaves as the page turns (no drawn line)
     setTarget(ang(s.f)); light(s);
     play('pop', sound);
     if (prev === s) return;
@@ -1650,7 +1680,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       ...home.querySelectorAll('.socials a'), home.querySelector('.t-avail'), home.querySelector('.t-now')
     ].filter(Boolean);
   }
-  function emitRipple() {
+  function emitRipple(quiet) {
     if (reduce) return;
     if (!ripTargets) ripInit();
     const now = performance.now(), cx = M.cx, cy = M.cy;
@@ -1659,7 +1689,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       return { el, d, ux: x / d, uy: y / d };
     });
     const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
-    ripples.push({ t0: now, list, life: far / RIP.speed + 400 });
+    ripples.push({ t0: now, list, life: far / RIP.speed + 400, quiet });
     if (ripples.length > 3) ripples.shift();
     const dprR = Math.min(2, devicePixelRatio || 1);
     if (ripCanvas.width !== innerWidth * dprR) { ripCanvas.width = innerWidth * dprR; ripCanvas.height = innerHeight * dprR; }
@@ -1673,8 +1703,8 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     for (const r of ripples) {
       const dt = Math.max(0, now - r.t0), R = dt * RIP.speed, fade = Math.max(0, 1 - dt / r.life);   // frame clock can start a hair early
       // the visible ring: a hairline that thins out as it travels
-      ripCtx.beginPath(); ripCtx.arc(M.cx, M.cy, R, 0, Math.PI * 2);
-      ripCtx.strokeStyle = `rgba(0,0,0,${(.16 * fade).toFixed(3)})`; ripCtx.lineWidth = 1; ripCtx.stroke();
+      if (!r.quiet) { ripCtx.beginPath(); ripCtx.arc(M.cx, M.cy, R, 0, Math.PI * 2);
+      ripCtx.strokeStyle = document.documentElement.dataset.theme === 'dark' ? `rgba(255,255,255,${(.16 * fade).toFixed(3)})` : `rgba(0,0,0,${(.16 * fade).toFixed(3)})`; ripCtx.lineWidth = 1; ripCtx.stroke(); }
       for (const t of r.list) {
         const x = (t.d - R) / RIP.width;
         if (x > 3 || x < -3) continue;
@@ -1695,6 +1725,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   layout();
   const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
+  if (hashId === 'designs') { location.replace('designs.html'); return; }
   const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
@@ -1702,6 +1733,26 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Pill widths change once Geist loads, so re-check the spacing then.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 })();
+</script>
+<button class="theme-btn" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
+<script>
+  // ---------- Theme toggle ----------
+  (function () {
+    const btn = document.getElementById('themeBtn'), ico = document.getElementById('themeIco');
+    const ICONS = { moon: '<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>', sun: '<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>' };
+    function paint() {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      ico.innerHTML = dark ? ICONS.sun : ICONS.moon;
+      btn.setAttribute('aria-pressed', dark); btn.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+    }
+    btn.addEventListener('click', () => {
+      const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+      try { localStorage.setItem('km-theme', t); } catch (e) {}
+      paint();
+    });
+    paint();
+  })();
 </script>
 </body>
 </html>
