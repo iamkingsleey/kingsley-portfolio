@@ -288,7 +288,9 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .t-more { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 6px; justify-items: end; white-space: nowrap; font-size: 13px; letter-spacing: -0.2px;
   opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1) }
 .mode-bottom .t-more { right: auto; left: 0; justify-items: start }
-.time:hover .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
+/* Only the time itself reveals the Lagos line, not the availability pill. */
+.t-now { cursor: default }
+.t-now:hover ~ .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
 .t-sky { display: inline-flex; align-items: center; gap: 6px; color: var(--muted) }
 .t-sky svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
 .t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 999px; background: var(--pill); color: var(--text); font-size: 13px; letter-spacing: -0.2px }
@@ -1314,7 +1316,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     if (k === skyState) return; skyState = k;
     sky.innerHTML = (day ? SUN : MOON) + `<span>GMT+1 · ${day ? 'daytime' : 'night'} in Lagos</span>`;
   }
-  timeEl.addEventListener('click', () => timeEl.classList.toggle('open'));   // taps on phones
+  timeEl.querySelector('.t-now').addEventListener('click', () => timeEl.classList.toggle('open'));   // taps on phones
 
   // Copy email: the word swaps to "copied" for a moment.
   const emailLink = document.getElementById('emailLink');
