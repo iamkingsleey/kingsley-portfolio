@@ -260,11 +260,8 @@ html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
 .fxsw button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
 body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
 @media (max-width: 899px) { .fxsw { left: 16px; bottom: calc(132px + env(safe-area-inset-bottom, 0px)) } }
-/* arrive: the page fades up from the colour of the circle that closed Home */
-body { animation: arrive .45s ease both }
-@keyframes arrive { from { opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { body { animation: none } }
 </style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
 
@@ -297,12 +294,13 @@ body { animation: arrive .45s ease both }
 <div class="vp" id="vp" aria-hidden="true">View project</div>
 <article class="detail" id="detail" aria-label="Project"><div class="d-wrap" id="dwrap"></div></article>
 <div class="sdial" id="sdial" role="slider" tabindex="0" aria-label="Sections" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><svg id="sstrip" aria-hidden="true"></svg><div class="needle" aria-hidden="true"></div></div>
-<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button><button type="button" id="snd" aria-label="Mute ticks" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
+<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button><button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
 <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Scroll through designs" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1">
   <svg id="strip" aria-hidden="true"></svg>
   <div class="needle" aria-hidden="true"></div>
 </div>
 
+<script src="popkit.js"></script>
 <script>
 (function () {
   // Pieces by category. Images and videos are the files in assets/designs (listed in content/designs.json).
@@ -357,7 +355,7 @@ body { animation: arrive .45s ease both }
     const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '');
     s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
     if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; s.appendChild(v); }
-    else { const im = new Image(); im.src = it.src; im.alt = ''; im.decoding = 'async'; s.appendChild(im); }
+    else { const im = new Image(); im.alt = ''; im.decoding = 'async'; if (i < 4) { im.fetchPriority = 'high'; im.src = it.src; } else im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
     row.appendChild(s);
     return s;
   });
@@ -494,6 +492,7 @@ body { animation: arrive .45s ease both }
         const w0 = w; w *= bounce; h *= bounceY; left -= (w - w0) / 2;
       }
       let src = slots[i].firstChild;
+      if (src.tagName === 'IMG' && !src.naturalWidth) { const th = thumbFor(items[i].src); if (th && th.naturalWidth) src = th; }   // small preview until the full image lands
       if (isA && hoverAmt > .01 && items[i].alt && altImg(i).naturalWidth) src = altImg(i);   // second angle while hovered
       if (src.tagName === 'VIDEO' && src.readyState < 2) src = texImg(items[i].poster);   // poster until frames arrive
       const sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
@@ -743,14 +742,10 @@ body { animation: arrive .45s ease both }
     b.lfo.frequency.setTargetAtTime(9 + amt * 26, t, .05);
   }
   // The one sound: a deep tick each time a piece passes the needle (also used by the section dial).
-  function tick() {
-    if (!soundOn || !ac) return;
-    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(), sh = ac.createWaveShaper();
-    sh.curve = crushCurve(5);
-    o.type = 'sine'; o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(42, t + .14);
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.32, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + .2);
-    o.connect(sh).connect(g).connect(ac.destination); o.start(t); o.stop(t + .22);
+  function tick() {                             // same detent as Home's dial
+    if (soundOn && window.Popkit) Popkit.play('detent');
   }
+
 
 
   // ---------- Sci-fi glitch (category change) ----------
@@ -814,7 +809,7 @@ body { animation: arrive .45s ease both }
     (function run(now) {
       const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3), v = 100 - 2 * e;
       fq.textContent = v.toFixed(1);
-      const st = Math.round(v * 5); if (st !== lastStep) { lastStep = st; tick(); }
+      // silent: no ticks on the way back to Home
       if (k < 1) return requestAnimationFrame(run);
       nm.textContent = 'Home'; station.classList.remove('tune-out');
       location.href = 'index.html#home';
@@ -955,8 +950,18 @@ body { animation: arrive .45s ease both }
       gl_FragColor=col;
     }`;
   const texCache = new Map();
+  // Thumbnails (assets/designs/thumbs/, 240px) load first so the row is never blank while full images arrive.
+  const thumbCache = new Map();
+  function thumbFor(path) {
+    if (!path || path.startsWith('data:') || !path.includes('assets/designs/')) return null;
+    let im = thumbCache.get(path);
+    if (!im) { im = new Image(); im.decoding = 'async'; im.src = path.replace('assets/designs/', 'assets/designs/thumbs/'); thumbCache.set(path, im); }
+    return im;
+  }
+  items.forEach(it => thumbFor(still(it)));
   function texImg(src) { let im = texCache.get(src); if (!im) { im = new Image(); im.src = src; texCache.set(src, im); } return im; }
-  items.forEach(it => texImg(still(it)));          // warm up so the first tap can ripple
+  const warm = () => { slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } }); items.forEach(it => texImg(still(it))); };
+  if (document.readyState === 'complete') setTimeout(warm, 200); else addEventListener('load', () => setTimeout(warm, 200));          // warm up so the first tap can ripple
   function makeRipple(src, W, H, cx, cy) {
     const im = texImg(src);
     if (reduce || !im.complete || !im.naturalWidth) return null;
@@ -1275,7 +1280,7 @@ body { animation: arrive .45s ease both }
       for (const o of ovTiles) {
         const r = o.im.getBoundingClientRect();
         if (r.bottom < -vh * .5 || r.top > vh * 1.5) continue;
-        const it = items[o.i], src = texImg(still(it));
+        const it = items[o.i], full = texImg(still(it)), th = thumbFor(still(it)), src = full.naturalWidth || !th ? full : th;
         const sw = src.naturalWidth, sh = src.naturalHeight;
         if (sw) {
           const ia = sw / sh, ba = r.width / r.height;

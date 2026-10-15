@@ -385,9 +385,39 @@ html[data-theme="dark"] {
 .theme-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
 /* Leaving for the Designs page: the page closes over with a circle from the dial, then designs.html loads */
 .leave { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none }
+
+/* ---------- Station readout on inner pages (same as the Designs page) ---------- */
+.side-nav { display: none !important }
+.inner .menu-btn { display: none !important }
+.station { position: fixed; z-index: 120; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(80px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 6px;
+  opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .25s, transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s .3s }
+.inner .station { opacity: 1; visibility: visible; transform: none; transition: opacity .35s .1s, transform .4s cubic-bezier(.2,.8,.2,1) .1s, visibility 0s }
+.station .back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
+.station .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
+.station .back span { font-family: var(--body); font-size: 13px; letter-spacing: -.1px }
+.station .back:hover { background: var(--pill-hover); color: var(--ink) }
+.station .back:hover svg { transform: translateX(-3px) }
+.station .now { display: flex; align-items: baseline; gap: 9px; padding: 0 10px; color: var(--ink) }
+.station .fq { font: 500 26px/1 var(--body); letter-spacing: -1px; font-variant-numeric: tabular-nums; min-width: 3.4ch }
+.station .nm { font-size: 13px; font-weight: 500 }
+.station .bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px }
+.station .bars i { width: 2.5px; border-radius: 1px; background: var(--ink) }
+.station .bars i:nth-child(1) { height: 4px } .station .bars i:nth-child(2) { height: 7px } .station .bars i:nth-child(3) { height: 11px }
+.station.tune-out .bars i { animation: sfade .3s steps(1) infinite }
+.station.tune-out .bars i:nth-child(2) { animation-delay: .1s } .station.tune-out .bars i:nth-child(3) { animation-delay: .2s }
+@keyframes sfade { 50% { opacity: .15 } }
+.mode-bottom .station { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)) }
+.mode-bottom .station .fq { font-size: 22px }
+/* keep page content clear of the readout */
+.inner.mode-top .sheet.about { padding-top: 150px }
+.inner.mode-top .sheet:not(.about) { top: calc(50% + 30px) }
 </style>
 </head>
 <body>
+<div class="station" id="station" aria-label="Station">
+  <button class="back" id="stBack" type="button" aria-label="Tune back to Home, 98.0"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>98.0 <span>Home</span></button>
+  <div class="now"><span class="fq" id="stFq">96.0</span><span class="nm" id="stNm">Engineering</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
+</div>
 <div class="loader" id="loader" role="status" aria-live="polite" aria-label="Loading">
   <div class="ld-inner"><div class="ld-num" id="ldNum">0</div><svg class="ld-strip" id="ldStrip" aria-hidden="true"></svg></div>
 </div>
@@ -879,14 +909,25 @@ html[data-theme="dark"] {
     const cover = document.createElement('div'); cover.className = 'leave'; document.body.appendChild(cover);
     const far = Math.ceil(Math.hypot(Math.max(o.x, innerWidth - o.x), Math.max(o.y, innerHeight - o.y))) + 8;
     const a = cover.animate([{ clipPath: `circle(${Math.round(o.r)}px at ${o.x}px ${o.y}px)` }, { clipPath: `circle(${far}px at ${o.x}px ${o.y}px)` }],
-      { duration: 520, easing: EASE, fill: 'forwards' });
-    a.onfinish = () => { location.href = 'designs.html'; };
+      { duration: 380, easing: EASE, fill: 'forwards' });
+    setTimeout(() => { location.href = 'designs.html'; }, 240);   // start loading while the circle is still closing
   }
+  // Fetch the Designs page and its first pictures while Home sits idle, so opening it is instant.
+  function prefetchDesigns() {
+    if (prefetchDesigns.done) return; prefetchDesigns.done = true;
+    const add = (href, as) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
+    add('designs.html', 'document');
+    const first = ['paper-plane-with-coin.jpg', '3d-tumbler-render.jpg', 'safe-with-coins.jpg', 'pawn-in-an-archway.jpg'];
+    first.forEach(f => add('assets/designs/' + f, 'image'));
+    PROJECTS.forEach(p => p.images && p.images[0] && p.images[0].src && add(p.images[0].src.replace('assets/designs/', 'assets/designs/thumbs/'), 'image'));
+  }
+  const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));
+  addEventListener('load', () => idle(prefetchDesigns));
   // Coming back from designs.html (bfcache): clear the cover
   addEventListener('pageshow', () => document.querySelectorAll('.leave').forEach(c => c.remove()));
   function tuneTo(s, sound) {
     const prev = active;
-    if (s.id === 'designs') { goDesigns(prev, sound); return; }
+    if (s.id === 'designs') { prefetchDesigns(); goDesigns(prev, sound); return; }
     if (prev && prev.id === 'home') emitRipple(true);                    // the wave leaves as the page turns (no drawn line)
     setTarget(ang(s.f)); light(s);
     play('pop', sound);
@@ -1173,6 +1214,7 @@ html[data-theme="dark"] {
   });
   function setInner(s) {
     const inner = s.id !== 'home';
+    if (inner) { document.getElementById('stFq').textContent = s.f.toFixed(1); document.getElementById('stNm').textContent = s.name; }
     root.classList.toggle('inner', inner);
     document.getElementById('tuner').tabIndex = inner ? -1 : 0;
   }
@@ -1723,6 +1765,7 @@ html[data-theme="dark"] {
 
   // ---------- Start ----------
   layout();
+  document.addEventListener('station:home', () => tuneTo(STATIONS.find(x => x.id === 'home'), false));   // silent
   const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
   if (hashId === 'designs') { location.replace('designs.html'); return; }
@@ -1736,6 +1779,23 @@ html[data-theme="dark"] {
 </script>
 <button class="theme-btn" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
 <script>
+  // ---------- Station readout: back to Home ----------
+  (function () {
+    const btn = document.getElementById('stBack'), st = document.getElementById('station'), fq = document.getElementById('stFq'), nm = document.getElementById('stNm');
+    const reduceM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    btn.addEventListener('click', () => {
+      if (st.classList.contains('tune-out')) return;
+      const from = parseFloat(fq.textContent) || 98, t0 = performance.now(), dur = reduceM ? 0 : 420;
+      st.classList.add('tune-out');
+      (function run(now) {
+        const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3);
+        fq.textContent = (from + (98 - from) * e).toFixed(1);
+        if (k < 1) return requestAnimationFrame(run);
+        nm.textContent = 'Home'; st.classList.remove('tune-out');
+        document.dispatchEvent(new CustomEvent('station:home'));
+      })(t0);
+    });
+  })();
   // ---------- Theme toggle ----------
   (function () {
     const btn = document.getElementById('themeBtn'), ico = document.getElementById('themeIco');
