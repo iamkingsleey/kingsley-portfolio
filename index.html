@@ -306,9 +306,12 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
 /* Static between stations, and a faint moving grain on Home. */
 .static { position: fixed; inset: 0; z-index: 99; pointer-events: none; opacity: 0; background: var(--noise) 0 0 / 140px 140px; mix-blend-mode: multiply }
-.grain { position: absolute; inset: -40px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; opacity: .04; mix-blend-mode: multiply;
-  animation: grain .9s steps(5) infinite }
-@keyframes grain { 0% { transform: translate(0, 0) } 20% { transform: translate(-14px, 9px) } 40% { transform: translate(11px, -16px) } 60% { transform: translate(-8px, -6px) } 80% { transform: translate(15px, 12px) } }
+/* Grain: darker, but calm. No jitter: it drifts slowly in one direction (one tile every 70s, so the loop
+   is seamless) and gently fades between two strengths, like dust moving through light. */
+.grain { position: absolute; inset: -160px 0 0 -160px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; mix-blend-mode: multiply;
+  opacity: .07; will-change: transform; animation: grainDrift 70s linear infinite, grainBreath 9s ease-in-out infinite alternate }
+@keyframes grainDrift { to { transform: translate(160px, 160px) } }
+@keyframes grainBreath { from { opacity: .055 } to { opacity: .085 } }
 /* Secret station 99.9: type "kingsley" on Home. */
 .secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
 .secret[hidden] { display: none }
