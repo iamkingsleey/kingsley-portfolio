@@ -775,7 +775,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
     // The reveal is slower than the needle so the circle reads clearly: the old page stays visible and sinks
     // back a little while the new one opens over it, and a thin ring traces the circle's edge as it grows.
-    const REV = 900;
+    const REV = 620;   // quick, but long enough for the circle and its ring to read
     from.style.willChange = 'opacity, transform';
     const fade = from.animate([
       { opacity: 1, transform: 'scale(1)' },
