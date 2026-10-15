@@ -88,6 +88,12 @@ canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-
 .cap .num i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); margin-right: 7px; vertical-align: 1px }
 .cap .meta { position: absolute; right: 0; text-align: right; font: 11px/1.6 var(--mono); letter-spacing: .3px; text-transform: uppercase; color: var(--muted); white-space: nowrap }
 .cap .meta b { color: var(--ink); font-weight: 500 }
+/* Tool icons (the same files as Home's dock); a tool without an icon shows its name in a small chip */
+.tools { display: inline-flex; gap: 6px; align-items: center; vertical-align: middle }
+.tools img, .tools .tx { width: var(--ts, 18px); height: var(--ts, 18px); border-radius: 27%; display: block; flex: none; box-shadow: 0 0 0 1px var(--edge) }   /* hairline keeps dark icons visible on dark */
+.tools .tx { width: auto; padding: 0 .5em; display: grid; place-items: center; background: var(--pill); color: var(--ink); font: 500 calc(var(--ts, 18px) * .5) var(--mono); text-transform: uppercase; letter-spacing: .3px }
+.cap .meta .tools { --ts: 18px; margin: 2px 0 0 4px }
+.d-meta .tools { --ts: 30px; gap: 8px; margin-top: 2px }
 
 /* ---------- Ruler dial ---------- */
 .dial { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 14; touch-action: none; cursor: grab }
@@ -197,7 +203,7 @@ body.open::before, body.all::before { opacity: 1 }
 .sdial { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 19; touch-action: none; cursor: grab; opacity: 0; pointer-events: none; transition: opacity .3s; background: linear-gradient(to top, var(--bg) 70%, transparent) }
 body.open .sdial { opacity: 1; pointer-events: auto }
 .sdial svg { position: absolute; left: 0; top: 0; width: 100%; height: 96px; overflow: visible }
-.sdial .needle { position: absolute; left: 50%; top: 6px; width: 3px; height: 58px; margin-left: -1.5px; border-radius: 2px; background: var(--ink) }
+.sdial .needle { position: absolute; left: 50%; top: 6px; width: 3px; height: 58px; margin-left: -1.5px; border-radius: 2px; background: #ff4a1c }
 .back b { font-weight: 500 }
 .now .nm { max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 @media (max-width: 899px) {
@@ -347,6 +353,18 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const $ = id => document.getElementById(id);
 
   // ---------- Content ----------
+  // Tools render as the icons from Home's dock. Names are matched loosely ("After Effects", "AE", "Ps"…);
+  // anything without an icon file shows as a small text chip.
+  const TOOL_ICONS = { blender: 'blender', figma: 'figma', illustrator: 'illustrator', ai: 'illustrator', photoshop: 'photoshop', ps: 'photoshop',
+    aftereffects: 'aftereffect', aftereffect: 'aftereffect', ae: 'aftereffect', claude: 'claude', chatgpt: 'chatgpt' };
+  const TOOL_NAMES = { blender: 'Blender', figma: 'Figma', illustrator: 'Adobe Illustrator', photoshop: 'Adobe Photoshop', aftereffect: 'Adobe After Effects', claude: 'Claude', chatgpt: 'ChatGPT' };
+  function toolIcons(str) {
+    const list = String(str || '').split(/\s*[·,\/]\s*/).filter(Boolean);
+    return `<span class="tools">${list.map(t => {
+      const f = TOOL_ICONS[t.toLowerCase().replace(/^adobe\s*/, '').replace(/[^a-z]/g, '')];
+      return f ? `<img src="assets/${f}.svg" alt="${TOOL_NAMES[f]}" title="${TOOL_NAMES[f]}" width="18" height="18">` : `<span class="tx">${t}</span>`;
+    }).join('')}</span>`;
+  }
   const CATS = [
     { k: '3d', name: '3D', tools: 'Blender' },
     { k: 'product', name: 'Product', tools: 'Figma · Code' },
@@ -453,7 +471,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const it = items[i];
     $('capT').textContent = it.t;
     $('capN').innerHTML = `<i></i>${String(i + 1).padStart(2, '0')}`;
-    $('capM').innerHTML = [it.client && `<b>Client</b> ${it.client}`, `<b>Category</b> ${it.cat}${it.year ? ' · ' + it.year : ''}`, `<b>Tools</b> ${it.tools}`].filter(Boolean).join('<br>');
+    $('capM').innerHTML = [it.client && `<b>Client</b> ${it.client}`, `<b>Category</b> ${it.cat}${it.year ? ' · ' + it.year : ''}`, `<b>Tools</b> ${toolIcons(it.tools)}`].filter(Boolean).join('<br>');
     $('count').innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b> / ${N}`;
     $('dial').setAttribute('aria-valuenow', i + 1);
     chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === it.cat));
@@ -990,7 +1008,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
             <div><dt>Type</dt><dd>${c.type}</dd></div>
             ${it.year ? `<div><dt>Year</dt><dd>${it.year}</dd></div>` : ''}
             <div><dt>Role</dt><dd>${it.role || c.role}</dd></div>
-            <div><dt>Tools</dt><dd>${it.tools}</dd></div>
+            <div><dt>Tools</dt><dd>${toolIcons(it.tools)}</dd></div>
           </dl>
         </div>
       </section>
