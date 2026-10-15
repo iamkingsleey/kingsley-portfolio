@@ -146,8 +146,14 @@
     }
   };
 
+  // One sound per action: the same sound asked for twice within a quarter second (say, a page-wide click
+  // handler and the button's own handler) plays once.
+  var lastName = '', lastAt = 0;
   function play(name, opt) {
     if (muted || !sounds[name] || !ensure()) return;
+    var now = Date.now();
+    if (name === lastName && now - lastAt < 250 && name !== 'detent' && name !== 'hover') return;
+    lastName = name; lastAt = now;
     sounds[name](opt);
   }
 
