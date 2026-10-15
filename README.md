@@ -23,7 +23,7 @@ python3 -m http.server 8000
 | `iteration-3/` | Third iteration: dial on Home, side menu, Designs as a masonry grid |
 | `iteration-2/` | Second iteration: the dial on every page |
 | `iteration-1/` | First iteration: top dial, Feed masonry, image trail on Home |
-| `project.html`, `logo.html`, `product.html` | Project pages. Which one a project opens is its `layout` (below) |
+| `project.html`, `logo.html`, `product.html`, `showcase.html` | Project pages. Which one a project opens is its `layout` (below) |
 | `tuner.js` | Page-to-page transition: the readout moves to the middle and tunes to the next page |
 | `popkit.js` | UI sounds made in code with Web Audio (pop on tap, detent while dragging). No audio files |
 | `assets/` | Headshot and other images |
@@ -53,6 +53,8 @@ Each project can pick the page it opens on. Add `"layout"` to the project in `co
 | `logo` | `logo.html` | Logo design: sideways run of the mark's stations, construction, colour, type, applications |
 | `product-panels` | `product.html` | Product design (UI/UX): the working prototype on top, then a few large screens on calm panels |
 | `product-story` | `product.html` | Product design (UI/UX): the same opening, then sticky text beside scrolling screens |
+| `illustration` | `showcase.html` | Showcase: prints you can move around a board, a loupe for looking closer, colours sampled from each piece, a contact sheet |
+| `3d` | `showcase.html` | Same as `illustration` for now (credits list 3D deliverables) |
 
 ```json
 { "title": "Ruler picker", "layout": "product-panels", "images": [ ... ] }
