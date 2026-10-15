@@ -193,6 +193,9 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 /* About: a longer page, so it scrolls on its own and starts on the same top line as the other pages. */
 .sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
 .sheet.about::-webkit-scrollbar { display: none }
+/* The scroll box clips anything outside it, so it gets 48px of extra room on each side (cancelled by a negative
+   margin): the content stays where it was, and the dock's soft shadow has space to show in full. */
+.sheet.about { margin-inline: -48px; padding-inline: 48px; box-sizing: content-box }
 .mode-top .sheet.about { top: 0; transform: translateX(-50%); padding-top: calc(var(--band) + 48px) }
 .inner.mode-top .sheet.about { top: 0; transform: none; padding-top: var(--flush) }
 .mode-bottom .sheet.about { top: 0; width: auto; padding-top: calc(96px + env(safe-area-inset-top, 0px)); padding-bottom: 48px }
