@@ -79,6 +79,10 @@ h1.typer { white-space: nowrap; display: flex; align-items: baseline; min-height
 
 /* Image trail on Home: small cards of the Designs work spill out behind the cursor, newest sharp on top,
    older ones blurring and fading away. Sits under the text; never catches the pointer. */
+/* Dial ripple: tuning sends a wave out from the dial across Home; words, photo and pills ride it. */
+.ripple-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none }
+.rw { display: inline-block }
+#typed { display: inline-block }
 .trail { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: strict }
 .trail .card { position: absolute; left: 0; top: 0; width: 84px; height: 105px; border-radius: 6px; overflow: hidden; opacity: 0;
   background: var(--tile); box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 8px 22px rgb(0 0 0 / .1) }
@@ -238,7 +242,6 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 /* Photo: tilts toward the cursor; on hover it briefly "tunes" through the work, like a TV catching a signal. */
 .avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto }
 .avatar .flick { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0 }
-.avatar .snow { position: absolute; inset: 0; background: var(--noise) 0 0 / 80px 80px; mix-blend-mode: multiply; opacity: 0; pointer-events: none }
 /* Name: click to type the next role; a small picture of that kind of work peeks beside the cursor. */
 h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .role-peek { position: fixed; left: 0; top: 0; z-index: 60; width: 64px; height: 80px; border-radius: 8px; overflow: hidden; pointer-events: none; opacity: 0;
@@ -304,14 +307,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .peek .pg img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 5px; display: block; background: var(--tile) }
 .peek .pl { display: grid; gap: 0; font-size: 12px }
 .peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
-/* Static between stations, and a faint moving grain on Home. */
-.static { position: fixed; inset: 0; z-index: 99; pointer-events: none; opacity: 0; background: var(--noise) 0 0 / 140px 140px; mix-blend-mode: multiply }
-/* Grain: darker, but calm. No jitter: it drifts slowly in one direction (one tile every 70s, so the loop
-   is seamless) and gently fades between two strengths, like dust moving through light. */
-.grain { position: absolute; inset: -160px 0 0 -160px; z-index: 0; pointer-events: none; background: var(--noise) 0 0 / 160px 160px; mix-blend-mode: multiply;
-  opacity: .07; will-change: transform; animation: grainDrift 70s linear infinite, grainBreath 9s ease-in-out infinite alternate }
-@keyframes grainDrift { to { transform: translate(160px, 160px) } }
-@keyframes grainBreath { from { opacity: .055 } to { opacity: .085 } }
 /* Secret station 99.9: type "kingsley" on Home. */
 .secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
 .secret[hidden] { display: none }
@@ -322,7 +317,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .secret-card p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--text) }
 .secret-card button { justify-self: start; margin-top: 6px; font-size: 13px; padding: 6px 12px; border-radius: 8px; background: var(--pill) }
 .secret-card button:hover { background: var(--pill-hover) }
-@media (prefers-reduced-motion: reduce) { .grain, .time .colon { animation: none } .avatar { transition: none } }
+@media (prefers-reduced-motion: reduce) { .time .colon { animation: none } .avatar { transition: none } }
 
 /* ---------- Loader: station counter that locks on 100 ---------- */
 .loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
@@ -402,12 +397,12 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 <div id="app">
   <section class="panel" data-station="home">
     <div class="trail" id="trail" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
+    <canvas class="ripple-canvas" id="rippleCanvas" aria-hidden="true"></canvas>
     <div class="time" id="time" tabindex="0"><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span><span class="t-now"><span id="clock">--:--</span>, Lagos 🇳🇬</span>
       <div class="t-more"><span class="t-sky" id="tSky"></span></div>
     </div>
     <div class="hero">
-      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"><img class="flick" alt="" aria-hidden="true"><span class="snow" aria-hidden="true"></span></div>
+      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"><img class="flick" alt="" aria-hidden="true"></div>
       <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
       <div class="links"><a href="#" id="emailLink" data-email="">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
       <div class="bio">
@@ -419,7 +414,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   </section>
   <div class="role-peek" id="rolePeek" aria-hidden="true"><img alt=""></div>
   <div class="peek" id="peek" aria-hidden="true"></div>
-  <div class="static" id="static" aria-hidden="true"></div>
   <div class="secret" id="secret" hidden role="dialog" aria-modal="true" aria-label="Secret station">
     <div class="secret-card">
       <span class="lbl">Secret station</span>
@@ -691,6 +685,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   function light(s) {
     if (lit === s) return false;
     lit = s;
+    if (s && dragging && active && active.id === 'home') emitRipple();   // each station passed while turning
     STATIONS.forEach(o => pills[o.id].classList.toggle('on', o === s));
     ticks.forEach(t => t.st && t.el.classList.toggle('on', t.st === s));
     return true;
@@ -783,6 +778,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   }
   function tuneTo(s, sound) {
     const prev = active;
+    if (prev && prev.id === 'home') emitRipple();                        // the wave leaves as the page turns
     setTarget(ang(s.f)); light(s);
     play('pop', sound);
     if (prev === s) return;
@@ -794,7 +790,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
     swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
     kickPx();
-    if (prev && (prev.id === 'home' || s.id === 'home')) staticFlash();
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
@@ -1245,7 +1240,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   // Designs image (small copies from assets/designs/thumbs, falling back to the full image).
   // Each card pops in, holds briefly, then blurs, shrinks and fades. Mouse only; off for reduced motion.
   // Switched off for now: set TRAIL_ON to true to bring it back (thumbnails stay in assets/designs/thumbs).
-  const TRAIL_ON = false;
+  const TRAIL_ON = true;
   if (TRAIL_ON && !reduce && finePointer) {
     const trail = document.getElementById('trail');
     const POOL = 16, GAP = 26, LIFE = 1150;
@@ -1303,26 +1298,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   let lastActive = performance.now();
   ['pointermove', 'pointerdown', 'keydown', 'wheel'].forEach(t => addEventListener(t, () => { lastActive = performance.now(); }, { passive: true }));
 
-  // Shared film-grain texture, made once on a small canvas.
-  (function makeNoise() {
-    const c = document.createElement('canvas'); c.width = c.height = 128;
-    const g = c.getContext('2d'), d = g.createImageData(128, 128);
-    for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255 | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
-    g.putImageData(d, 0, 0);
-    root.style.setProperty('--noise', `url(${c.toDataURL('image/png')})`);
-  })();
-
-  // Static between stations: a quick burst of grain when leaving or arriving at Home.
-  const staticEl = document.getElementById('static');
-  function staticFlash() {
-    if (reduce) return;
-    staticEl.getAnimations().forEach(a => a.cancel());
-    staticEl.animate([
-      { opacity: 0, backgroundPosition: '0 0' }, { opacity: .32, backgroundPosition: '37px 11px', offset: .25 },
-      { opacity: .18, backgroundPosition: '-21px 46px', offset: .55 }, { opacity: 0, backgroundPosition: '13px -29px' }
-    ], { duration: 420, easing: 'steps(6)' });
-  }
-
   // Lagos sky and availability under the time.
   const sky = document.getElementById('tSky');
   document.getElementById('tAvail').textContent = AVAILABILITY;
@@ -1375,7 +1350,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
 
     // Photo: tilt toward the cursor, and tune through the work on hover.
-    const avatar = document.getElementById('avatar'), flick = avatar.querySelector('.flick'), snow = avatar.querySelector('.snow');
+    const avatar = document.getElementById('avatar'), flick = avatar.querySelector('.flick');
     addEventListener('pointermove', e => {
       if (!homeOn() || e.pointerType !== 'mouse') return;
       const r = avatar.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
@@ -1388,12 +1363,12 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       const pics = designPics();
       for (let i = 0; i < 4 && pics.length; i++) {
         flick.src = thumb(pics[Math.floor(Math.random() * pics.length)]);
-        flick.style.opacity = 1; snow.style.opacity = .45 - i * .08;
+        flick.style.opacity = 1;
         await pause(70 + i * 15);
         flick.style.opacity = i % 2 ? 0 : .6;
         await pause(40);
       }
-      flick.style.opacity = 0; snow.style.opacity = 0;
+      flick.style.opacity = 0;
       setTimeout(() => { tuning = false; }, 600);
     });
 
@@ -1475,6 +1450,77 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   document.getElementById('secretClose').addEventListener('click', closeSecret);
   secret.addEventListener('click', e => { if (e.target === secret) closeSecret(); });
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSecret(); });
+
+  // ---------- Dial ripple ----------
+  // Turning the dial on Home sends a ring out from the dial's centre. As it passes, each word, the photo,
+  // the name, the time and the pills are pushed out and pulled back (one push-pull swing), with a slight swell.
+  const RIP = { speed: 1.5, amp: 12, width: 64 };      // px per ms, push in px, wave width in px
+  const ripCanvas = document.getElementById('rippleCanvas'), ripCtx = ripCanvas.getContext('2d');
+  let ripples = [], ripRaf = 0, ripTargets = null;
+  function ripInit() {
+    // Split the bio and link text into word boxes so the wave can move each word on its own.
+    const wrapWords = el => {
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('.ref-card') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+      const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
+      nodes.forEach(n => {
+        if (!n.textContent.trim()) return;
+        const f = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) f.appendChild(document.createTextNode(part));
+          else { const w = document.createElement('span'); w.className = 'rw'; w.textContent = part; f.appendChild(w); }
+        });
+        n.replaceWith(f);
+      });
+    };
+    document.querySelectorAll('.hero .bio p').forEach(wrapWords);
+    const home = panels.home;
+    ripTargets = [
+      home.querySelector('.avatar img'), document.getElementById('typed'),
+      ...home.querySelectorAll('.links > *'), ...home.querySelectorAll('.bio .rw'),
+      ...home.querySelectorAll('.socials a'), home.querySelector('.t-avail'), home.querySelector('.t-now')
+    ].filter(Boolean);
+  }
+  function emitRipple() {
+    if (reduce) return;
+    if (!ripTargets) ripInit();
+    const now = performance.now(), cx = M.cx, cy = M.cy;
+    const list = ripTargets.map(el => {
+      const r = el.getBoundingClientRect(), x = r.left + r.width / 2 - cx, y = r.top + r.height / 2 - cy, d = Math.hypot(x, y) || 1;
+      return { el, d, ux: x / d, uy: y / d };
+    });
+    const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+    ripples.push({ t0: now, list, life: far / RIP.speed + 400 });
+    if (ripples.length > 3) ripples.shift();
+    const dprR = Math.min(2, devicePixelRatio || 1);
+    if (ripCanvas.width !== innerWidth * dprR) { ripCanvas.width = innerWidth * dprR; ripCanvas.height = innerHeight * dprR; }
+    ripCtx.setTransform(dprR, 0, 0, dprR, 0, 0);
+    if (!ripRaf) ripRaf = requestAnimationFrame(ripFrame);
+  }
+  function ripFrame(now) {
+    ripples = ripples.filter(r => now - r.t0 < r.life);
+    const acc = new Map();
+    ripCtx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const r of ripples) {
+      const dt = Math.max(0, now - r.t0), R = dt * RIP.speed, fade = Math.max(0, 1 - dt / r.life);   // frame clock can start a hair early
+      // the visible ring: a hairline that thins out as it travels
+      ripCtx.beginPath(); ripCtx.arc(M.cx, M.cy, R, 0, Math.PI * 2);
+      ripCtx.strokeStyle = `rgba(0,0,0,${(.16 * fade).toFixed(3)})`; ripCtx.lineWidth = 1; ripCtx.stroke();
+      for (const t of r.list) {
+        const x = (t.d - R) / RIP.width;
+        if (x > 3 || x < -3) continue;
+        const g = Math.exp(-x * x), push = RIP.amp * -2 * x * g * fade, swell = .05 * g * fade;
+        const a = acc.get(t.el) || { x: 0, y: 0, s: 0 };
+        a.x += t.ux * push; a.y += t.uy * push; a.s += swell; acc.set(t.el, a);
+      }
+    }
+    ripTargets.forEach(el => {
+      const a = acc.get(el);
+      el.style.transform = a ? `translate(${a.x.toFixed(2)}px, ${a.y.toFixed(2)}px) scale(${(1 + a.s).toFixed(4)})` : '';
+    });
+    if (ripples.length) ripRaf = requestAnimationFrame(ripFrame);
+    else { ripRaf = 0; ripCtx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
 
   // ---------- Start ----------
   layout();
