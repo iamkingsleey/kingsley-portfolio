@@ -190,7 +190,24 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom .fade.bottom { bottom: calc(100% - var(--dial-top)) }
 .mode-bottom #ruler { display: none }
 
-/* Tools dock on Skills: a light shelf of app tiles that swell under the cursor */
+/* About: a longer page, so it scrolls on its own and starts on the same top line as the other pages. */
+.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
+.sheet.about::-webkit-scrollbar { display: none }
+.mode-top .sheet.about { top: 0; transform: translateX(-50%); padding-top: calc(var(--band) + 48px) }
+.inner.mode-top .sheet.about { top: 0; transform: none; padding-top: var(--flush) }
+.mode-bottom .sheet.about { top: 0; width: auto; padding-top: calc(96px + env(safe-area-inset-top, 0px)); padding-bottom: 48px }
+.mode-top .sheet.about { width: auto }
+.about-intro { display: grid; gap: 12px; margin-top: 18px; font-size: 15px; line-height: 1.5; letter-spacing: -0.2px; color: var(--text); max-width: 52ch }
+.about-intro p { margin: 0 }
+.about-h { font: 600 13px/1 var(--body); letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin: 44px 0 0 }
+.sheet.about .list { margin-top: 14px }
+.sheet.about .dock-wrap { margin-top: 0 }
+.sheet.about .dock-label { margin-top: 44px }
+.hobbies { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px }
+.hobbies li { font-size: 14px; padding: 7px 13px; border-radius: 999px; background: var(--pill); color: var(--text); transition: background .2s, color .2s }
+.hobbies li:hover { background: var(--ink); color: #fff }
+
+/* Tools dock on About: a light shelf of app tiles that swell under the cursor */
 .dock-wrap { margin-top: 56px }
 .dock-label { font-size: 13px; color: var(--muted); letter-spacing: -0.26px; margin: 0 }
 /* The row is already as tall as the dock at full magnification, so hovering never changes the
@@ -208,7 +225,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .tool .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; pointer-events: none;
   font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; opacity: 0; transition: opacity .15s, transform .15s }
 .tool:hover .tip, .tool:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
-@media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 8px; padding: 0 12px 10px; height: 64px; border-radius: 18px } .tool { --size: 44px; border-radius: 12px } }
+@media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 6px; padding: 0 10px 10px; height: 58px; border-radius: 16px } .tool { --size: 38px; border-radius: 10px } }
 @media (prefers-reduced-motion: reduce) { .tool { transition: none } }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
@@ -468,9 +485,15 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     </div>
   </section>
 
-  <section class="panel" data-station="skills" hidden>
-    <div class="sheet">
-      <h2>Skills</h2>
+  <section class="panel" data-station="about" hidden>
+    <div class="sheet about">
+      <h2>About</h2>
+      <div class="about-intro">
+        <p>I'm Kingsley, a senior product designer and founder based in Lagos, with about five years of designing products from zero to one.</p>
+        <p>I led design at Kusnap, a peer-to-peer marketplace, from its early days to 50,000+ users. I'm a Design Maintainer at CHAOSS, part of the Linux Foundation, and I lead design for Open Source Community Africa.</p>
+        <p>I work across product, brand and 3D, and I write my own code when a tool doesn't exist yet: Figma plugins, prototypes and small bots in Python and Node.</p>
+      </div>
+      <h3 class="about-h">Skills</h3>
       <ul class="list">
         <li><b>Brand Design</b></li>
         <li><b>Product Design</b></li>
@@ -479,9 +502,13 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
         <li><b>Design Engineer</b></li>
       </ul>
       <div class="dock-wrap">
-        <p class="dock-label">Tools I use</p>
+        <h3 class="about-h dock-label">Tools I use</h3>
         <div class="dock-row"><div class="dock" id="dock" role="list" aria-label="Tools"></div></div>
       </div>
+      <h3 class="about-h">Off the clock</h3>
+      <ul class="hobbies" aria-label="Hobbies">
+        <li>Music</li><li>Football</li><li>History</li><li>Etymology</li><li>Business strategy books</li><li>Building little tools</li>
+      </ul>
     </div>
   </section>
 </div>
@@ -513,7 +540,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   const play = (n, trusted) => { if (trusted && window.Popkit) Popkit.play(n); };
 
   const STATIONS = [
-    { f: 94,  id: 'skills',      name: 'Skills' },
+    { f: 94,  id: 'about',       name: 'About' },
     { f: 96,  id: 'engineering', name: 'Engineering' },
     { f: 98,  id: 'home',        name: 'Home' },
     { f: 100, id: 'designs',     name: 'Designs' },
@@ -1110,7 +1137,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 
   // ---------- Side menu on inner pages ----------
   const navEl = document.getElementById('sideNav'), navList = document.getElementById('navList'), navDash = document.getElementById('navDash');
-  const NAV_ORDER = ['home', 'designs', 'engineering', 'projects', 'skills'];
+  const NAV_ORDER = ['home', 'designs', 'engineering', 'projects', 'about'];
   const navBtns = {};
   NAV_ORDER.forEach(id => {
     const s = STATIONS.find(x => x.id === id), li = document.createElement('li'), b = document.createElement('button');
@@ -1670,7 +1697,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 
   // ---------- Start ----------
   layout();
-  const OLD_IDS = { feed: 'designs', contact: 'skills' };   // old links still land somewhere sensible
+  const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
   const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
