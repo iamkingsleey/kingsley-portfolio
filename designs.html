@@ -294,7 +294,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
 <div class="vp" id="vp" aria-hidden="true">View project</div>
 <article class="detail" id="detail" aria-label="Project"><div class="d-wrap" id="dwrap"></div></article>
 <div class="sdial" id="sdial" role="slider" tabindex="0" aria-label="Sections" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><svg id="sstrip" aria-hidden="true"></svg><div class="needle" aria-hidden="true"></div></div>
-<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button><button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
+<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
 <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Scroll through designs" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1">
   <svg id="strip" aria-hidden="true"></svg>
   <div class="needle" aria-hidden="true"></div>
@@ -322,7 +322,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     try { localStorage.setItem('km-theme', dark ? 'dark' : 'light'); } catch (_) {}
   }
   applyTheme(document.documentElement.dataset.theme === 'dark');
-  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark'); });
+
   const $ = id => document.getElementById(id);
 
   // ---------- Content ----------
