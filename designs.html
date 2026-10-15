@@ -8,7 +8,7 @@
 <script>
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
-    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (!t) t = 'dark';   // Designs opens dark unless the visitor picked a theme
     document.documentElement.dataset.theme = t; })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -259,7 +259,7 @@ html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
 .fxsw button:hover { color: var(--ink) }
 .fxsw button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
 body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
-@media (max-width: 899px) { .fxsw { left: 16px; bottom: calc(132px + env(safe-area-inset-bottom, 0px)) } }
+@media (max-width: 899px) { .fxsw { left: 16px; right: 16px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); flex-wrap: wrap } .fxsw button { padding: 4px 8px; font-size: 11px } }
 </style>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
@@ -439,6 +439,71 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     HZ = innerWidth * (innerWidth < 900 ? .08 : HWARP.zone);
   }
   const boxes = [];
+  // ---------- Edge treatments (preview: switch at the bottom left) ----------
+  //   fold     – current: column warp + mirror fold at the screen edges
+  //   clean    – no effect: pieces slide straight off
+  //   fade     – pieces shrink slightly and fade out near the edges
+  //   bulge    – the whole row is warped smoothly on the GPU: edges swell taller and stretch outward
+  //   curve    – the row wraps around a shallow cylinder: edges recede and compress like a curved screen
+  //   stretch  – flat when still; while moving, the edges stretch with the speed and spring back
+  let EDGE = 'bulge';   // chosen: bulge (others kept for reference)
+  const EZ = () => W * .24;
+  const glc = document.createElement('canvas'); glc.className = 'field gl'; glc.setAttribute('aria-hidden', 'true');
+  row.appendChild(glc);
+  const gl = glc.getContext('webgl', { premultipliedAlpha: true, alpha: true });
+  let glProg = null, glU = {};
+  if (gl) {
+    const vs = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+    const fs = `precision highp float;varying vec2 v;uniform sampler2D t;uniform float mode,amt,asp,speed;
+      void main(){
+        vec2 q=v; float u=(v.x-.5)*2.; float a=abs(u);
+        if(mode<1.5){                                   // bulge
+          float e=smoothstep(.35,1.,a); e=e*e;
+          q.x=.5+(v.x-.5)*(1.-.10*amt*e);
+          q.y=.5+(v.y-.5)/(1.+.28*amt*e);
+        } else if(mode<2.5){                            // curve
+          float T=.95*amt+.001; float s=sin(T);
+          q.x=.5+asin(clamp(u,-1.,1.)*s)/T*.5;
+          q.y=.5+(v.y-.5)/(1.-.16*amt*u*u);
+        } else {                                        // stretch (speed)
+          float e=a*a*a; float k=clamp(speed,0.,1.);
+          q.x=.5+(v.x-.5)*(1.-.16*k*e);
+          q.y=.5+(v.y-.5)/(1.+.22*k*e);
+        }
+        if(q.x<0.||q.x>1.||q.y<0.||q.y>1.){gl_FragColor=vec4(0.);return;}
+        gl_FragColor=texture2D(t,q);
+      }`;
+    const sh = (ty, src) => { const o = gl.createShader(ty); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+    glProg = gl.createProgram(); gl.attachShader(glProg, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(glProg, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(glProg);
+    if (!gl.getProgramParameter(glProg, gl.LINK_STATUS)) glProg = null;
+    else {
+      gl.useProgram(glProg);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(glProg, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+      ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE));
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      ['mode', 'amt', 'asp', 'speed'].forEach(n => glU[n] = gl.getUniformLocation(glProg, n));
+    }
+  }
+  let edgeSpeed = 0;
+  function present() {
+    const shader = glProg && !reduce && (EDGE === 'bulge' || EDGE === 'curve' || EDGE === 'stretch');
+    field.style.opacity = shader ? '0' : '';
+    glc.style.display = shader ? '' : 'none';
+    if (!shader) return;
+    if (glc.width !== field.width || glc.height !== field.height) { glc.width = field.width; glc.height = field.height; gl.viewport(0, 0, glc.width, glc.height); }
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, field);
+    edgeSpeed += (Math.min(1, Math.abs(vel) * 40) - edgeSpeed) * .12;
+    gl.uniform1f(glU.mode, EDGE === 'bulge' ? 1 : EDGE === 'curve' ? 2 : 3);
+    gl.uniform1f(glU.amt, W < 900 ? .6 : 1);
+    gl.uniform1f(glU.asp, W / H);
+    gl.uniform1f(glU.speed, edgeSpeed);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
   const foldCv = document.createElement('canvas'), foldCx = foldCv.getContext('2d');
   // horizontal edge warp (same idea as the All view, turned sideways)
   let HZ = 300;
@@ -523,7 +588,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
           const ch2 = h * k, top = T + (h - ch2) / 2 + ty * 10 * (2 * um - 1) * 0;
           fx.drawImage(src, sx + scw * u0, sy, scw * (u1 - u0), sch, L + w * u0 + tx * 6, top + ty * 6, w * (u1 - u0) + .5, ch2);
         }
-      } else if (!reduce && W >= 900 && (L < HZ || L + w > W - HZ)) {   // desktop only: phones keep a clean peek
+      } else if (EDGE === 'fold' && !reduce && W >= 900 && (L < HZ || L + w > W - HZ)) {   // desktop only: phones keep a clean peek
         // edge warp: draw in thin columns; near the side edges each column grows taller around the centre
         // line and is pushed further out, so pieces flare as they arrive and settle as they reach the middle
         // walk the screen one pixel column at a time and look up where each column comes from (inverse map),
@@ -537,16 +602,21 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
           const k = hg((c0 + c1) / 2), u0 = (c0 - L) / w, u1 = (c1 - L) / w;
           fx.drawImage(src, sx + scw * u0, sy, Math.max(.01, scw * (u1 - u0)), sch, X, cy + (T - cy) * k, step + .35, h * k);
         }
+      } else if (EDGE === 'fade' && !reduce) {
+        // soft fade: pieces shrink a little and fade out as they near the edges
+        const c = L + w / 2, e = Math.max(0, Math.min(1, Math.max(EZ() - c, c - (W - EZ())) / EZ()));
+        const k = 1 - .22 * e * e, a = 1 - e * e;
+        if (a > .01) { fx.globalAlpha = a; fx.drawImage(src, sx, sy, scw, sch, c - w * k / 2, cy + (T - cy) * k, w * k, h * k); fx.globalAlpha = 1; }
       } else fx.drawImage(src, sx, sy, scw, sch, L, T, w, h);
       if (bx.white) {
-        if (W >= 900 && (L < HZ || L + w > W - HZ)) {
+        if (EDGE === 'fold' && W >= 900 && (L < HZ || L + w > W - HZ)) {
           const a0 = hf(L), a1 = hf(L + w), k0 = hg(L), k1 = hg(L + w);
           fx.strokeStyle = THEME.edge; fx.lineWidth = 1; fx.beginPath();
           fx.moveTo(a0, cy + (T - cy) * k0); fx.lineTo(a1, cy + (T - cy) * k1); fx.lineTo(a1, cy + (T + h - cy) * k1); fx.lineTo(a0, cy + (T + h - cy) * k0); fx.closePath(); fx.stroke();
         } else { fx.strokeStyle = THEME.edge; fx.lineWidth = 1; fx.strokeRect(L + .5, T + .5, w - 1, h - 1); }
       }
     }
-    if (reduce) return;
+    if (reduce || EDGE !== 'fold') return;
     // Mirror fold: a fold line sits BAND px in from each edge. Past it, the screen shows the (already warped)
     // picture just inside the fold, flipped and stretched a touch, so pieces fold into a false duplicate.
     foldCv.width = field.width; foldCv.height = field.height;
@@ -597,7 +667,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
       active = a; setCaption(a);
       if (prevCat && prevCat !== items[a].cat) { scanDir = a > prevIdx ? 1 : -1; stationJump(items[a].cat); }
     }
-    drawField(L0, L1, t);
+    drawField(L0, L1, t); present();
     drawStatic();
     // bassFollow(openIdx >= 0 || ovOpen ? 0 : Math.abs(p - prev));   // movement hum: off for now, sound TBD
     // caption tracks the active piece and fades while it is between stops
@@ -741,10 +811,11 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     b.lp.frequency.setTargetAtTime(180 + amt * 900, t, .04);
     b.lfo.frequency.setTargetAtTime(9 + amt * 26, t, .05);
   }
-  // The one sound: a deep tick each time a piece passes the needle (also used by the section dial).
+  // The one sound: Home's dial detent each time a piece passes the needle (Popkit, popkit.js).
   function tick() {                             // same detent as Home's dial
     if (soundOn && window.Popkit) Popkit.play('detent');
   }
+
 
 
 
@@ -1322,6 +1393,11 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
     $('fxsw').querySelectorAll('[data-fx="split"],[data-fx="scan"]').forEach(x => x.setAttribute('aria-pressed', x === b));
     field.style.filter = ''; splitOn = false; sweep.style.opacity = '0';
     stationJump(items[active].cat);
+  });
+  if ($('edgesw')) $('edgesw').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    EDGE = b.dataset.e;
+    $('edgesw').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
   });
   addEventListener('pageshow', e => { if (e.persisted) { document.body.classList.remove('leaving'); $('fq').textContent = '100.0'; $('nm').textContent = 'Designs'; leaving = false; } });
   addEventListener('resize', measure);
