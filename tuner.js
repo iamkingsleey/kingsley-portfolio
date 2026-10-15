@@ -20,6 +20,12 @@
     '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .35s cubic-bezier(.65,0,.35,1)}' +
     '.tuner::before{content:"";position:absolute;inset:0;background:rgb(11 11 11 / .6);background:color-mix(in srgb,var(--bg,#0b0b0b) 62%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}' +
     '.tuner.on{opacity:1}' +
+    // leaving the screen it settles in place (a little smaller, fading), it never travels anywhere
+    '.tuner .tin{transition:transform .5s cubic-bezier(.2,.8,.2,1)}' +
+    '.tuner.out .tin{transform:translate(-50%,-56%) scale(.94)}' +
+    // the page's own readout (top left) waits until the centre one has gone, so the number never seems to jump there
+    'html.tuning [data-readout]{opacity:0!important;transition:none}' +
+    '[data-readout]{transition:opacity .6s cubic-bezier(.2,.8,.2,1) .15s}' +
     '.tuner.now{transition:none}' +
     '.tuner .tin{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);display:grid;justify-items:center;gap:8px;width:min(560px,88vw)}' +
     '.tuner .tlb{font:500 10.5px "Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.6px;text-transform:uppercase;color:var(--muted,#7a7a7a)}' +
@@ -96,7 +102,7 @@
       if (!ready || !counted || over || !el) return; over = true;
       el.classList.remove('now');
       document.documentElement.classList.add('tuned');   // the page sharpens…
-      requestAnimationFrame(function () { el.classList.remove('on'); });   // …as the readout fades
+      requestAnimationFrame(function () { el.classList.add('out'); el.classList.remove('on'); });   // the readout fades where it is
       setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } }, 500);
     };
     var begin = function () { count(+arr.v, +arr.to, Math.max(260, +arr.ms || 400), easeOut, function () { counted = true; setTimeout(finish, 160); }); };
