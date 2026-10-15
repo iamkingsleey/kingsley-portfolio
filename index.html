@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
+  var BUILD = "202610151730";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -905,18 +906,18 @@ html[data-theme="dark"] {
     let o = { x: M.cx, y: M.cy, r: 264.5 * M.S };
     const g = prev && prev.id !== 'home' && tagFor(STATIONS.find(x => x.id === 'designs'));
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2 };
-    if (reduce) { location.href = 'designs.html'; return; }
+    if (reduce) { location.href = 'designs.html?v=' + BUILD; return; }
     const cover = document.createElement('div'); cover.className = 'leave'; document.body.appendChild(cover);
     const far = Math.ceil(Math.hypot(Math.max(o.x, innerWidth - o.x), Math.max(o.y, innerHeight - o.y))) + 8;
     const a = cover.animate([{ clipPath: `circle(${Math.round(o.r)}px at ${o.x}px ${o.y}px)` }, { clipPath: `circle(${far}px at ${o.x}px ${o.y}px)` }],
       { duration: 380, easing: EASE, fill: 'forwards' });
-    setTimeout(() => { location.href = 'designs.html'; }, 240);   // start loading while the circle is still closing
+    setTimeout(() => { location.href = 'designs.html?v=' + BUILD; }, 240);   // start loading while the circle is still closing
   }
   // Fetch the Designs page and its first pictures while Home sits idle, so opening it is instant.
   function prefetchDesigns() {
     if (prefetchDesigns.done) return; prefetchDesigns.done = true;
     const add = (href, as) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-    add('designs.html', 'document');
+    add('designs.html?v=' + BUILD, 'document');
     const first = ['paper-plane-with-coin.jpg', '3d-tumbler-render.jpg', 'safe-with-coins.jpg', 'pawn-in-an-archway.jpg'];
     first.forEach(f => add('assets/designs/' + f, 'image'));
     PROJECTS.forEach(p => p.images && p.images[0] && p.images[0].src && add(p.images[0].src.replace('assets/designs/', 'assets/designs/thumbs/'), 'image'));
@@ -1768,7 +1769,7 @@ html[data-theme="dark"] {
   document.addEventListener('station:home', () => tuneTo(STATIONS.find(x => x.id === 'home'), false));   // silent
   const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
-  if (hashId === 'designs') { location.replace('designs.html'); return; }
+  if (hashId === 'designs') { location.replace('designs.html?v=' + BUILD); return; }
   const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
