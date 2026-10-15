@@ -802,7 +802,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
     swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
     kickPx();
-    setTimeout(syncVideos, 60);
+    setTimeout(() => { syncVideos(); bendRemeasure(); }, 60);
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
@@ -880,6 +880,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       h[k] += 1 / r + 0.05;
     });
     kickPx();   // new tiles pick up the current parallax
+    bendRemeasure();
   }
 
   // ---------- Feed: graduated ruler tracks the scroll position ----------
@@ -922,6 +923,60 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     rRaf = rPos !== rTarget ? requestAnimationFrame(rulerLoop) : 0;
   }
   scroller.addEventListener('scroll', () => { syncTarget(); if (!rRaf) rRaf = requestAnimationFrame(rulerLoop); }, { passive: true });
+
+  // ---------- Designs: smooth scroll and page bend ----------
+  // Two parts, modelled on the reference: (1) wheel scrolling glides to a stop instead of jumping;
+  // (2) tiles entering the bottom of the view fold back into depth, as if curling over a drum, and fade
+  // the deeper they bend; scrolling brings each one upright as it rises. Off for reduced motion.
+  var bendItems = null, bendRaf = 0;
+  const BEND = { angle: 32 * Math.PI / 180, round: 220, fadeIn: 240, fadeOut: 760, persp: 1100 };
+  function bendRemeasure() { bendItems = null; bendKick(); }
+  function bendKick() { if (!bendRaf && !reduce) bendRaf = requestAnimationFrame(bendFrame); }
+  function bendFrame() {
+    bendRaf = 0;
+    if (!active || active.id !== 'designs') return;
+    if (!bendItems) bendItems = [...masonry.querySelectorAll('.tile')].map(el => ({ el, mid: el.offsetTop + el.offsetHeight / 2, last: '' }));
+    const H = scroller.clientHeight, top = scroller.scrollTop, M = Math.min(300, H * .36);
+    const sA = BEND.angle, l = Math.min(BEND.round, M / sA), w = l * sA;
+    for (const f of bendItems) {
+      const r = f.mid - top - (H - M);          // how far into the fold zone at the bottom this tile's middle is
+      let tf = '', g = 1;
+      if (r > 0) {
+        let F, y, d;
+        if (r < w) { d = r / l; F = l * Math.sin(d) - r; y = -l * (1 - Math.cos(d)); }                       // on the rounded part of the curl
+        else { d = sA; const L = r - w; F = l * Math.sin(sA) + L * Math.cos(sA) - r; y = -l * (1 - Math.cos(sA)) - L * Math.sin(sA); }   // past it, on the flat slope
+        tf = `perspective(${BEND.persp}px) translate3d(0, ${F.toFixed(2)}px, ${y.toFixed(2)}px) rotateX(${(-d * 180 / Math.PI).toFixed(3)}deg)`;
+        const S = Math.min(1, Math.max(0, (-y - BEND.fadeIn) / (BEND.fadeOut - BEND.fadeIn)));
+        g = 1 - S * S * (3 - 2 * S);
+      }
+      const key = tf + '|' + g.toFixed(3);
+      if (key !== f.last) { f.last = key; f.el.style.transform = tf; f.el.style.opacity = g === 1 ? '' : g.toFixed(3); }
+    }
+  }
+  scroller.addEventListener('scroll', bendKick, { passive: true });
+  addEventListener('resize', bendRemeasure);
+
+  // Smooth wheel: each wheel step moves a target; the view eases toward it (lerp .075 per frame).
+  let sTarget = null, sPos = 0, sRaf = 0;
+  function stopSmooth() { cancelAnimationFrame(sRaf); sRaf = 0; sTarget = null; }
+  function smoothStep() {
+    const d = sTarget - sPos;
+    if (Math.abs(d) < .4) { sPos = sTarget; scroller.scrollTop = sPos; stopSmooth(); return; }
+    sPos += d * .075; scroller.scrollTop = sPos;
+    sRaf = requestAnimationFrame(smoothStep);
+  }
+  scroller.addEventListener('wheel', e => {
+    if (reduce || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    if (sTarget === null) { sPos = scroller.scrollTop; sTarget = sPos; }
+    sTarget = Math.max(0, Math.min(max, sTarget + e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? scroller.clientHeight : 1) * .9));
+    if (!sRaf) sRaf = requestAnimationFrame(smoothStep);
+  }, { passive: false });
+  ruler.addEventListener('pointerdown', stopSmooth);          // scrubbing the ruler takes over
+  scroller.addEventListener('pointerdown', stopSmooth);
+  addEventListener('keydown', stopSmooth);
+
 
   // Drag or tap the ruler to scrub through the feed.
   let scrubbing = false, lastSound = 0;
