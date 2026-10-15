@@ -229,7 +229,7 @@ body.all .dial, body.all .hint, body.all .px, body.all .chips, body.all .count {
 .ov { position: fixed; inset: 0; z-index: 12; overflow-y: auto; padding: 150px max(48px, env(safe-area-inset-right, 0px)) 80px max(48px, env(safe-area-inset-left, 0px)); visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .4s; scrollbar-width: none }
 .ov::-webkit-scrollbar { display: none }
 body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, visibility 0s }
-.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 28px; margin: 0 }   /* spans edge to edge between the station pill and the All button */
+.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 48px 28px; margin: 0 }   /* spans edge to edge between the station pill and the All button */
 .ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
 body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
 .ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
@@ -239,7 +239,14 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 .ov-c { will-change: transform; display: block; margin-top: 12px; font-size: 15px; letter-spacing: -.2px; font-weight: 500; color: var(--ink); line-height: 1.35 }
 .ov-c b { font: 500 12px var(--mono); color: var(--muted); margin-right: 4px }
 .ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
-@media (max-width: 899px) { .ov { padding: 120px 16px 60px } .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px } .ov-c { font-size: 14px } .allbtn { height: 28px; padding: 0 10px } }
+/* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
+   category starts, a fixed needle in the middle. It moves with the page; drag it or tap a label to travel. */
+.ov { padding-right: max(124px, env(safe-area-inset-right, 0px)) }
+.vrul { position: fixed; right: 0; top: 0; bottom: 0; width: 96px; z-index: 13; cursor: ns-resize; touch-action: none; opacity: 0; pointer-events: none; transition: opacity .3s }
+body.all .vrul { opacity: 1; pointer-events: auto; transition: opacity .4s .2s }
+.vrul canvas { display: block; width: 100%; height: 100% }
+@media (max-width: 899px) { .ov { padding: 120px 60px 60px 16px } .vrul { width: 48px } }
+@media (max-width: 899px) { .ov { padding: 120px 60px 60px 16px } .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px } .ov-c { font-size: 14px } .allbtn { height: 28px; padding: 0 10px } }
 @media (prefers-reduced-motion: reduce) { .row, .ov, .ov-t { transition: none } }
 
 /* ---------- Dark mode ---------- */
@@ -1369,62 +1376,167 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     document.body.classList.remove('all');
     $('allBtn').setAttribute('aria-pressed', 'false');
   }
-  // Edge warp on scroll (after sashamartynchuk.com): the All view is drawn on a canvas in thin horizontal
-  // strips. Near the bottom (and, less, the top) of the screen each strip is widened around the centre and
-  // pushed further out, so pictures arriving from the edge flare and stretch, then settle into their true
-  // shape as they scroll toward the middle. The DOM grid underneath still handles layout and clicks.
+  let vrLastRow = null;
+  // Drum: the All view is drawn flat onto an offscreen canvas, then a WebGL pass wraps it around a turning drum.
+  // Toward the top and bottom of the screen rows bend away, compress and narrow, then fade into the background;
+  // in the middle they sit flat at true size. Doing the bend per pixel on the GPU keeps the card edges smooth.
+  // The DOM grid underneath still handles layout and clicks.
   const ovc = document.createElement('canvas'); ovc.className = 'ovc'; ovc.setAttribute('aria-hidden', 'true');
   ov.prepend(ovc);
-  const oc = ovc.getContext('2d');
+  const ovFlat = document.createElement('canvas'), oc = ovFlat.getContext('2d');
   const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
-  const WARP = { bottom: .3, top: .15, widen: .32, push: .9 };   // zone sizes (share of screen), how wide, how far
+  const DRUM = { radius: .62, narrow: .2, fade: .16, margin: .12 };   // radius and margin (share of screen height), how much far rows narrow, fade band
+  let ogl = ovc.getContext('webgl', { premultipliedAlpha: true, alpha: true }), oglU = {}, ov2d = null;
+  if (ogl) {
+    const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    const fs = `precision highp float;uniform sampler2D t;uniform vec2 res;uniform float mid,R,narrow,cx,M,topClear,fadeT,fadeB,on;
+      void main(){
+        vec2 P=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);
+        float sy=P.y, sx=P.x, a=1.;
+        if(on>.5){
+          float s=(P.y-mid)/R;
+          if(abs(s)>.992){gl_FragColor=vec4(0.);return;}
+          float th=asin(s);
+          sy=mid+R*th;
+          sx=cx+(P.x-cx)/(1.-narrow+narrow*cos(th));
+          a=min(clamp((P.y-topClear)/fadeT,0.,1.),clamp((res.y-P.y)/fadeB,0.,1.)); a=a*a*(3.-2.*a);
+        }
+        vec2 uv=vec2(sx/res.x,(sy+M)/(res.y+2.*M));
+        if(uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.){gl_FragColor=vec4(0.);return;}
+        gl_FragColor=texture2D(t,uv)*a;
+      }`;
+    const sh = (ty, src) => { const o = ogl.createShader(ty); ogl.shaderSource(o, src); ogl.compileShader(o); return o; };
+    const pr = ogl.createProgram(); ogl.attachShader(pr, sh(ogl.VERTEX_SHADER, vs)); ogl.attachShader(pr, sh(ogl.FRAGMENT_SHADER, fs)); ogl.linkProgram(pr);
+    if (!ogl.getProgramParameter(pr, ogl.LINK_STATUS)) ogl = null;
+    else {
+      ogl.useProgram(pr);
+      ogl.bindBuffer(ogl.ARRAY_BUFFER, ogl.createBuffer());
+      ogl.bufferData(ogl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), ogl.STATIC_DRAW);
+      const loc = ogl.getAttribLocation(pr, 'p'); ogl.enableVertexAttribArray(loc); ogl.vertexAttribPointer(loc, 2, ogl.FLOAT, false, 0, 0);
+      ogl.bindTexture(ogl.TEXTURE_2D, ogl.createTexture());
+      ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => ogl.texParameteri(ogl.TEXTURE_2D, ogl[k], ogl.CLAMP_TO_EDGE));
+      ogl.texParameteri(ogl.TEXTURE_2D, ogl.TEXTURE_MIN_FILTER, ogl.LINEAR); ogl.texParameteri(ogl.TEXTURE_2D, ogl.TEXTURE_MAG_FILTER, ogl.LINEAR);
+      ogl.pixelStorei(ogl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      ['res', 'mid', 'R', 'narrow', 'cx', 'M', 'topClear', 'fadeT', 'fadeB', 'on'].forEach(n => oglU[n] = ogl.getUniformLocation(pr, n));
+    }
+  }
+  if (!ogl) ov2d = ovc.getContext('2d');      // no WebGL: show the grid flat
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
       const dpr = Math.min(2, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;
-      if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) { ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr); }
-      oc.setTransform(dpr, 0, 0, dpr, 0, 0); oc.clearRect(0, 0, vw, vh);
-      const on = !reduce, Zb = vh * WARP.bottom, Zt = vh * WARP.top, sb = vh - Zb, cx = vw / 2;
-      const kb = y => on ? Math.max(0, Math.min(1, (y - sb) / Zb)) : 0;
-      const kt = y => on ? Math.max(0, Math.min(1, (Zt - y) / Zt)) : 0;
-      const g = y => 1 + WARP.widen * (kb(y) ** 2 + kt(y) ** 2);                       // horizontal widening
-      const f = y => !on ? y : y > sb ? y + WARP.push * (y - sb) ** 2 / (2 * Zb)            // pushed further out
-                         : y < Zt ? y - WARP.push * (Zt - y) ** 2 / (2 * Zt) : y;
+      const on = !reduce && !!ogl, mid = vh / 2, R = vh * DRUM.radius, M = on ? Math.round(vh * DRUM.margin) : 0;
+      if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) {
+        ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr);
+        if (ogl) ogl.viewport(0, 0, ovc.width, ovc.height);
+      }
+      const FW = Math.round(vw * dpr), FH = Math.round((vh + 2 * M) * dpr);
+      if (ovFlat.width !== FW || ovFlat.height !== FH) { ovFlat.width = FW; ovFlat.height = FH; }
+      oc.setTransform(dpr, 0, 0, dpr, 0, M * dpr); oc.clearRect(0, -M, vw, vh + 2 * M);
+      const gr = ov.querySelector('.ov-grid').getBoundingClientRect(), cx = gr.left + gr.width / 2;   // bend around the grid's centre
+      const th = y => Math.max(-1.45, Math.min(1.45, (y - mid) / R));
+      const f = y => on ? mid + R * Math.sin(th(y)) : y;                                   // where a line of the grid lands
+      const fade = y => on ? Math.max(0, Math.cos(th(y))) ** .6 : 1;
       for (const o of ovTiles) {
         const r = o.im.getBoundingClientRect();
-        if (r.bottom < -vh * .5 || r.top > vh * 1.5) continue;
-        const it = items[o.i], full = texImg(still(it)), th = thumbFor(still(it)), src = full.naturalWidth || !th ? full : th;
+        // caption rides the drum and fades as it turns away (off-screen captions stay put, so the scroll length stays honest)
+        const cr = o.c.getBoundingClientRect(), base = cr.top - o.cy;
+        o.cy = base < -60 || base > vh + 60 ? 0 : f(base) - base;
+        o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
+        o.c.style.opacity = fade(base).toFixed(3);
+        if (r.bottom < -M || r.top > vh + M) continue;
+        const it = items[o.i], full = texImg(still(it)), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
         const sw = src.naturalWidth, sh = src.naturalHeight;
         if (sw) {
           const ia = sw / sh, ba = r.width / r.height;
           const cw = ia > ba ? sh * ba : sw, ch = ia > ba ? sh : sw / ba, cx0 = (sw - cw) / 2, cy0 = (sh - ch) / 2;
-          if (r.top >= Zt && r.bottom <= sb) oc.drawImage(src, cx0, cy0, cw, ch, r.left, r.top, r.width, r.height);
-          else {
-            const step = 3;
-            for (let y = r.top; y < r.bottom; y += step) {
-              const y1 = Math.min(r.bottom, y + step), Y0 = f(y), Y1 = f(y1);
-              if (Y1 < 0 || Y0 > vh) continue;
-              const s2 = g((y + y1) / 2), dx = cx + (r.left - cx) * s2, dw = r.width * s2;
-              const u0 = (y - r.top) / r.height, u1 = (y1 - r.top) / r.height;
-              oc.drawImage(src, cx0, cy0 + ch * u0, cw, ch * (u1 - u0), dx, Y0, dw, Y1 - Y0 + .6);
-            }
-          }
+          oc.drawImage(src, cx0, cy0, cw, ch, r.left, r.top, r.width, r.height);
         }
-        if (it.video) {                            // white UI pieces get a hairline so they read on white
-          const T = f(r.top), B = f(r.bottom), gt = g(r.top), gb = g(r.bottom);
-          oc.strokeStyle = THEME.edge; oc.lineWidth = 1;
-          oc.beginPath(); oc.moveTo(cx + (r.left - cx) * gt, T); oc.lineTo(cx + (r.right - cx) * gt, T);
-          oc.lineTo(cx + (r.right - cx) * gb, B); oc.lineTo(cx + (r.left - cx) * gb, B); oc.closePath(); oc.stroke();
-        }
-        // caption rides the warped bottom edge and fades inside the zones
-        const cr = o.c.getBoundingClientRect(), base = cr.top - o.cy;
-        o.cy = f(base) - base;
-        o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
-        o.c.style.opacity = (1 - Math.min(1, Math.max(kb(base), kt(base)) * 1.4)).toFixed(3);
+        if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
       }
-    }
+      if (ogl) {
+        ogl.texImage2D(ogl.TEXTURE_2D, 0, ogl.RGBA, ogl.RGBA, ogl.UNSIGNED_BYTE, ovFlat);
+        ogl.uniform2f(oglU.res, ovc.width, ovc.height);
+        ogl.uniform1f(oglU.mid, mid * dpr); ogl.uniform1f(oglU.R, R * dpr); ogl.uniform1f(oglU.narrow, DRUM.narrow);
+        ogl.uniform1f(oglU.cx, cx * dpr); ogl.uniform1f(oglU.M, M * dpr); ogl.uniform1f(oglU.topClear, (vw < 900 ? 64 : 104) * dpr); ogl.uniform1f(oglU.fadeT, 90 * dpr); ogl.uniform1f(oglU.fadeB, vh * DRUM.fade * dpr); ogl.uniform1f(oglU.on, on ? 1 : 0);   // nothing shows behind the station pill; the fade starts below it
+        ogl.clearColor(0, 0, 0, 0); ogl.clear(ogl.COLOR_BUFFER_BIT);
+        ogl.drawArrays(ogl.TRIANGLE_STRIP, 0, 4);
+      } else { ov2d.setTransform(1, 0, 0, 1, 0, 0); ov2d.clearRect(0, 0, ovc.width, ovc.height); ov2d.drawImage(ovFlat, 0, 0); }
+      drawVRuler();
+    } else vrLastRow = null;
     requestAnimationFrame(ovWarp);
   }
   requestAnimationFrame(ovWarp);
+
+  // Side ruler for the All view
+  const vrul = document.createElement('div'); vrul.className = 'vrul'; vrul.setAttribute('aria-hidden', 'true');
+  const vrc = document.createElement('canvas'); vrul.appendChild(vrc); document.body.appendChild(vrul);
+  const vrx = vrc.getContext('2d');
+  const VR_ROW = 34;                          // ruler pixels per row of the grid
+  let vrDrag = null, vrAnim = null;
+  const ovCols = () => getComputedStyle(ov.querySelector('.ov-grid')).gridTemplateColumns.split(' ').length;
+  function vrModel() {
+    const n = ovCols(), centres = [], vh = innerHeight, st = ov.scrollTop;
+    for (let k = 0; k < ovTiles.length; k += n) { const r = ovTiles[k].im.getBoundingClientRect(); centres.push(st + r.top + r.height / 2 - vh / 2); }
+    let fr = 0;
+    if (centres.length < 2) fr = 0;
+    else if (st <= centres[0]) fr = (st - centres[0]) / (centres[1] - centres[0]);
+    else { fr = centres.length - 1; for (let k = 0; k < centres.length - 1; k++) if (st <= centres[k + 1]) { fr = k + (st - centres[k]) / (centres[k + 1] - centres[k]); break; } }
+    const cats = [];
+    ovTiles.forEach(o => { const c = items[o.i].cat; if (!cats.find(x => x.c === c)) cats.push({ c, row: Math.floor(o.i / n) }); });
+    return { rows: centres.length, fr, cats, centres, max: ov.scrollHeight - ov.clientHeight };
+  }
+  function vrScrollFor(fr) {
+    const c = vrModel().centres, max = ov.scrollHeight - ov.clientHeight;
+    const k = Math.max(0, Math.min(c.length - 1, fr)), k0 = Math.floor(k), k1 = Math.min(c.length - 1, k0 + 1);
+    return Math.max(0, Math.min(max, c[k0] + (c[k1] - c[k0]) * (k - k0)));
+  }
+  function drawVRuler() {
+    if (vrAnim) {                              // glide after a label tap, with a small overshoot
+      const x = Math.min(1, (performance.now() - vrAnim.t0) / 620);
+      const e = x >= 1 ? 1 : 1 - Math.pow(2, -9 * x) * Math.cos(x * Math.PI * 2.2);
+      ov.scrollTop = vrAnim.from + (vrAnim.to - vrAnim.from) * e;
+      if (x >= 1) vrAnim = null;
+    }
+    const dpr = Math.min(2, devicePixelRatio || 1), w = vrul.clientWidth, h = vrul.clientHeight;
+    if (!w || !h) return;
+    if (vrc.width !== Math.round(w * dpr) || vrc.height !== Math.round(h * dpr)) { vrc.width = Math.round(w * dpr); vrc.height = Math.round(h * dpr); }
+    vrx.setTransform(dpr, 0, 0, dpr, 0, 0); vrx.clearRect(0, 0, w, h);
+    const m = vrModel(), mid = h / 2, right = w - (w < 60 ? 10 : 18);
+    // the dial's detent each time a row crosses the needle (scroll, drag or a label jump)
+    const row = Math.round(m.fr);
+    if (vrLastRow !== null && row !== vrLastRow && soundOn && window.Popkit) Popkit.play('detent');
+    vrLastRow = row;
+    vrx.strokeStyle = vrx.fillStyle = THEME.ink;
+    for (let q = -8; q <= m.rows * 4 + 4; q++) {                 // minor ticks every quarter row, majors on rows
+      const v = q / 4, y = mid + (v - m.fr) * VR_ROW;
+      if (y < -10 || y > h + 10) continue;
+      const cat = q % 4 === 0 && m.cats.find(c => c.row === v);
+      const isRow = q % 4 === 0 && v >= 0 && v < m.rows;
+      const near = Math.max(0, 1 - Math.abs(y - mid) / 60);
+      const len = cat ? 22 : isRow ? 12 + near * 6 : 6 + near * 4;
+      vrx.globalAlpha = (cat ? .7 : isRow ? .4 : .16) + near * .3;
+      vrx.lineWidth = cat ? 2 : 1.2;
+      vrx.beginPath(); vrx.moveTo(right, y); vrx.lineTo(right - len, y); vrx.stroke();
+      if (cat && w >= 60) {
+        vrx.font = '500 9.5px "Geist Mono", ui-monospace, monospace'; vrx.textAlign = 'right'; vrx.textBaseline = 'middle';
+        vrx.globalAlpha = .55 + near * .45;
+        vrx.fillText(String(cat.c).toUpperCase(), right - len - 6, y);
+      }
+    }
+    vrx.globalAlpha = 1;
+    vrx.beginPath(); vrx.roundRect ? vrx.roundRect(right - 30, mid - 1.5, 30, 3, 1.5) : vrx.rect(right - 30, mid - 1.5, 30, 3); vrx.fill();   // needle
+  }
+  vrul.addEventListener('pointerdown', e => {
+    vrAnim = null;
+    const m = vrModel(), y = e.clientY - vrul.getBoundingClientRect().top, mid = vrul.clientHeight / 2;
+    const hit = m.cats.find(c => Math.abs(mid + (c.row - m.fr) * VR_ROW - y) < 10);
+    if (hit) { tap(); vrAnim = { from: ov.scrollTop, to: vrScrollFor(hit.row), t0: performance.now() }; return; }
+    vrDrag = { y: e.clientY, fr: m.fr }; vrul.setPointerCapture(e.pointerId);
+  });
+  vrul.addEventListener('pointermove', e => { if (vrDrag) ov.scrollTop = vrScrollFor(vrDrag.fr - (e.clientY - vrDrag.y) / VR_ROW); });   // drag down = go back, like turning the dial
+  const vrEnd = () => { vrDrag = null; };
+  vrul.addEventListener('pointerup', vrEnd); vrul.addEventListener('pointercancel', vrEnd);
+  vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
   ov.addEventListener('click', e => { const t = e.target.closest('.ov-t'); if (t) { tap(); closeOverview(+t.dataset.i); } });
   if ($('fxsw')) $('fxsw').addEventListener('click', e => {
