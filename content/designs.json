@@ -20,6 +20,7 @@
     },
     {
       "title": "Tennis in motion, blue",
+      "layout": "product-story",
       "images": [
         {
           "src": "assets/designs/tennis-in-motion-blue-background.jpg",
@@ -74,6 +75,7 @@
     },
     {
       "title": "Orange padlock",
+      "layout": "product-panels",
       "images": [
         {
           "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
@@ -92,6 +94,7 @@
     },
     {
       "title": "Ruler picker",
+      "layout": "product-panels",
       "images": [
         {
           "src": "assets/designs/ruler-picker.jpg",
@@ -111,6 +114,7 @@
     },
     {
       "title": "Award with ribbons",
+      "layout": "logo",
       "images": [
         {
           "src": "assets/designs/colorful-award-with-ribbons.jpg",
@@ -120,6 +124,7 @@
     },
     {
       "title": "Paper plane with coin",
+      "layout": "logo",
       "images": [
         {
           "src": "assets/designs/paper-plane-with-coin.jpg",
@@ -129,6 +134,7 @@
     },
     {
       "title": "Drink tumbler",
+      "layout": "product-story",
       "images": [
         {
           "src": "assets/designs/3d-tumbler-render.jpg",
@@ -147,6 +153,7 @@
     },
     {
       "title": "Price tag and coins",
+      "layout": "logo",
       "images": [
         {
           "src": "assets/designs/price-tag-and-coins.jpg",
@@ -165,6 +172,7 @@
     },
     {
       "title": "Pawn in an archway",
+      "layout": "logo",
       "images": [
         {
           "src": "assets/designs/pawn-in-an-archway.jpg",

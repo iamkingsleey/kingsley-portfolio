@@ -18,11 +18,13 @@ python3 -m http.server 8000
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | Current design (v3): Home with the dial, plus Engineering, Projects and About behind a side menu. Light and dark mode (button bottom-right) |
+| `index.html` | Current design (v3): Home with the dial, plus Engineering, Projects and About. Inner pages show a station readout (back to 98.0 Home) like the Designs page. Light and dark mode (button bottom-right) |
 | `designs.html` | Designs page (v3): a horizontal row of work scrubbed by a ruler dial, an All grid, and a page per project |
 | `iteration-3/` | Third iteration: dial on Home, side menu, Designs as a masonry grid |
 | `iteration-2/` | Second iteration: the dial on every page |
 | `iteration-1/` | First iteration: top dial, Feed masonry, image trail on Home |
+| `project.html`, `logo.html`, `product.html` | Project pages. Which one a project opens is its `layout` (below) |
+| `tuner.js` | Page-to-page transition: the readout moves to the middle and tunes to the next page |
 | `popkit.js` | UI sounds made in code with Web Audio (pop on tap, detent while dragging). No audio files |
 | `assets/` | Headshot and other images |
 
@@ -41,9 +43,26 @@ A CMS for uploading content is planned as the next phase.
 - **Getting there**: tuning Home's dial (or the side menu) to Designs closes the page with a circle and opens `designs.html`. The `98.0 Home` button tunes back. Old `#designs` and `#feed` links forward to the new page.
 - **Theme**: both pages share the light/dark choice (saved in the browser as `km-theme`; first visit follows the system setting).
 
+## Project layouts (`layout` in `content/designs.json`)
+
+Each project can pick the page it opens on. Add `"layout"` to the project in `content/designs.json` (the CMS will set it); leave it out for the default project page.
+
+| `layout` | Page | What it is |
+| --- | --- | --- |
+| *(none)* | `project.html` | Default: split story, needle sweep, sideways gallery, swap section, palette |
+| `logo` | `logo.html` | Logo design: sideways run of the mark's stations, construction, colour, type, applications |
+| `product-panels` | `product.html` | Product design (UI/UX): the working prototype on top, then a few large screens on calm panels |
+| `product-story` | `product.html` | Product design (UI/UX): the same opening, then sticky text beside scrolling screens |
+
+```json
+{ "title": "Ruler picker", "layout": "product-panels", "images": [ ... ] }
+```
+
+One file serves every project with that layout: the address picks the project (`logo.html#badge`). The station number, back button and "Next on the dial" work the same on every page. The copy and stand-in screens inside the logo and product pages are placeholders until each project has its own.
+
 ## Behaviour notes
 
-- Sounds play only on real taps and drags, never on their own. On the Designs page the only sound is a deep tick as each piece passes the needle.
+- Sounds play only on real taps and drags, never on their own. On the Designs page the only sound is Home's dial detent as each piece passes the needle.
 - The loading counter shows once per visit; coming back to Home from Designs skips it.
 - Respects reduced-motion settings: the dial and pages switch without animation.
 - Layout adapts: left-edge dial on laptops and desktops, dial on top for tablets, a row of station labels on phones.
