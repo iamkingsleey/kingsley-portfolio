@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
-  var BUILD = "202610151754";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610151755";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -422,6 +422,8 @@ html[data-theme="dark"] {
 /* keep page content clear of the readout */
 .inner.mode-top .sheet.about { padding-top: 150px }
 .inner.mode-top .sheet:not(.about) { top: calc(50% + 30px) }
+h1.typer { position: relative }
+.fm-wave { position: absolute; left: 0; top: 0; pointer-events: none }
 </style>
 </head>
 <body>
@@ -503,7 +505,7 @@ html[data-theme="dark"] {
     </div>
     <div class="hero">
       <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
-      <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
+      <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span><canvas class="fm-wave" id="fmWave" aria-hidden="true"></canvas></h1>
       <div class="links"><a href="#" id="emailLink" data-email="">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
       <div class="bio">
         <p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>
@@ -1443,14 +1445,43 @@ html[data-theme="dark"] {
     typeBusy = true;
     caretEl.classList.remove('idle');
     let keep = 0; while (keep < from.length && keep < to.length && from[keep] === to[keep]) keep++;
-    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); await pause(34 + Math.random() * 18); }
+    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); fmKick(-1); await pause(34 + Math.random() * 18); }
     if (from.length > keep) await pause(160);
     for (let i = keep; i < to.length; i++) {
-      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1);
+      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1); fmKick(1);
       await pause((ch === ' ' ? 120 : 62) + Math.random() * 70);   // uneven, human rhythm with a beat on spaces
     }
     caretEl.classList.add('idle');
     typeBusy = false;
+  }
+  // ---------- FM wave out of the cursor ----------
+  // Every keystroke adds energy. Energy raises the wave's height and its frequency (frequency modulation),
+  // then drains, so the wave flutters out of the cursor while the name types and settles when it rests.
+  // Typing pushes the wave outward; deleting pulls it back toward the cursor.
+  const fmCv = document.getElementById('fmWave'), fmCx = fmCv.getContext('2d');
+  let fmEnergy = 0, fmDir = 1, fmPhase = 0, fmFreq = .12, fmRaf = 0;
+  function fmKick(d) { if (reduce) return; fmEnergy = Math.min(1.6, fmEnergy + .55); fmDir = d; if (!fmRaf) fmRaf = requestAnimationFrame(fmFrame); }
+  function fmFrame() {
+    const dpr = Math.min(2, devicePixelRatio || 1), W = 150, H = 40;
+    const c = caretEl.getBoundingClientRect(), hr = typerEl.getBoundingClientRect();
+    if (fmCv.width !== Math.round(W * dpr)) { fmCv.width = Math.round(W * dpr); fmCv.height = Math.round(H * dpr); fmCv.style.width = W + 'px'; fmCv.style.height = H + 'px'; }
+    fmCv.style.transform = `translate(${(c.right - hr.left + 8).toFixed(1)}px, ${(c.top + c.height / 2 - hr.top - H / 2).toFixed(1)}px)`;
+    fmCx.setTransform(dpr, 0, 0, dpr, 0, 0); fmCx.clearRect(0, 0, W, H);
+    fmEnergy *= .955;
+    const e = Math.min(1, fmEnergy);
+    fmFreq += ((.09 + e * .28) - fmFreq) * .15;
+    fmPhase += (.12 + e * .55) * fmDir;
+    if (e > .01) {
+      fmCx.beginPath();
+      for (let x = 0; x <= W; x += 1.5) {
+        const env = Math.exp(-x / (W * .38)) * Math.min(1, x / 6);   // strongest at the cursor, fading out
+        const y = H / 2 + Math.sin(x * fmFreq - fmPhase) * (H * .42) * e * env;
+        x ? fmCx.lineTo(x, y) : fmCx.moveTo(x, y);
+      }
+      fmCx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
+      fmCx.globalAlpha = .35 + .5 * e; fmCx.lineWidth = 1.6; fmCx.lineCap = 'round'; fmCx.stroke(); fmCx.globalAlpha = 1;
+      fmRaf = requestAnimationFrame(fmFrame);
+    } else fmRaf = 0;
   }
   let typedOnce = false;
   async function typeIntro() {
