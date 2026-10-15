@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
-  var BUILD = "202610151817";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610151819";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -423,6 +423,9 @@ html[data-theme="dark"] {
 .inner.mode-top .sheet.about { padding-top: 150px }
 .inner.mode-top .sheet:not(.about) { top: calc(50% + 30px) }
 h1.typer { position: relative }
+/* Typing cursor hidden for now (it still marks where the text ends, so the FM wave starts there).
+   To bring it back, delete this rule. */
+.caret { opacity: 0; width: 0 !important; margin-left: 0 !important; animation: none !important }
 .fm-wave { position: absolute; left: 0; top: 0; pointer-events: none }
 </style>
 </head>
