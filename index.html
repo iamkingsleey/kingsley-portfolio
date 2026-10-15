@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
 <script>
-  var BUILD = "202610151742";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610151754";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -384,6 +384,16 @@ html[data-theme="dark"] {
   width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--ink); transition: background .2s }
 .theme-btn:hover { background: var(--pill-hover) }
 .theme-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
+.sound-btn { position: fixed; z-index: 150; right: calc(max(24px, env(safe-area-inset-right, 0px)) + 44px); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--ink); transition: background .2s }
+.sound-btn:hover { background: var(--pill-hover) }
+.sound-btn svg { width: 15px; height: 15px; fill: currentColor }
+/* Phones: the dial sits at the bottom, so the two buttons move up beside the menu button */
+.mode-bottom .theme-btn, .mode-bottom .sound-btn { top: calc(20px + env(safe-area-inset-top, 0px)); bottom: auto; width: 32px; height: 32px }
+.mode-bottom .theme-btn { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 40px) }
+.mode-bottom .sound-btn { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 78px) }
+.inner.mode-bottom .theme-btn { right: max(16px, env(safe-area-inset-right, 0px)) }
+.inner.mode-bottom .sound-btn { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 38px) }
 /* Leaving for the Designs page: the page closes over with a circle from the dial, then designs.html loads */
 .leave { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none }
 
@@ -1778,8 +1788,25 @@ html[data-theme="dark"] {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 })();
 </script>
-<button class="theme-btn" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
+<button class="sound-btn" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="theme-btn" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
 <script>
+  // ---------- Sound switch (whole site; Designs reads the same setting) ----------
+  (function () {
+    const btn = document.getElementById('soundBtn'), ico = document.getElementById('soundIco');
+    const ON = '<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
+    const OFF = '<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
+    let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (e) {}
+    function paint() {
+      ico.innerHTML = on ? ON : OFF;
+      btn.setAttribute('aria-pressed', on); btn.setAttribute('aria-label', on ? 'Mute sound' : 'Turn sound on');
+      if (window.Popkit) Popkit.mute(!on);
+    }
+    btn.addEventListener('click', () => {
+      on = !on; try { localStorage.setItem('km-sound', on ? 'on' : 'off'); } catch (e) {}
+      paint(); if (on && window.Popkit) Popkit.play('pop');
+    });
+    paint();
+  })();
   // ---------- Station readout: back to Home ----------
   (function () {
     const btn = document.getElementById('stBack'), st = document.getElementById('station'), fq = document.getElementById('stFq'), nm = document.getElementById('stNm');

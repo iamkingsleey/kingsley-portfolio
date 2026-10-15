@@ -308,7 +308,7 @@ body.open .phys, body.all .phys, body.open .fmwave { opacity: 0; pointer-events:
 <div class="vp" id="vp" aria-hidden="true">View project</div>
 <article class="detail" id="detail" aria-label="Project"><div class="d-wrap" id="dwrap"></div></article>
 <div class="sdial" id="sdial" role="slider" tabindex="0" aria-label="Sections" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><svg id="sstrip" aria-hidden="true"></svg><div class="needle" aria-hidden="true"></div></div>
-<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
+<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" id="snd" hidden aria-hidden="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
 <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Scroll through designs" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1">
   <svg id="strip" aria-hidden="true"></svg>
   <div class="needle" aria-hidden="true"></div>
@@ -800,6 +800,7 @@ body.open .phys, body.all .phys, body.open .fmwave { opacity: 0; pointer-events:
 
   // ---------- Sound: only from real input. A light tick each time a piece lands on the needle. ----------
   let ac = null, soundOn = true;
+  try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (e) {}   // set by the sound button on Home
   function unlockAudio() { if (ac) { if (ac.state === 'suspended') ac.resume(); return; } const AC = window.AudioContext || window.webkitAudioContext; if (AC) { ac = new AC(); } }
   // ---------- Bass glitch, synced to movement ----------
   // A low, bit-crushed hum runs while the row moves: its volume, pitch and grit follow the speed, and a
