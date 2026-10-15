@@ -276,8 +276,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .socials a:hover .sig rect { opacity: 1 }
 .socials a:hover .sig rect:nth-child(2) { transition-delay: .09s } .socials a:hover .sig rect:nth-child(3) { transition-delay: .18s }
 /* Lagos time: the colon ticks each second; hover shows day or night there, and availability. */
-.time { cursor: default; text-align: right }
-.mode-bottom .time { text-align: left }
+/* Availability pill sits before the time, always visible; the dot pulses gently like an on-air light. */
+.time { cursor: default; display: flex; align-items: center; gap: 12px; white-space: nowrap }
+.mode-bottom .time { flex-direction: column; align-items: flex-start; gap: 8px }
+.mode-bottom .time .t-avail { order: 2 }
 .time .colon { animation: tick 1s steps(1) infinite }
 @keyframes tick { 50% { opacity: .2 } }
 .t-more { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 6px; justify-items: end; white-space: nowrap; font-size: 13px; letter-spacing: -0.2px;
@@ -286,8 +288,11 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
 .time:hover .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
 .t-sky { display: inline-flex; align-items: center; gap: 6px; color: var(--muted) }
 .t-sky svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
-.t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px; border-radius: 999px; background: var(--pill); color: var(--text) }
-.t-avail i { width: 6px; height: 6px; border-radius: 50%; background: #2fb35b; box-shadow: 0 0 0 3px rgb(47 179 91 / .18) }
+.t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 999px; background: var(--pill); color: var(--text); font-size: 13px; letter-spacing: -0.2px }
+.t-avail i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #2fb35b }
+.t-avail i::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: rgb(47 179 91 / .35); animation: onair 2.4s ease-out infinite }
+@keyframes onair { 0% { transform: scale(.6); opacity: .9 } 70%, 100% { transform: scale(1.9); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .t-avail i::after { animation: none; opacity: .4 } }
 /* Dial station preview: a small card beside a hovered station pill. */
 .peek { position: fixed; left: 0; top: 0; z-index: 130; width: 196px; padding: 12px; border-radius: 14px; background: var(--bg); pointer-events: none;
   box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(4px) scale(.98); transform-origin: left center;
@@ -395,8 +400,8 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   <section class="panel" data-station="home">
     <div class="trail" id="trail" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
-    <div class="time" id="time" tabindex="0"><span id="clock">--:--</span>, Lagos 🇳🇬
-      <div class="t-more"><span class="t-sky" id="tSky"></span><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span></div>
+    <div class="time" id="time" tabindex="0"><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span><span class="t-now"><span id="clock">--:--</span>, Lagos 🇳🇬</span>
+      <div class="t-more"><span class="t-sky" id="tSky"></span></div>
     </div>
     <div class="hero">
       <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"><img class="flick" alt="" aria-hidden="true"><span class="snow" aria-hidden="true"></span></div>
