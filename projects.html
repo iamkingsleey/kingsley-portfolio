@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
+<script src="tuner.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Projects · Kingsley M.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* About page: the signal tunes in to a face (lines across the whole screen), one statement, the career as a
+   band you tune through, skills as a mixing desk, on air from Lagos and calling in to the station. Geist throughout; Jockey One only for the name. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f3f3f3;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --display: "Jockey One", "Arial Narrow", Impact, sans-serif;
+  --gut: max(48px, env(safe-area-inset-left, 0px)); --max: 1320px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #141414;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html { background: var(--bg) }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden }
+img { display: block; max-width: 100% }
+button, a, input, textarea { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 max(var(--gut), 128px) 0 var(--gut) }
+.todo { font-style: italic; color: var(--muted) }
+
+/* chrome */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px }
+.station .nm { font-size: 13px; font-weight: 500 }
+.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
+.sdial { position: fixed; right: 0; top: 0; bottom: 0; width: 112px; z-index: 30 }
+.sdial canvas { width: 100%; height: 100%; display: block; cursor: pointer }
+
+/* one spacing step between every section */
+:root { --sp: 180px } @media (max-width: 899px) { :root { --sp: 112px } }
+.shead { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: var(--sp) 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 24px }
+.shead h2 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.shead p { margin: 6px 0 0; font-size: 15px; max-width: 48ch }
+.rv { opacity: 0; translate: 0 26px; transition: opacity .8s var(--ease), translate 1.1s var(--pop) } .rv.in { opacity: 1; translate: 0 0 }
+
+/* ---------- 1 · hero: one field of signal lines across the screen; the face resolves as it tunes in ---------- */
+.sig { position: relative; height: 100vh; height: 100svh; touch-action: pan-y; background: #0b0b0b; color-scheme: dark }   /* plain black, the same black as the site in dark mode */
+.sread { position: absolute; left: 50%; top: 34px; translate: -50% 0; color: #fff; font-size: 11px; display: flex; gap: 10px; align-items: center }
+.sread #sst { color: rgb(255 255 255 / .5) }
+/* one small centred column, with the same breathing room as Home */
+/* the picture and name line up with the text column below (the statement's second column) */
+.hc { position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 24px }
+.hcol { grid-column: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 22px }
+.hm { position: relative; width: 220px; aspect-ratio: 4 / 5; overflow: hidden; background: #141414 }
+.sname { margin: 0; font: 400 50px/1.05 var(--display); color: #fff; letter-spacing: -1px; opacity: 0; translate: 0 12px; transition: opacity .8s var(--ease) .2s, translate 1.1s var(--pop) .2s }
+.sline { margin-top: 8px; font-size: 14px; line-height: 1.5; color: rgb(255 255 255 / .62); opacity: 0; transition: opacity .8s var(--ease) .45s }
+.sig.locked .sname { opacity: 1; translate: 0 0 } .sig.locked .sline { opacity: 1 }
+.hp { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) brightness(.88); transform: scale(var(--hs, 1.04)); transition: transform 1.6s var(--ease) }
+/* slit: the portrait sits in the dark; a lit window with the red needle follows the cursor across it, like the window on a radio dial */
+.hp.dim { filter: grayscale(1) brightness(.07) }
+.hp.lit { filter: grayscale(1) brightness(.92); clip-path: inset(0 calc(100% - var(--sx, 50%) - var(--sw, 12%)) 0 calc(var(--sx, 50%) - var(--sw, 12%))) }
+.sl-edge { position: absolute; top: 0; bottom: 0; left: var(--sx, 50%); width: 2px; margin-left: -1px; background: var(--red) }
+.sl-rul { display: block; width: 220px; height: 30px; margin-top: -14px }
+
+/* ---------- 2 · statement ---------- */
+.stmt { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 24px; padding: var(--sp) 0 0 }
+main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thing on the page: clear of the readout */
+.stmt p { margin: 0; color: var(--ink); font-size: clamp(28px, 3.4vw, 50px); line-height: 1.12; letter-spacing: -.035em; font-weight: 500 }
+.stmt p span { opacity: .14; transition: opacity .5s var(--ease) } .stmt p span.on { opacity: 1 }
+
+/* ---------- 3 · career band ---------- */
+.band { position: relative }
+.band { margin: calc(240px - 50vh) 0 calc(var(--sp) + 30px - 50vh) }   /* the pinned card sits mid-screen; pull the neighbours in so the gaps match the rest */
+.bpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: center; padding: 0 }
+.bruler { position: relative; height: 72vh } .bruler canvas { width: 100%; height: 100%; display: block; cursor: pointer }
+.bcard { position: relative; min-height: 340px }
+.bcard .ch { position: absolute; inset: 0; opacity: 0; translate: 0 30px; transition: opacity .5s var(--ease), translate .9s var(--pop); pointer-events: none }
+.bcard .ch.on { opacity: 1; translate: 0 0; pointer-events: auto }
+.bcard .fqv { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .5px }
+.bcard h3 { margin: 14px 0 0; color: var(--ink); font-size: clamp(36px, 4.6vw, 68px); line-height: .98; font-weight: 500; letter-spacing: -.045em; max-width: 14ch }
+.bcard .role { margin-top: 14px; color: var(--ink); font-size: 16px }
+.bcard p { margin: 14px 0 0; font-size: 16px; line-height: 1.6; max-width: 52ch }
+.bcard .stat { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line) }
+.bcard .stat b { color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em }
+
+/* ---------- 4 · mixing desk ---------- */
+/* what I do: the five skills as stations on one dial line; the red needle slides to the one you point at and its tools rise out from under it */
+.skrow { display: flex; justify-content: space-between; gap: 16px; padding: 18px 0 0 }
+.skw { color: var(--faint); font-size: clamp(22px, 3.2vw, 46px); font-weight: 500; letter-spacing: -.04em; line-height: 1; cursor: pointer; transition: color .45s var(--ease); user-select: none; white-space: nowrap }
+.skw.on { color: var(--ink) }
+.skscale { position: relative; height: 120px; margin-top: 14px }
+.skscale canvas { position: absolute; left: 0; right: 0; top: 0; width: 100%; height: 44px }
+.sktools { position: absolute; top: 56px; left: 0; display: flex; gap: 8px; translate: -50% 0; will-change: transform }
+.sktools img { width: 34px; height: 34px; border-radius: 9px; animation: tup .7s var(--pop) both; animation-delay: calc(var(--k) * 60ms) }
+@keyframes tup { from { opacity: 0; translate: 0 -16px; scale: .5 } to { opacity: 1; translate: 0 0; scale: 1 } }
+
+/* ---------- 5 · how I work ---------- */
+.how { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center }
+.knob { position: relative; width: min(380px, 100%); aspect-ratio: 1; justify-self: center; touch-action: none; cursor: grab; user-select: none }
+.knob:active { cursor: grabbing }
+.knob svg { width: 100%; height: 100% }
+.knob .face { transition: none }
+.say { position: relative; min-height: 260px }
+.say .q { position: absolute; inset: 0; opacity: 0; translate: 0 24px; transition: opacity .45s var(--ease), translate .9s var(--pop) }
+.say .q.on { opacity: 1; translate: 0 0 }
+.say .q p { margin: 14px 0 0; color: var(--ink); font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; max-width: 18ch }
+.say .q small { display: block; margin-top: 18px; font-size: 15px; line-height: 1.55; max-width: 46ch; color: var(--text) }
+
+/* ---------- 6 · on air + call in ---------- */
+.air { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px }
+.onair { background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 22px; min-height: 420px }
+.onair .lt { display: flex; align-items: center; gap: 10px }
+.onair .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--faint) }
+.onair.live .lamp { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 22%, transparent) }
+.onair .clock { color: var(--ink); font: 500 clamp(56px, 6vw, 88px)/1 var(--body); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
+.onair .clock small { font-size: .32em; color: var(--muted); margin-left: 8px; letter-spacing: 0 }
+.onair dl { margin: auto 0 0; display: grid; gap: 14px }
+.onair dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.onair dd { margin: 4px 0 0; color: var(--ink); font-size: 15px }
+.sw { position: relative; width: 44px; height: 24px; border-radius: 99px; background: var(--line); transition: background .3s }
+.sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: translate .5s var(--pop) }
+.sw[aria-pressed="true"] { background: var(--ink) } .sw[aria-pressed="true"]::after { translate: 20px 0 }
+.call { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden }
+.call h3 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.call label { display: grid; gap: 6px }
+.call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
+.call input:focus, .call textarea:focus { border-color: var(--ink) }
+.call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
+.call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
+.call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
+.call .done { position: absolute; inset: 0; background: var(--bg); display: grid; place-items: center; text-align: center; opacity: 0; pointer-events: none; transition: opacity .5s var(--ease) }
+.call.sent .done { opacity: 1; pointer-events: auto }
+.call .done b { display: block; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em; margin-top: 12px }
+.call .done .lamp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); vertical-align: middle; margin-right: 8px }
+.foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
+
+@media (max-width: 899px) {
+  :root { --gut: 18px }
+  .wrap { padding: 0 44px 0 var(--gut) }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .sdial { width: 38px }
+  .sname { font-size: 42px }
+  .stmt { grid-template-columns: 1fr } .hc { grid-template-columns: 1fr } .hcol { grid-column: 1 }
+  .bpin { grid-template-columns: 74px minmax(0, 1fr); gap: 16px; padding-top: 80px }
+  .skrow { gap: 8px } .skw { font-size: 17px } .sktools img { width: 28px; height: 28px; border-radius: 7px }
+  .how, .air { grid-template-columns: 1fr } .knob { width: 260px }
+  .shead { flex-direction: column; align-items: start }
+}
+@media (prefers-reduced-motion: reduce) { .rv { transition: none; translate: none; opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="station" data-readout><a class="back" href="index.html#home" id="back"><span aria-hidden="true">‹</span><b>98.0</b> Home</a><span class="fq">102.0</span><span class="nm">Projects</span></div>
+
+  <!-- 1 · hero: the signal tunes in to a face -->
+<!-- hero, switched off for now: the page opens on the statement (inner comment markers written as <!~~ ~~> so this block stays one comment)
+<section class="sig" id="s-hero">
+    <div class="sread mono"><span id="sfq">87.5</span> <span id="sst">Tuning</span></div>
+    <div class="hc wrap"><div class="hcol">
+      <!~~ the portrait with the red needle, switched off for now:
+      <div class="hm" id="hm"><img class="hp dim" alt=""><img class="hp lit" alt="Kingsley M."><span class="sl-edge"></span></div>
+      <canvas class="sl-rul" id="slr"></canvas>
+      ~~>
+      <div class="ht"><h1 class="sname">Kingsley M.</h1><!~~ switched off for now: <div class="sline">Product designer and founder in Lagos.<br>I design from zero to one, and build my own tools.</div> ~~></div>
+    </div></div>
+  </section>
+-->
+
+<main class="wrap">
+  <!-- 2 · one statement, lit word by word as you scroll -->
+  <section class="stmt" id="s-stmt"><span class="mono">102.0 · Projects</span><p id="stmt">Products I’ve designed and the ones I’m building myself. Marketplaces, commerce and payments, mostly for people in Africa.</p></section>
+
+  <!-- 3 · career band -->
+  <div class="shead" id="s-band"><div><h2>On the dial</h2><p>Scroll to tune through them. Each one is a station.</p></div><span class="mono">Projects</span></div>
+  <section class="band" id="band"><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
+
+  <div class="foot"><span class="mono">Kingsley M. · 102.0 Projects</span><a class="mono" href="index.html#home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
+</main>
+<div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
+
+<script src="popkit.js"></script>
+<script>
+  // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
+  (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
+    document.addEventListener('click', function (e) {
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+      if (on) Popkit.play('pop');
+    }, true); })();
+</script>
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const HEAD = 'assets/headshot.jpg';
+  const $ = id => document.getElementById(id);
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const narrow = innerWidth < 900;
+  const ticks = [];
+
+  // ---------- 1 · hero: the readout tunes to 94.0, then the name, line and photo settle in ----------
+  const sig = $('s-hero'); if (sig) sig.querySelectorAll('.hp').forEach(im => im.src = HEAD);
+  let lock = reduce || !sig ? 1 : 0, t0 = 0;
+  ticks.push(() => { if (lock >= 1) return; if (!t0) t0 = performance.now();
+    const k = reduce ? 1 : clamp(((performance.now() - t0) / 1000 - .25) / 1.8, 0, 1); lock = 1 - Math.pow(1 - k, 3);
+    $('sfq').textContent = (87.5 + 6.5 * lock).toFixed(1); sig.style.setProperty('--hs', (1.08 - .04 * lock).toFixed(3));
+    if (lock >= 1) { sig.classList.add('locked'); $('sst').textContent = 'Signal locked'; snd('detent'); } });
+  if ($('hm')) {   // only while the portrait is in the page (it's commented out for now)
+  // the window follows the cursor with a little spring; the ruler under it reads its position as a frequency
+  let slx = .5, slt = .5, slv = 0; const slr = $('slr'), slc = slr.getContext('2d');
+  sig.addEventListener('pointermove', e => { const r = $('hm').getBoundingClientRect(); slt = clamp((e.clientX - r.left) / r.width, .12, .88); });
+  sig.addEventListener('pointerleave', () => { slt = .5; });
+  ticks.push(dt => { const s2 = dt / 1000, a = (slt - slx) * 90 - slv * 13; slv += a * s2; slx += slv * s2;
+    sig.style.setProperty('--sx', (slx * 100).toFixed(2) + '%'); sig.style.setProperty('--sw', 12 * (.5 + .5 * lock) + '%');
+    const dpr = Math.min(2, devicePixelRatio || 1), W = slr.clientWidth, H = slr.clientHeight; if (slr.width !== Math.round(W * dpr)) { slr.width = Math.round(W * dpr); slr.height = Math.round(H * dpr); }
+    slc.setTransform(dpr, 0, 0, dpr, 0, 0); slc.clearRect(0, 0, W, H); slc.strokeStyle = '#fff';
+    for (let q = 0; q <= 44; q++) { const x = q / 44 * W, d = Math.abs(q / 44 - slx); slc.globalAlpha = (q % 4 ? .2 : .45) + Math.max(0, 1 - d * 8) * .4; slc.lineWidth = 1; slc.beginPath(); slc.moveTo(x, 0); slc.lineTo(x, (q % 4 ? 5 : 10) + Math.max(0, 1 - d * 8) * 6); slc.stroke(); }
+    slc.globalAlpha = 1; slc.fillStyle = RED; slc.fillRect(slx * W - 1, 0, 2, H);
+    if (lock >= 1) $('sfq').textContent = (87.5 + slx * 20.5).toFixed(1); });
+  }
+
+  // statement: words light up as it scrolls through
+  const stmt = $('stmt'); stmt.innerHTML = stmt.textContent.split(' ').map(w => `<span>${w}</span>`).join(' '); const sw = [...stmt.children];
+  ticks.push(() => { const r = stmt.getBoundingClientRect(), q = clamp((innerHeight * .85 - r.top) / (r.height + innerHeight * .3), 0, 1), n = Math.round(q * sw.length); sw.forEach((w, i) => w.classList.toggle('on', i < n)); });
+
+  // ---------- 3 · career band ----------
+  // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
+  const CH = [
+    ['88.1', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace, designed from its early stage to more than fifty thousand users.', '50,000+', 'users', 'Marketplace'],
+    ['92.5', 'Pingmart', 'Founder', 'Multi-vendor commerce that lives inside WhatsApp, where the buyers already are.', '', '', 'Commerce'],
+    ['96.9', 'ShareBuddy', 'Founder', 'Social bill-splitting and group wallets, so paying back friends takes one tap.', '', '', 'Fintech'],
+    ['101.3', 'Kauri', 'Concept', 'A payments brand for African small businesses, built around the cowrie shell, the region’s first currency.', '', '', 'Brand · Payments']
+  ];
+  const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
+  band.style.height = (CH.length * 70 + 40) + 'vh';
+  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM · ${c[6]}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>` : ''}</div>`).join('');
+  const chs = [...bcard.children]; let bcur = -1, bsp = 0;
+  const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
+  brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);
+    const br = band.getBoundingClientRect(), y = scrollY + br.top + k / (CH.length - 1) * (br.height - innerHeight) * .999; go(y); snd('pop'); });
+  ticks.push(dt => {
+    const r = band.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1) * (CH.length - 1), q = reduce ? Math.round(p) : held(p);
+    bsp += (q - bsp) * (1 - Math.exp(-dt / 90));
+    const c = Math.round(bsp);
+    if (c !== bcur) { if (bcur >= 0) snd('detent'); bcur = c; chs.forEach((el, k) => el.classList.toggle('on', k === c)); }
+    // vertical frequency ruler: one major per chapter, minor ticks every 0.1, the needle fixed in the middle
+    const dpr = Math.min(2, devicePixelRatio || 1), W = brc.clientWidth, H = brc.clientHeight;
+    if (brc.width !== Math.round(W * dpr)) { brc.width = Math.round(W * dpr); brc.height = Math.round(H * dpr); }
+    bx.setTransform(dpr, 0, 0, dpr, 0, 0); bx.clearRect(0, 0, W, H);
+    const col = ink(), SP = 90, mid = H / 2, x0 = narrow ? 6 : 40;
+    for (let k = -4; k <= CH.length * 10 + 4; k++) {
+      const y = mid + (k / 10 - bsp) * SP; if (y < 0 || y > H) continue;
+      const major = k % 10 === 0 && k >= 0 && k / 10 < CH.length, d = Math.abs(y - mid) / SP, e = clamp(Math.min(y, H - y) / 80, 0, 1);
+      bx.globalAlpha = ((major ? .55 : .16) + Math.max(0, 1 - d * 1.5) * .35) * e; bx.strokeStyle = col; bx.lineWidth = major ? 2 : 1;
+      const L = major ? 26 : 10 + Math.max(0, .6 - d) * 12;
+      bx.beginPath(); bx.moveTo(x0, y); bx.lineTo(x0 + L, y); bx.stroke();
+      if (major) { const ch = CH[k / 10]; bx.globalAlpha = (d < .5 ? 1 : .45) * e; bx.fillStyle = col; bx.font = '500 10px "Geist Mono", monospace'; bx.textBaseline = 'middle';
+        bx.fillText(ch[0], x0 + L + 8, y - (narrow ? 0 : 7)); if (!narrow) { bx.font = '500 12px Geist, sans-serif'; bx.fillText(ch[1].length > 18 ? ch[1].slice(0, 17) + '…' : ch[1], x0 + L + 8, y + 9); } }
+    }
+    bx.globalAlpha = 1; bx.fillStyle = RED; bx.fillRect(x0 - 10, mid - 1.5, narrow ? 36 : 46, 3);
+  });
+
+  // ---------- arrivals, theme, a pop on every click ----------
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in'); }), { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.rv').forEach(el => reduce ? el.classList.add('in') : io.observe(el));
+
+  // ---------- smooth scrolling + the section dial on the right ----------
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, mine: false };
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  if (smooth) {
+    addEventListener('wheel', e => { if (e.ctrlKey) return; e.preventDefault(); const raw = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1); SS.target = clamp(SS.target + clamp(raw * .85, -140, 140), 0, maxY()); }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
+  }
+  function go(y) { y = clamp(y, 0, maxY()); if (smooth) SS.target = y; else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); }
+  const SECN = ['Projects', 'On the dial'], secEls = ['s-band'].map($);   // with the hero back: ['Hello', 'About', …] and 's-stmt' first   // add 'How' / 's-how' back with the section
+  const sd = $('sdial'), sx = sd.getContext('2d'); let sp = 0, lastSt = -1;
+  sd.addEventListener('click', e => { const r = sd.getBoundingClientRect(), k = clamp(Math.round(sp + (e.clientY - r.top - r.height / 2) / 150), 0, SECN.length - 1); go(k ? secEls[k - 1].getBoundingClientRect().top + scrollY - 40 : 0); snd('pop'); });
+  // ---------- fluid motion: everything floats on springs ----------
+  // Each text block and panel hangs on its own spring. The cursor pulls them a little (deeper ones further), and
+  // scrolling makes them trail behind for a moment, then settle with a soft overshoot, so the page moves like liquid.
+  const PX = [['#stmt', 22], ['.stmt > .mono', 8], ['.shead h2', 12], ['.shead p', 7], ['.shead > .mono', 5], ['#bcard', 24], ['.bruler', 9], ['.foot', 4]]
+    .flatMap(([q, d]) => [...document.querySelectorAll(q)].map(el => ({ el, d, x: 0, y: 0, vx: 0, vy: 0, k: 150 - d * 3.2 })));
+  let ptx = 0, pty = 0, lastSY = scrollY, sVel = 0;
+  if (!reduce) {
+    if (matchMedia('(pointer: fine)').matches) {
+      addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; ptx = e.clientX / innerWidth * 2 - 1; pty = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+      document.documentElement.addEventListener('pointerleave', () => { ptx = pty = 0; });
+    }
+    ticks.push(dt => { const s2 = Math.min(dt, 34) / 1000, vh = innerHeight;
+      const v = (scrollY - lastSY) / Math.max(s2, .001); lastSY = scrollY; sVel += (v - sVel) * (1 - Math.exp(-dt / 90));   // smoothed scroll speed, px/s
+      PX.forEach(o => { const r = o.el.getBoundingClientRect(); if (r.bottom < -120 || r.top > vh + 120) { o.x = o.y = o.vx = o.vy = 0; o.el.style.transform = ''; return; }
+        const tx = -ptx * o.d * 1.3, ty = -pty * o.d * .8 + clamp(sVel * o.d * .0016, -o.d * 2.2, o.d * 2.2)   /* trails behind the scroll */;
+        o.vx += ((tx - o.x) * o.k - o.vx * 11) * s2; o.vy += ((ty - o.y) * o.k - o.vy * 11) * s2; o.x += o.vx * s2; o.y += o.vy * s2;
+        o.el.style.transform = `translate3d(${o.x.toFixed(2)}px,${o.y.toFixed(2)}px,0)`; }); });
+  }
+  let prevT = performance.now();
+  function frame(now) {
+    const dt = Math.min(48, now - prevT); prevT = now; const vh = innerHeight;
+    if (smooth) { SS.cur += (SS.target - SS.cur) * (1 - Math.exp(-dt / 150)); if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target; if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); } }
+    ticks.forEach(f => f(dt));
+    let f = 0; secEls.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
+    sp += (f - sp) * (1 - Math.exp(-dt / 110));
+    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
+    if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);
+    const SP = 30, right = Wd - (Wd < 60 ? 8 : 18), col = sig && sig.getBoundingClientRect().bottom > Hd / 2 ? '#fff' : ink(), mid = Hd / 2;
+    for (let q = -40; q <= (SECN.length - 1) * 5 + 40; q++) {
+      const y = mid + q * SP - sp * 5 * SP; if (y < -10 || y > Hd + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(y - mid) / SP, edge = clamp(Math.min(y - 90, Hd - y) / 120, 0, 1);
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = ((major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35) * edge; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(right, y); sx.lineTo(right - L, y); sx.stroke();
+      if (major && Wd >= 60) { sx.globalAlpha = (d < 2.5 ? 1 : .5) * edge; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'right'; sx.textBaseline = 'middle'; sx.fillText(SECN[q / 5].toUpperCase(), right - L - 8, y); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(right + 6 - (Wd < 60 ? 28 : 34), mid - 1.5, Wd < 60 ? 28 : 34, 3);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+    ['back', 'back2'].forEach(function (id) { var a = document.getElementById(id); if (!a) return;
+      a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+        if (window.Tuner) Tuner.go({ from: 102, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
+  </script>
+  </body>
+</html>

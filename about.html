@@ -429,9 +429,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 })();
 </script>
 <script>
-  ['back', 'back2'].forEach(function (id) { var a = document.getElementById(id); if (!a) return;
-    a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      if (window.Tuner) Tuner.go({ from: 94, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
-</script>
-</body>
+    ['back', 'back2'].forEach(function (id) { var a = document.getElementById(id); if (!a) return;
+      a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+        if (window.Tuner) Tuner.go({ from: 94, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
+  </script>
+  </body>
 </html>

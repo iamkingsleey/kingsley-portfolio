@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610160241";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610160248";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -946,8 +946,9 @@ h1.typer { position: relative }
   function tuneTo(s, sound) {
     const prev = active;
     if (s.id === 'designs') { prefetchDesigns(); goDesigns(prev, sound); return; }
-    if (s.id === 'about') { setTarget(ang(s.f)); play('pop', sound); const href = 'about.html?v=' + BUILD;   // About lives on its own page too
-      if (window.Tuner && !reduce) { Tuner.go({ from: (prev && prev.f) || 98, to: 94, name: 'About', href }); return; } location.href = href; return; }
+    const PAGE = { about: ['about.html', 94, 'About'], engineering: ['engineering.html', 96, 'Engineering'], projects: ['projects.html', 102, 'Projects'] }[s.id];
+    if (PAGE) { setTarget(ang(s.f)); play('pop', sound); const href = PAGE[0] + '?v=' + BUILD;   // About, Engineering and Projects live on their own pages
+      if (window.Tuner && !reduce) { Tuner.go({ from: (prev && prev.f) || 98, to: PAGE[1], name: PAGE[2], href }); return; } location.href = href; return; }
     if (prev && prev.id === 'home') emitRipple(true);                    // the wave leaves as the page turns (no drawn line)
     setTarget(ang(s.f)); light(s);
     play('pop', sound);
@@ -1818,7 +1819,7 @@ h1.typer { position: relative }
   const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
   if (hashId === 'designs') { location.replace('designs.html?v=' + BUILD); return; }
-  if (hashId === 'about') { location.replace('about.html?v=' + BUILD); return; }
+  if (['about', 'engineering', 'projects'].includes(hashId)) { location.replace(hashId + '.html?v=' + BUILD); return; }
   const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
