@@ -23,6 +23,7 @@ python3 -m http.server 8000
 | `iteration-3/` | Third iteration: dial on Home, side menu, Designs as a masonry grid |
 | `iteration-2/` | Second iteration: the dial on every page |
 | `iteration-1/` | First iteration: top dial, Feed masonry, image trail on Home |
+| `about.html` | About page (94.0): statement, the career as a band you tune through, what I do on a dial with the tools behind each skill, on air from Lagos and a call-in form. Home's dial opens it through the tuner |
 | `project.html`, `logo.html`, `product.html`, `showcase.html` | Project pages. Which one a project opens is its `layout` (below) |
 | `tuner.js` | Page-to-page transition: the readout moves to the middle and tunes to the next page |
 | `popkit.js` | UI sounds made in code with Web Audio (pop on tap, detent while dragging). No audio files |

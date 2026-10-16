@@ -6,9 +6,9 @@
 <title>Kingsley M.</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610160104";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610160241";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -404,7 +404,7 @@ html[data-theme="dark"] {
 .station { position: fixed; z-index: 120; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(80px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 6px;
   opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .25s, transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s .3s }
 .inner .station { opacity: 1; visibility: visible; transform: none; transition: opacity .35s .1s, transform .4s cubic-bezier(.2,.8,.2,1) .1s, visibility 0s }
-.station .back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
+.station .back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace; color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
 .station .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
 .station .back span { font-family: var(--body); font-size: 13px; letter-spacing: -.1px }
 .station .back:hover { background: var(--pill-hover); color: var(--ink) }
@@ -946,6 +946,8 @@ h1.typer { position: relative }
   function tuneTo(s, sound) {
     const prev = active;
     if (s.id === 'designs') { prefetchDesigns(); goDesigns(prev, sound); return; }
+    if (s.id === 'about') { setTarget(ang(s.f)); play('pop', sound); const href = 'about.html?v=' + BUILD;   // About lives on its own page too
+      if (window.Tuner && !reduce) { Tuner.go({ from: (prev && prev.f) || 98, to: 94, name: 'About', href }); return; } location.href = href; return; }
     if (prev && prev.id === 'home') emitRipple(true);                    // the wave leaves as the page turns (no drawn line)
     setTarget(ang(s.f)); light(s);
     play('pop', sound);
@@ -1816,6 +1818,7 @@ h1.typer { position: relative }
   const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
   const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
   if (hashId === 'designs') { location.replace('designs.html?v=' + BUILD); return; }
+  if (hashId === 'about') { location.replace('about.html?v=' + BUILD); return; }
   const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
   cur = target = ang(start.f); light(start); drawDial();
   tuneTo(start, false);
