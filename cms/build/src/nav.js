@@ -107,3 +107,17 @@
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 0)); else setTimeout(start, 0);
 })();
+// any link to another site opens in a new tab, so visitors never leave the portfolio (covers links added later from the CMS too)
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="http"]');
+  if (!a || a.target === '_blank' || a.host === location.host) return;
+  a.target = '_blank'; a.rel = 'noopener';
+}, true);
+// two-finger swipe left/right on a trackpad = back/forward, as in any browser. Some pages run their own smooth scroll and
+// call preventDefault on every wheel event, which also kills the browser's swipe; sideways swipes skip those handlers
+// (nothing on these pages scrolls sideways with the wheel), so the browser's own back/forward swipe works again.
+addEventListener('wheel', e => {
+  if (e.ctrlKey || Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 1.5) return;
+  if (document.getElementById('allBtn') && !document.body.classList.contains('all')) return;   /* Designs' row view scrolls sideways itself */
+  e.stopPropagation();
+}, { capture: true, passive: true });

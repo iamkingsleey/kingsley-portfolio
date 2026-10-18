@@ -152,7 +152,7 @@ body.open .px { opacity: 0; pointer-events: none }
 /* ---------- Project page ---------- */
 .vp { position: fixed; left: 0; top: 0; z-index: 40; pointer-events: none; background: var(--ink); color: var(--on-ink); font-size: 12px; font-weight: 500; padding: 7px 11px; border-radius: 999px; opacity: 0; transform: translate(-50%, -50%) scale(.6); transition: opacity .2s, transform .25s cubic-bezier(.2,1.3,.3,1); white-space: nowrap }
 .vp.show { opacity: 1; transform: translate(-50%, -50%) scale(1) }
-.detail { position: fixed; inset: 0; z-index: 18; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; visibility: hidden; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .62s cubic-bezier(.65,0,.35,1), visibility 0s .62s; scrollbar-width: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.detail { position: fixed; inset: 0; z-index: 18; background: var(--bg); overflow-y: auto; overscroll-behavior-y: contain; visibility: hidden; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .62s cubic-bezier(.65,0,.35,1), visibility 0s .62s; scrollbar-width: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 .detail::-webkit-scrollbar { display: none }
 body.open .detail { visibility: visible; clip-path: circle(150vmax at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .7s cubic-bezier(.65,0,.35,1), visibility 0s }
 .fly canvas { display: block; width: 100%; height: 100% }

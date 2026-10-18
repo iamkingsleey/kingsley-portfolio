@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610181930";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610181942";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -115,7 +115,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .list i { font-style: normal; color: var(--muted); font-size: 13px }
 
 /* Feed */
-.scroller { position: absolute; left: var(--content-left); right: 145px; top: 0; bottom: 0; overflow-y: auto; overscroll-behavior: contain;
+.scroller { position: absolute; left: var(--content-left); right: 145px; top: 0; bottom: 0; overflow-y: auto; overscroll-behavior-y: contain;
   padding: var(--flush) 27px var(--flush); scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
 .fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
@@ -207,7 +207,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom #ruler { display: none }
 
 /* About: a longer page, so it scrolls on its own and starts on the same top line as the other pages. */
-.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
+.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior-y: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
 .sheet.about::-webkit-scrollbar { display: none }
 /* The scroll box clips anything outside it, so it gets 48px of extra room on each side (cancelled by a negative
    margin): the content stays where it was, and the dock's soft shadow has space to show in full. */
@@ -519,7 +519,7 @@ h1.typer { position: relative }
         <p>Previously, I led design at <span class="ref" tabindex="0">Kusnap<span class="ref-card" role="tooltip"><b>Kusnap</b><span class="k">Peer-to-peer marketplace · Head of Design</span><span class="n">50,000+</span><span class="k">users, designed from early stage</span></span></span>.</p>
       </div>
     </div>
-    <nav class="socials" aria-label="Social"><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="https://medium.com/@iamkingsleey" target="_blank" rel="noopener">Medium</a><a href="#">Unsplash</a></nav>
+    <nav class="socials" aria-label="Social"><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://dribbble.com/kingsleey" target="_blank" rel="noopener">Dribbble</a><a href="https://www.instagram.com/iamkingsleey/" target="_blank" rel="noopener">Instagram</a><a href="https://medium.com/@iamkingsleey" target="_blank" rel="noopener">Medium</a><a href="https://unsplash.com/@iamkingsleey" target="_blank" rel="noopener">Unsplash</a></nav>
   </section>
   <div class="role-peek" id="rolePeek" aria-hidden="true"><img alt=""></div>
   <div class="peek" id="peek" aria-hidden="true"></div>

@@ -291,7 +291,7 @@ s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailt
 s = rep(s, '<p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>',
         '<p>Brand and product designer, designing from <span class="hl">0-1</span> at <br><span class="hl">fintech, e-commerce</span> and property startups.</p>')
 # real links from the old site (the rest stay as # until there's a URL)
-for _n, _u in [('LinkedIn', 'https://www.linkedin.com/in/iamkingsleey/'), ('Medium', 'https://medium.com/@iamkingsleey'), ('github', 'https://github.com/iamkingsleey')]:
+for _n, _u in [('LinkedIn', 'https://www.linkedin.com/in/iamkingsleey/'), ('Medium', 'https://medium.com/@iamkingsleey'), ('Dribbble', 'https://dribbble.com/kingsleey'), ('Instagram', 'https://www.instagram.com/iamkingsleey/'), ('Unsplash', 'https://unsplash.com/@iamkingsleey'), ('github', 'https://github.com/iamkingsleey')]:
     s = rep(s, f'<a href="#">{_n}</a>', f'<a href="{_u}" target="_blank" rel="noopener">{_n}</a>')
 open(f'{REPO}/index.html', 'w', encoding='utf-8').write(s)
 

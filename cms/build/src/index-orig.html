@@ -99,7 +99,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .list i { font-style: normal; color: var(--muted); font-size: 13px }
 
 /* Feed */
-.scroller { position: absolute; left: var(--content-left); right: 145px; top: 0; bottom: 0; overflow-y: auto; overscroll-behavior: contain;
+.scroller { position: absolute; left: var(--content-left); right: 145px; top: 0; bottom: 0; overflow-y: auto; overscroll-behavior-y: contain;
   padding: var(--flush) 27px var(--flush); scrollbar-width: none }
 /* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
 .fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
@@ -191,7 +191,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 .mode-bottom #ruler { display: none }
 
 /* About: a longer page, so it scrolls on its own and starts on the same top line as the other pages. */
-.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
+.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior-y: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
 .sheet.about::-webkit-scrollbar { display: none }
 /* The scroll box clips anything outside it, so it gets 48px of extra room on each side (cancelled by a negative
    margin): the content stays where it was, and the dock's soft shadow has space to show in full. */
