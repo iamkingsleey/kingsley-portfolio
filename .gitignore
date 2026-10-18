@@ -2,4 +2,11 @@
 # Original full-size renders; the site uses the web copies in assets/designs/
 img/
 assets/*.mp3
-tools/
+/tools/
+
+# CMS: kept on this Mac only
+cms/.secrets.json
+cms/.history/
+cms/build/.gen/
+cms/build/.index.json
+__pycache__/

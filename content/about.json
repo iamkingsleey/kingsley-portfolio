@@ -1,0 +1,114 @@
+{
+ "chapters": [
+  {
+   "fq": "88.1",
+   "where": "Sarge",
+   "role": "Visual Designer",
+   "what": "Where it started: visual design for Sarge in Lagos, full time. Interfaces first, then brands, then 3D.",
+   "stat": "",
+   "statLabel": "",
+   "years": "2020 – 2021",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "90.3",
+   "where": "Kusnap",
+   "role": "Head of Design",
+   "what": "A peer-to-peer marketplace. I built its design from the early stage, product and brand, as it grew, including the verification system that made it safer to trade.",
+   "stat": "50,000+",
+   "statLabel": "users",
+   "years": "2020 – Now",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "92.5",
+   "where": "Haus des Stiftens",
+   "role": "UX Designer · Germany",
+   "what": "UX design for Haus des Stiftens in Germany, on a remote contract. Around the same time I went through Digital Product School.",
+   "stat": "",
+   "statLabel": "",
+   "years": "2021 – 2022",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "94.7",
+   "where": "CHAOSS",
+   "role": "Design Maintainer · Linux Foundation",
+   "what": "I lead design at CHAOSS: open source health and community tooling, alongside maintainers around the world.",
+   "stat": "",
+   "statLabel": "",
+   "years": "2022 – Now",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "96.9",
+   "where": "Open Source Community Africa",
+   "role": "Design lead",
+   "what": "Design for OSCAFEST, the largest open source festival in Africa: identity, stage, and everything people hold in their hands.",
+   "stat": "",
+   "statLabel": "",
+   "years": "",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "99.1",
+   "where": "GitSkilled",
+   "role": "Brand Designer · GitHub",
+   "what": "Brand design for GitSkilled, GitHub’s open source skills program for Africans.",
+   "stat": "2,500+",
+   "statLabel": "Africans reached",
+   "years": "2024 – 2025",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "101.3",
+   "where": "Bulvds",
+   "role": "UX Designer",
+   "what": "Short-lets and rentals in Lagos. I designed the Bulvds Wallet: payments, refunds and commissions in one place.",
+   "stat": "",
+   "statLabel": "",
+   "years": "2025",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "103.5",
+   "where": "My own stations",
+   "role": "Founder",
+   "what": "Ventures in commerce and payments for African users, from WhatsApp-native shopping to splitting bills with friends.",
+   "stat": "",
+   "statLabel": "",
+   "years": "",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "105.7",
+   "where": "Tools I build",
+   "role": "Design engineer",
+   "what": "Figma plugins like LineCraft and MeshCraft, and a recorder that turns prototypes into videos. When the tool is missing, I make it.",
+   "stat": "2",
+   "statLabel": "plugins",
+   "years": "",
+   "stat2": "",
+   "stat2Label": ""
+  },
+  {
+   "fq": "107.9",
+   "where": "Resources I share",
+   "role": "Creator",
+   "what": "3D assets I publish for free on Unsplash, used across platforms like Notion, Typeform, Figma, Trello, Medium, Squarespace, Wix and Unfold.",
+   "stat": "400K+",
+   "statLabel": "views",
+   "years": "",
+   "stat2": "3K+",
+   "stat2Label": "downloads"
+  }
+ ]
+}

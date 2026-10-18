@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Showcase Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Showcase layouts for work with no story to tell, just pieces to enjoy.
+   3D (#3d): a dial carousel you turn by dragging, a table where the pieces can be thrown around,
+   clay-to-colour under the red needle, and a wall where every piece tilts toward the cursor.
+   Illustration (#illustration): prints you can move around the board, a loupe with a dial bezel for
+   looking closer, colours sampled from each piece, and a contact sheet. Pictures are stand-ins. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f3f3f3;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px)); --max: 1320px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #141414;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+html { background: var(--bg) }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden }
+img { display: block; max-width: 100% }
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gut) }
+
+/* chrome */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px }
+.station .nm { font-size: 13px; font-weight: 500 }
+.pv { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill) }
+.pv button { height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .3s, color .3s }
+.pv button[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.pv #theme { color: var(--ink) }
+/* the section dial runs down the right edge (like the ruler on Designs' All view); content keeps clear of it */
+.sdial { position: fixed; right: 0; top: 0; bottom: 0; width: 112px; z-index: 30 }
+.sdial canvas { position: relative; width: 100%; height: 100%; cursor: pointer }
+@media (min-width: 900px) { .wrap { padding-right: max(var(--gut), 128px) } }
+@media (max-width: 899px) { .sdial { width: 38px } .wrap { padding-right: 44px } }
+
+/* shared text */
+.top { padding-top: 112px }
+.head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px }
+h1 { margin: 0; color: var(--ink); font-weight: 500; font-size: clamp(36px, 5.2vw, 72px); line-height: 1; letter-spacing: -.045em; max-width: 14ch }
+h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em }
+h1 .w > span { display: inline-block; translate: 0 105%; transition: translate 1.1s var(--pop); transition-delay: calc(var(--i) * 60ms + .15s) }
+h1 .w.in > span { translate: 0 0 }
+.lede { margin: 18px 0 0; font-size: 17px; line-height: 1.5; max-width: 44ch }
+.shead { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 120px 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 16px }
+.shead h2 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.shead p { margin: 6px 0 0; font-size: 15px; max-width: 46ch }
+.chip { height: 32px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px }
+.chip:active { scale: .96 }
+.rv { opacity: 0; translate: 0 26px; transition: opacity .8s var(--ease), translate 1.1s var(--pop) } .rv.in { opacity: 1; translate: 0 0 }
+.cap { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0 0 }
+.cap b { color: var(--ink); font-weight: 500 }
+
+/* ---------- 3D · dial carousel ---------- */
+.ring { position: relative; height: min(64vh, 620px); margin-top: 28px; perspective: 1700px; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none }
+.ring:active { cursor: grabbing }
+.ring .rot { position: absolute; left: 50%; top: 46%; transform-style: preserve-3d; will-change: transform }
+.ring .card { position: absolute; left: calc(var(--cw) / -2); top: calc(var(--cw) * -.625); width: var(--cw); aspect-ratio: 4 / 5; backface-visibility: hidden; background: var(--panel) }
+.ring .card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none }
+.ring .card::after { content: ""; position: absolute; inset: 0; background: var(--bg); opacity: var(--dim, 0); pointer-events: none }
+.rruler { height: 54px; margin-top: 8px } .rruler canvas { width: 100%; height: 100%; display: block; cursor: pointer }
+.rcap { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; padding-top: 6px }
+.rcap h3 { margin: 0; color: var(--ink); font-size: 18px; font-weight: 500; letter-spacing: -.01em; transition: opacity .25s }
+.rcap .k { display: flex; gap: 8px }
+.rcap .k button { width: 36px; height: 36px; border-radius: 50%; background: var(--pill); color: var(--ink); font-size: 15px }
+
+/* ---------- 3D · the table (throw things) ---------- */
+.table { position: relative; height: min(78vh, 720px); background: var(--panel); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none }
+.table .obj { position: absolute; left: 0; top: 0; width: var(--ow); aspect-ratio: 4 / 5; cursor: grab; will-change: transform; box-shadow: 0 24px 40px -24px rgb(0 0 0 / .45) }
+.table .obj.held { cursor: grabbing; box-shadow: 0 40px 60px -24px rgb(0 0 0 / .5) }
+.table .obj img { width: 100%; height: 100%; object-fit: cover; pointer-events: none }
+.table .hint { position: absolute; left: 20px; bottom: 16px; transition: opacity .6s } .table.used .hint { opacity: 0 }
+.tbar { display: flex; gap: 8px }
+
+/* ---------- 3D · clay to colour ---------- */
+.clay { position: relative; aspect-ratio: 16 / 9; background: var(--panel); overflow: hidden; touch-action: pan-y; cursor: ew-resize; user-select: none; -webkit-user-select: none }
+.clay img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none }
+.clay .grey { filter: grayscale(1) contrast(.92) brightness(1.18); clip-path: inset(0 calc(100% - var(--cut, 50%)) 0 0) }
+.clay .ndl { position: absolute; top: 0; bottom: 0; left: var(--cut, 50%); width: 3px; margin-left: -1.5px; background: var(--red) }
+.clay .ndl::before { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px; border-radius: 50%; background: var(--red); box-shadow: 0 8px 20px -6px rgb(0 0 0 / .4) }
+.clay .ndl::after { content: "‹ ›"; position: absolute; left: 50%; top: 50%; translate: -50% -52%; color: #fff; font-size: 15px; letter-spacing: 4px }
+.clay .tag { position: absolute; top: 16px; padding: 6px 10px; background: rgb(0 0 0 / .45); color: #fff; backdrop-filter: blur(6px) }
+.clay .tag.l { left: 16px } .clay .tag.r { right: 16px }
+
+/* ---------- 3D · tilt wall ---------- */
+.wall { columns: 4 240px; column-gap: 16px }
+.tile { break-inside: avoid; margin: 0 0 16px; perspective: 900px; cursor: zoom-in }
+.tile .in { position: relative; transform-style: preserve-3d; transition: transform .6s var(--pop); will-change: transform }
+.tile img { width: 100%; height: auto; aspect-ratio: var(--r); object-fit: cover }
+.tile .gl { position: absolute; inset: 0; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / .35), transparent 55%); opacity: 0; transition: opacity .4s; pointer-events: none; mix-blend-mode: soft-light }
+.tile:hover .gl { opacity: 1 }
+.tile .cap { padding-top: 8px }
+
+/* ---------- Illustration · board of prints ---------- */
+.board { position: relative; height: min(80vh, 760px); margin-top: 28px; background: var(--panel); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none }
+.board::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(var(--line) 1px, transparent 1.4px); background-size: 22px 22px; pointer-events: none }
+.print { position: absolute; left: 0; top: 0; width: var(--pw); padding: calc(var(--pw) * .045); background: #fff; cursor: grab; will-change: transform;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 18px 34px -18px rgb(0 0 0 / .35); transition: box-shadow .3s }
+.print.held { cursor: grabbing; box-shadow: 0 2px 4px rgb(0 0 0 / .08), 0 44px 60px -24px rgb(0 0 0 / .45) }
+.print img { width: 100%; aspect-ratio: var(--r); object-fit: cover; pointer-events: none }
+.print span { display: block; padding-top: calc(var(--pw) * .04); font: 500 9.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: #8c8c8c }
+
+/* ---------- Illustration · loupe ---------- */
+.lpanel { position: relative; aspect-ratio: 16 / 9.6; background: var(--panel); overflow: hidden; cursor: none; touch-action: none; display: grid; place-items: center }
+.lpanel > img { position: absolute; left: 50%; top: 6%; height: 88%; width: auto; max-width: none; translate: -50% 0; pointer-events: none }
+.loupe { position: absolute; left: 0; top: 0; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; pointer-events: none; opacity: 0; scale: .6;
+  transition: opacity .3s, scale .6s var(--pop); background-repeat: no-repeat; box-shadow: 0 0 0 6px var(--bg), 0 24px 50px -10px rgb(0 0 0 / .45) }
+.loupe.on { opacity: 1; scale: 1 }
+.loupe svg { position: absolute; inset: -18px; width: calc(100% + 36px); height: calc(100% + 36px); overflow: visible }
+.lzoom { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 6px }
+
+/* ---------- Illustration · colours ---------- */
+.swrap { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 16px }
+.sbig { background: var(--panel); aspect-ratio: 1; display: grid; place-items: center; overflow: hidden }
+.sbig img { width: 78%; height: 78%; object-fit: contain; transition: opacity .3s, scale .7s var(--pop) }
+.sbig img.out { opacity: 0; scale: .94 }
+.sw { display: grid; grid-template-rows: repeat(5, 1fr); gap: 0 }
+.sw button { position: relative; display: flex; align-items: end; justify-content: space-between; padding: 14px 16px; font: 500 11px var(--mono); letter-spacing: .5px; text-transform: uppercase; transition: background .6s var(--ease), color .6s }
+.sw button em { font-style: normal; opacity: .7 }
+.strip { display: flex; gap: 8px; margin-top: 16px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none }
+.strip button { flex: none; width: 86px; aspect-ratio: 4 / 5; background: var(--panel); opacity: .45; transition: opacity .3s, translate .5s var(--pop) }
+.strip button.on { opacity: 1; translate: 0 -6px; box-shadow: 0 3px 0 var(--red) }
+.strip img { width: 100%; height: 100%; object-fit: cover }
+
+/* contact sheet */
+.sheet { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px 12px }
+.sheet figure { margin: 0; cursor: zoom-in }
+.sheet figure .im { aspect-ratio: 4 / 5; background: var(--panel); overflow: hidden }
+.sheet img { width: 100%; height: 100%; object-fit: cover; transition: scale .8s var(--pop) }
+.sheet figure:hover img { scale: 1.06 }
+.sheet .cap { padding-top: 6px }
+
+/* lightbox: the piece large, tuned in like a station */
+.lb { position: fixed; inset: 0; z-index: 60; display: grid; grid-template-rows: 1fr auto; padding: 88px var(--gut) 28px; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(14px); opacity: 0; pointer-events: none; transition: opacity .35s var(--ease) }
+.lb.on { opacity: 1; pointer-events: auto }
+.lb .st { display: grid; place-items: center; min-height: 0 }
+.lb img { max-width: 100%; max-height: 100%; object-fit: contain; scale: .92; transition: scale .8s var(--pop), opacity .3s; box-shadow: 0 40px 80px -40px rgb(0 0 0 / .5) }
+.lb.on img { scale: 1 }
+.lb img.sw2 { opacity: 0 }
+.lb .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 18px }
+.lb .bar b { color: var(--ink); font-weight: 500; font-size: 16px }
+.lb .bar .k { display: flex; gap: 8px }
+.lb .bar .k button { width: 40px; height: 40px; border-radius: 50%; background: var(--pill); color: var(--ink) }
+
+/* credits + next */
+.cred { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 120px 0 80px; border-bottom: 1px solid var(--line) }
+.cred h2 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.cred dl { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 32px }
+.cred dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.cred dd { margin: 8px 0 0; color: var(--ink); font-size: 15px; line-height: 1.5 }
+.next { display: block; padding: 64px 0 160px; text-decoration: none }
+.next .fq { font: 500 12px var(--mono); color: var(--muted) }
+.next b { display: block; margin-top: 10px; color: var(--ink); font-weight: 500; font-size: clamp(28px, 4vw, 52px); letter-spacing: -.04em; line-height: 1 }
+.next i { font-style: normal; display: inline-block; transition: translate .6s var(--pop) } .next:hover i { translate: 10px 0 }
+
+@media (max-width: 899px) {
+  :root { --gut: 18px }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .pv { top: 74px; left: var(--gut); right: auto }
+  .top { padding-top: 130px }
+  .head { grid-template-columns: 1fr } .head > .chip { justify-self: start }
+  .ring { height: 440px }
+  .shead { padding-top: 80px; flex-direction: column; align-items: start }
+  .table { height: 560px } .board { height: 620px }
+  .lpanel { aspect-ratio: 4 / 4.6 } .loupe { width: 170px; height: 170px; margin: -85px 0 0 -85px }
+  .swrap { grid-template-columns: 1fr } .sbig { aspect-ratio: 4 / 3.4 } .sw { grid-template-rows: none; grid-template-columns: repeat(5, 1fr) } .sw button { height: 84px; padding: 8px; font-size: 8.5px; flex-direction: column; align-items: start }
+  .sheet { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .cred { grid-template-columns: 1fr; padding: 72px 0 }
+}
+@media (prefers-reduced-motion: reduce) { .rv, h1 .w > span { transition: none; translate: none; opacity: 1 } }
+
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
+.next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
+@media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+</style>
+</head>
+<body>
+<div class="station"><a class="back" href="#" onclick="return false"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="sfq">100.3</span><span class="nm" id="snm"></span></div>
+<div class="pv" role="group" aria-label="Version" id="pv"></div>
+<main class="wrap top" id="page"></main>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Piece"><div class="st"><img id="lbi" alt=""></div>
+  <div class="bar"><span><span class="mono" id="lbf"></span><br><b id="lbt"></b></span><span class="k"><button type="button" id="lbp" aria-label="Previous">‹</button><button type="button" id="lbn" aria-label="Next">›</button><button type="button" id="lbx" aria-label="Close">✕</button></span></div></div>
+<div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
+
+<!--__POPKIT__-->
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PICS = __PICS__;   // { t, src, r } stand-ins: 3D renders and brand pieces
+  const $ = id => document.getElementById(id);
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  const snd = n => { if (window.Popkit) Popkit.play(n); };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const FQ = i => (88.1 + i * 1.7).toFixed(1);   // each piece gets its own station
+  const narrow = innerWidth < 900;
+  const MODE = location.hash === '#illustration' ? 'ill' : '3d';
+  const page = $('page');
+  const words = t => t.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
+  const CRED = (type, del) => `<section class="cred"><h2 class="rv">Credits</h2><dl class="rv"><div><dt>Year</dt><dd>2026</dd></div><div><dt>Type</dt><dd>${type}</dd></div><div><dt>Deliverables</dt><dd>${del}</dd></div><div><dt>Made by</dt><dd>Kingsley Mkpandiok</dd></div></dl></section>
+    <a class="next" href="#" onclick="return false"><span class="fq">Next on the dial · 100.7</span><span class="r"><h5>Card holder with stickers →</h5><span class="th"><img alt=""></span></span></a>`;
+  let SECN = [], secs = [], ticks = [];
+
+  // ===================================================================== 3D
+  if (MODE === '3d') {
+    $('snm').textContent = '3D · Objects';
+    const P = PICS.slice(0, 12);
+    page.innerHTML = `
+      <header class="head" id="s-ring"><div><h1 id="ttl">Everyday objects, made to feel precious</h1><p class="lede rv">A set of renders, nothing to read. Drag the dial to turn through them, tap one to look closer.</p></div>
+        <span class="mono rv">${P.length} pieces · Blender</span></header>
+      <div class="ring" id="ring"><div class="rot" id="rot">${P.map((p, i) => `<div class="card" data-i="${i}"><img src="${p.src}" alt="${p.t}"></div>`).join('')}</div></div>
+      <div class="rruler"><canvas id="rr"></canvas></div>
+      <div class="rcap"><div><span class="mono" id="rcf"></span><h3 id="rct"></h3></div><span class="k"><button type="button" id="rp" aria-label="Previous">‹</button><button type="button" id="rn" aria-label="Next">›</button></span></div>
+
+      <div class="shead" id="s-table"><div><h2>Play with them</h2><p>Pick a piece up and throw it. They bump into each other and slide to a stop.</p></div>
+        <div class="tbar"><button type="button" class="chip" id="tidy">Tidy up</button><button type="button" class="chip" id="toss">Shake</button></div></div>
+      <div class="table" id="table"><span class="mono hint">Drag and let go</span></div>
+
+      <div class="shead" id="s-clay"><div><h2>From clay to colour</h2><p>Every render starts grey. Form and light are settled first, colour and material come last. Drag the needle.</p></div><span class="mono">Before · after</span></div>
+      <div class="clay" id="clay"><img src="${P[2].src}" alt="${P[2].t} in colour"><img class="grey" src="${P[2].src}" alt="${P[2].t} in clay"><span class="ndl"></span><span class="tag l mono">Clay</span><span class="tag r mono">Colour</span></div>
+
+      <div class="shead" id="s-wall"><div><h2>Every piece</h2><p>Move across them; tap any one to see it large.</p></div><span class="mono">${PICS.length} renders</span></div>
+      <div class="wall" id="wall">${PICS.map((p, i) => `<figure class="tile" data-i="${i}"><div class="in" style="--r:${p.r}"><img src="${p.src}" alt="${p.t}" loading="lazy"><span class="gl"></span></div><figcaption class="cap mono"><span>${p.t}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
+      ${CRED('Personal, ongoing', '3D models<br>Lighting and materials<br>Final renders')}`;
+    SECN = ['Dial', 'Play', 'Clay', 'All', 'Credits']; secs = ['s-table', 's-clay', 's-wall', 'cred'];
+
+    // ---- the dial carousel: drag (or keys, or the ruler) to turn; it springs onto the nearest piece ----
+    const N = P.length, step = 360 / N, ring = $('ring'), rot = $('rot'), cards = [...rot.children];
+    let ang = 0, vel = 0, tgt = 0, drag = null, cur = -1;
+    const size = () => { const cw = narrow ? Math.min(220, innerWidth * .52) : Math.min(330, innerWidth * .22); ring.style.setProperty('--cw', cw + 'px'); return (cw / 2) / Math.tan(Math.PI / N) * 1.08; };
+    let R = size();
+    addEventListener('resize', () => { R = size(); });
+    ring.addEventListener('pointerdown', e => { drag = { x: e.clientX, a: tgt, moved: 0, t: performance.now(), card: e.target.closest('.card') }; ring.setPointerCapture(e.pointerId); });
+    ring.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x; drag.moved = Math.max(drag.moved, Math.abs(dx)); tgt = drag.a + dx * (narrow ? .35 : .22); });
+    const release = () => { if (!drag) return;
+      if (drag.moved < 6 && drag.card) { const i = +drag.card.dataset.i; if (i === cur) openLB(PICS.indexOf(P[i])); else turnTo(i); snd('pop'); }
+      tgt = Math.round(tgt / step) * step; drag = null; };
+    ring.addEventListener('pointerup', release); ring.addEventListener('pointercancel', release);
+    const turnTo = i => { const now = Math.round(-tgt / step); let d = ((i - now) % N + N) % N; if (d > N / 2) d -= N; tgt -= d * step; };
+    $('rp').onclick = () => turnTo(((cur - 1) + N) % N); $('rn').onclick = () => turnTo((cur + 1) % N);
+    ring.tabIndex = 0; ring.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { turnTo((cur + 1) % N); snd('pop'); } if (e.key === 'ArrowLeft') { turnTo((cur - 1 + N) % N); snd('pop'); } });
+    const rr = $('rr'), rx = rr.getContext('2d');
+    rr.addEventListener('click', e => { const r = rr.getBoundingClientRect(), d = Math.round((e.clientX - r.left - r.width / 2) / 60); turnTo(((cur + d) % N + N) % N); snd('pop'); });
+    ticks.push(dt => {
+      if (!drag) { const a = (tgt - ang) * 120 - vel * 17; vel += a * dt / 1000; ang += vel * dt / 1000; } else { ang += (tgt - ang) * .35; vel = 0; }
+      rot.style.transform = `translateZ(${-R}px) rotateY(${ang}deg)`;
+      cards.forEach((c, i) => { const rel = ((i * step + ang) % 360 + 540) % 360 - 180, f = Math.cos(rel * Math.PI / 180);
+        c.style.transform = `rotateY(${i * step}deg) translateZ(${R}px)`; c.style.setProperty('--dim', (clamp(.75 - f * .75, 0, .75)).toFixed(3)); c.style.zIndex = Math.round(f * 100) + 100; });
+      const c = ((Math.round(-ang / step) % N) + N) % N;
+      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; $('rcf').textContent = `${String(c + 1).padStart(2, '0')} / ${N} · ${FQ(c)} FM`; $('rct').textContent = P[c].t; }
+      // the ruler under the dial: one major tick per piece, the needle fixed in the middle
+      const dpr = Math.min(2, devicePixelRatio || 1), W = rr.clientWidth, H = rr.clientHeight;
+      if (rr.width !== Math.round(W * dpr)) { rr.width = Math.round(W * dpr); rr.height = Math.round(H * dpr); }
+      rx.setTransform(dpr, 0, 0, dpr, 0, 0); rx.clearRect(0, 0, W, H);
+      const col = ink(), pos = -ang / step, base = H - 16, SP = 60;
+      for (let q = Math.floor(pos * 5) - 60; q <= Math.ceil(pos * 5) + 60; q++) {
+        const x = W / 2 + (q / 5 - pos) * SP; if (x < 0 || x > W) continue;
+        const major = q % 5 === 0, d = Math.abs(x - W / 2) / SP, e = clamp(Math.min(x, W - x) / 90, 0, 1);
+        rx.globalAlpha = ((major ? .55 : .18) + Math.max(0, 1 - d / 3) * .3) * e; rx.strokeStyle = col; rx.lineWidth = major ? 2 : 1;
+        rx.beginPath(); rx.moveTo(x, base); rx.lineTo(x, base - (major ? 18 : 8) - Math.max(0, 2 - d) * 5); rx.stroke();
+        if (major) { const k = ((q / 5) % N + N) % N; rx.fillStyle = col; rx.font = '500 9.5px "Geist Mono", monospace'; rx.textAlign = 'center'; rx.fillText(FQ(k), x, base + 12); }
+      }
+      rx.globalAlpha = 1; rx.fillStyle = RED; rx.fillRect(W / 2 - 1.5, base - 34, 3, 36);
+    });
+
+    // ---- the table: pieces you can pick up and throw ----
+    const table = $('table'), objs = [];
+    const OW = narrow ? 104 : 150;
+    table.style.setProperty('--ow', OW + 'px');
+    PICS.slice(0, narrow ? 8 : 12).forEach((p, i) => { const el = document.createElement('div'); el.className = 'obj'; el.innerHTML = `<img src="${p.src}" alt="${p.t}">`; table.appendChild(el);
+      objs.push({ el, x: 0, y: 0, vx: 0, vy: 0, a: 0, va: 0, hx: 0, hy: 0, held: false, z: i }); });
+    const home = () => { const W = table.clientWidth, H = table.clientHeight, cols = Math.max(3, Math.floor(W / (OW * 1.35))), rows = Math.ceil(objs.length / cols);
+      objs.forEach((o, i) => { const c = i % cols, r = Math.floor(i / cols); o.hx = (c + .5) * W / cols - OW / 2 + (r % 2 ? OW * .25 : 0); o.hy = (r + .5) * H / rows - OW * .625; }); };
+    home(); objs.forEach((o, i) => { o.x = o.hx + (Math.random() - .5) * 60; o.y = o.hy + (Math.random() - .5) * 60; o.a = (Math.random() - .5) * 16; });
+    let tidy = 0, zTop = objs.length, held = null;
+    $('tidy').onclick = () => { home(); tidy = 1.6; };
+    $('toss').onclick = () => { tidy = 0; objs.forEach(o => { o.vx += (Math.random() - .5) * 2600; o.vy += (Math.random() - .5) * 2600; o.va += (Math.random() - .5) * 600; }); };
+    table.addEventListener('pointerdown', e => { const el = e.target.closest('.obj'); if (!el) return; const o = objs.find(q => q.el === el); const r = table.getBoundingClientRect();
+      held = { o, dx: e.clientX - r.left - o.x, dy: e.clientY - r.top - o.y, lx: e.clientX, ly: e.clientY, lt: performance.now() }; o.held = true; o.el.classList.add('held'); o.el.style.zIndex = ++zTop; table.classList.add('used'); table.setPointerCapture(e.pointerId); snd('pop'); tidy = 0; });
+    table.addEventListener('pointermove', e => { if (!held) return; const r = table.getBoundingClientRect(), now = performance.now(), dt = Math.max(8, now - held.lt), o = held.o;
+      const nx = e.clientX - r.left - held.dx, ny = e.clientY - r.top - held.dy; o.vx = o.vx * .5 + (nx - o.x) / dt * 1000 * .5; o.vy = o.vy * .5 + (ny - o.y) / dt * 1000 * .5; o.x = nx; o.y = ny; held.lt = now; });
+    const drop = () => { if (!held) return; held.o.held = false; held.o.el.classList.remove('held'); held.o.va = held.o.vx * .08; held = null; };
+    table.addEventListener('pointerup', drop); table.addEventListener('pointercancel', drop);
+    addEventListener('resize', home);
+    ticks.push(dt => {
+      const W = table.clientWidth, H = table.clientHeight, s = dt / 1000, OH = OW * 1.25;
+      objs.forEach(o => { if (o.held) { o.a += (0 - o.a) * .2; return; }
+        if (tidy > 0) { o.vx += ((o.hx - o.x) * 60 - o.vx * 9) * s; o.vy += ((o.hy - o.y) * 60 - o.vy * 9) * s; o.va += ((0 - o.a) * 60 - o.va * 9) * s; }
+        const fr = Math.pow(.12, s); o.vx *= fr; o.vy *= fr; o.va *= fr;
+        o.x += o.vx * s; o.y += o.vy * s; o.a += o.va * s;
+        if (o.x < 0) { o.x = 0; o.vx = Math.abs(o.vx) * .55; o.va *= -.6; } if (o.x > W - OW) { o.x = W - OW; o.vx = -Math.abs(o.vx) * .55; o.va *= -.6; }
+        if (o.y < 0) { o.y = 0; o.vy = Math.abs(o.vy) * .55; } if (o.y > H - OH) { o.y = H - OH; o.vy = -Math.abs(o.vy) * .55; } });
+      // soft nudges where two pieces overlap
+      for (let i = 0; i < objs.length; i++) for (let j = i + 1; j < objs.length; j++) { const A = objs[i], B = objs[j], dx = (B.x - A.x), dy = (B.y - A.y), d = Math.hypot(dx, dy) || 1, m = OW * .92;
+        if (d < m) { const push = (m - d) / d * .5 * (tidy > 0 ? .1 : 1); if (!A.held) { A.x -= dx * push * .5; A.y -= dy * push * .5; } if (!B.held) { B.x += dx * push * .5; B.y += dy * push * .5; } } }
+      tidy = Math.max(0, tidy - s);
+      objs.forEach(o => { o.el.style.transform = `translate3d(${o.x.toFixed(1)}px,${o.y.toFixed(1)}px,0) rotate(${o.a.toFixed(2)}deg) scale(${o.held ? 1.08 : 1})`; });
+    });
+
+    // ---- clay to colour: drag the needle (it springs toward your finger) ----
+    const clay = $('clay'); let cut = 50, cutT = 50, cv = 0, cdrag = false;
+    const setT = e => { const r = clay.getBoundingClientRect(); cutT = clamp((e.clientX - r.left) / r.width * 100, 0, 100); };
+    clay.addEventListener('pointerdown', e => { cdrag = true; clay.setPointerCapture(e.pointerId); setT(e); snd('pop'); });
+    clay.addEventListener('pointermove', e => { if (cdrag) setT(e); });
+    clay.addEventListener('pointerup', () => cdrag = false); clay.addEventListener('pointercancel', () => cdrag = false);
+    ticks.push(dt => { const a = (cutT - cut) * 170 - cv * 18; cv += a * dt / 1000; cut += cv * dt / 1000; clay.style.setProperty('--cut', cut.toFixed(2) + '%'); });
+
+    // ---- the wall: every tile leans toward the cursor ----
+    const wall = $('wall');
+    wall.querySelectorAll('.tile').forEach(t => {
+      const inn = t.querySelector('.in');
+      t.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || reduce) return; const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        inn.style.transition = 'transform .15s ease-out'; inn.style.transform = `rotateY(${((x - .5) * 14).toFixed(2)}deg) rotateX(${((.5 - y) * 14).toFixed(2)}deg) translateZ(18px)`; inn.style.setProperty('--gx', x * 100 + '%'); inn.style.setProperty('--gy', y * 100 + '%'); });
+      t.addEventListener('pointerleave', () => { inn.style.transition = ''; inn.style.transform = ''; });
+      t.addEventListener('click', () => { snd('pop'); openLB(+t.dataset.i); });
+    });
+  }
+
+  // ===================================================================== Illustration
+  if (MODE === 'ill') {
+    $('snm').textContent = 'Illustration · Set';
+    const P = PICS.slice().reverse();
+    page.innerHTML = `
+      <header class="head" id="s-board"><div><h1 id="ttl">A set of small things with big colour</h1><p class="lede rv">Prints on a board. Move them around, stack them, make your own layout.</p></div>
+        <button type="button" class="chip rv" id="shuffle">Shuffle the board</button></header>
+      <div class="board" id="board"></div>
+
+      <div class="shead" id="s-loupe"><div><h2>Look closer</h2><p>Move across the piece. The loupe turns like a dial: scroll on it, or use the buttons, to zoom.</p></div><span class="mono" id="lzl">Zoom 2.5×</span></div>
+      <div class="lpanel" id="lpanel"><img id="limg" src="${P[0].src}" alt="${P[0].t}"><div class="loupe" id="loupe"></div>
+        <div class="lzoom"><button type="button" class="chip" id="lzm" aria-label="Zoom out">−</button><button type="button" class="chip" id="lzp" aria-label="Zoom in">+</button></div></div>
+
+      <div class="shead" id="s-col"><div><h2>Colours, pulled from each piece</h2><p>Pick a piece below. Tap a swatch to copy its hex.</p></div><span class="mono">Sampled live</span></div>
+      <div class="swrap"><div class="sbig"><img id="sbi" src="${P[0].src}" alt=""></div><div class="sw" id="sw"></div></div>
+      <div class="strip" id="strip">${P.map((p, i) => `<button type="button" data-i="${i}" aria-label="${p.t}"><img src="${p.src}" alt=""></button>`).join('')}</div>
+
+      <div class="shead" id="s-sheet"><div><h2>Contact sheet</h2><p>The whole set at a glance. Tap one to see it large.</p></div><span class="mono">${P.length} pieces</span></div>
+      <div class="sheet" id="sheet">${P.map((p, i) => `<figure data-i="${PICS.indexOf(p)}"><div class="im"><img src="${p.src}" alt="${p.t}" loading="lazy"></div><figcaption class="cap mono"><span>${String(i + 1).padStart(2, '0')}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
+      ${CRED('Personal, ongoing', 'Illustrations<br>Colour studies')}`;
+    SECN = ['Board', 'Loupe', 'Colour', 'Sheet', 'Credits']; secs = ['s-loupe', 's-col', 's-sheet', 'cred'];
+
+    // ---- the board: prints you can drag; they land with a little bounce ----
+    const board = $('board'), prints = [];
+    const PW = narrow ? 120 : 200;
+    P.slice(0, narrow ? 9 : 14).forEach((p, i) => { const el = document.createElement('div'); el.className = 'print'; el.style.setProperty('--pw', PW * (p.r > 1 ? 1.35 : 1) + 'px'); el.style.setProperty('--r', p.r);
+      el.innerHTML = `<img src="${p.src}" alt="${p.t}"><span>${FQ(i)} · ${p.t}</span>`; board.appendChild(el); prints.push({ el, x: 0, y: 0, a: 0, tx: 0, ty: 0, ta: 0, vx: 0, vy: 0, va: 0, s: 1, ts: 1, vs: 0 }); });
+    const scatter = (first) => { const W = board.clientWidth, H = board.clientHeight;
+      prints.forEach((q, i) => { const w = q.el.offsetWidth, h = q.el.offsetHeight; q.tx = 20 + Math.random() * Math.max(10, W - w - 40); q.ty = 20 + Math.random() * Math.max(10, H - h - 40); q.ta = (Math.random() - .5) * 18;
+        if (first) { q.x = W / 2 - w / 2; q.y = H + 40; q.a = 0; } q.el.style.zIndex = i; }); };
+    requestAnimationFrame(() => scatter(true));
+    $('shuffle').onclick = () => scatter(false);
+    let pz = 100, ph = null;
+    board.addEventListener('pointerdown', e => { const el = e.target.closest('.print'); if (!el) return; const q = prints.find(x => x.el === el), r = board.getBoundingClientRect();
+      ph = { q, dx: e.clientX - r.left - q.tx, dy: e.clientY - r.top - q.ty }; q.ts = 1.06; q.ta = q.ta * .3; el.style.zIndex = ++pz; el.classList.add('held'); board.setPointerCapture(e.pointerId); snd('pop'); });
+    board.addEventListener('pointermove', e => { if (!ph) return; const r = board.getBoundingClientRect(), q = ph.q, nx = e.clientX - r.left - ph.dx;
+      q.ta = clamp((nx - q.tx) * .8, -14, 14); q.tx = nx; q.ty = e.clientY - r.top - ph.dy; });
+    const pdrop = () => { if (!ph) return; const q = ph.q; q.ts = 1; q.ta = (Math.random() - .5) * 10; q.el.classList.remove('held'); ph = null; };
+    board.addEventListener('pointerup', pdrop); board.addEventListener('pointercancel', pdrop);
+    ticks.push(dt => { const s = dt / 1000; prints.forEach(q => {
+      const k = ph && ph.q === q ? 900 : 170, c = ph && ph.q === q ? 60 : 17;   // held: follow closely; dropped: settle with a bounce
+      q.vx += ((q.tx - q.x) * k - q.vx * c) * s; q.vy += ((q.ty - q.y) * k - q.vy * c) * s; q.va += ((q.ta - q.a) * 170 - q.va * 15) * s; q.vs += ((q.ts - q.s) * 300 - q.vs * 16) * s;
+      q.x += q.vx * s; q.y += q.vy * s; q.a += q.va * s; q.s += q.vs * s;
+      q.el.style.transform = `translate3d(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px,0) rotate(${q.a.toFixed(2)}deg) scale(${q.s.toFixed(3)})`; }); });
+
+    // ---- the loupe: a magnifier with a dial bezel; the wheel over it turns the zoom ----
+    const lp = $('lpanel'), lo = $('loupe'), li = $('limg'); let Z = 2.5, lx = 0, ly = 0, tlx = 0, tly = 0, lon = false, lastZ = 2.5;
+    lo.innerHTML = `<svg viewBox="-128 -128 256 256" aria-hidden="true">${Array.from({ length: 60 }, (_, k) => { const a = k * 6 * Math.PI / 180, r1 = 118, r2 = k % 5 ? 112 : 106; return `<line x1="${(Math.sin(a) * r1).toFixed(1)}" y1="${(-Math.cos(a) * r1).toFixed(1)}" x2="${(Math.sin(a) * r2).toFixed(1)}" y2="${(-Math.cos(a) * r2).toFixed(1)}" stroke="currentColor" stroke-width="${k % 5 ? 1 : 1.8}" opacity="${k % 5 ? .35 : .7}"/>`; }).join('')}<g id="lzn"><line x1="0" y1="-124" x2="0" y2="-100" stroke="${RED}" stroke-width="3"/></g></svg>`;
+    lo.style.color = 'var(--ink)';
+    const setZ = z => { Z = clamp(z, 1.5, 5); $('lzl').textContent = `Zoom ${Z.toFixed(1)}×`; lo.querySelector('#lzn').setAttribute('transform', `rotate(${((Z - 1.5) / 3.5 * 300 - 150).toFixed(1)})`); if (Math.round(Z * 2) !== Math.round(lastZ * 2)) { snd('detent'); lastZ = Z; } };
+    setZ(2.5);
+    const lmove = e => { const r = lp.getBoundingClientRect(); tlx = e.clientX - r.left; tly = e.clientY - r.top; if (!lon) { lx = tlx; ly = tly; } lon = true; lo.classList.add('on'); };
+    lp.addEventListener('pointermove', lmove); lp.addEventListener('pointerdown', e => { lmove(e); lp.setPointerCapture(e.pointerId); });
+    lp.addEventListener('pointerleave', () => { lon = false; lo.classList.remove('on'); });
+    lp.addEventListener('wheel', e => { if (!lon) return; e.preventDefault(); e.stopPropagation(); setZ(Z - e.deltaY * .004); }, { passive: false });
+    $('lzp').onclick = () => setZ(Z + .5); $('lzm').onclick = () => setZ(Z - .5);
+    ticks.push(dt => { if (!lon) return; const k = 1 - Math.exp(-dt / 60); lx += (tlx - lx) * k; ly += (tly - ly) * k;
+      const pr = lp.getBoundingClientRect(), ir = li.getBoundingClientRect(), ix = ir.left - pr.left, iy = ir.top - pr.top, R = lo.offsetWidth / 2;
+      lo.style.translate = `${lx.toFixed(1)}px ${ly.toFixed(1)}px`;
+      lo.style.backgroundImage = `url("${li.src}")`; lo.style.backgroundSize = `${ir.width * Z}px ${ir.height * Z}px`;
+      lo.style.backgroundPosition = `${(-(lx - ix) * Z + R).toFixed(1)}px ${(-(ly - iy) * Z + R).toFixed(1)}px`; lo.style.backgroundColor = getComputedStyle(lp).backgroundColor; });
+
+    // ---- colours: sample five from the picked piece ----
+    const sw = $('sw'), sbi = $('sbi'), strip = [...$('strip').children];
+    function sample(src) { return new Promise(res => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'), S = 48; c.width = S; c.height = S; const x = c.getContext('2d'); x.drawImage(im, 0, 0, S, S);
+      const d = x.getImageData(0, 0, S, S).data, B = {}; for (let i = 0; i < d.length; i += 4) { const k = (d[i] >> 4) + ',' + (d[i + 1] >> 4) + ',' + (d[i + 2] >> 4); (B[k] = B[k] || [0, 0, 0, 0]); B[k][0] += d[i]; B[k][1] += d[i + 1]; B[k][2] += d[i + 2]; B[k][3]++; }
+      const L = Object.values(B).sort((a, b) => b[3] - a[3]).map(b => [b[0] / b[3], b[1] / b[3], b[2] / b[3]]), out = [];
+      for (const c2 of L) { if (out.every(o => Math.hypot(o[0] - c2[0], o[1] - c2[1], o[2] - c2[2]) > 60)) out.push(c2); if (out.length === 5) break; }
+      while (out.length < 5) out.push(L[out.length] || [200, 200, 200]); res(out); }; im.src = src; }); }
+    const hex = c => '#' + c.map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase();
+    let si = -1;
+    async function pick(i) { if (i === si) return; si = i; strip.forEach((b, k) => b.classList.toggle('on', k === i));
+      sbi.classList.add('out'); setTimeout(() => { sbi.src = P[i].src; sbi.classList.remove('out'); }, 200);
+      const cols = await sample(P[i].src);
+      sw.innerHTML = cols.map((c, k) => { const h = hex(c), lum = .299 * c[0] + .587 * c[1] + .114 * c[2]; return `<button type="button" style="background:${h};color:${lum > 150 ? '#000' : '#fff'}" data-h="${h}"><span>${h}</span><em>${['Main', 'Second', 'Third', 'Accent', 'Detail'][k]}</em></button>`; }).join('');
+      sw.querySelectorAll('button').forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.h); } catch (_) {} const s0 = b.firstChild.textContent; b.firstChild.textContent = 'Copied'; setTimeout(() => b.firstChild.textContent = s0, 900); }); }
+    strip.forEach((b, i) => b.onclick = () => { pick(i); li.src = P[i].src; li.alt = P[i].t; });
+    pick(0);
+
+    $('sheet').querySelectorAll('figure').forEach(f => f.addEventListener('click', () => { snd('pop'); openLB(+f.dataset.i); }));
+  }
+
+  // ===================================================================== shared: lightbox
+  const lb = $('lb'), lbi = $('lbi'); let lbI = -1;
+  function lbShow(i) { lbI = (i + PICS.length) % PICS.length; const p = PICS[lbI]; lbi.classList.add('sw2'); setTimeout(() => { lbi.src = p.src; lbi.alt = p.t; lbi.classList.remove('sw2'); }, lb.classList.contains('on') ? 160 : 0); $('lbt').textContent = p.t; $('lbf').textContent = `${String(lbI + 1).padStart(2, '0')} / ${PICS.length} · ${FQ(lbI)} FM`; }
+  function openLB(i) { lbShow(i); lb.classList.add('on'); }
+  const closeLB = () => lb.classList.remove('on');
+  $('lbx').onclick = closeLB; $('lbp').onclick = () => { lbShow(lbI - 1); snd('detent'); }; $('lbn').onclick = () => { lbShow(lbI + 1); snd('detent'); };
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('st')) closeLB(); });
+  addEventListener('keydown', e => { if (!lb.classList.contains('on')) return; if (e.key === 'Escape') closeLB(); if (e.key === 'ArrowRight') $('lbn').click(); if (e.key === 'ArrowLeft') $('lbp').click(); });
+
+  // title, arrivals, version switch, one pop per click
+  const ttl = $('ttl'); ttl.innerHTML = words(ttl.textContent);
+  requestAnimationFrame(() => setTimeout(() => ttl.querySelectorAll('.w').forEach(w => w.classList.add('in')), 120));
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); e.target.classList.add('in'); } }), { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.rv').forEach(el => reduce ? el.classList.add('in') : io.observe(el));
+  const VER = [['3d', '3D'], ['illustration', 'Illustration']];
+  function buildPv() {
+    $('pv').innerHTML = VER.map(([k, l]) => `<button type="button" data-v="${k}" aria-pressed="${(MODE === 'ill') === (k === 'illustration')}">${l}</button>`).join('') + `<button type="button" id="theme">${document.documentElement.dataset.theme === 'light' ? 'Dark' : 'Light'}</button>`;
+    $('pv').querySelectorAll('[data-v]').forEach(b => b.onclick = () => { history.replaceState(null, '', '#' + b.dataset.v); scrollTo(0, 0); location.reload(); });
+    $('theme').onclick = () => { const d = document.documentElement.dataset.theme === 'light'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; buildPv(); };
+  }
+  buildPv();
+  addEventListener('click', e => { if (e.target.closest('a, button')) snd('pop'); });
+
+  // smooth wheel scrolling (not over the loupe, which uses the wheel for zoom)
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, mine: false };
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  if (smooth) {
+    addEventListener('wheel', e => { if (e.ctrlKey || e.defaultPrevented) return; e.preventDefault(); const raw = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1); SS.target = clamp(SS.target + clamp(raw * .85, -140, 140), 0, maxY()); }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
+  }
+  const go = el => { const y = clamp(el ? el.getBoundingClientRect().top + scrollY - 90 : 0, 0, maxY()); if (smooth) SS.target = y; else scrollTo({ top: y, behavior: 'smooth' }); };
+
+  // section dial: click a label to go there
+  const secEls = secs.map(id => id === 'cred' ? document.querySelector('.cred') : $(id));
+  const sd = $('sdial'), sx = sd.getContext('2d'); let sp = 0, lastSt = -1;
+  sd.addEventListener('click', e => { const r = sd.getBoundingClientRect(), k = clamp(Math.round(sp + (e.clientY - r.top - r.height / 2) / 150), 0, SECN.length - 1); go(k ? secEls[k - 1] : null); snd('pop'); });
+
+  let prevT = performance.now();
+  function frame(now) {
+    const dt = Math.min(48, now - prevT); prevT = now; const vh = innerHeight;
+    if (smooth) { SS.cur += (SS.target - SS.cur) * (1 - Math.exp(-dt / 150)); if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target; if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); } }
+    ticks.forEach(f => f(dt));
+    let f = 0; secEls.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
+    sp += (f - sp) * (1 - Math.exp(-dt / 110));
+    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
+    if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);
+    const SP = 30, right = Wd - (Wd < 60 ? 8 : 18), col = ink(), mid = Hd / 2;
+    for (let q = -40; q <= (SECN.length - 1) * 5 + 40; q++) {
+      const y = mid + q * SP - sp * 5 * SP; if (y < -10 || y > Hd + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(y - mid) / SP, edge = clamp(Math.min(y - 90, Hd - y) / 120, 0, 1);
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = ((major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35) * edge; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(right, y); sx.lineTo(right - L, y); sx.stroke();
+      if (major && Wd >= 60) { sx.globalAlpha = (d < 2.5 ? 1 : .5) * edge; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'right'; sx.textBaseline = 'middle'; sx.fillText(SECN[q / 5].toUpperCase(), right - L - 8, y); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(right + 6 - (Wd < 60 ? 28 : 34), mid - 1.5, Wd < 60 ? 28 : 34, 3);   // the needle
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1841 @@
+<meta charset="utf-8">
+<title>Designs Dial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the V1 side menu top-left, category chips top-right, a horizontal row of work in the middle where the
+   piece on the needle is full size and its neighbours sit smaller and faded, its caption above and meta below,
+   and the ruler dial along the bottom that scrubs the row. Single light look, matching the site. */
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --text: #3b3b3b;
+  --muted: #8c8c8c;
+  --faint: #d4d4d4;
+  --tile: #f3f3f3;
+  --on-ink: #ffffff;
+  --hover: #e8e8e8;
+  --line: #ececec;
+  --edge: rgb(0 0 0 / .08);
+  --pill: #f2f2f2;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { height: 100%; overflow: hidden }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0;
+  -webkit-user-select: none; user-select: none }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
+
+/* ---------- Station indicator: where you are, and the way back to Home (98.0) ---------- */
+.station { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); top: 80px; z-index: 20; display: flex; align-items: center; gap: 6px }
+.back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px var(--mono); color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
+.back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
+.back span { font-family: var(--body); font-size: 13px; letter-spacing: -.1px }
+.back:hover { background: var(--hover); color: var(--ink) }
+.back:hover svg { transform: translateX(-3px) }
+.now { display: flex; align-items: baseline; gap: 9px; padding: 0 10px; color: var(--ink) }
+.now .fq { font: 500 26px/1 var(--body); letter-spacing: -1px; font-variant-numeric: tabular-nums; min-width: 3.4ch }
+.now .nm { font-size: 13px; font-weight: 500 }
+.now .bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px }
+.now .bars i { width: 2.5px; border-radius: 1px; background: var(--ink); transition: opacity .2s }
+.now .bars i:nth-child(1) { height: 4px } .now .bars i:nth-child(2) { height: 7px } .now .bars i:nth-child(3) { height: 11px }
+.tune-out .now .bars i { animation: fade .3s steps(1) infinite }
+.tune-out .now .bars i:nth-child(2) { animation-delay: .1s } .tune-out .now .bars i:nth-child(3) { animation-delay: .2s }
+@keyframes fade { 50% { opacity: .15 } }
+.toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 30; background: var(--ink); color: var(--on-ink); font-size: 13px; padding: 10px 16px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .3s }
+.toast.show { opacity: 1 }
+body { transition: opacity .35s }
+body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transition: opacity .4s, filter .4s }
+
+/* ---------- Top right: category chips + count ---------- */
+.top { position: fixed; right: max(48px, env(safe-area-inset-right, 0px)); top: 80px; z-index: 20; display: flex; align-items: center; gap: 18px }
+.chips { display: flex; gap: 4px }
+.chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
+.chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
+.chips button:hover { color: var(--ink) }
+.chips button.on { background: var(--ink); color: var(--on-ink) }
+.count { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; text-align: right }
+.count b { color: var(--ink); font-weight: 500 }
+
+/* ---------- Row of work ---------- */
+.row { position: fixed; inset: 0 0 96px 0; z-index: 5; touch-action: pan-y; cursor: grab }
+.row.drag { cursor: grabbing }
+.slot .cstag { position: absolute; top: 12px; left: 12px; z-index: 4; display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px 6px 8px; border-radius: 999px; background: rgb(0 0 0 / .55); color: #fff; font: 500 9.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none }
+.slot .cstag::before, .cap .csc::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #ff4a1c }
+.cap .csc { display: inline-flex; align-items: center; gap: 6px; color: var(--ink) }
+/* the small view for a design shot: the picture, its title and a line about it */
+/* small view: two columns, the picture on the left and its details on the right (they stay put as you scroll) */
+.d-mini .d-cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: start }
+.d-mini .d-info { position: sticky; top: 140px; margin-top: 0; max-width: none }
+.d-mini .d-frame.m { width: min(100%, calc((100svh - 200px) * var(--r))) }
+@media (max-width: 899px) { .d-mini .d-cols { grid-template-columns: 1fr; gap: 36px } .d-mini .d-info { position: static } }
+.d-mini .d-frame.m { height: auto; overflow: hidden; background: var(--tile) }
+.d-mini .d-frame.m .d-pic { inset: 0 }
+.d-info { display: grid; gap: 44px; max-width: 620px; margin-top: 44px }
+.d-ih h1 { margin: 0; color: var(--ink); font-size: clamp(36px, 4.4vw, 60px); line-height: .95; font-weight: 500; letter-spacing: -0.045em }
+.d-yr { display: block; margin-top: 12px; color: var(--muted); font-size: 15px }
+.d-chip { display: inline-block; margin-top: 16px; padding: 7px 11px; background: var(--tile); color: var(--ink); font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase }
+.d-ib h3 { margin: 0 0 12px; color: var(--ink); font-size: 15px; font-weight: 600 }
+.d-ib p { margin: 0; color: var(--text); font-size: 17px; line-height: 1.6 }
+.d-read { display: inline-block; margin-top: 18px; color: var(--ink); font-size: 15px; font-weight: 500; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px }
+.d-cred { margin: 0; max-width: 420px } .d-cred > div { display: flex; justify-content: space-between; gap: 24px; padding: 6px 0 } .d-cred dt { color: var(--muted) } .d-cred dd { margin: 0; color: var(--ink) }
+.d-mini .d-intro .d-sum { max-width: 46ch; font-size: clamp(20px, 2vw, 26px); line-height: 1.35 }
+.d-mini .d-sec[data-s="1"] { padding-bottom: 80px }
+body.open.mini .sdial { opacity: 0; pointer-events: none }
+.slot { position: absolute; left: 50%; top: 0; transform-origin: center; will-change: transform; overflow: hidden; background: var(--tile); cursor: pointer; opacity: 0 }   /* hit areas + video sources; the canvas draws them */
+canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1 }
+.slot.active { cursor: default }
+.slot img, .slot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none }
+.slot.white { background: #fff; outline: 1px solid var(--edge); outline-offset: -1px }
+
+/* Caption: follows the piece on the needle */
+.cap { position: absolute; left: 50%; top: 0; z-index: 6; pointer-events: none; will-change: transform, opacity }
+.cap h2 { position: absolute; left: 0; bottom: 14px; margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.5px; color: var(--ink); white-space: nowrap }
+.cap .num { position: absolute; left: 0; font: 500 12px var(--mono); color: var(--muted) }
+.cap .num i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); margin-right: 7px; vertical-align: 1px }
+.cap .meta { position: absolute; right: 0; text-align: right; font: 11px/1.6 var(--mono); letter-spacing: .3px; text-transform: uppercase; color: var(--muted); white-space: nowrap }
+.cap .meta b { color: var(--ink); font-weight: 500 }
+/* Tool icons (the same files as Home's dock); a tool without an icon shows its name in a small chip */
+.tools { display: inline-flex; gap: 6px; align-items: center; vertical-align: middle }
+.tools img, .tools .tx { width: var(--ts, 18px); height: var(--ts, 18px); border-radius: 27%; display: block; flex: none; box-shadow: 0 0 0 1px var(--edge) }   /* hairline keeps dark icons visible on dark */
+.tools .tx { width: auto; padding: 0 .5em; display: grid; place-items: center; background: var(--pill); color: var(--ink); font: 500 calc(var(--ts, 18px) * .5) var(--mono); text-transform: uppercase; letter-spacing: .3px }
+.cap .meta .tools { --ts: 18px; margin: 2px 0 0 4px }
+.d-meta .tools { --ts: 30px; gap: 8px; margin-top: 2px }
+
+/* ---------- Ruler dial ---------- */
+.dial { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 14; touch-action: none; cursor: grab }
+.dial.drag { cursor: grabbing }
+.dial svg { position: absolute; left: 0; top: 0; width: 100%; height: 96px; overflow: visible }
+.dial .needle { position: absolute; left: 50%; top: 6px; width: 3px; height: 58px; margin-left: -1.5px; border-radius: 2px; background: #ff4a1c }   /* the main tick is the one red thing on the page */
+.px { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); bottom: calc(106px + env(safe-area-inset-bottom, 0px)); z-index: 15; display: flex; align-items: center; gap: 4px; font-size: 12px }
+.px > span { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-right: 6px }
+.px button { padding: 5px 10px; border-radius: 999px; color: var(--muted); font-weight: 500; transition: background .2s, color .2s }
+.px button:hover { color: var(--ink) }
+.px button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+@media (hover: none), (max-width: 899px) { .px { display: none } }
+body.open .px { opacity: 0; pointer-events: none }
+.hint { position: fixed; right: max(48px, env(safe-area-inset-right, 0px)); bottom: calc(140px + env(safe-area-inset-bottom, 0px));   /* clear of the FM wave line above the ruler */ z-index: 15; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); display: flex; gap: 14px; align-items: center }
+.hint button { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--pill) }
+.hint button svg { width: 14px; height: 14px; fill: var(--ink); color: var(--ink) }
+
+@media (max-width: 899px) {
+  .station { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)) }
+  .now .fq { font-size: 22px }
+  .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between }
+  .chips { overflow-x: auto; scrollbar-width: none }
+  .chips button { padding: 6px 9px; font-size: 12px }
+  .chips button sup { display: none }
+  .hint span { display: none }
+  .hint { right: 16px }
+  .cap h2 { font-size: 18px }
+}
+@media (prefers-reduced-motion: reduce) { .chips button { transition: none } }
+
+/* ---------- Project page ---------- */
+.vp { position: fixed; left: 0; top: 0; z-index: 40; pointer-events: none; background: var(--ink); color: var(--on-ink); font-size: 12px; font-weight: 500; padding: 7px 11px; border-radius: 999px; opacity: 0; transform: translate(-50%, -50%) scale(.6); transition: opacity .2s, transform .25s cubic-bezier(.2,1.3,.3,1); white-space: nowrap }
+.vp.show { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+.detail { position: fixed; inset: 0; z-index: 18; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; visibility: hidden; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .62s cubic-bezier(.65,0,.35,1), visibility 0s .62s; scrollbar-width: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.detail::-webkit-scrollbar { display: none }
+body.open .detail { visibility: visible; clip-path: circle(150vmax at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .7s cubic-bezier(.65,0,.35,1), visibility 0s }
+.fly canvas { display: block; width: 100%; height: 100% }
+@media (prefers-reduced-motion: reduce) { .detail, body.open .detail { transition: none } }
+body.open .row, body.open .cap, body.open .top, body.open .dial, body.open .hint { opacity: 0; pointer-events: none; transition: opacity .2s .45s }
+body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.noanim .hint { transition: none }
+.d-wrap { max-width: 1180px; margin: 0 auto; padding: 160px 32px 180px; transition: opacity .3s }
+.d-wrap.swap { opacity: 0 }
+.d-sec { padding: 0 0 120px }
+.d-label { font: 500 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center }
+.d-label i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink) }
+.d-frame { position: relative; width: 100%; height: min(74vh, 720px); overflow: hidden; background: var(--tile) }
+.d-frame.white { background: #fff; outline: 1px solid var(--edge); outline-offset: -1px }
+.d-frame.hidden { visibility: hidden }
+.d-pic { position: absolute; inset: -5%; will-change: transform }
+.d-pic img, .d-pic video { width: 100%; height: 100%; object-fit: cover; display: block }
+.notch { position: absolute; z-index: 2; background: var(--bg); width: 0; transition: width .8s cubic-bezier(.2,.8,.2,1) }
+.notch.l { left: 0; height: 26% }
+.notch.r { right: 0; height: 24%; transition-delay: .08s }
+.d-frame.in .notch.l { width: 9% }
+.d-frame.in .notch.r { width: 6.5% }
+.d-over { position: absolute; z-index: 3; left: 14%; top: 34%; max-width: 62%; will-change: transform; opacity: 0; transition: opacity .6s .15s }
+.d-frame.in .d-over { opacity: 1 }
+.d-over .d-label { color: inherit; opacity: .85 }
+.d-over .d-label i { background: currentColor }
+.d-over h1 { margin: 14px 0 0; font-size: clamp(44px, 7.4vw, 112px); line-height: .9; font-weight: 500; letter-spacing: -0.05em; text-wrap: balance; text-shadow: 0 2px 30px rgb(0 0 0 / .12) }
+.d-intro { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 64px; margin-top: 44px; align-items: start }
+.d-intro .d-sum { margin: 0; font-size: 22px; max-width: 26ch; color: var(--ink); letter-spacing: -0.3px }
+.d-intro .d-meta { margin: 6px 0 0 }
+.fly canvas { object-fit: cover }
+@media (max-width: 899px) {
+  .d-frame { height: 62vh }
+  .d-frame.in .notch.l { width: 11% } .d-frame.in .notch.r { width: 8% }
+  .d-over { left: 9%; top: 46%; max-width: 82% }
+  .d-intro { grid-template-columns: 1fr; gap: 28px; margin-top: 28px }
+  .d-intro .d-sum { font-size: 18px }
+}
+.d-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 64px; align-items: end }
+.d-hero h1 { margin: 18px 0 0; font-size: clamp(44px, 6vw, 84px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; color: var(--ink); text-wrap: balance }
+.d-sum { margin: 22px 0 0; font-size: 19px; line-height: 1.45; max-width: 30ch; color: var(--text); text-wrap: pretty }
+.d-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 28px; margin: 44px 0 0; max-width: 420px }
+.d-meta dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.d-meta dd { margin: 6px 0 0; font-size: 14px; font-weight: 500; color: var(--ink) }
+.d-media { position: relative; overflow: hidden; background: var(--tile) }
+.d-media img, .d-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block }
+.d-media.white { background: #fff; outline: 1px solid var(--edge); outline-offset: -1px }
+.d-media.hidden { visibility: hidden }
+.d-two { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px }
+.d-state { margin: 0; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.22; letter-spacing: -0.03em; font-weight: 500; color: var(--ink); text-wrap: balance }
+.d-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 36px; font-size: 15px; line-height: 1.6; color: var(--text) }
+.d-cols p { margin: 0 }
+.d-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px; position: relative }
+.d-step { padding: 18px 16px 20px; border-radius: 10px; background: var(--tile); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between }
+.d-step .n { font: 500 11px var(--mono); color: var(--muted) }
+.d-step b { display: block; font-size: 16px; font-weight: 500; color: var(--ink); letter-spacing: -.2px }
+.d-step span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--muted) }
+.d-crops { display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: auto auto; gap: 12px; margin-top: 28px }
+.d-crop { border-radius: 8px; background-repeat: no-repeat; background-color: var(--tile); aspect-ratio: 1; position: relative; overflow: hidden }
+.d-crop:first-child { grid-row: span 2; aspect-ratio: auto }
+.d-crop em { position: absolute; left: 12px; bottom: 10px; font: 500 10.5px var(--mono); font-style: normal; letter-spacing: .5px; text-transform: uppercase; background: rgb(255 255 255 / .9); color: var(--ink); padding: 4px 8px; border-radius: 999px }
+.d-pal { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px }
+.d-sw { border-radius: 10px; aspect-ratio: 1 / 1.15; display: flex; align-items: flex-end; padding: 14px; font: 500 11px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .06) }
+.d-next { border-top: 1px solid var(--line) }
+body::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 140px; z-index: 19; pointer-events: none; background: linear-gradient(var(--bg) 62%, transparent); opacity: 0; transition: opacity .3s }
+body.open::before, body.all::before { opacity: 1 }
+@media (max-width: 899px) { body::before { height: 84px } }
+.fly { position: fixed; z-index: 35; overflow: hidden; pointer-events: none; background: var(--tile) }
+.fly img { width: 100%; height: 100%; object-fit: cover; display: block }
+/* Section dial on the project page */
+.sdial { position: fixed; left: 0; right: 0; bottom: 0; height: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 19; touch-action: none; cursor: grab; opacity: 0; pointer-events: none; transition: opacity .3s; background: linear-gradient(to top, var(--bg) 70%, transparent) }
+body.open .sdial { opacity: 1; pointer-events: auto }
+.sdial svg { position: absolute; left: 0; top: 0; width: 100%; height: 96px; overflow: visible }
+.sdial .needle { position: absolute; left: 50%; top: 6px; width: 3px; height: 58px; margin-left: -1.5px; border-radius: 2px; background: #ff4a1c }
+.back b { font-weight: 500 }
+.now .nm { max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+@media (max-width: 899px) {
+  .d-wrap { padding: 120px 0 160px }
+  .d-hero, .d-two { grid-template-columns: 1fr; gap: 28px }
+  .d-sum { font-size: 17px }
+  .d-cols { grid-template-columns: 1fr; gap: 16px }
+  .d-steps { grid-template-columns: 1fr 1fr }
+  .d-step { min-height: 120px }
+  .d-crops { grid-template-columns: 1fr 1fr }
+  .d-crop:first-child { grid-row: auto; grid-column: span 2; aspect-ratio: 4 / 3 }
+  .d-pal { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .d-sec { padding-bottom: 88px }
+  .now .nm { max-width: 13ch }
+}
+
+/* ---------- Category static ---------- */
+canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(100% - 96px); z-index: 7; pointer-events: none; opacity: 0; image-rendering: pixelated; mix-blend-mode: multiply }
+/* ---------- Opening a project that has its own page ---------- */
+.pagecover { position: fixed; inset: 0; z-index: 90; background: var(--bg); pointer-events: none; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .42s cubic-bezier(.55,0,.45,1) }
+.pagecover.on { clip-path: circle(150vmax at var(--rx, 50%) var(--ry, 50%)) }
+/* ---------- See everything ---------- */
+.allbtn { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--pill); font-size: 13px; font-weight: 500; color: var(--ink); transition: background .2s, color .2s }
+.allbtn svg { width: 12px; height: 12px; fill: currentColor }
+.allbtn:hover { background: var(--hover) }
+.allbtn[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+.row { transition: transform .6s cubic-bezier(.65,0,.35,1), opacity .45s }
+body.all .row { transform: scale(.42); opacity: 0; pointer-events: none }
+body.all .cap { visibility: hidden }
+body.all .dial, body.all .hint, body.all .px, body.all .chips, body.all .count { opacity: 0; pointer-events: none; transition: opacity .3s }
+.ov { position: fixed; inset: 0; z-index: 12; overflow-y: auto; padding: 150px max(48px, env(safe-area-inset-right, 0px)) 80px max(48px, env(safe-area-inset-left, 0px)); visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .4s; scrollbar-width: none }
+.ov::-webkit-scrollbar { display: none }
+body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, visibility 0s }
+.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 48px 28px; margin: 0 }   /* spans edge to edge between the station pill and the All button */
+.ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
+body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
+.ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
+.ov.flat .ov-im { opacity: 1; background-size: cover; background-position: center }   /* fallback: the plain pictures, when the canvas can't draw them */
+.ovc { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0 }
+.ov-grid { position: relative; z-index: 1 }
+.ov-t:hover .ov-c b { color: var(--ink) }
+.ov-c { will-change: transform; display: block; margin-top: 12px; font-size: 15px; letter-spacing: -.2px; font-weight: 500; color: var(--ink); line-height: 1.35 }
+.ov-c b { font: 500 12px var(--mono); color: var(--muted); margin-right: 4px }
+.ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
+/* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
+   category starts, a fixed needle in the middle. It moves with the page; drag it or tap a label to travel. */
+.ov { padding-right: max(124px, env(safe-area-inset-right, 0px)) }
+.vrul { position: fixed; right: 0; top: 0; bottom: 0; width: 96px; z-index: 13; cursor: ns-resize; touch-action: none; opacity: 0; pointer-events: none; transition: opacity .3s }
+body.all .vrul { opacity: 1; pointer-events: auto; transition: opacity .4s .2s }
+.vrul canvas { display: block; width: 100%; height: 100% }
+@media (max-width: 899px) { .ov { padding: 120px 60px 60px 16px } .vrul { width: 48px } }
+@media (max-width: 899px) { .ov { padding: 120px 60px 60px 16px } .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px } .ov-c { font-size: 14px } .allbtn { height: 28px; padding: 0 10px } }
+@media (prefers-reduced-motion: reduce) { .row, .ov, .ov-t { transition: none } }
+
+/* ---------- Dark mode ---------- */
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --tile: #161616; --pill: #1c1c1c; --on-ink: #000000; --hover: #262626; --line: #222222; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
+.themebtn svg { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round }
+
+/* ---------- Scanline sweep ---------- */
+.sweep { position: fixed; left: 0; right: 0; top: 0; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); z-index: 15; pointer-events: none; overflow: hidden; opacity: 0 }
+.sw-line { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--ink) }
+.sw-trail { position: absolute; left: 0; top: 0; bottom: 0; width: 160px; opacity: .45; transform-origin: 0 0;
+  background: repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1px 4px);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000); mask-image: linear-gradient(to right, transparent, #000) }
+.fxsw { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); bottom: calc(140px + env(safe-area-inset-bottom, 0px)); z-index: 15; display: flex; align-items: center; gap: 4px; font-size: 12px }
+.fxsw > span { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-right: 6px }
+.fxsw button { padding: 5px 10px; border-radius: 999px; color: var(--muted); font-weight: 500 }
+.fxsw button:hover { color: var(--ink) }
+.fxsw button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
+@media (max-width: 899px) { .fxsw { left: 16px; right: 16px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); flex-wrap: wrap } .fxsw button { padding: 4px 8px; font-size: 11px } }
+
+/* ---------- Radio physics preview ---------- */
+.fmwave { position: fixed; left: 0; right: 0; width: 100%; height: 30px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 13; pointer-events: none }
+.noisefloor { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(100% - 96px); z-index: 7; pointer-events: none; opacity: 0; mix-blend-mode: overlay; image-rendering: pixelated }
+.bcast { position: fixed; z-index: 30; width: 0; height: 0; border-radius: 50%; pointer-events: none; border: 1.5px solid var(--ink);
+  transform: translate(-50%, -50%); animation: bcast 1.2s cubic-bezier(.2,.7,.3,1) both }
+@keyframes bcast { from { width: 0; height: 0; opacity: .6 } to { width: 220vmax; height: 220vmax; opacity: 0 } }
+.phys { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); bottom: calc(132px + env(safe-area-inset-bottom, 0px)); z-index: 16; display: flex; flex-wrap: wrap; gap: 4px; max-width: min(620px, calc(100vw - 32px)); align-items: center; font-size: 12px }
+.phys > span { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-right: 6px }
+.phys button { padding: 4px 9px; border-radius: 999px; color: var(--muted); font-weight: 500; background: var(--pill) }
+.phys button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+.phys button.all { background: none; text-decoration: underline; text-underline-offset: 3px }
+body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 0; pointer-events: none }
+@media (max-width: 899px) { .phys { left: 16px; bottom: calc(150px + env(safe-area-inset-bottom, 0px)) } .phys button { font-size: 11px; padding: 3px 7px } }
+
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
+.next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
+@media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+</style>
+
+<div class="station" id="station" data-readout>
+  <button class="back" id="back" type="button" aria-label="Tune back to Home, 98.0"><svg viewBox="0 0 16 16"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg><b id="bkF">98.0</b> <span id="bkN">Home</span></button>
+  <div class="now" aria-label="Now on 100.0, Designs"><span class="fq" id="fq">100.0</span><span class="nm" id="nm">Designs</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
+</div>
+<div class="toast" id="toast" role="status">In the real site this lands back on Home</div>
+
+<div class="top">
+  <div class="chips" id="chips" role="group" aria-label="Jump to a category"></div>
+  <div class="count" id="count"><b>01</b> / 19</div>
+  <button class="allbtn" id="allBtn" type="button" aria-label="See all work"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="5" height="5"/><rect x="9.5" y="1.5" width="5" height="5"/><rect x="1.5" y="9.5" width="5" height="5"/><rect x="9.5" y="9.5" width="5" height="5"/></svg>All</button>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- colour split: the red and blue channels slide apart from green, then snap back -->
+  <filter id="rgbsplit" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+    <feOffset in="r" id="rOff" dx="0" dy="0" result="ro"/>
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+    <feOffset in="b" id="bOff" dx="0" dy="0" result="bo"/>
+    <feBlend in="ro" in2="g" mode="screen" result="rg"/>
+    <feBlend in="rg" in2="bo" mode="screen"/>
+  </filter>
+</svg>
+<main class="row" id="row" aria-label="Designs" aria-live="polite"></main>
+<div class="cap" id="cap" aria-hidden="true"><h2 id="capT"></h2><span class="num" id="capN"></span><span class="meta" id="capM"></span></div>
+
+<div class="vp" id="vp" aria-hidden="true">View project</div>
+<article class="detail" id="detail" aria-label="Project"><div class="d-wrap" id="dwrap"></div></article>
+<div class="sdial" id="sdial" role="slider" tabindex="0" aria-label="Sections" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><svg id="sstrip" aria-hidden="true"></svg><div class="needle" aria-hidden="true"></div></div>
+<div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button><button type="button" id="snd" aria-label="Mute ticks" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
+<div class="dial" id="dial" role="slider" tabindex="0" aria-label="Scroll through designs" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1">
+  <svg id="strip" aria-hidden="true"></svg>
+  <div class="needle" aria-hidden="true"></div>
+</div>
+
+<script>
+(function () {
+  const A = __ASSETS__;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS = 'http://www.w3.org/2000/svg';
+  // ---------- Theme ----------
+  const THEME = { ink: '#000000', muted: '#8c8c8c', edge: 'rgba(0,0,0,.08)' };
+  function applyTheme(dark) {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    Object.assign(THEME, dark ? { ink: '#ffffff', muted: '#7a7a7a', edge: 'rgba(255,255,255,.1)' } : { ink: '#000000', muted: '#8c8c8c', edge: 'rgba(0,0,0,.08)' });
+    const b = document.getElementById('themeBtn');
+    if (b) {
+      b.setAttribute('aria-pressed', dark); b.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+      document.getElementById('themeIco').innerHTML = dark
+        ? '<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>'
+        : '<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>';
+    }
+    try { localStorage.setItem('kfm-theme', dark ? 'dark' : 'light'); } catch (_) {}
+  }
+  let startDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  try { const v = localStorage.getItem('kfm-theme'); if (v) startDark = v === 'dark'; } catch (_) {}
+  applyTheme(startDark);
+  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark'); });
+  const $ = id => document.getElementById(id);
+
+  // ---------- Content ----------
+  // Tools render as the icons from Home's dock. Names are matched loosely ("After Effects", "AE", "Ps"…);
+  // anything without an icon file shows as a small text chip.
+  const TOOL_ICONS = { blender: 'blender', figma: 'figma', illustrator: 'illustrator', ai: 'illustrator', photoshop: 'photoshop', ps: 'photoshop',
+    aftereffects: 'aftereffect', aftereffect: 'aftereffect', ae: 'aftereffect', claude: 'claude', chatgpt: 'chatgpt' };
+  const TOOL_NAMES = { blender: 'Blender', figma: 'Figma', illustrator: 'Adobe Illustrator', photoshop: 'Adobe Photoshop', aftereffect: 'Adobe After Effects', claude: 'Claude', chatgpt: 'ChatGPT' };
+  function toolIcons(str) {
+    const list = String(str || '').split(/\s*[·,\/]\s*/).filter(Boolean);
+    return `<span class="tools">${list.map(t => {
+      const f = TOOL_ICONS[t.toLowerCase().replace(/^adobe\s*/, '').replace(/[^a-z]/g, '')];
+      return f ? `<img src="assets/${f}.svg" alt="${TOOL_NAMES[f]}" title="${TOOL_NAMES[f]}" width="18" height="18">` : `<span class="tx">${t}</span>`;
+    }).join('')}</span>`;
+  }
+  const CATS = [
+    { k: '3d', name: '3D', tools: 'Blender' },
+    { k: 'product', name: 'Product', tools: 'Figma · Code' },
+    { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
+    { k: 'motion', name: 'Motion', tools: 'Blender' }
+  ];
+  // ---------- Real project details ----------
+  // One entry per piece, keyed by title. Every field is optional: anything left empty is simply not shown.
+  //   year, client, role, tools, summary – shown in the caption and on the project page
+  //   alt  – a second image (another angle) shown while hovering the piece on the needle
+  //   loop – a short video loop played while hovering
+  //   page – a separate project page (e.g. the logo template) to open instead of the built-in one
+  //   featured: true – the page opens on this piece (later picked in the CMS). Without one, it opens on a
+  //                     random piece in the middle stretch, so pieces and ruler fill both sides.
+  const PROJECTS = {
+    'Paper plane with coin': {}, 'Drink tumbler': {}, 'Safe with coins': {}, 'Pawn in an archway': {}, 'Award with ribbons': {},
+    'Ruler picker': {},
+    'Card holder with stickers': {}, 'Badge': {}, 'Badge in a box': {}, 'Price tag and coins': {}, 'Debit card, floating': {}, 'Debit card with shapes': {}, 'Pink debit card': {},
+    'Tennis ball and rackets': {}, 'Tennis in motion, blue': {}, 'Tennis in motion, dark blue': {}, 'Tennis on court': {}, 'Red padlock': {}, 'Orange padlock': {}
+  };
+  // Every piece opens on the project page (project.html#its-name) unless it names a page of its own.
+  const PROJECT_PAGE = '';   // design shots open the small view on this page; case studies (page: case.html#…) open their own
+  const slugOf = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const items = CATS.flatMap(c => A[c.k].map(x => {
+    const pj = PROJECTS[x.t] || {};
+    return { ...x, featured: !!pj.featured, cat: c.name, tools: pj.tools || x.tools || (x.video ? 'Figma · Code' : c.tools), year: pj.year || x.year || '', client: pj.client || x.client || '', role: pj.role || '', summary: pj.summary || x.desc || '', alt: pj.alt || '', loop: pj.loop || '', page: x.page || pj.page || (PROJECT_PAGE ? PROJECT_PAGE + '#' + slugOf(x.t) : ''), cs: !!x.cs, link: x.link || pj.link || (x.layout ? x.page : '') };
+  }));
+  const N = items.length;
+
+  // ---------- Build ----------
+  // pictures from another site (the case-study covers) are fetched with CORS, so the dial's bend and the All view's drum can still use them;
+  // if that site refuses, the picture loads plainly and the canvases leave it out instead of breaking the effect
+  const remote = u => /^https?:/i.test(u || '') && !String(u).startsWith(location.origin);
+  const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
+  const okDraw = im => !(im && im.dataset && im.dataset.nox);
+  const row = $('row');
+  const slots = items.map((it, i) => {
+    const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '') + (it.cs ? ' cs' : '');
+    s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
+    if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; s.appendChild(v); }
+    else { const im = xo(new Image(), it.src); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
+    row.appendChild(s);
+    return s;
+  });
+  // Clicks land on the row (it captures the pointer for dragging), so find the piece under the pointer
+  row.addEventListener('click', e => {
+    if (moved) return;
+    const hit = document.elementsFromPoint(e.clientX, e.clientY).find(el => el.classList && el.classList.contains('slot'));
+    if (!hit) return;
+    const i = slots.indexOf(hit);
+    if (Math.round(p) !== i) { tap(); goTo(i); } else openDetail(i, e.clientX, e.clientY);
+  });
+  const chips = $('chips');
+  const firstOf = CATS.map(c => items.findIndex(x => x.cat === c.name));
+  const chipEls = CATS.map((c, ci) => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.innerHTML = `${c.name}<sup>${A[c.k].length}</sup>`;
+    b.addEventListener('click', () => { tap(); goTo(firstOf[ci]); });
+    chips.appendChild(b); return b;
+  });
+
+  // ---------- Geometry ----------
+  // The piece on the needle is full size; every other piece sits at scale S. Positions are packed edge to edge
+  // with a gap, for the layout centred on k and on k+1, then blended by the fractional position. That keeps
+  // gaps even even when pieces have different shapes.
+  let W, H, cy, S, G, sizes = [];
+  function measure() {
+    sizeField();
+    W = innerWidth; H = innerHeight;
+    const mob = W < 900;
+    const maxH = mob ? Math.min(H * .44, 460) : Math.min(H * .54, 600);
+    const maxW = mob ? W * .74 : W * .4;
+    sizes = items.map(it => { let h = maxH, w = h * it.r; if (w > maxW) { w = maxW; h = w / it.r; } return [w, h]; });
+    S = mob ? .7 : .58; G = mob ? 28 : 96;
+    cy = (H - 96) / 2 + (mob ? 44 : 12);
+    sizes.forEach(([w, h], i) => { slots[i].style.width = w + 'px'; slots[i].style.height = h + 'px'; });
+    drawStripStatic();
+  }
+  function layout(k) {
+    const x = new Array(N), sc = items.map((_, i) => i === k ? 1 : S);
+    x[k] = 0;
+    for (let i = k + 1; i < N; i++) x[i] = x[i - 1] + sizes[i - 1][0] * sc[i - 1] / 2 + G + sizes[i][0] * sc[i] / 2;
+    for (let i = k - 1; i >= 0; i--) x[i] = x[i + 1] - sizes[i + 1][0] * sc[i + 1] / 2 - G - sizes[i][0] * sc[i] / 2;
+    return { x, sc };
+  }
+
+  // ---------- State ----------
+  // Opening piece: the featured one if set, else a random piece away from the ends, so the row is centred
+  // with work on both sides.
+  const START = (() => {
+    // coming back from a project page: open on the piece you left from
+    let back = null; try { back = sessionStorage.getItem('km-return'); sessionStorage.removeItem('km-return'); } catch (_) {}
+    const r = back ? items.findIndex(it => it.t === back) : -1;
+    if (r >= 0) return r;
+    const f = items.findIndex(it => it.featured);
+    if (f >= 0) return f;
+    // far enough from both ends that the row has pieces on both sides and the ruler's ticks fill the
+    // screen edge to edge (its spacing is 120px per piece on desktop, 84px on phones)
+    const sp = innerWidth < 900 ? 84 : 120;
+    const m = Math.min(Math.floor((N - 1) / 2), Math.ceil((innerWidth / 2) / sp));
+    return m + Math.floor(Math.random() * (N - 2 * m));
+  })();
+  let p = START, target = START, last = 0, vel = 0, active = -1;
+  // load the opening piece and its neighbours at full size straight away (the rest wait for page load),
+  // so the centre piece is sharp on first visit instead of showing its small preview
+  slots.forEach((sl, i) => {
+    const im = sl.querySelector('img[data-src]');
+    if (im && Math.abs(i - START) <= 2) { im.fetchPriority = i === START ? 'high' : 'auto'; im.src = im.dataset.src; im.removeAttribute('data-src'); }
+  });
+  let hovering = false, hoverAmt = 0, moving = false, settleAt = -1e9, bounce = 0, bounceY = 1;
+  const clamp = v => Math.max(0, Math.min(N - 1, v));
+  function goTo(i) { target = clamp(i); }
+
+  // ---------- Caption ----------
+  const cap = $('cap');
+  function setCaption(i) {
+    const it = items[i];
+    $('capT').textContent = it.t;
+    $('capN').innerHTML = `<i></i>${String(i + 1).padStart(2, '0')}${it.cs ? ' · <span class="csc">Case study</span>' : ''}`;
+    $('vp').textContent = 'View';
+    $('capM').innerHTML = [it.client && `<b>Client</b> ${it.client}`, `<b>Category</b> ${it.cat}${it.year ? ' · ' + it.year : ''}`, `<b>Tools</b> ${toolIcons(it.tools)}`].filter(Boolean).join('<br>');
+    $('count').innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b> / ${N}`;
+    $('dial').setAttribute('aria-valuenow', i + 1);
+    chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === it.cat));
+    slots.forEach((s, j) => {
+      s.classList.toggle('active', j === i);
+      const v = s.querySelector('video'); if (!v) return;
+      v.pause();                          // videos rest on their first frame; hovering the piece on the needle plays them
+    });
+  }
+
+  // ---------- Magnetic edges ----------
+  // The row is drawn on a canvas so each screen edge can act like a mirror: pieces fold into a flipped
+  // duplicate of themselves as they reach it, as if the edge were a magnet pulling them in.
+  const field = document.createElement('canvas'); field.className = 'field'; field.setAttribute('aria-hidden', 'true');
+  row.appendChild(field);
+  const fx = field.getContext('2d');
+  let BAND = 90, dprF = 1, flyIdx = -1;
+  const MIRROR = .8;      // < 1 stretches the flipped strip a little, like the reference
+  function sizeField() {
+    dprF = Math.min(2, devicePixelRatio || 1);
+    field.width = Math.round(innerWidth * dprF); field.height = Math.round((innerHeight - 96) * dprF);
+    BAND = innerWidth < 900 ? 22 : Math.min(56, innerWidth * .035);
+    HZ = innerWidth * (innerWidth < 900 ? .08 : HWARP.zone);
+  }
+  const boxes = [];
+  // ---------- Edge treatments (preview: switch at the bottom left) ----------
+  //   fold     – current: column warp + mirror fold at the screen edges
+  //   clean    – no effect: pieces slide straight off
+  //   fade     – pieces shrink slightly and fade out near the edges
+  //   bulge    – the whole row is warped smoothly on the GPU: edges swell taller and stretch outward
+  //   curve    – the row wraps around a shallow cylinder: edges recede and compress like a curved screen
+  //   stretch  – flat when still; while moving, the edges stretch with the speed and spring back
+  let EDGE = 'bulge';   // chosen: bulge (others kept for reference)
+  const EZ = () => W * .24;
+  const glc = document.createElement('canvas'); glc.className = 'field gl'; glc.setAttribute('aria-hidden', 'true');
+  row.appendChild(glc);
+  const gl = glc.getContext('webgl', { premultipliedAlpha: true, alpha: true });
+  let glProg = null, glU = {};
+  if (gl) {
+    const vs = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+    const fs = `precision highp float;varying vec2 v;uniform sampler2D t;uniform float mode,amt,asp,speed;
+      void main(){
+        vec2 q=v; float u=(v.x-.5)*2.; float a=abs(u);
+        if(mode<1.5){                                   // bulge
+          float e=smoothstep(.35,1.,a); e=e*e;
+          q.x=.5+(v.x-.5)*(1.-.10*amt*e);
+          q.y=.5+(v.y-.5)/(1.+.28*amt*e);
+        } else if(mode<2.5){                            // curve
+          float T=.95*amt+.001; float s=sin(T);
+          q.x=.5+asin(clamp(u,-1.,1.)*s)/T*.5;
+          q.y=.5+(v.y-.5)/(1.-.16*amt*u*u);
+        } else {                                        // stretch (speed)
+          float e=a*a*a; float k=clamp(speed,0.,1.);
+          q.x=.5+(v.x-.5)*(1.-.16*k*e);
+          q.y=.5+(v.y-.5)/(1.+.22*k*e);
+        }
+        if(q.x<0.||q.x>1.||q.y<0.||q.y>1.){gl_FragColor=vec4(0.);return;}
+        gl_FragColor=texture2D(t,q);
+      }`;
+    const sh = (ty, src) => { const o = gl.createShader(ty); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+    glProg = gl.createProgram(); gl.attachShader(glProg, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(glProg, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(glProg);
+    if (!gl.getProgramParameter(glProg, gl.LINK_STATUS)) glProg = null;
+    else {
+      gl.useProgram(glProg);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(glProg, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+      ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE));
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      ['mode', 'amt', 'asp', 'speed'].forEach(n => glU[n] = gl.getUniformLocation(glProg, n));
+    }
+  }
+  let edgeSpeed = 0;
+  function present() {
+    const shader = glProg && !reduce && (EDGE === 'bulge' || EDGE === 'curve' || EDGE === 'stretch');
+    field.style.opacity = shader ? '0' : '';
+    glc.style.display = shader ? '' : 'none';
+    if (!shader) return;
+    if (glc.width !== field.width || glc.height !== field.height) { glc.width = field.width; glc.height = field.height; gl.viewport(0, 0, glc.width, glc.height); }
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, field); }
+    catch (_) { glProg = null; field.style.opacity = ''; glc.style.display = 'none'; return; }   // pictures from another origin: keep the plain dial
+    edgeSpeed += (Math.min(1, Math.abs(vel) * 40) - edgeSpeed) * .12;
+    gl.uniform1f(glU.mode, EDGE === 'bulge' ? 1 : EDGE === 'curve' ? 2 : 3);
+    gl.uniform1f(glU.amt, W < 900 ? .6 : 1);
+    gl.uniform1f(glU.asp, W / H);
+    gl.uniform1f(glU.speed, edgeSpeed);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  const foldCv = document.createElement('canvas'), foldCx = foldCv.getContext('2d');
+  // horizontal edge warp (same idea as the All view, turned sideways)
+  let HZ = 300;
+  const HWARP = { zone: .22, tall: .3, push: .55 };
+  const hk = x => Math.max(0, Math.min(1, x < HZ ? (HZ - x) / HZ : (x - (W - HZ)) / HZ));
+  const hg = x => { const k = hk(x); return 1 + HWARP.tall * k * k * (3 - 2 * k) * .9; };
+  const hinv = X => {                                   // screen x → layout x (exact inverse of hf)
+    const p = HWARP.push / HZ;
+    if (X < HZ) { const D = HZ - X; return HZ - (-1 + Math.sqrt(1 + 2 * p * D)) / p; }
+    if (X > W - HZ) { const D = X - (W - HZ); return W - HZ + (-1 + Math.sqrt(1 + 2 * p * D)) / p; }
+    return X;
+  };
+  const hf = x => x < HZ ? x - HWARP.push * (HZ - x) ** 2 / (2 * HZ) : x > W - HZ ? x + HWARP.push * (x - (W - HZ)) ** 2 / (2 * HZ) : x;
+
+  // ---------- Mouse parallax ----------
+  // Modes (pick in the switcher, bottom left):
+  //   depth  – frames drift against the mouse; pieces further from the needle drift more, so the row has layers
+  //   pan    – frames stay put, the picture slides inside each one (like looking through windows)
+  //   magnet – the piece on the needle leans toward the cursor, neighbours lean slightly away
+  //   tilt   – pieces turn toward the cursor in perspective
+  const MODES = {
+    'Depth + pan': { depth: 1, pan: 1 }, 'Depth': { depth: 1 }, 'Pan': { pan: 1 },
+    'Magnet': { magnet: 1 }, 'Tilt': { tilt: 1 }, 'Off': {}
+  };
+  let PMODE = MODES['Depth + pan'];
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    tmx = (e.clientX / innerWidth) * 2 - 1; tmy = (e.clientY / innerHeight) * 2 - 1;
+  });
+  document.addEventListener('mouseleave', () => { tmx = tmy = 0; });
+  function frameOffset(i) {
+    if (reduce) return [0, 0];
+    const d = Math.min(2, Math.abs(i - p));
+    let ox = 0, oy = 0;
+    if (PMODE.depth) { const dep = 14 + d * 16; ox -= mx * dep; oy -= my * dep * .55; }
+    if (PMODE.magnet) { const pull = d < .5 ? 22 : -8; ox += mx * pull; oy += my * (d < .5 ? 14 : -4); }
+    return [ox, oy];
+  }
+  function drawField(L0, L1, t) {
+    fx.setTransform(dprF, 0, 0, dprF, 0, 0);
+    fx.clearRect(0, 0, W, H);
+    boxes.length = 0;
+    for (let i = 0; i < N; i++) {
+      if (i === flyIdx) continue;
+      const x = L0.x[i] + (L1.x[i] - L0.x[i]) * t, sc = L0.sc[i] + (L1.sc[i] - L0.sc[i]) * t;
+      let w = sizes[i][0] * sc, h = sizes[i][1] * sc, left = W / 2 + x - w / 2;
+      if (left > W + 4 || left + w < -4) continue;
+      const isA = i === active;
+      if (isA && bounce) {                                   // elastic squash and stretch around the centre
+        const w0 = w; w *= bounce; h *= bounceY; left -= (w - w0) / 2;
+      }
+      let src = slots[i].firstChild;
+      if (src.tagName === 'IMG' && !src.naturalWidth) { const th = thumbFor(items[i].src); if (th && th.naturalWidth) src = th; }   // small preview until the full image lands
+      if (isA && hoverAmt > .01 && items[i].alt && altImg(i).naturalWidth) src = altImg(i);   // second angle while hovered
+      if (src.tagName === 'VIDEO' && src.readyState < 2) src = texImg(items[i].poster);   // poster until frames arrive
+      if (!okDraw(src)) continue;
+      const sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
+      if (!sw) continue;
+      const ia = sw / sh, ba = w / h;                                  // object-fit: cover crop
+      const cw = ia > ba ? sh * ba : sw, ch = ia > ba ? sh : sw / ba, cx0 = (sw - cw) / 2, cy0 = (sh - ch) / 2;
+      // mouse parallax: move the frame, the picture inside it, or bend it, depending on the mode
+      const [ox, oy] = frameOffset(i);
+      let sx = cx0, sy = cy0, scw = cw, sch = ch;
+      if (PMODE.pan) {                                       // picture slides inside its frame
+        const z = 1.16; scw = cw / z; sch = ch / z;
+        sx = cx0 + (cw - scw) / 2 * (1 + mx); sy = cy0 + (ch - sch) / 2 * (1 + my);
+      }
+      if (isA && hoverAmt > .001 && !items[i].alt && !items[i].video) {   // stills: a slow push-in for a closer look
+        const e = hoverAmt * hoverAmt * (3 - 2 * hoverAmt), z = 1 + .16 * e;
+        const nw = scw / z, nh = sch / z;
+        sx += (scw - nw) * .5; sy += (sch - nh) * .42; scw = nw; sch = nh;
+      }
+      const L = left + ox, T = cy - h / 2 + oy;
+      const bx = { src, left: L, top: T, w, h, cw: scw, ch: sch, cx0: sx, cy0: sy, white: slots[i].classList.contains('white') };
+      boxes.push(bx);
+      diffract(i, L, T, w, h, src, sx, sy, scw, sch);
+      fx.filter = cardFilter(i);
+      if (PMODE.tilt) {                                      // card turns toward the cursor (columns get taller on the near side)
+        const cols = Math.ceil(w / 4), d = Math.min(1, Math.abs(i - p));
+        const tx = mx * (1 - d * .5), ty = my * (1 - d * .5);
+        for (let c = 0; c < cols; c++) {
+          const u0 = c / cols, u1 = (c + 1) / cols, um = (u0 + u1) / 2;
+          const k = 1 + tx * .09 * (2 * um - 1);
+          const ch2 = h * k, top = T + (h - ch2) / 2 + ty * 10 * (2 * um - 1) * 0;
+          fx.drawImage(src, sx + scw * u0, sy, scw * (u1 - u0), sch, L + w * u0 + tx * 6, top + ty * 6, w * (u1 - u0) + .5, ch2);
+        }
+      } else if (EDGE === 'fold' && !reduce && W >= 900 && (L < HZ || L + w > W - HZ)) {   // desktop only: phones keep a clean peek
+        // edge warp: draw in thin columns; near the side edges each column grows taller around the centre
+        // line and is pushed further out, so pieces flare as they arrive and settle as they reach the middle
+        // walk the screen one pixel column at a time and look up where each column comes from (inverse map),
+        // so the curve is smooth with no gaps or steps
+        const A = Math.max(0, Math.floor(hf(L))), Bx = Math.min(W, Math.ceil(hf(L + w)));
+        const step = 1 / Math.max(1, dprF > 1 ? 1 : 1);
+        for (let X = A; X < Bx; X += step) {
+          const x0 = hinv(X), x1 = hinv(X + step);
+          if (x1 <= L || x0 >= L + w) continue;
+          const c0 = Math.max(L, x0), c1 = Math.min(L + w, x1);
+          const k = hg((c0 + c1) / 2), u0 = (c0 - L) / w, u1 = (c1 - L) / w;
+          fx.drawImage(src, sx + scw * u0, sy, Math.max(.01, scw * (u1 - u0)), sch, X, cy + (T - cy) * k, step + .35, h * k);
+        }
+      } else if (EDGE === 'fade' && !reduce) {
+        // soft fade: pieces shrink a little and fade out as they near the edges
+        const c = L + w / 2, e = Math.max(0, Math.min(1, Math.max(EZ() - c, c - (W - EZ())) / EZ()));
+        const k = 1 - .22 * e * e, a = 1 - e * e;
+        if (a > .01) { fx.globalAlpha = a; fx.drawImage(src, sx, sy, scw, sch, c - w * k / 2, cy + (T - cy) * k, w * k, h * k); fx.globalAlpha = 1; }
+      } else fx.drawImage(src, sx, sy, scw, sch, L, T, w, h);
+      if (bx.white) {
+        if (EDGE === 'fold' && W >= 900 && (L < HZ || L + w > W - HZ)) {
+          const a0 = hf(L), a1 = hf(L + w), k0 = hg(L), k1 = hg(L + w);
+          fx.strokeStyle = THEME.edge; fx.lineWidth = 1; fx.beginPath();
+          fx.moveTo(a0, cy + (T - cy) * k0); fx.lineTo(a1, cy + (T - cy) * k1); fx.lineTo(a1, cy + (T + h - cy) * k1); fx.lineTo(a0, cy + (T + h - cy) * k0); fx.closePath(); fx.stroke();
+        } else { fx.strokeStyle = THEME.edge; fx.lineWidth = 1; fx.strokeRect(L + .5, T + .5, w - 1, h - 1); }
+      }
+      fx.filter = 'none';
+      cardFX(i, L, T, w, h);
+    }
+    rowFX();
+    if (reduce || EDGE !== 'fold') return;
+    // Mirror fold: a fold line sits BAND px in from each edge. Past it, the screen shows the (already warped)
+    // picture just inside the fold, flipped and stretched a touch, so pieces fold into a false duplicate.
+    foldCv.width = field.width; foldCv.height = field.height;
+    foldCx.drawImage(field, 0, 0);
+    fx.setTransform(1, 0, 0, 1, 0, 0);
+    const Bp = BAND * dprF, Hp = field.height, Wp = field.width;
+    for (const side of [-1, 1]) {
+      const fold = side > 0 ? Wp - Bp : Bp, srcW = Bp * MIRROR;
+      fx.clearRect(side > 0 ? fold : 0, 0, Bp, Hp);
+      fx.save();
+      fx.translate(fold, 0); fx.scale(-side, 1);              // flip about the fold line
+      fx.drawImage(foldCv, side > 0 ? fold - srcW : fold, 0, srcW, Hp, side > 0 ? 0 : -Bp, 0, Bp, Hp);
+      fx.restore();
+    }
+    fx.setTransform(dprF, 0, 0, dprF, 0, 0);
+  }
+
+  // ---------- Frame ----------
+  function frame() {
+    const prev = p;
+    p += (target - p) * (reduce ? 1 : .14);
+    if (Math.abs(target - p) < .0005) p = target;
+    vel = vel * .8 + (p - prev) * .2;
+    const k = Math.min(N - 2, Math.floor(p)), t = p - k;
+    const L0 = layout(k), L1 = layout(k + 1);
+    const blur = reduce ? 0 : Math.min(3, Math.abs(vel) * 60);
+    const FOCUS = reduce ? 0 : 5;   // how soft the pieces off the needle are
+    for (let i = 0; i < N; i++) {
+      const x = L0.x[i] + (L1.x[i] - L0.x[i]) * t, sc = L0.sc[i] + (L1.sc[i] - L0.sc[i]) * t;
+      const d = Math.abs(i - p), off = x > W || x < -W;
+      const s = slots[i];
+      s.style.visibility = off ? 'hidden' : 'visible';
+      if (off) continue;
+      s.style.transform = `translate(${(x - sizes[i][0] / 2).toFixed(1)}px, ${(cy - sizes[i][1] / 2).toFixed(1)}px) scale(${sc.toFixed(4)})`;
+    }
+    // hover preview eases in slowly and out quickly
+    hoverAmt += ((hovering ? 1 : 0) - hoverAmt) * (hovering ? .025 : .12);
+    // settle: once a move ends on a piece, give it a small bounce and a soft lock tick
+    if (Math.abs(target - p) > .04) moving = true;
+    else if (moving && Math.abs(target - p) < .004) { moving = false; settleAt = performance.now(); lockTick(); }
+    const st = performance.now() - settleAt;
+    // elastic: a strong first stretch that rings down; width and height move in opposite directions
+    if (reduce || st > 1100) { bounce = 0; bounceY = 1; }
+    else { const e = Math.exp(-st / 230) * Math.sin(st / 46); bounce = 1 + .11 * e; bounceY = 1 - .075 * e; }
+    const a = Math.round(p);
+    if (a !== active) {
+      const prevCat = active >= 0 ? items[active].cat : null, prevIdx = active;
+      active = a; setCaption(a);
+      if (prevCat && prevCat !== items[a].cat) { scanDir = a > prevIdx ? 1 : -1; stationJump(items[a].cat); }
+    }
+    drawField(L0, L1, t); present(); overlaysFX();
+    drawStatic();
+    // bassFollow(openIdx >= 0 || ovOpen ? 0 : Math.abs(p - prev));   // movement hum: off for now, sound TBD
+    // caption tracks the active piece and fades while it is between stops
+    const xa = L0.x[a] + (L1.x[a] - L0.x[a]) * t, [w, h] = sizes[a];
+    const scA = L0.sc[a] + (L1.sc[a] - L0.sc[a]) * t;
+    cap.style.width = (w * scA) + 'px';
+    mx += (tmx - mx) * .07; my += (tmy - my) * .07;
+    const [cox, coy] = frameOffset(a);
+    cap.style.transform = `translate(${(xa - w * scA / 2 + cox).toFixed(1)}px, ${(cy - h * scA / 2 + coy).toFixed(1)}px)`;
+    $('capN').style.top = $('capM').style.top = (h * scA + 16) + 'px';
+    cap.style.opacity = Math.max(0, 1 - Math.abs(p - a) * 3.2).toFixed(3);
+    drawStrip();
+    if (Math.abs(target - p) > .0005 || Math.abs(vel) > .0001) {} // keep looping; cheap
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Ruler dial ----------
+  // One major tick per piece with four minor ticks between. Ticks grow toward the needle, like the ruler on V1.
+  const strip = $('strip'), dial = $('dial');
+  let SP = 120;
+  const ticks = [];
+  for (let k = 0; k <= (N - 1) * 5; k++) { const l = document.createElementNS(NS, 'line'); l.setAttribute('stroke-linecap', 'round'); strip.appendChild(l); ticks.push({ l, v: k / 5, major: k % 5 === 0 }); }
+  const labels = items.map((it, i) => {
+    const t = document.createElementNS(NS, 'text'); t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-family', 'Geist Mono, ui-monospace, monospace'); t.setAttribute('font-size', '10.5'); t.setAttribute('letter-spacing', '.5');
+    const isFirst = firstOf.includes(i);
+    t.textContent = isFirst ? it.cat.toUpperCase() : String(i + 1).padStart(2, '0');
+    t.dataset.first = isFirst ? 1 : 0;
+    t.style.cursor = 'pointer'; t.addEventListener('click', () => { tap(); goTo(i); });
+    strip.appendChild(t); return t;
+  });
+  const PROFILE = [52, 44, 38, 33, 28, 24, 20, 17, 15, 13, 12, 11, 10, 10, 9];
+  function drawStripStatic() { SP = W < 900 ? 84 : 120; }
+  function drawStrip() {
+    const cx = W / 2;
+    ticks.forEach(({ l, v, major }) => {
+      const x = cx + (v - p) * SP, d = Math.abs(v - p) * 5;
+      let L = d < PROFILE.length - 1 ? PROFILE[Math.floor(d)] + (PROFILE[Math.floor(d) + 1] - PROFILE[Math.floor(d)]) * (d % 1) : 9;
+      if (major) L = Math.max(L, 20);
+      L = tickFX(L, v, x);
+      l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', 66); l.setAttribute('y2', 66 - L);
+      l.setAttribute('stroke', THEME.ink); l.setAttribute('stroke-width', major ? 2 : 1.2);
+      l.setAttribute('stroke-opacity', x < -10 || x > W + 10 ? 0 : (major ? .55 : .18) + Math.max(0, 1 - d / 10) * .35);
+    });
+    labels.forEach((t, i) => {
+      const x = cx + (i - p) * SP, on = Math.abs(i - p) < .5;
+      t.setAttribute('x', x); t.setAttribute('y', 86);
+      t.setAttribute('fill', on || t.dataset.first === '1' ? THEME.ink : THEME.muted);
+      t.setAttribute('font-weight', t.dataset.first === '1' ? 600 : 400);
+      t.setAttribute('opacity', x < -40 || x > W + 40 ? 0 : 1);
+    });
+  }
+
+  // ---------- Input ----------
+  let lastTick = START;
+  function maybeTick() { const r = Math.round(target); if (r !== lastTick) { lastTick = r; tick(); } }
+  // Drag the dial: drag left to move forward, like turning a dial
+  let dragging = null, lastX = 0, moved = false, downX = 0;
+  function startDrag(el, e, scale) { dragging = { el, scale }; lastX = downX = e.clientX; moved = false; el.classList.add('drag'); el.setPointerCapture(e.pointerId); unlockAudio(); }
+  dial.addEventListener('pointerdown', e => startDrag(dial, e, () => SP));
+  row.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; startDrag(row, e, () => (sizes[Math.round(p)][0] * .6 + G)); });
+  addEventListener('pointermove', e => {
+    if (!dragging) return;
+    if (Math.abs(e.clientX - downX) > 4) moved = true;
+    target = clamp(target - (e.clientX - lastX) / dragging.scale()); lastX = e.clientX;
+    p = target; maybeTick();
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging.el.classList.remove('drag');
+    target = clamp(Math.round(target + vel * 6)); maybeTick();
+    dragging = null; setTimeout(() => moved = false, 0);
+  }
+  addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
+  // Wheel / trackpad: either axis
+  let wt = 0;
+  addEventListener('wheel', e => {
+    if (openIdx >= 0 || ovOpen) return;
+    e.preventDefault(); unlockAudio();
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    target = clamp(target + d / 260); p = p + (target - p) * .5; maybeTick();
+    clearTimeout(wt); wt = setTimeout(() => { target = clamp(Math.round(target)); maybeTick(); }, 140);
+  }, { passive: false });
+  addEventListener('keydown', e => {
+    if (ovOpen) { if (e.key === 'Escape') { e.preventDefault(); closeOverview(-1); } return; }
+    if (openIdx >= 0) {
+      if (e.key === 'Escape') { e.preventDefault(); closeDetail(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); swapDetail(Math.min(N - 1, openIdx + 1)); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); swapDetail(Math.max(0, openIdx - 1)); }
+      return;
+    }
+    if (e.key === 'Enter' && document.activeElement === document.body) { e.preventDefault(); openDetail(Math.round(p)); return; }
+    const a = Math.round(target);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(a + 1); maybeTick(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(a - 1); maybeTick(); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); maybeTick(); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(N - 1); maybeTick(); }
+  });
+
+  // ---------- Sound: only from real input. A light tick each time a piece lands on the needle. ----------
+  let ac = null, soundOn = true;
+  function unlockAudio() { if (ac) { if (ac.state === 'suspended') ac.resume(); return; } const AC = window.AudioContext || window.webkitAudioContext; if (AC) { ac = new AC(); } }
+  // ---------- Bass glitch, synced to movement ----------
+  // A low, bit-crushed hum runs while the row moves: its volume, pitch and grit follow the speed, and a
+  // stutter chops it faster the faster you go. Each time a piece passes the needle it gets a crushed
+  // bass thump that drops in pitch. Silent when the row is still.
+  function crushCurve(levels) {
+    const n = 2048, c = new Float32Array(n);
+    for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.round(x * levels) / levels; }
+    return c;
+  }
+  function driveCurve(k) {
+    const n = 2048, c = new Float32Array(n);
+    for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(x * k); }
+    return c;
+  }
+  let bass = null;
+  function bassRig() {
+    if (bass || !ac) return bass;
+    const out = ac.createGain(); out.gain.value = 0; out.connect(ac.destination);
+    const crush = ac.createWaveShaper(); crush.curve = crushCurve(6);
+    const drive = ac.createWaveShaper(); drive.curve = driveCurve(3);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 220; lp.Q.value = 6;
+    const o1 = ac.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 46;
+    const o2 = ac.createOscillator(); o2.type = 'square'; o2.frequency.value = 46.7;
+    const og = ac.createGain(); og.gain.value = .5;
+    // stutter: a square LFO chopping the hum on and off
+    const chop = ac.createGain(); chop.gain.value = .55;
+    const lfo = ac.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 12;
+    const lfoAmt = ac.createGain(); lfoAmt.gain.value = .45; lfo.connect(lfoAmt).connect(chop.gain);
+    o1.connect(og); o2.connect(og); og.connect(drive).connect(crush).connect(lp).connect(chop).connect(out);
+    [o1, o2, lfo].forEach(o => o.start());
+    bass = { out, lp, o1, o2, lfo };
+    return bass;
+  }
+  function bassFollow(speed) {                  // speed in pieces per frame
+    if (!soundOn || !ac) { if (bass) bass.out.gain.setTargetAtTime(0, ac.currentTime, .05); return; }
+    const b = bassRig(); if (!b) return;
+    const amt = Math.min(1, speed * 22), t = ac.currentTime;
+    b.out.gain.setTargetAtTime(amt < .03 ? 0 : .05 + amt * .16, t, amt < .03 ? .08 : .03);
+    const f = 42 + amt * 38;
+    b.o1.frequency.setTargetAtTime(f, t, .05); b.o2.frequency.setTargetAtTime(f * 1.015, t, .05);
+    b.lp.frequency.setTargetAtTime(180 + amt * 900, t, .04);
+    b.lfo.frequency.setTargetAtTime(9 + amt * 26, t, .05);
+  }
+  // The one sound: Home's dial detent each time a piece passes the needle (Popkit, popkit.js).
+  function tick() {
+    if (soundOn && window.Popkit) Popkit.play('detent');
+  }
+
+
+
+  // ---------- Sci-fi glitch (category change) ----------
+  // Built fresh each time: a burst of very short square-wave fragments at random pitches, hopping left and
+  // right in stereo, high-passed so it stays crisp and digital rather than noisy, ending on a quick upward chirp.
+  function sciGlitch() {
+    return;   // off: only the deep tick plays for now
+    if (!soundOn || !ac) return;
+    const t0 = ac.currentTime + .005, out = ac.createGain(), hp = ac.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = 700; out.gain.value = .9;
+    hp.connect(out).connect(ac.destination);
+    const pan = ac.createStereoPanner ? () => ac.createStereoPanner() : null;
+    let t = t0;
+    const frags = 9 + (Math.random() * 4 | 0);
+    for (let k = 0; k < frags; k++) {
+      const d = .007 + Math.random() * .016, o = ac.createOscillator(), g = ac.createGain();
+      o.type = Math.random() > .3 ? 'square' : 'sawtooth';
+      const f = [880, 1320, 1760, 2640, 3520, 5280][Math.random() * 6 | 0] * (Math.random() > .5 ? 1 : 1.5);
+      o.frequency.setValueAtTime(f, t);
+      if (Math.random() > .6) o.frequency.exponentialRampToValueAtTime(f * (Math.random() > .5 ? 2 : .5), t + d);
+      const lvl = .05 + Math.random() * .05;
+      g.gain.setValueAtTime(lvl, t); g.gain.setValueAtTime(lvl, t + d * .8); g.gain.linearRampToValueAtTime(0, t + d);
+      let node = o.connect(g);
+      if (pan) { const p = pan(); p.pan.value = Math.random() * 1.6 - .8; node = node.connect(p); }
+      node.connect(hp);
+      o.start(t); o.stop(t + d + .002);
+      t += d + (Math.random() > .7 ? .012 : .002);           // tiny gaps make it stutter
+    }
+    // closing chirp
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(1800, t); o.frequency.exponentialRampToValueAtTime(5200, t + .05);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.07, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .06);
+    o.connect(g).connect(hp); o.start(t); o.stop(t + .065);
+  }
+  function tap() {                               // every click: Home's pop (the dial keeps its detent)
+    unlockAudio(); if (soundOn && window.Popkit) Popkit.play('pop'); return;
+    if (!soundOn || !ac) return;
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(480, t); o.frequency.exponentialRampToValueAtTime(920, t + .05);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .1);
+  }
+  const SND_ON = '<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
+  const SND_OFF = '<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>';
+  $('sndIco').innerHTML = SND_ON;
+  $('snd').addEventListener('click', () => {
+    soundOn = !soundOn; if (soundOn) tap();
+    $('sndIco').innerHTML = soundOn ? SND_ON : SND_OFF;
+    $('snd').setAttribute('aria-pressed', soundOn); $('snd').setAttribute('aria-label', soundOn ? 'Mute ticks' : 'Unmute ticks');
+  });
+
+  // ---------- Back to Home: the readout tunes down 100.0 → 98.0, the signal drops, then the page would switch ----------
+  let leaving = false;
+  $('back').addEventListener('click', () => {
+    if (openIdx >= 0) { tap(); closeDetail(); return; }
+    if (leaving) return; leaving = true; tap();
+    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'index.html#home' }); return; }   // the readout moves to the middle and tunes down
+    const station = $('station'), fq = $('fq'), nm = $('nm');
+    station.classList.add('tune-out'); document.body.classList.add('leaving');
+    const t0 = performance.now(), dur = reduce ? 0 : 700;
+    let lastStep = 1000;
+    (function run(now) {
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3), v = 100 - 2 * e;
+      fq.textContent = v.toFixed(1);
+      // silent: no ticks on the way back to Home
+      if (k < 1) return requestAnimationFrame(run);
+      nm.textContent = 'Home'; station.classList.remove('tune-out');
+      $('toast').classList.add('show');
+      setTimeout(() => {
+        $('toast').classList.remove('show'); document.body.classList.remove('leaving');
+        fq.textContent = '100.0'; nm.textContent = 'Designs'; leaving = false;
+      }, 1600);
+    })(t0);
+  });
+
+
+  // =====================================================================================
+  // Project page. Clicking the piece on the needle flies its image into the hero of a
+  // project page. The bottom dial switches to section ticks that follow your scroll.
+  // Copy below is placeholder written per category, to be replaced with the real story.
+  // =====================================================================================
+  const COPY = {
+    '3D': { type: '3D illustration', role: 'Modelling, lighting, art direction',
+      sum: 'A hero object modelled, lit and rendered in Blender, built to carry an idea in a single frame.',
+      state: t => `${t} started with one question: how do you make a familiar object feel worth collecting?`,
+      p: ['I blocked out the form first, then kept pushing materials and light until the object read clearly at thumbnail size and still rewarded a closer look.',
+          'The backdrop, the softness of the shadows and the colour of the light were all tuned together, so the piece can stand alone or slot into a wider brand system.'],
+      steps: [['Reference', 'Mood, shape language and light references.'], ['Blockout', 'Rough forms to lock proportion and camera.'], ['Materials', 'Surfaces tuned for colour and response to light.'], ['Lighting', 'Key, rim and bounce to shape the mood.'], ['Render', 'Final frame, colour pass and crops.']] },
+    'Product': { type: 'Interaction design', role: 'Product design, prototyping, code',
+      sum: 'An interaction study that makes a common control feel physical, then proves it in working code.',
+      state: t => `${t} asks how a small control can carry weight, feedback and a bit of personality.`,
+      p: ['I mapped every state of the control first: idle, hover, drag, snap and settle, so the motion has rules instead of guesses.',
+          'Then I built it as a real prototype with timing, easing and sound tuned by hand, so it can be tested on real fingers and handed straight to engineering.'],
+      steps: [['Problem', 'Where the default control feels flat.'], ['States', 'Every state and transition mapped.'], ['Prototype', 'Built in code to feel it for real.'], ['Tuning', 'Timing, easing and sound by hand.'], ['Handoff', 'Specs and the working build.']] },
+    'Brand': { type: 'Brand asset', role: 'Brand identity, 3D, illustration',
+      sum: 'A brand piece with personality: real-world objects that take the identity off the screen.',
+      state: t => `${t} was about giving the brand something to hold, not just something to look at.`,
+      p: ['I started from the identity system, its colours, marks and tone, and asked where it could live as a physical thing.',
+          'Each object was modelled and dressed in the brand’s language so it works as merch, campaign imagery or a hero visual on its own.'],
+      steps: [['Identity', 'Colours, marks and tone of voice.'], ['Objects', 'Where the brand lives in real life.'], ['Model', 'Built and dressed in 3D.'], ['Details', 'Stickers, stitching and texture.'], ['Assets', 'Crops for web, social and print.']] },
+    'Motion': { type: 'Motion study', role: 'Animation, 3D, art direction',
+      sum: 'A study in speed and weight, rendered as stills that still feel like they are moving.',
+      state: t => `${t} explores how blur, timing and camera can make a single frame feel fast.`,
+      p: ['I animated the full move first, then hunted for the frame where the motion reads best: the moment just before or after the peak.',
+          'Motion blur, camera angle and colour were pushed together so the still carries the energy of the loop it came from.'],
+      steps: [['Storyboard', 'The move and the moment to capture.'], ['Blockout', 'Rough timing and camera.'], ['Animation', 'Spacing, arcs and weight.'], ['Blur', 'Shutter and motion blur tuned.'], ['Frames', 'Hero stills and the loop.']] }
+  };
+  const SECS = ['Intro', 'Overview', 'Process', 'Details', 'Palette', 'Next'];
+  const CROPS = [['50% 50%', 180, 'Form'], ['28% 34%', 300, 'Material'], ['72% 68%', 300, 'Light']];
+  const detail = $('detail'), dwrap = $('dwrap');
+  let openIdx = -1, busy = false;
+  const pad = i => String(i + 1).padStart(2, '0');
+  const still = it => it.video ? it.poster : it.src;
+
+  function render(i) {
+    const it = items[i], c = COPY[it.cat], nx = items[(i + 1) % N];
+    const media = it.video ? `<video src="${it.video}" poster="${it.poster}" muted loop playsinline autoplay></video>` : `<img src="${it.src}" alt="${it.t}">`;
+    document.body.classList.toggle('mini', true);
+    if (true) {                                     // every piece: picture, title, info, credits, next (the CMS can point a piece elsewhere with "link")
+      dwrap.classList.add('d-mini');
+      // the piece whole, in its own shape (no cuts), with its details beside it; a piece from a bigger project links to that case study
+      const parent = it.cs ? it : it.case ? items.find(y => y.cs && (y.page || '').split('#')[1] === it.case) : null;
+      const credits = it.credits && it.credits.length ? it.credits : [['Design', 'Kingsley Mkpandiok']];
+      dwrap.innerHTML = `
+      <section class="d-sec d-top" data-s="0">
+        <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
+          <div class="d-pic" id="dpic">${media}</div>
+        </div></div>
+        <div class="d-info">
+          <div class="d-ih"><h1>${it.t}</h1>${it.year ? `<span class="d-yr">${it.year}</span>` : ''}<span class="d-chip">${it.cat}</span></div>
+          <div class="d-ib"><h3>Project info</h3><p>${it.summary || c.sum}</p>${parent ? `<a class="d-read" href="${parent.page}" id="dread">Read case study</a>` : ''}</div>
+          <div class="d-ib"><h3>Credits</h3><dl class="d-cred">${credits.map(([r, n]) => `<div><dt>${r}</dt><dd>${n}</dd></div>`).join('')}</dl></div>
+        </div></div>
+      </section>
+      <section class="d-sec" data-s="1">
+        <div class="d-next next" id="dnext">
+          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+        </div>
+      </section>`;
+      if (parent) $('dread').addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); tap();
+        const href = parent.page; if (window.Tuner) Tuner.go({ from: +(100 + (i + 1) / 10).toFixed(1), to: +parent.fq || 102, name: parent.t, href }); else location.href = href; });
+      const v0 = $('dmedia').querySelector('video'); if (v0) { v0.muted = true; const pr = v0.play(); if (pr) pr.catch(() => {}); }
+      $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage((i + 1) % N) : swapDetail((i + 1) % N); });
+      $('fq').textContent = pad(i); $('nm').textContent = it.t;
+      if (window.KMtrack) KMtrack('/designs/' + slugOf(it.t), it.t);   // analytics: which pieces people open
+      $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';
+      $('back').setAttribute('aria-label', 'Back to Designs, 100.0');
+      measureSecs();
+      return;
+    }
+    dwrap.classList.remove('d-mini');
+    dwrap.innerHTML = `
+      <section class="d-sec d-top" data-s="0">
+        <div class="d-frame${it.video ? ' white' : ''}" id="dmedia">
+          <div class="d-pic" id="dpic">${media}</div>
+          <i class="notch l" id="nL"></i><i class="notch r" id="nR"></i>
+          <div class="d-over" id="dover" style="color:${it.dark ? '#fff' : '#0b0b0b'}"><div class="d-label"><i></i>${pad(i)} · ${it.cat}</div><h1>${it.t}</h1></div>
+        </div>
+        <div class="d-intro">
+          <p class="d-sum">${it.summary || c.sum}</p>
+          <dl class="d-meta">
+            ${it.client ? `<div><dt>Client</dt><dd>${it.client}</dd></div>` : ''}
+            <div><dt>Type</dt><dd>${c.type}</dd></div>
+            ${it.year ? `<div><dt>Year</dt><dd>${it.year}</dd></div>` : ''}
+            <div><dt>Role</dt><dd>${it.role || c.role}</dd></div>
+            <div><dt>Tools</dt><dd>${toolIcons(it.tools)}</dd></div>
+          </dl>
+        </div>
+      </section>
+      <section class="d-sec d-two" data-s="1">
+        <div class="d-label"><i></i>Overview</div>
+        <div><p class="d-state">${c.state(it.t)}</p><div class="d-cols"><p>${c.p[0]}</p><p>${c.p[1]}</p></div></div>
+      </section>
+      <section class="d-sec" data-s="2">
+        <div class="d-label"><i></i>Process</div>
+        <div class="d-steps">${c.steps.map((s, k) => `<div class="d-step"><span class="n">0${k + 1}</span><div><b>${s[0]}</b><span>${s[1]}</span></div></div>`).join('')}</div>
+      </section>
+      <section class="d-sec" data-s="3">
+        <div class="d-label"><i></i>Details</div>
+        <div class="d-crops">${CROPS.map(([pos, z, l]) => `<div class="d-crop" style="background-image:url(${still(it)});background-position:${pos};background-size:${z}%"><em>${l}</em></div>`).join('')}</div>
+      </section>
+      <section class="d-sec" data-s="4">
+        <div class="d-label"><i></i>Palette · sampled from the piece</div>
+        <div class="d-pal" id="dpal"></div>
+      </section>
+      <section class="d-sec" data-s="5">
+        <div class="d-next next" id="dnext">
+          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+        </div>
+      </section>`;
+    const m = $('dmedia');
+    const v = m.querySelector('video'); if (v) { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); }
+    $('dnext').addEventListener('click', () => { tap(); swapDetail((i + 1) % N); });
+    palette(still(it));
+    $('fq').textContent = pad(i); $('nm').textContent = it.t;
+    $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';
+    $('back').setAttribute('aria-label', 'Back to Designs, 100.0');
+    measureSecs();
+  }
+
+  // Five colours sampled from the image itself
+  function palette(src) {
+    const im = new Image();
+    im.onload = () => {
+      const cv = document.createElement('canvas'), w = 48, h = Math.round(48 / (im.width / im.height));
+      cv.width = w; cv.height = h; const x = cv.getContext('2d'); x.drawImage(im, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data, bins = new Map();
+      for (let k = 0; k < d.length; k += 4) {
+        const key = (d[k] >> 5) << 6 | (d[k + 1] >> 5) << 3 | (d[k + 2] >> 5);
+        const b = bins.get(key) || { n: 0, r: 0, g: 0, b: 0 }; b.n++; b.r += d[k]; b.g += d[k + 1]; b.b += d[k + 2]; bins.set(key, b);
+      }
+      const cols = [...bins.values()].sort((a, b) => b.n - a.n).map(b => [b.r / b.n, b.g / b.n, b.b / b.n]);
+      const pick = [];
+      for (const c of cols) { if (pick.every(q => Math.hypot(q[0] - c[0], q[1] - c[1], q[2] - c[2]) > 60)) pick.push(c); if (pick.length === 5) break; }
+      const el = $('dpal'); if (!el) return;
+      el.innerHTML = pick.map(([r, g, b]) => {
+        const hex = '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+        const lum = .2126 * r + .7152 * g + .0722 * b;
+        return `<div class="d-sw" style="background:${hex};color:${lum > 150 ? '#000' : '#fff'}">${hex}</div>`;
+      }).join('');
+    };
+    im.src = src;
+  }
+
+  // ---------- Tap ripple ----------
+  // Same ripple as V1's image tap: a WebGL canvas redraws the picture with a ring of displacement travelling
+  // out from the click, plus a faint highlight on the ring. Here it rides inside the image as it flies open.
+  const RIPPLE = { ms: 1250, speed: .75, amp: 18, width: 34 };
+  const VERT = 'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  const FRAG = `precision mediump float;varying vec2 uv;uniform sampler2D tex;uniform vec2 size,c,cover;uniform float r,amp,wid,fade;
+    void main(){
+      vec2 px=uv*size, v=px-c; float d=length(v);
+      float band=exp(-pow((d-r)/wid,2.));
+      float band2=exp(-pow((d-r+wid*2.2)/(wid*.8),2.))*.45;
+      float off=amp*(band-band2)*fade;
+      vec2 q=(px-(d>0.?v/d:vec2(0.))*off)/size;
+      vec2 t=vec2(.5)+(q-vec2(.5))*cover;
+      vec4 col=texture2D(tex,clamp(t,0.,1.));
+      col.rgb+=.07*band*fade;
+      gl_FragColor=col;
+    }`;
+  const texCache = new Map();
+  // Thumbnails (assets/designs/thumbs/, 240px) load first so the row is never blank while full images arrive.
+  const thumbCache = new Map();
+  function thumbFor(path) {
+    if (!path || path.startsWith('data:') || !path.includes('assets/designs/')) return null;
+    let im = thumbCache.get(path);
+    if (!im) { im = new Image(); im.decoding = 'async'; im.src = path.replace('assets/designs/', 'assets/designs/thumbs/'); thumbCache.set(path, im); }
+    return im;
+  }
+  items.forEach(it => thumbFor(still(it)));
+  function texImg(src) { let im = texCache.get(src); if (!im) { im = xo(new Image(), src); im.src = src; texCache.set(src, im); } return im; }
+  const warm = () => { slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } }); items.forEach(it => texImg(still(it))); };
+  if (document.readyState === 'complete') setTimeout(warm, 200); else addEventListener('load', () => setTimeout(warm, 200));          // warm up so the first tap can ripple
+  function makeRipple(src, W, H, cx, cy) {
+    if (/^https?:/.test(src)) return null;   // pictures from another site can't go into WebGL; no ripple for those
+    const im = texImg(src);
+    if (reduce || !im.complete || !im.naturalWidth) return null;
+    const cv = document.createElement('canvas');
+    const gl = cv.getContext('webgl', { premultipliedAlpha: false });
+    if (!gl) return null;
+    const sh = (type, code) => { const o = gl.createShader(type); gl.shaderSource(o, code); gl.compileShader(o); return o; };
+    const pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+    ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); } catch (_) { return null; }
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    // render at the hero's size so it stays crisp once it has grown
+    const k = 2.2;
+    cv.width = Math.round(W * dpr * k); cv.height = Math.round(H * dpr * k);
+    gl.viewport(0, 0, cv.width, cv.height);
+    const ia = im.naturalWidth / im.naturalHeight, ba = W / H, U = n => gl.getUniformLocation(pr, n);
+    gl.uniform2f(U('size'), W, H); gl.uniform2f(U('c'), cx, cy);
+    gl.uniform2f(U('cover'), ia > ba ? ba / ia : 1, ia > ba ? 1 : ia / ba);
+    gl.uniform1f(U('amp'), RIPPLE.amp); gl.uniform1f(U('wid'), RIPPLE.width);
+    const uR = U('r'), uF = U('fade');
+    let resolve; const done = new Promise(r => resolve = r);
+    const t0 = performance.now();
+    (function draw(now) {
+      const t = now - t0, q = Math.min(1, t / RIPPLE.ms);
+      gl.uniform1f(uR, t * RIPPLE.speed); gl.uniform1f(uF, Math.pow(1 - q, 1.6));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (q < 1) requestAnimationFrame(draw); else resolve();
+    })(t0);
+    return { cv, done };
+  }
+
+  // ---------- Fly the image between the row and the hero ----------
+  function flyEl(from, node, src) {
+    const f = document.createElement('div'); f.className = 'fly';
+    if (node) f.appendChild(node); else f.innerHTML = `<img src="${src}" alt="">`;
+    Object.assign(f.style, { left: from.left + 'px', top: from.top + 'px', width: from.width + 'px', height: from.height + 'px', transformOrigin: '0 0' });
+    document.body.appendChild(f);
+    return f;
+  }
+  function flyTo(f, from, to, ms) {
+    if (reduce) return Promise.resolve();
+    // animate the box itself; the picture inside stays object-fit: cover, so it re-crops instead of stretching
+    const k = r => ({ left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    return f.animate([k(from), k(to)], { duration: ms, easing: 'cubic-bezier(.65,0,.2,1)', fill: 'forwards' }).finished;
+  }
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  function setOrigin(x, y) { detail.style.setProperty('--rx', x + 'px'); detail.style.setProperty('--ry', y + 'px'); }
+
+  // Tap → the picture ripples where you touched it → the page opens as a circle from that point while the
+  // still-rippling picture flies into the hero.
+  // Pieces with their own page: the picture ripples, a circle of the page colour grows from the tap, then
+  // the project page opens (and opens itself from the same point).
+  async function goPage(i, x, y) {
+    busy = true; tap();
+    const from = slots[i].getBoundingClientRect();
+    if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
+    const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
+    const f = flyEl(from, rp && rp.cv, still(items[i]));   // the picture itself ripples from the tap (no ring lines)
+    if (window.Tuner) {                                       // then the page blurs and the readout tunes to the piece's station
+      try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+      await wait(rp && !reduce ? 260 : 0);
+      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: items[i].link });
+      setTimeout(() => { f.remove(); busy = false; }, 2000);
+      return;
+    }
+    try { sessionStorage.setItem('km-enter', JSON.stringify({ x: x / innerWidth, y: y / innerHeight })); sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+    const cov = document.createElement('div'); cov.className = 'pagecover';
+    cov.style.setProperty('--rx', x + 'px'); cov.style.setProperty('--ry', y + 'px'); document.body.appendChild(cov);
+    await wait(rp && !reduce ? 300 : 0);                      // let the ripple read on the picture
+    requestAnimationFrame(() => cov.classList.add('on'));
+    await wait(reduce ? 0 : 400);                             // the circle needs only to cover the screen
+    location.href = items[i].link;
+    setTimeout(() => { f.remove(); cov.remove(); busy = false; }, 1500);
+  }
+  if (PROJECT_PAGE) setTimeout(() => { [PROJECT_PAGE, 'logo.html', 'product.html', 'showcase.html'].forEach(h => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; document.head.appendChild(l); }); }, 1500);
+  addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly').forEach(c => c.remove()); busy = false; flyIdx = -1; } });   // back button: nothing left over
+  async function openDetail(i, x, y, fr) {      // fr: the box it flies from (a tile in the All view), else the piece on the dial
+    if (items[i] && items[i].link && !busy) return goPage(i, x, y);
+    if (busy || openIdx >= 0) return; busy = true; tap();
+    vpEl.classList.remove('show');
+    const from = fr || slots[i].getBoundingClientRect();
+    if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
+    const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
+    const f = flyEl(from, rp && rp.cv, still(items[i]));
+    broadcast(x, y);
+    flyIdx = i;
+    await wait(rp ? 280 : 0);                                     // let the first ring travel before it moves
+    render(i); openIdx = i; detail.scrollTop = 0;
+    const m = $('dmedia'); m.classList.add('hidden');
+    setOrigin(x, y);
+    document.body.classList.add('open');
+    await flyTo(f, from, m.getBoundingClientRect(), 760);
+    if (fr) { document.body.classList.add('noanim'); closeOverview(i); setTimeout(() => document.body.classList.remove('noanim'), 60); }   // the All view closes out of sight, behind the small view, so closing that lands on this piece in the row
+    if (rp) await rp.done;
+    m.classList.remove('hidden'); f.remove(); flyIdx = -1;
+    requestAnimationFrame(() => m.classList.add('in'));
+    detail.focus({ preventScroll: true }); busy = false;
+  }
+  async function closeDetail() {
+    if (busy || openIdx < 0) return; busy = true;
+    const i = openIdx; target = p = i; openIdx = -1;
+    const m = $('dmedia'), from = m.getBoundingClientRect();
+    m.classList.add('hidden');
+    const f = flyEl(from, null, still(items[i]));
+    $('fq').textContent = '100.0'; $('nm').textContent = 'Designs';
+    $('bkF').textContent = '98.0'; $('bkN').textContent = 'Home'; $('back').setAttribute('aria-label', 'Tune back to Home, 98.0');
+    await new Promise(r => requestAnimationFrame(r));
+    const to = slots[i].getBoundingClientRect();
+    setOrigin(to.left + to.width / 2, to.top + to.height / 2);   // the page closes back into the piece
+    document.body.classList.remove('open');
+    flyIdx = i;
+    await flyTo(f, from, to, 640);
+    f.remove(); flyIdx = -1; busy = false;
+  }
+  function swapDetail(i) {
+    if (busy || i === openIdx) return; busy = true; tick();
+    dwrap.classList.add('swap');
+    setTimeout(() => { render(i); openIdx = i; target = p = i; detail.scrollTop = 0; dwrap.classList.remove('swap'); busy = false; setTimeout(() => $('dmedia').classList.add('in'), 120); }, reduce ? 0 : 300);
+  }
+
+  // "View project" pill follows the cursor over the piece on the needle
+  const vpEl = $('vp');
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const over = openIdx < 0 && !ovOpen && !dragging && e.target.closest && e.target.closest('.slot.active');
+    vpEl.classList.toggle('show', !!over);
+    setHover(!!over);
+    vpEl.style.left = e.clientX + 'px'; vpEl.style.top = (e.clientY - 26) + 'px';
+  });
+
+  // Section dial: one tall tick per section, four small ticks between; follows the scroll, and can be dragged
+  const sstrip = $('sstrip'), sdial = $('sdial');
+  let secTops = [], sp = 0, SSP = 150;
+  const sticks = [];
+  for (let k = 0; k <= (SECS.length - 1) * 5; k++) { const l = document.createElementNS(NS, 'line'); l.setAttribute('stroke-linecap', 'round'); sstrip.appendChild(l); sticks.push({ l, v: k / 5, major: k % 5 === 0 }); }
+  const slabels = SECS.map((nm, k) => { const t = document.createElementNS(NS, 'text'); t.textContent = nm.toUpperCase(); t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-family', 'Geist Mono, ui-monospace, monospace'); t.setAttribute('font-size', '10.5'); t.setAttribute('letter-spacing', '.5'); t.style.cursor = 'pointer';
+    t.addEventListener('click', () => { tap(); scrollToSec(k); }); sstrip.appendChild(t); return t; });
+  function measureSecs() { secTops = [...dwrap.querySelectorAll('[data-s]')].map(el => el.offsetTop); }
+  function secFromScroll() {
+    if (!secTops.length) return 0;
+    const max = detail.scrollHeight - detail.clientHeight;
+    if (detail.scrollTop >= max - 2) return SECS.length - 1;
+    const y = detail.scrollTop + 140;
+    for (let k = 0; k < secTops.length - 1; k++) if (y < secTops[k + 1]) return k + Math.max(0, (y - secTops[k]) / (secTops[k + 1] - secTops[k]));
+    return SECS.length - 1;
+  }
+  function scrollToSec(k) { detail.scrollTo({ top: Math.max(0, secTops[k] - 140), behavior: reduce ? 'auto' : 'smooth' }); }
+  let lastSec = 0;
+  // Hero parallax (after the Viru reference): the picture pans against the mouse, two white notches cut into
+  // the frame's sides slide up and down with it, and the title floats over the picture as its own layer.
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  function heroParallax(now) {
+    const pic = $('dpic'); if (!pic || reduce || !$('nL')) return;   // the small view has no notches and keeps the picture still
+    const ex = fine ? mx : Math.sin(now / 2600) * .6, ey = fine ? my : Math.sin(now / 3400) * .8;
+    pic.style.transform = `translate(${(-ex * 3).toFixed(2)}%, ${(-ey * 3).toFixed(2)}%)`;
+    $('nL').style.top = (40 + ey * 12).toFixed(2) + '%';
+    $('nR').style.top = (31 + ey * 9 - ex * 4).toFixed(2) + '%';
+    $('dover').style.transform = `translate(${(ex * 22).toFixed(1)}px, ${(ey * 14).toFixed(1)}px)`;
+  }
+  function drawSec(now) {
+    if (openIdx >= 0) heroParallax(now || 0);
+    if (openIdx >= 0) {
+      const t = secFromScroll(); sp += (t - sp) * (reduce ? 1 : .2);
+      const r = Math.round(t); if (r !== lastSec) { lastSec = r; tick(); sdial.setAttribute('aria-valuenow', r + 1); }
+      SSP = innerWidth < 900 ? 96 : 150;
+      const cx = innerWidth / 2;
+      sticks.forEach(({ l, v, major }) => {
+        const x = cx + (v - sp) * SSP, d = Math.abs(v - sp) * 5;
+        let L = d < PROFILE.length - 1 ? PROFILE[Math.floor(d)] + (PROFILE[Math.floor(d) + 1] - PROFILE[Math.floor(d)]) * (d % 1) : 9;
+        if (major) L = Math.max(L, 20);
+        l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', 66); l.setAttribute('y2', 66 - L);
+        l.setAttribute('stroke', THEME.ink); l.setAttribute('stroke-width', major ? 2 : 1.2);
+        l.setAttribute('stroke-opacity', (major ? .55 : .18) + Math.max(0, 1 - d / 10) * .35);
+      });
+      slabels.forEach((t, k) => { t.setAttribute('x', cx + (k - sp) * SSP); t.setAttribute('y', 86); t.setAttribute('fill', Math.abs(k - sp) < .5 ? THEME.ink : THEME.muted); t.setAttribute('font-weight', Math.abs(k - sp) < .5 ? 600 : 400); });
+    }
+    requestAnimationFrame(drawSec);
+  }
+  let sdrag = null;
+  sdial.addEventListener('pointerdown', e => { sdrag = { x: e.clientX }; sdial.setPointerCapture(e.pointerId); unlockAudio(); });
+  sdial.addEventListener('pointermove', e => {
+    if (!sdrag) return;
+    const dv = -(e.clientX - sdrag.x) / SSP; sdrag.x = e.clientX;
+    const v = Math.max(0, Math.min(SECS.length - 1, secFromScroll() + dv)), k = Math.floor(v), f = v - k;
+    const top = secTops[k] + ((secTops[k + 1] ?? secTops[k]) - secTops[k]) * f - 140;
+    detail.scrollTop = Math.max(0, top);
+  });
+  sdial.addEventListener('pointerup', () => { sdrag = null; });
+  addEventListener('resize', () => { if (openIdx >= 0) { render(openIdx); } });
+  detail.tabIndex = -1;
+  requestAnimationFrame(drawSec);
+
+  if ($('px')) Object.keys(MODES).forEach(name => {   // switcher removed: Depth + pan chosen
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = name;
+    b.setAttribute('aria-pressed', MODES[name] === PMODE);
+    b.addEventListener('click', () => { tap(); PMODE = MODES[name]; $('px').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('px').appendChild(b);
+  });
+
+  // ---------- Hover preview ----------
+  const altCache = {};
+  function altImg(i) { if (!altCache[i]) { altCache[i] = xo(new Image(), items[i].alt); altCache[i].src = items[i].alt; } return altCache[i]; }
+  function setHover(on) {
+    if (on === hovering) return;
+    hovering = on;
+    const s = slots[active], v = s && s.querySelector('video');
+    if (v) { if (on) { const pr = v.play(); if (pr) pr.catch(() => {}); } else v.pause(); }
+  }
+  slots.forEach(s => s.addEventListener('pointerleave', () => setHover(false)));
+
+  // ---------- Settle tick: two soft notes, like a station locking in ----------
+  function lockTick() {
+    return;   // off: only the deep tick plays for now
+    if (!soundOn || !ac) return;
+    [[1320, 0], [1980, .045]].forEach(([f, d]) => {
+      const t = ac.currentTime + d, o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.045, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .1);
+    });
+  }
+
+  // ---------- Static between categories ----------
+  // Crossing into a new category: a short burst of radio static over the row and the readout jumps through
+  // frequencies before landing back on 100.0.
+  const sc2 = document.createElement('canvas'); sc2.className = 'static'; sc2.setAttribute('aria-hidden', 'true'); document.body.appendChild(sc2);
+  const sx2 = sc2.getContext('2d');
+  let staticUntil = 0, staticStart = 0;
+  function sizeStatic() { sc2.width = Math.ceil(innerWidth / 3); sc2.height = Math.ceil(innerHeight / 3); }
+  sizeStatic(); addEventListener('resize', sizeStatic);
+  function drawStatic() {
+    if (FX === 'split') return drawSplit();
+    if (FX === 'scan') return drawScan();
+    const now = performance.now();
+    if (now > staticUntil) { if (sc2.style.opacity !== '0') sc2.style.opacity = '0'; return; }
+    const k = (now - staticStart) / (staticUntil - staticStart);
+    sc2.style.opacity = ((1 - k) * .3).toFixed(3);
+    const im = sx2.createImageData(sc2.width, sc2.height), d = im.data;
+    for (let i = 0; i < d.length; i += 4) { const v = Math.random() * 255 | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+    sx2.putImageData(im, 0, 0);
+    // a couple of torn bands
+    for (let b = 0; b < 1; b++) { const y = Math.random() * sc2.height; sx2.fillStyle = Math.random() > .5 ? '#fff' : '#000'; sx2.fillRect(0, y, sc2.width, 1 + Math.random() * 3); }
+  }
+  // Colour split (option 2): replaces the noise flash. Red slides one way, blue the other, with a small
+  // vertical jitter, then both ease back into register.
+  let FX = 'scan';     // chosen: scanline sweep ('split' = colour split, kept for reference)
+  const rOff = document.getElementById('rOff'), bOff = document.getElementById('bOff');
+  let splitOn = false;
+  function drawSplit() {
+    const now = performance.now();
+    if (now > staticUntil) {
+      if (splitOn) { field.style.filter = ''; splitOn = false; }
+      return;
+    }
+    const k = (now - staticStart) / (staticUntil - staticStart), e = Math.pow(1 - k, 2);
+    const amp = (W < 900 ? 7 : 12) * e, jit = (Math.random() - .5) * 3 * e;
+    rOff.setAttribute('dx', (amp).toFixed(2)); rOff.setAttribute('dy', (jit).toFixed(2));
+    bOff.setAttribute('dx', (-amp).toFixed(2)); bOff.setAttribute('dy', (-jit).toFixed(2));
+    if (!splitOn) { field.style.filter = 'url(#rgbsplit)'; splitOn = true; }
+  }
+  // Scanline sweep (option 3): one thin line sweeps down the row like a screen refreshing, trailing a short
+  // band of fine horizontal lines that fades behind it.
+  const sweep = document.createElement('div'); sweep.className = 'sweep'; sweep.setAttribute('aria-hidden', 'true');
+  sweep.innerHTML = '<i class="sw-trail"></i><i class="sw-line"></i>';
+  document.body.appendChild(sweep);
+  const swLine = sweep.querySelector('.sw-line'), swTrail = sweep.querySelector('.sw-trail');
+  let scanOn = false, scanDir = 1;
+  function drawScan() {
+    const now = performance.now();
+    if (now > staticUntil) { if (scanOn) { sweep.style.opacity = '0'; scanOn = false; } return; }
+    const k = (now - staticStart) / (staticUntil - staticStart);
+    // vertical line sweeps in from the edge, in the direction the row and the dial's ticks move, and lands
+    // on the needle with a small overshoot; then it fades into the needle
+    const m = Math.min(1, k / .62), c1 = 1.5, c3 = c1 + 1;
+    const e = 1 + c3 * Math.pow(m - 1, 3) + c1 * Math.pow(m - 1, 2);          // ease-out-back
+    const from = scanDir > 0 ? W + 20 : -20, x = from + (W / 2 - 1 - from) * e;
+    swLine.style.transform = `translateX(${x.toFixed(1)}px)`;
+    swTrail.style.transform = `translateX(${(scanDir > 0 ? x : x - 160).toFixed(1)}px) scaleX(${scanDir > 0 ? -1 : 1})`;
+    sweep.style.opacity = (k < .7 ? 1 : (1 - k) / .3).toFixed(3);
+    swTrail.style.opacity = (.45 * Math.max(0, 1 - m * 1.1)).toFixed(3);   // trail dies as it lands
+    swLine.style.background = `color-mix(in srgb, #ff4a1c ${Math.round(Math.max(0, (m - .55) / .45) * 100)}%, var(--ink))`;   // turns needle-red as it lands
+    scanOn = true;
+  }
+  function stationJump(cat) {
+    if (reduce || openIdx >= 0 || ovOpen) return;
+    staticStart = performance.now(); staticUntil = staticStart + (FX === 'scan' ? 760 : 320);
+    burst();
+    const fq = $('fq'), nm = $('nm'), t0 = performance.now();
+    nm.textContent = cat;
+    (function j(now) {
+      if (now - t0 < 240) { fq.textContent = (99 + Math.random() * 3).toFixed(1); requestAnimationFrame(j); }
+      else { fq.textContent = '100.0'; setTimeout(() => { if (openIdx < 0) nm.textContent = 'Designs'; }, 900); }
+    })(t0);
+  }
+  function burst() { sciGlitch(); }
+
+
+  // ---------- See everything ----------
+  // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
+  const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
+  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" style="background-image:url(${it.video ? it.poster : it.src})"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
+  document.body.appendChild(ov);
+  let ovOpen = false;
+  function openOverview() {
+    if (ovOpen || openIdx >= 0) return; ovOpen = true; tap();
+    vpEl.classList.remove('show'); setHover(false);
+    ov.querySelectorAll('.ov-t').forEach(t => t.classList.toggle('on', +t.dataset.i === active));
+    document.body.classList.add('all');
+    $('allBtn').setAttribute('aria-pressed', 'true');
+    setTimeout(() => { const on = ov.querySelector('.ov-t.on'); if (on) on.focus({ preventScroll: true, focusVisible: false }); }, 50);   // keyboard users land here; no ring for mouse users
+  }
+  function closeOverview(i) {
+    if (!ovOpen) return; ovOpen = false;
+    if (i >= 0) { target = p = i; tick(); }
+    document.body.classList.remove('all');
+    $('allBtn').setAttribute('aria-pressed', 'false');
+  }
+  let vrLastRow = null;
+  // Drum: the All view is drawn flat onto an offscreen canvas, then a WebGL pass wraps it around a turning drum.
+  // Toward the top and bottom of the screen rows bend away, compress and narrow, then fade into the background;
+  // in the middle they sit flat at true size. Doing the bend per pixel on the GPU keeps the card edges smooth.
+  // The DOM grid underneath still handles layout and clicks.
+  const ovc = document.createElement('canvas'); ovc.className = 'ovc'; ovc.setAttribute('aria-hidden', 'true');
+  ov.prepend(ovc);
+  const ovFlat = document.createElement('canvas'), oc = ovFlat.getContext('2d');
+  const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
+  const DRUM = { radius: .62, narrow: .2, fade: .16, margin: .12 };   // radius and margin (share of screen height), how much far rows narrow, fade band
+  let ogl = ovc.getContext('webgl', { premultipliedAlpha: true, alpha: true }), oglU = {}, ov2d = null;
+  if (ogl) {
+    const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    const fs = `precision highp float;uniform sampler2D t;uniform vec2 res;uniform float mid,R,narrow,cx,M,topClear,fadeT,fadeB,on;
+      void main(){
+        vec2 P=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);
+        float sy=P.y, sx=P.x, a=1.;
+        if(on>.5){
+          float s=(P.y-mid)/R;
+          if(abs(s)>.992){gl_FragColor=vec4(0.);return;}
+          float th=asin(s);
+          sy=mid+R*th;
+          sx=cx+(P.x-cx)/(1.-narrow+narrow*cos(th));
+          a=min(clamp((P.y-topClear)/fadeT,0.,1.),clamp((res.y-P.y)/fadeB,0.,1.)); a=a*a*(3.-2.*a);
+        }
+        vec2 uv=vec2(sx/res.x,(sy+M)/(res.y+2.*M));
+        if(uv.x<0.||uv.x>1.||uv.y<0.||uv.y>1.){gl_FragColor=vec4(0.);return;}
+        gl_FragColor=texture2D(t,uv)*a;
+      }`;
+    const sh = (ty, src) => { const o = ogl.createShader(ty); ogl.shaderSource(o, src); ogl.compileShader(o); return o; };
+    const pr = ogl.createProgram(); ogl.attachShader(pr, sh(ogl.VERTEX_SHADER, vs)); ogl.attachShader(pr, sh(ogl.FRAGMENT_SHADER, fs)); ogl.linkProgram(pr);
+    if (!ogl.getProgramParameter(pr, ogl.LINK_STATUS)) ogl = null;
+    else {
+      ogl.useProgram(pr);
+      ogl.bindBuffer(ogl.ARRAY_BUFFER, ogl.createBuffer());
+      ogl.bufferData(ogl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), ogl.STATIC_DRAW);
+      const loc = ogl.getAttribLocation(pr, 'p'); ogl.enableVertexAttribArray(loc); ogl.vertexAttribPointer(loc, 2, ogl.FLOAT, false, 0, 0);
+      ogl.bindTexture(ogl.TEXTURE_2D, ogl.createTexture());
+      ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => ogl.texParameteri(ogl.TEXTURE_2D, ogl[k], ogl.CLAMP_TO_EDGE));
+      ogl.texParameteri(ogl.TEXTURE_2D, ogl.TEXTURE_MIN_FILTER, ogl.LINEAR); ogl.texParameteri(ogl.TEXTURE_2D, ogl.TEXTURE_MAG_FILTER, ogl.LINEAR);
+      ogl.pixelStorei(ogl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      ['res', 'mid', 'R', 'narrow', 'cx', 'M', 'topClear', 'fadeT', 'fadeB', 'on'].forEach(n => oglU[n] = ogl.getUniformLocation(pr, n));
+    }
+  }
+  if (!ogl) ov2d = ovc.getContext('2d');      // no WebGL: show the grid flat
+  function ovWarp() {
+    if (ovOpen || document.body.classList.contains('all')) {
+      const dpr = Math.min(2, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;
+      const on = !reduce && !!ogl, mid = vh / 2, R = vh * DRUM.radius, M = on ? Math.round(vh * DRUM.margin) : 0;
+      if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) {
+        ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr);
+        if (ogl) ogl.viewport(0, 0, ovc.width, ovc.height);
+      }
+      const FW = Math.round(vw * dpr), FH = Math.round((vh + 2 * M) * dpr);
+      if (ovFlat.width !== FW || ovFlat.height !== FH) { ovFlat.width = FW; ovFlat.height = FH; }
+      oc.setTransform(dpr, 0, 0, dpr, 0, M * dpr); oc.clearRect(0, -M, vw, vh + 2 * M);
+      const gr = ov.querySelector('.ov-grid').getBoundingClientRect(), cx = gr.left + gr.width / 2;   // bend around the grid's centre
+      const th = y => Math.max(-1.45, Math.min(1.45, (y - mid) / R));
+      const f = y => on ? mid + R * Math.sin(th(y)) : y;                                   // where a line of the grid lands
+      const fade = y => on ? Math.max(0, Math.cos(th(y))) ** .6 : 1;
+      for (const o of ovTiles) {
+        const r = o.im.getBoundingClientRect();
+        // caption rides the drum and fades as it turns away (off-screen captions stay put, so the scroll length stays honest)
+        const cr = o.c.getBoundingClientRect(), base = cr.top - o.cy;
+        o.cy = base < -60 || base > vh + 60 ? 0 : f(base) - base;
+        o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
+        o.c.style.opacity = fade(base).toFixed(3);
+        if (r.bottom < -M || r.top > vh + M) continue;
+        const it = items[o.i], full = texImg(still(it)), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
+        const sw = src.naturalWidth, sh = src.naturalHeight;
+        if (sw && okDraw(src)) {
+          const ia = sw / sh, ba = r.width / r.height;
+          const cw = ia > ba ? sh * ba : sw, ch = ia > ba ? sh : sw / ba, cx0 = (sw - cw) / 2, cy0 = (sh - ch) / 2;
+          oc.drawImage(src, cx0, cy0, cw, ch, r.left, r.top, r.width, r.height);
+        }
+        if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
+      }
+      if (ogl) {
+        // pictures from another origin can't be read into WebGL (it throws); then the grid shows flat, with the plain pictures
+        try { ogl.texImage2D(ogl.TEXTURE_2D, 0, ogl.RGBA, ogl.RGBA, ogl.UNSIGNED_BYTE, ovFlat); }
+        catch (_) { ogl = null; ovc.style.display = 'none'; ov.classList.add('flat'); requestAnimationFrame(ovWarp); return; }
+        ogl.uniform2f(oglU.res, ovc.width, ovc.height);
+        ogl.uniform1f(oglU.mid, mid * dpr); ogl.uniform1f(oglU.R, R * dpr); ogl.uniform1f(oglU.narrow, DRUM.narrow);
+        ogl.uniform1f(oglU.cx, cx * dpr); ogl.uniform1f(oglU.M, M * dpr); ogl.uniform1f(oglU.topClear, (vw < 900 ? 64 : 104) * dpr); ogl.uniform1f(oglU.fadeT, 90 * dpr); ogl.uniform1f(oglU.fadeB, vh * DRUM.fade * dpr); ogl.uniform1f(oglU.on, on ? 1 : 0);   // nothing shows behind the station pill; the fade starts below it
+        ogl.clearColor(0, 0, 0, 0); ogl.clear(ogl.COLOR_BUFFER_BIT);
+        ogl.drawArrays(ogl.TRIANGLE_STRIP, 0, 4);
+      } else if (ov2d) { try { ov2d.setTransform(1, 0, 0, 1, 0, 0); ov2d.clearRect(0, 0, ovc.width, ovc.height); ov2d.drawImage(ovFlat, 0, 0); ov2d.getImageData(0, 0, 1, 1); } catch (_) { ov2d = null; ovc.style.display = 'none'; ov.classList.add('flat'); } }
+      drawVRuler();
+    } else vrLastRow = null;
+    requestAnimationFrame(ovWarp);
+  }
+  requestAnimationFrame(ovWarp);
+
+  // Side ruler for the All view
+  const vrul = document.createElement('div'); vrul.className = 'vrul'; vrul.setAttribute('aria-hidden', 'true');
+  const vrc = document.createElement('canvas'); vrul.appendChild(vrc); document.body.appendChild(vrul);
+  const vrx = vrc.getContext('2d');
+  const VR_ROW = 34;                          // ruler pixels per row of the grid
+  let vrDrag = null, vrAnim = null;
+  const ovCols = () => getComputedStyle(ov.querySelector('.ov-grid')).gridTemplateColumns.split(' ').length;
+  function vrModel() {
+    const n = ovCols(), centres = [], vh = innerHeight, st = ov.scrollTop;
+    for (let k = 0; k < ovTiles.length; k += n) { const r = ovTiles[k].im.getBoundingClientRect(); centres.push(st + r.top + r.height / 2 - vh / 2); }
+    let fr = 0;
+    if (centres.length < 2) fr = 0;
+    else if (st <= centres[0]) fr = (st - centres[0]) / (centres[1] - centres[0]);
+    else { fr = centres.length - 1; for (let k = 0; k < centres.length - 1; k++) if (st <= centres[k + 1]) { fr = k + (st - centres[k]) / (centres[k + 1] - centres[k]); break; } }
+    const cats = [];
+    ovTiles.forEach(o => { const c = items[o.i].cat; if (!cats.find(x => x.c === c)) cats.push({ c, row: Math.floor(o.i / n) }); });
+    return { rows: centres.length, fr, cats, centres, max: ov.scrollHeight - ov.clientHeight };
+  }
+  function vrScrollFor(fr) {
+    const c = vrModel().centres, max = ov.scrollHeight - ov.clientHeight;
+    const k = Math.max(0, Math.min(c.length - 1, fr)), k0 = Math.floor(k), k1 = Math.min(c.length - 1, k0 + 1);
+    return Math.max(0, Math.min(max, c[k0] + (c[k1] - c[k0]) * (k - k0)));
+  }
+  function drawVRuler() {
+    if (vrAnim) {                              // glide after a label tap, with a small overshoot
+      const x = Math.min(1, (performance.now() - vrAnim.t0) / 620);
+      const e = x >= 1 ? 1 : 1 - Math.pow(2, -9 * x) * Math.cos(x * Math.PI * 2.2);
+      ov.scrollTop = vrAnim.from + (vrAnim.to - vrAnim.from) * e;
+      if (x >= 1) vrAnim = null;
+    }
+    const dpr = Math.min(2, devicePixelRatio || 1), w = vrul.clientWidth, h = vrul.clientHeight;
+    if (!w || !h) return;
+    if (vrc.width !== Math.round(w * dpr) || vrc.height !== Math.round(h * dpr)) { vrc.width = Math.round(w * dpr); vrc.height = Math.round(h * dpr); }
+    vrx.setTransform(dpr, 0, 0, dpr, 0, 0); vrx.clearRect(0, 0, w, h);
+    const m = vrModel(), mid = h / 2, right = w - (w < 60 ? 10 : 18);
+    // the dial's detent each time a row crosses the needle (scroll, drag or a label jump)
+    const row = Math.round(m.fr);
+    if (vrLastRow !== null && row !== vrLastRow && soundOn && window.Popkit) Popkit.play('detent');
+    vrLastRow = row;
+    vrx.strokeStyle = vrx.fillStyle = THEME.ink;
+    for (let q = -8; q <= m.rows * 4 + 4; q++) {                 // minor ticks every quarter row, majors on rows
+      const v = q / 4, y = mid + (v - m.fr) * VR_ROW;
+      if (y < -10 || y > h + 10) continue;
+      const cat = q % 4 === 0 && m.cats.find(c => c.row === v);
+      const isRow = q % 4 === 0 && v >= 0 && v < m.rows;
+      const near = Math.max(0, 1 - Math.abs(y - mid) / 60);
+      const len = cat ? 22 : isRow ? 12 + near * 6 : 6 + near * 4;
+      vrx.globalAlpha = (cat ? .7 : isRow ? .4 : .16) + near * .3;
+      vrx.lineWidth = cat ? 2 : 1.2;
+      vrx.beginPath(); vrx.moveTo(right, y); vrx.lineTo(right - len, y); vrx.stroke();
+      if (cat && w >= 60) {
+        vrx.font = '500 9.5px "Geist Mono", ui-monospace, monospace'; vrx.textAlign = 'right'; vrx.textBaseline = 'middle';
+        vrx.globalAlpha = .55 + near * .45;
+        vrx.fillText(String(cat.c).toUpperCase(), right - len - 6, y);
+      }
+    }
+    vrx.globalAlpha = 1; vrx.fillStyle = '#ff4a1c';
+    vrx.beginPath(); vrx.roundRect ? vrx.roundRect(right - 30, mid - 1.5, 30, 3, 1.5) : vrx.rect(right - 30, mid - 1.5, 30, 3); vrx.fill();   // needle
+  }
+  vrul.addEventListener('pointerdown', e => {
+    vrAnim = null;
+    const m = vrModel(), y = e.clientY - vrul.getBoundingClientRect().top, mid = vrul.clientHeight / 2;
+    const hit = m.cats.find(c => Math.abs(mid + (c.row - m.fr) * VR_ROW - y) < 10);
+    if (hit) { tap(); vrAnim = { from: ov.scrollTop, to: vrScrollFor(hit.row), t0: performance.now() }; return; }
+    vrDrag = { y: e.clientY, fr: m.fr }; vrul.setPointerCapture(e.pointerId);
+  });
+  vrul.addEventListener('pointermove', e => { if (vrDrag) ov.scrollTop = vrScrollFor(vrDrag.fr - (e.clientY - vrDrag.y) / VR_ROW); });   // drag down = go back, like turning the dial
+  const vrEnd = () => { vrDrag = null; };
+  vrul.addEventListener('pointerup', vrEnd); vrul.addEventListener('pointercancel', vrEnd);
+  vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
+  $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
+  // a tile in the All view opens the piece in the small view, or the page the CMS points it to
+  ov.addEventListener('click', e => {
+    const t = e.target.closest('.ov-t'); if (!t) return;
+    const i = +t.dataset.i;
+    if (items[i].link && window.Tuner) { tap();
+      try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: items[i].link });
+      return;
+    }
+    const r = (t.querySelector('.ov-im') || t).getBoundingClientRect(), cx = e.clientX, cy = e.clientY;
+    openDetail(i, cx, cy, r);   // straight from the tile into the small view
+  });
+  if ($('fxsw')) $('fxsw').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.fx === 'test') { stationJump(items[active].cat); return; }
+    FX = b.dataset.fx;
+    $('fxsw').querySelectorAll('[data-fx="split"],[data-fx="scan"]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    field.style.filter = ''; splitOn = false; sweep.style.opacity = '0';
+    stationJump(items[active].cat);
+  });
+  if ($('edgesw')) $('edgesw').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    EDGE = b.dataset.e;
+    $('edgesw').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+
+  // =================================================================================================
+  // Radio physics preview. Each effect can be switched on and off in the panel (bottom left).
+  // =================================================================================================
+  // chosen: 1 FM wave, 4 Doppler, 5 Signal falloff, 7 Standing wave, 8 Broadcast ring, 9 Noise floor, 10 Spectrum
+  const PHY = { fm: 1, resonance: 0, interference: 0, doppler: 1, falloff: 1, diffraction: 0, standing: 1, broadcast: 1, noise: 1, spectrum: 1 };
+  const PHY_NAMES = { fm: 'FM wave', resonance: 'Resonance', interference: 'Interference', doppler: 'Doppler', falloff: 'Signal falloff',
+    diffraction: 'Diffraction', standing: 'Standing wave', broadcast: 'Broadcast ring', noise: 'Noise floor', spectrum: 'Spectrum' };
+  const speedAmt = () => Math.min(1, Math.abs(vel) * 30);
+  // grain tile shared by falloff and noise floor
+  const grain = document.createElement('canvas'); grain.width = grain.height = 160;
+  const gx = grain.getContext('2d');
+  function regrain() {
+    const im = gx.createImageData(160, 160), d = im.data;
+    for (let k = 0; k < d.length; k += 4) { const v = Math.random() * 255 | 0; d[k] = d[k + 1] = d[k + 2] = v; d[k + 3] = 255; }
+    gx.putImageData(im, 0, 0);
+  }
+  regrain();
+  let grainPat = null;
+
+  // 2 Resonance + 5 Signal falloff: pieces fill in on a sharp peak as they near the needle
+  function cardFilter(i) {
+    if (reduce) return 'none';
+    const d = Math.min(3, Math.abs(i - p));
+    let f = '';
+    if (PHY.resonance) {
+      const q = 1 / (1 + (d * 2.2) ** 2);                // resonance curve: sharp peak at the needle
+      f += `saturate(${(.35 + .65 * q).toFixed(3)}) `;
+    }
+    if (PHY.falloff) f += `contrast(${(1 - .22 * Math.min(1, d / 2)).toFixed(3)}) brightness(${(1 - .12 * Math.min(1, d / 2)).toFixed(3)}) `;
+    return f || 'none';
+  }
+  // 6 Diffraction: near the screen edge the picture spreads past its frame as a soft glow
+  function diffract(i, L, T, w, h, src, sx, sy, scw, sch) {
+    if (!PHY.diffraction || reduce) return;
+    const e = Math.max(0, Math.max(W * .14 - L, (L + w) - W * .86)) / (W * .14);
+    if (e <= 0) return;
+    const k = Math.min(1, e);
+    fx.save(); fx.filter = `blur(${(10 + 16 * k).toFixed(1)}px)`; fx.globalAlpha = .55 * k;
+    const g = 18 * k;
+    fx.drawImage(src, sx, sy, scw, sch, L - g, T - g, w + g * 2, h + g * 2);
+    fx.restore();
+  }
+  // 4 Doppler + 5 falloff grain, drawn over each piece
+  function cardFX(i, L, T, w, h) {
+    if (reduce) return;
+    const rel = i - p;
+    if (PHY.doppler && Math.abs(vel) > .0005 && Math.abs(rel) > .05) {
+      const toward = rel * vel > 0;                     // moving toward the needle?
+      const a = Math.min(.32, Math.abs(vel) * 9) * Math.min(1, Math.abs(rel));
+      fx.save(); fx.globalCompositeOperation = 'soft-light'; fx.globalAlpha = a;
+      fx.fillStyle = toward ? '#3d7bff' : '#ff6a2b'; fx.fillRect(L, T, w, h); fx.restore();
+    }
+    if (PHY.falloff) {
+      const d = Math.min(2, Math.abs(rel));
+      if (d > .15) {
+        if (!grainPat) grainPat = fx.createPattern(grain, 'repeat');
+        fx.save(); fx.globalCompositeOperation = 'overlay'; fx.globalAlpha = .14 * d; fx.fillStyle = grainPat; fx.fillRect(L, T, w, h); fx.restore();
+      }
+    }
+  }
+  // 3 Interference: two sets of fine lines with slightly different spacing; their beat makes moving moiré bands
+  function rowFX() {
+    if (!PHY.interference || reduce) return;
+    const a = speedAmt(); if (a < .02) return;
+    const [w0, h0] = sizes[Math.round(p)] || [400, 500], top = cy - h0 / 2, hh = h0;
+    fx.save(); fx.globalAlpha = .22 * a; fx.strokeStyle = THEME.ink; fx.lineWidth = 1;
+    const ph = p * 60;
+    fx.beginPath();
+    for (let x = -(ph % 6); x < W; x += 6) { fx.moveTo(x, top); fx.lineTo(x, top + hh); }
+    for (let x = -((ph * 1.08) % 6.4); x < W; x += 6.4) { fx.moveTo(x, top); fx.lineTo(x, top + hh); }
+    fx.stroke(); fx.restore();
+  }
+  // 7 Standing wave (ruler rings on settle) + 10 Spectrum (peaks at categories while moving)
+  function tickFX(L, v, x) {
+    if (reduce) return L;
+    if (PHY.standing) {
+      const t = performance.now() - settleAt;
+      if (t < 1100) L += 9 * Math.sin((v - p) * Math.PI * 1.25) * Math.cos(t / 38) * Math.exp(-t / 320);
+    }
+    if (PHY.spectrum) {
+      const a = speedAmt();
+      if (a > .02) {
+        let pk = 0;
+        for (const ci of firstOf) pk = Math.max(pk, Math.exp(-((v - ci) ** 2) / .06));
+        L += a * (34 * pk + 6 * Math.random() * Math.exp(-((v - p) ** 2) / 4));
+      }
+    }
+    return Math.max(4, L);
+  }
+  // 1 FM wave above the ruler + 9 noise floor over the row
+  const fm = document.createElement('canvas'); fm.className = 'fmwave'; fm.setAttribute('aria-hidden', 'true'); document.body.appendChild(fm);
+  const fmx = fm.getContext('2d');
+  const nf = document.createElement('canvas'); nf.className = 'noisefloor'; nf.setAttribute('aria-hidden', 'true'); nf.width = 480; nf.height = 300; document.body.appendChild(nf);
+  const nfx = nf.getContext('2d');
+  let fmPhase = 0, fmFreq = 0;
+  function overlaysFX() {
+    // FM wave
+    const dpr = Math.min(2, devicePixelRatio || 1), fw = innerWidth, fh = 30;
+    if (fm.width !== Math.round(fw * dpr)) { fm.width = Math.round(fw * dpr); fm.height = Math.round(fh * dpr); }
+    fmx.setTransform(dpr, 0, 0, dpr, 0, 0); fmx.clearRect(0, 0, fw, fh);
+    if (PHY.fm && !reduce && openIdx < 0) {
+      const a = speedAmt();
+      fmFreq += ((.018 + a * .11) - fmFreq) * .08;     // carrier speeds up with scroll speed (frequency modulation)
+      fmPhase += .05 + a * .5;
+      fmx.beginPath();
+      for (let x = 0; x <= fw; x += 2) {
+        const env = Math.exp(-(((x - fw / 2) / (fw * .33)) ** 2));
+        const y = fh / 2 + Math.sin(x * fmFreq - fmPhase) * (2 + 7 * a) * env;
+        x ? fmx.lineTo(x, y) : fmx.moveTo(x, y);
+      }
+      fmx.strokeStyle = THEME.ink; fmx.globalAlpha = .25 + .45 * a; fmx.lineWidth = 1.2; fmx.stroke(); fmx.globalAlpha = 1;
+    }
+    // noise floor: faint grain while between pieces
+    const between = Math.abs(p - Math.round(p)) * 2;
+    if (PHY.noise && !reduce && openIdx < 0 && between > .02) {
+      const im = nfx.createImageData(nf.width, nf.height), d = im.data;
+      for (let k = 0; k < d.length; k += 4) { const v = Math.random() * 255 | 0; d[k] = d[k + 1] = d[k + 2] = v; d[k + 3] = 255; }
+      nfx.putImageData(im, 0, 0);
+      nf.style.opacity = (.1 * Math.min(1, between * 1.5)).toFixed(3);
+    } else nf.style.opacity = '0';
+    if (PHY.falloff && Math.random() < .2) { regrain(); grainPat = null; }
+  }
+  // 8 Broadcast: opening a project sends rings out from the tap across the page
+  function broadcast(x, y) {
+    if (!PHY.broadcast || reduce) return;
+    for (let k = 0; k < 3; k++) {
+      const r = document.createElement('i'); r.className = 'bcast';
+      r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.animationDelay = (k * 140) + 'ms';
+      document.body.appendChild(r); setTimeout(() => r.remove(), 1400 + k * 140);
+    }
+  }
+  // panel
+  const ph = document.createElement('div'); ph.className = 'phys'; ph.setAttribute('role', 'group'); ph.setAttribute('aria-label', 'Radio physics (preview)');
+  ph.innerHTML = '<span>Radio physics</span>' + Object.keys(PHY).map((k, n) => `<button type="button" data-k="${k}" aria-pressed="true">${n + 1} ${PHY_NAMES[k]}</button>`).join('') +
+    '<button type="button" class="all" data-all="1">All off</button>';
+  // (preview panel not shown on the site)
+  ph.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.all) {
+      const on = b.textContent === 'All on';
+      Object.keys(PHY).forEach(k => PHY[k] = on ? 1 : 0);
+      ph.querySelectorAll('[data-k]').forEach(x => x.setAttribute('aria-pressed', on));
+      b.textContent = on ? 'All off' : 'All on';
+      return;
+    }
+    PHY[b.dataset.k] = PHY[b.dataset.k] ? 0 : 1;
+    b.setAttribute('aria-pressed', !!PHY[b.dataset.k]);
+  });
+  addEventListener('resize', measure);
+  measure(); requestAnimationFrame(frame);
+  if (document.fonts) document.fonts.ready.then(drawStrip);
+})();
+</script>

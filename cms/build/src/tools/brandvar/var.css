@@ -1,0 +1,30 @@
+/* ---------- brand page versions ---------- */
+.cmpv { touch-action: pan-y; cursor: ew-resize; user-select: none; clip-path: none !important }
+.cmpv .cl { position: absolute; inset: 0 } .cmpv .cl img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none }
+.cmpv .sk img { filter: grayscale(1) contrast(1.6) brightness(1.15) blur(.3px) }
+.cmpv .cline { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; background: var(--red); z-index: 4 }
+.cmpv .cline .split-tag { opacity: 1; top: 14px; right: auto; left: 10px }
+.cmpl { position: absolute; bottom: 14px; left: 16px; z-index: 5; color: #fff; mix-blend-mode: difference } .cmpl.r { left: auto; right: 16px }
+/* colour dial */
+.cdial { display: block; min-height: 0; margin: 0 calc(-1 * var(--gut)) }
+.cpin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden }
+.cfill { position: absolute; inset: 0 }
+.cinfo { position: absolute; left: var(--gut); bottom: 120px; display: grid; gap: 12px; color: inherit }
+.cinfo .mono { color: inherit; opacity: .75 }
+.cinfo b { font-size: clamp(64px, 10vw, 168px); line-height: .9; font-weight: 500; letter-spacing: -0.055em }
+.cstations { position: absolute; right: max(var(--gut), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 14px; text-align: right }
+.cstations .mono { color: inherit; opacity: .4; transition: opacity .3s } .cstations .mono.on { opacity: 1 }
+.cruler { position: absolute; left: 0; right: 0; bottom: 36px; height: 46px } .cruler canvas { width: 100%; height: 100% }
+.tread { display: flex; justify-content: space-between; gap: 16px; padding: 16px 24px; border-top: 1px solid var(--line) }
+@media (max-width: 899px) { .cstations { display: none } }
+/* type versions */
+.tdial { display: block; padding: 0; background: none; margin: 0 calc(-1 * var(--gut)) }
+.tpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; place-items: center; align-content: center; gap: 22px; overflow: hidden; background: var(--panel) }
+.tbig { color: var(--ink); font-size: clamp(90px, 15vw, 260px); line-height: .9; letter-spacing: -0.045em; white-space: nowrap }
+.tdl { position: absolute; top: 110px; left: var(--gut) }
+.tdst { position: absolute; right: max(var(--gut), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 12px; text-align: right }
+.tdst .mono { opacity: .4; transition: opacity .3s, color .3s } .tdst .mono.on { opacity: 1; color: var(--ink) }
+.truler { position: absolute; left: 0; right: 0; bottom: 96px; height: 46px } .truler canvas { width: 100%; height: 100% }
+.tticker { display: block; padding: 40px 0 0; background: var(--panel); overflow: hidden }
+.tkrow { white-space: nowrap; color: var(--ink); font-size: clamp(80px, 11vw, 190px); line-height: 1.05; letter-spacing: -0.04em; will-change: transform }
+.tkrow.rev { font-size: clamp(28px, 3vw, 46px); color: var(--muted); letter-spacing: -0.01em; padding: 10px 0 30px }

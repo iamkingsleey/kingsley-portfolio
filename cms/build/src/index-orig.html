@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kingsley M.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&display=swap">
+<style>
+/* Layout: the tuning dial sits on the left edge of Home; inner pages swap it for a side menu (a rail with the current page as a tag); each station is a full-screen layer revealed from the dial; Feed scrolls inside its own pane with a graduated ruler on the right. */
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --text: #3b3b3b;
+  --muted: #8c8c8c;
+  --time: #7d7d7d;
+  --ring: #e4e4e4;
+  --disc: #f2f2f2;
+  --pill: #f2f2f2;
+  --pill-hover: #e8e8e8;
+  --tile: #f3f3f3;
+  --photo: #aaa9aa;
+  --display: "Jockey One", "Arial Narrow", Impact, sans-serif;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --content-left: 366px;
+  --hero-left: 708px;
+  --band: 0px;
+  --marker: #fff0a6;   /* highlighter on the bio */
+  --flush: 80px;   /* one top line: the menu's Home, the first row of images and the ruler's active tick */
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { height: 100%; overflow: hidden }
+body { background: var(--bg); color: var(--text); font-family: var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 }
+a { color: inherit; text-decoration: none }
+button { font: inherit; background: none; border: 0; padding: 0; color: inherit; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
+
+/* ---------- Dial (fixed, always on top) ---------- */
+.dial-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; touch-action: none }
+#dialSvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible }
+#hit { fill: transparent; pointer-events: all; cursor: grab }
+.dragging #hit { cursor: grabbing }
+.t-minor { stroke: var(--ink); stroke-linecap: round }
+.t-major { stroke: var(--muted); stroke-linecap: round; transition: stroke .2s }
+.t-major.on { stroke: var(--ink) }
+.needle { stroke: var(--ink); stroke-linecap: round }
+
+.pill { position: absolute; pointer-events: auto; font-size: 14px; line-height: 16px; padding: 6px 12px; border-radius: 8px;
+  background: var(--pill); color: var(--text); white-space: nowrap; transition: background .2s, color .2s }
+.pill:hover { background: var(--pill-hover) }
+.pill.on { background: var(--ink); color: #fff }
+
+/* ---------- Station layers ---------- */
+.panel { position: fixed; inset: 0; background: var(--bg) }
+.panel[hidden] { display: none }
+
+/* Home */
+.time { position: absolute; z-index: 1; top: calc(56px + env(safe-area-inset-top, 0px)); right: max(64px, env(safe-area-inset-right, 0px)); font-size: 16px; letter-spacing: -0.32px; color: var(--time) }
+.hero { position: absolute; z-index: 1; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(440px, calc(100% - var(--hero-left) - 24px)) }
+.avatar { width: 94px; height: 94px; border-radius: 50%; overflow: hidden; background: var(--photo); margin-bottom: 14px }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block }
+h1 { font: 400 50px/1.05 var(--display); color: var(--ink); letter-spacing: -1px; margin: 0 }
+/* Typed name: one line that never wraps, with a horizontal cursor on the baseline (solid while typing, blinking at rest). */
+h1.typer { white-space: nowrap; display: flex; align-items: baseline; min-height: 1.05em }
+.caret { display: inline-block; width: .42em; height: .075em; min-height: 3px; background: var(--ink); margin-left: .06em; border-radius: 1px; transform: translateY(-.04em) }
+.caret.idle { animation: blink 1.05s steps(1) infinite }
+@keyframes blink { 50% { opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .caret.idle { animation: none } }
+.links { display: flex; gap: 9px; font-size: 16px; font-weight: 500; letter-spacing: -0.32px; margin-top: 8px }
+.links a:hover { color: var(--ink) }
+.bio { display: grid; gap: 14px; margin-top: 14px; font-size: 14px; font-weight: 500; letter-spacing: -0.28px; line-height: 1.3 }
+.bio p { margin: 0 }
+.socials { position: absolute; z-index: 1; left: var(--hero-left); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 8px }
+.socials a { font-size: 13px; padding: 5px 10px; border-radius: 6px; background: var(--pill); transition: background .2s }
+.socials a:hover { background: var(--pill-hover); color: var(--ink) }
+
+/* Image trail on Home: small cards of the Designs work spill out behind the cursor, newest sharp on top,
+   older ones blurring and fading away. Sits under the text; never catches the pointer. */
+/* Dial ripple: tuning sends a wave out from the dial across Home; words, photo and pills ride it. */
+.ripple-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none }
+.rw { display: inline-block }
+#typed { display: inline-block }
+.trail { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: strict }
+.trail .card { position: absolute; left: 0; top: 0; width: 84px; height: 105px; border-radius: 6px; overflow: hidden; opacity: 0;
+  background: var(--tile); box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 8px 22px rgb(0 0 0 / .1) }
+.trail .card img { width: 100%; height: 100%; object-fit: cover; display: block }
+
+/* Text stations */
+.sheet { position: absolute; left: var(--hero-left); top: 47%; transform: translateY(-50%); width: min(520px, calc(100% - var(--hero-left) - 24px)) }
+h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px; margin: 0 }
+.list { list-style: none; margin: 22px 0 0; padding: 0; display: grid }
+.list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; padding: 14px 0; border-top: 1px solid #eeeeee; font-size: 14px; letter-spacing: -0.28px }
+.list li:last-child { border-bottom: 1px solid #eeeeee }
+.list b { color: var(--ink); font-weight: 500; font-size: 16px; letter-spacing: -0.32px }
+.list span, .list .sub { color: var(--muted); grid-column: 1 / -1 }
+.list i { font-style: normal; color: var(--muted); font-size: 13px }
+
+/* Feed */
+.scroller { position: absolute; left: var(--content-left); right: 145px; top: 0; bottom: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: var(--flush) 27px var(--flush); scrollbar-width: none }
+/* Soft edges above and below the scrolling grid, as plain overlays (cheaper than a mask while the page turns) */
+.fade { position: absolute; left: var(--content-left); right: 145px; height: 84px; pointer-events: none; z-index: 1 }
+.fade.top { top: calc(64px + var(--band)); height: 64px }
+.fade.bottom { bottom: 63px }
+/* Progressive blur edge: content blurs more and fades to white the closer it gets to the edge.
+   Four stacked blur layers, each masked to a band, then a white wash on top. Reuse .fade on any scroll edge. */
+.fade i { position: absolute; inset: 0; -webkit-backdrop-filter: blur(var(--b)); backdrop-filter: blur(var(--b));
+  -webkit-mask-image: linear-gradient(var(--dir), transparent var(--s1), #000 var(--s2), #000 var(--s3), transparent var(--s4));
+  mask-image: linear-gradient(var(--dir), transparent var(--s1), #000 var(--s2), #000 var(--s3), transparent var(--s4)) }
+.fade.bottom { --dir: to bottom } .fade.top { --dir: to top }
+.fade i:nth-child(1) { --b: 1px;  --s1: 0%;  --s2: 25%; --s3: 50%;  --s4: 75% }
+.fade i:nth-child(2) { --b: 3px;  --s1: 25%; --s2: 50%; --s3: 75%;  --s4: 100% }
+.fade i:nth-child(3) { --b: 6px;  --s1: 50%; --s2: 75%; --s3: 100%; --s4: 101% }
+.fade i:nth-child(4) { --b: 12px; --s1: 75%; --s2: 100%; --s3: 101%; --s4: 102% }
+.fade::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--dir), rgb(255 255 255 / 0) 10%, rgb(255 255 255 / .55) 60%, var(--bg) 100%) }
+.mode-top .fade { left: 0; right: 0 } .mode-top .fade.bottom { bottom: 0 }
+/* The top edge is a solid white band: images scroll up under it and disappear cleanly. */
+.fade.top { background: var(--bg) } .fade.top::after { content: none }
+.scroller::-webkit-scrollbar { display: none }
+.masonry { display: flex; gap: 16px; align-items: flex-start }
+.col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 14px }
+.tile { position: relative; margin: 0; background: var(--tile); border-radius: 24px; overflow: hidden }
+.tile .art { position: absolute; inset: 0 }
+.tile .count { font-size: 12px; font-weight: 500; color: var(--text); background: rgb(255 255 255 / .85); padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums }
+/* Captions sit on photos, so both the title and the count get a soft white pill and stay on one line. */
+.tile .cap > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgb(255 255 255 / .85); padding: 3px 9px; border-radius: 999px }
+.tile .count { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px }
+.tile .count b { font-weight: 500 }
+.tile .count svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: none }
+@media (max-width: 599px) { .tile .cap { left: 8px; right: 8px; bottom: 8px; gap: 6px; font-size: 12px } .tile .count { font-size: 11px; padding: 3px 7px } .tile .count .lbl { display: none } .tile .count svg { display: block } .tile .cap > span:first-child { padding: 3px 8px } }
+/* Pictures are zoomed so they can travel inside their frames (inner pan, Medium: 14% of the frame each way). */
+.tile img, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; scale: 1.3 }
+/* Video tiles: clips play muted on a loop while on screen. Most are UI on white, so a hairline edge keeps them reading as cards. */
+.tile.is-video::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .07); pointer-events: none; z-index: 1 }
+.tile.is-video .cap { z-index: 2 }
+.tile canvas.ripple { position: absolute; inset: 0; width: 100%; height: 100%; scale: 1.3; pointer-events: none }   /* headroom for the inner parallax */
+@media (prefers-reduced-motion: reduce) { .tile img, .tile video { scale: 1 } }
+.tile .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--ink);
+  font-size: 13px; font-weight: 500; letter-spacing: -0.26px; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s }
+.tile .cap i { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
+.tile:hover figcaption { opacity: 1; transform: none }
+@media (hover: none) { .tile .cap { opacity: 1; transform: none } }
+#ruler { position: absolute; right: 0; top: calc(var(--flush) - 6px + var(--band)); height: calc(100% - 2 * var(--flush) + 12px - var(--band)); width: 140px; touch-action: none; cursor: ns-resize }
+#ruler line { stroke-linecap: round }
+
+/* Narrow screens: the dial moves to the top edge */
+.mode-top .time { top: auto; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); right: 50%; transform: translateX(50%) }
+.mode-top .hero, .mode-top .sheet { left: 50%; top: calc(var(--band) + (100% - var(--band)) * .46); transform: translate(-50%, -50%); width: min(400px, calc(100% - 32px)) }
+.mode-top .socials { left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); justify-content: center; width: max-content; max-width: calc(100% - 32px) }
+.mode-top .scroller { left: 0; right: 0; top: var(--band); bottom: 0; padding: 64px 16px 84px }
+.mode-top #ruler { display: none }
+
+/* Phones: the dial sits at the bottom edge and turns under a fixed needle */
+.menu-btn { position: fixed; top: calc(28px + env(safe-area-inset-top, 0px)); right: max(22px, env(safe-area-inset-right, 0px)); width: 24px; height: 24px;
+  display: none; pointer-events: auto; z-index: 120 }
+.mode-bottom .menu-btn { display: block }
+.menu-btn span { position: absolute; right: 2px; height: 1.5px; border-radius: 2px; background: var(--ink);
+  transition: transform .32s cubic-bezier(.65,0,.35,1), opacity .2s }
+.menu-btn span:nth-child(1) { top: 6px; width: 20px }
+.menu-btn span:nth-child(2) { top: 11.25px; width: 12px }
+.menu-btn span:nth-child(3) { top: 16.5px; width: 20px }
+.menu-open .menu-btn span:nth-child(1) { transform: translateY(5.25px) rotate(45deg) }
+.menu-open .menu-btn span:nth-child(2) { opacity: 0 }
+.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5.25px) rotate(-45deg) }
+.menu { position: fixed; inset: 0; z-index: 110; background: var(--bg); pointer-events: auto; display: flex; flex-direction: column; justify-content: center;
+  padding: calc(96px + env(safe-area-inset-top, 0px)) max(29px, env(safe-area-inset-right, 0px)) calc(56px + env(safe-area-inset-bottom, 0px)) max(29px, env(safe-area-inset-left, 0px)) }
+.menu[hidden] { display: none }
+.menu-list { list-style: none; margin: 0; padding: 0 }
+.menu-item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid #eeeeee;
+  font: 600 32px/1.1 var(--body); letter-spacing: -0.96px; color: #b5b5b5; text-align: left; transition: color .2s }
+.menu-item.on { color: var(--ink) }
+.menu-item .freq { font: 400 13px/1 var(--body); letter-spacing: 0; color: var(--muted); font-variant-numeric: tabular-nums }
+
+.mode-bottom .pill { transition: background .2s, color .2s, opacity .12s; will-change: transform }
+.mode-bottom .time { top: calc(32px + env(safe-area-inset-top, 0px)); left: max(28px, env(safe-area-inset-left, 0px)); right: auto; bottom: auto; transform: none }
+.mode-bottom .hero { left: 29px; right: 29px; top: clamp(96px, 22.7vh, 240px); transform: none; width: auto; max-width: 370px }
+.mode-bottom .avatar { width: 95px; height: 95px; margin-bottom: 0 }
+.mode-bottom h1 { font-size: clamp(32px, 10vw, 50px); line-height: 1.4 }   /* the longest role still fits on one line */
+.mode-bottom .links { margin-top: 0 }
+.mode-bottom .bio { font-size: 15px; line-height: 1.2; margin-top: 11px; max-width: 316px }
+.mode-bottom .socials { position: static; transform: none; width: auto; margin-top: 34px; gap: 10px }
+.mode-bottom .socials a { font-size: 13px; padding: 6px 12px; border-radius: 8px }
+.mode-bottom .sheet { left: 29px; right: 29px; top: calc(96px + env(safe-area-inset-top, 0px)); transform: none; width: auto }
+.mode-bottom .scroller { left: 0; right: 0; top: calc(72px + env(safe-area-inset-top, 0px)); bottom: calc(100% - var(--dial-top)); padding: 64px 16px 84px }
+.mode-bottom .fade { left: 0; right: 0 }
+.mode-bottom .fade.top { top: calc(72px + env(safe-area-inset-top, 0px)) }
+.mode-bottom .fade.bottom { bottom: calc(100% - var(--dial-top)) }
+.mode-bottom #ruler { display: none }
+
+/* About: a longer page, so it scrolls on its own and starts on the same top line as the other pages. */
+.sheet.about { top: 0; bottom: 0; transform: none; overflow-y: auto; overscroll-behavior: contain; padding-block: var(--flush); scrollbar-width: none; width: min(560px, calc(100% - var(--hero-left) - 24px)) }
+.sheet.about::-webkit-scrollbar { display: none }
+/* The scroll box clips anything outside it, so it gets 48px of extra room on each side (cancelled by a negative
+   margin): the content stays where it was, and the dock's soft shadow has space to show in full. */
+.sheet.about { margin-inline: -48px; padding-inline: 48px; box-sizing: content-box }
+.mode-top .sheet.about { top: 0; transform: translateX(-50%); padding-top: calc(var(--band) + 48px) }
+.inner.mode-top .sheet.about { top: 0; transform: none; padding-top: var(--flush) }
+.mode-bottom .sheet.about { top: 0; width: auto; padding-top: calc(96px + env(safe-area-inset-top, 0px)); padding-bottom: 48px }
+.mode-top .sheet.about { width: auto }
+.about-intro { display: grid; gap: 12px; margin-top: 18px; font-size: 15px; line-height: 1.5; letter-spacing: -0.2px; color: var(--text); max-width: 52ch }
+.about-intro p { margin: 0 }
+.about-h { font: 600 13px/1 var(--body); letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin: 44px 0 0 }
+.sheet.about .list { margin-top: 14px }
+.sheet.about .dock-wrap { margin-top: 0 }
+.sheet.about .dock-label { margin-top: 44px }
+
+/* Tools dock on About: a light shelf of app tiles that swell under the cursor */
+.dock-wrap { margin-top: 56px }
+.dock-label { font-size: 13px; color: var(--muted); letter-spacing: -0.26px; margin: 0 }
+/* The row is already as tall as the dock at full magnification, so hovering never changes the
+   page's layout: the dock grows upward into reserved space and nothing else moves. */
+.dock-row { height: 104px; display: flex; align-items: flex-end }
+/* The shelf keeps its resting height; magnified icons rise out of its top edge, like the Mac dock. */
+.dock { display: inline-flex; align-items: flex-end; gap: 12px; padding: 0 16px 14px; height: 80px; overflow: visible; border-radius: 22px; background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 12px 32px rgb(0 0 0 / .08); max-width: 100% }
+.tool { position: relative; border-radius: 14px; display: grid; place-items: center; flex: none;
+  --size: 52px; width: var(--size); height: var(--size); transition: width .16s cubic-bezier(.2,.8,.2,1), height .16s cubic-bezier(.2,.8,.2,1);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04), 0 2px 6px rgb(0 0 0 / .08) }
+.tool svg { width: 46%; height: 46%; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round }
+.tool svg .solid { fill: #fff; stroke: none }
+.tool img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover }
+.tool .tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; pointer-events: none;
+  font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; opacity: 0; transition: opacity .15s, transform .15s }
+.tool:hover .tip, .tool:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
+@media (max-width: 599px) { .dock-row { height: auto; margin-top: 14px } .dock-wrap { margin-top: 40px } .dock { gap: 6px; padding: 0 10px 10px; height: 58px; border-radius: 16px } .tool { --size: 38px; border-radius: 10px } }
+@media (prefers-reduced-motion: reduce) { .tool { transition: none } }
+@media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
+@media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
+
+/* ---------- Inner pages: the dial steps aside for a side menu ----------
+   A plain list of pages; the current one is black with a small dash beside it. */
+.dial-fade { transition: opacity .3s cubic-bezier(.65,0,.35,1), visibility 0s 0s }
+.inner .dial-fade { opacity: 0; visibility: hidden; transition: opacity .25s cubic-bezier(.65,0,.35,1), visibility 0s .25s }
+.inner #hit { pointer-events: none }
+.side-nav { position: fixed; left: 0; top: 0; bottom: 0; width: 136px; z-index: 100; pointer-events: none; opacity: 0; visibility: hidden;
+  transition: opacity .25s cubic-bezier(.65,0,.35,1), visibility 0s .25s }
+.inner .side-nav { opacity: 1; visibility: visible; transition: opacity .35s cubic-bezier(.65,0,.35,1) .1s, visibility 0s }
+.nav-list { position: absolute; left: 48px; top: calc(var(--flush) + env(safe-area-inset-top, 0px)); list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; pointer-events: auto }
+.nav-item { position: relative; display: block; height: 28px; padding: 0; font-size: 18px; line-height: 28px; letter-spacing: -0.36px; font-weight: 500;
+  color: #d4d4d4; white-space: nowrap; transition: color .25s }
+.nav-item:hover { color: var(--muted) }
+.nav-item.on { color: var(--ink) }
+.nav-item:focus-visible { outline-offset: 2px }
+/* The dash slides to the current page. */
+.nav-dash { position: absolute; left: -15px; top: 0; width: 9px; height: 2.5px; border-radius: 2px; background: var(--ink); pointer-events: none }
+.nav-dash.ready { transition: transform .45s cubic-bezier(.65,0,.35,1) }
+/* Without the dial, the grid and pages move in toward the menu. */
+.inner .scroller, .inner .fade { left: 150px }
+/* Laptops and desktops: the grid takes more of the width (less empty space by the menu and the ruler). */
+.inner:not(.mode-top):not(.mode-bottom) .scroller { right: 84px; padding-left: 12px; padding-right: 16px }
+.inner.mode-top .scroller { left: 168px; right: 16px; top: 0; bottom: 0; padding: var(--flush) 0 var(--flush) }
+.inner.mode-top .fade { left: 168px; right: 16px } .inner.mode-top .fade.top { top: 64px } .inner.mode-top .fade.bottom { bottom: 0 }
+.inner.mode-top .sheet { left: 184px; right: 24px; top: 47%; transform: translateY(-50%); width: auto; max-width: 520px }
+/* Phones: no side menu; the menu button lists every page and the grid runs to the bottom. */
+.mode-bottom .side-nav { display: none }
+.inner.mode-bottom .scroller { left: 0; bottom: 0 } .inner.mode-bottom .fade { left: 0 }
+
+
+/* ---------- Home micro-interactions ---------- */
+/* Photo: tilts toward the cursor, and squishes when pressed. */
+.avatar { position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation }
+/* Name: click to type the next role; a small picture of that kind of work peeks beside the cursor. */
+h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
+.role-peek { position: fixed; left: 0; top: 0; z-index: 60; width: 64px; height: 80px; border-radius: 8px; overflow: hidden; pointer-events: none; opacity: 0;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 10px 24px rgb(0 0 0 / .14); transition: opacity .2s; background: var(--tile) }
+.role-peek img { width: 100%; height: 100%; object-fit: cover; display: block }
+.role-peek.show { opacity: 1 }
+/* Links: an underline drawn as a strip of dial ticks; the "x" beside a hovered link turns into a "+". */
+.links a { position: relative; transition: color .2s }
+.links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 6px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 12px) left bottom / 100% 6px no-repeat,
+              repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 4px) left bottom / 100% 3px no-repeat;
+  opacity: .55; clip-path: inset(0 100% 0 0); transition: clip-path .4s cubic-bezier(.65,0,.35,1) }
+.links a:hover::after, .links a:focus-visible::after { clip-path: inset(0 0 0 0) }
+.links > span { display: inline-block; transition: transform .35s cubic-bezier(.2,.8,.2,1), color .2s }
+.links a:hover + span, .links span:has(+ a:hover) { transform: rotate(45deg); color: var(--ink) }
+.links a.copied { color: var(--ink) }
+/* Bio: key phrases get a highlighter sweep; "Kusnap" opens a small card. */
+.hl { background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 92%, transparent 92%) no-repeat 0 0 / 0% 100%;
+  transition: background-size .55s cubic-bezier(.65,0,.35,1) }
+.bio p:hover .hl { background-size: 100% 100% }
+.bio p:hover .hl + .hl, .bio p:hover .hl:nth-of-type(2) { transition-delay: .12s }
+.ref { position: relative; cursor: default; text-decoration: underline dotted rgb(0 0 0 / .35); text-underline-offset: 3px }
+.ref-card { position: absolute; left: -12px; top: calc(100% + 10px); width: 228px; padding: 14px 16px; border-radius: 14px; background: var(--bg); z-index: 5;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(-6px); pointer-events: none;
+  transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1); display: grid; gap: 2px; font-weight: 400 }
+.ref:hover .ref-card, .ref:focus-within .ref-card { opacity: 1; transform: none }
+.ref-card b { font-weight: 600; color: var(--ink); font-size: 14px }
+.ref-card .k { font-size: 12px; color: var(--muted) }
+.ref-card .n { font: 600 26px/1.1 var(--body); letter-spacing: -0.8px; color: var(--ink); margin-top: 8px; font-variant-numeric: tabular-nums }
+/* Social pills: lean toward the cursor; a three-bar signal fills in on hover. */
+.socials a { display: inline-flex; align-items: center; translate: 0 0; transition: background .2s, translate .3s cubic-bezier(.2,.8,.2,1) }
+.sig { width: 0; height: 10px; margin-left: 0; opacity: 0; overflow: visible; transition: width .25s, margin .25s, opacity .2s }
+.sig rect { fill: currentColor; opacity: .2; transition: opacity .15s }
+.socials a:hover .sig, .socials a:focus-visible .sig { width: 11px; margin-left: 6px; opacity: 1 }
+.socials a:hover .sig rect { opacity: 1 }
+.socials a:hover .sig rect:nth-child(2) { transition-delay: .09s } .socials a:hover .sig rect:nth-child(3) { transition-delay: .18s }
+/* Lagos time: the colon ticks each second; hover shows day or night there, and availability. */
+/* Availability pill sits before the time, always visible; the dot pulses gently like an on-air light. */
+.time { cursor: default; display: flex; align-items: center; gap: 12px; white-space: nowrap }
+.mode-bottom .time { flex-direction: column; align-items: flex-start; gap: 8px }
+.mode-bottom .time .t-cta { order: 2 }
+.time .colon { animation: tick 1s steps(1) infinite }
+@keyframes tick { 50% { opacity: .2 } }
+.t-more { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 6px; justify-items: end; white-space: nowrap; font-size: 13px; letter-spacing: -0.2px;
+  opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .22s, transform .3s cubic-bezier(.2,.8,.2,1) }
+.mode-bottom .t-more { right: auto; left: 0; justify-items: start }
+/* Only the time itself reveals the Lagos line, not the availability pill. */
+.t-now { cursor: default }
+.t-now:hover ~ .t-more, .time:focus-visible .t-more, .time.open .t-more { opacity: 1; transform: none }
+.t-sky { display: inline-flex; align-items: center; gap: 6px; color: var(--muted) }
+.t-sky svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round }
+/* Book a call: a round calendar button before the availability pill. */
+.t-cta { display: inline-flex; align-items: center; gap: 6px }
+.t-book { position: relative; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--text); transition: background .2s, color .2s, transform .25s cubic-bezier(.2,.8,.2,1) }
+.t-book:hover, .t-book:focus-visible { background: var(--ink); color: #fff; transform: translateY(-1px) }
+.t-book svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round }
+.t-book svg .d { fill: currentColor; stroke: none }
+.t-book .tip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translate(-50%, -3px); font-size: 12px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s }
+.t-book:hover .tip, .t-book:focus-visible .tip { opacity: 1; transform: translate(-50%, 0) }
+.t-avail { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 999px; background: var(--pill); color: var(--text); font-size: 13px; letter-spacing: -0.2px }
+.t-avail i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #2fb35b }
+.t-avail i::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: rgb(47 179 91 / .35); animation: onair 2.4s ease-out infinite }
+@keyframes onair { 0% { transform: scale(.6); opacity: .9 } 70%, 100% { transform: scale(1.9); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .t-avail i::after { animation: none; opacity: .4 } }
+/* Dial station preview: a small card beside a hovered station pill. */
+.peek { position: fixed; left: 0; top: 0; z-index: 130; width: 196px; padding: 12px; border-radius: 14px; background: var(--bg); pointer-events: none;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 14px 34px rgb(0 0 0 / .12); opacity: 0; transform: translateY(4px) scale(.98); transform-origin: left center;
+  transition: opacity .18s, transform .25s cubic-bezier(.2,.8,.2,1) }
+.peek.show { opacity: 1; transform: none }
+.peek .ph { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px }
+.peek .ph span { font-weight: 400; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums }
+.peek .pg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px }
+.peek .pg img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 5px; display: block; background: var(--tile) }
+.peek .pl { display: grid; gap: 0; font-size: 12px }
+.peek .pl div { padding: 5px 0; border-top: 1px solid #eeeeee; color: var(--text) }
+/* Secret station 99.9: type "kingsley" on Home. */
+.secret { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: rgb(255 255 255 / .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 24px }
+.secret[hidden] { display: none }
+.secret-card { width: min(380px, 100%); padding: 26px 26px 22px; border-radius: 22px; background: var(--bg); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 24px 60px rgb(0 0 0 / .16); display: grid; gap: 10px }
+.secret-card .f { font: 600 56px/1 var(--body); letter-spacing: -2px; color: var(--ink); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 8px }
+.secret-card .f small { font-size: 13px; letter-spacing: 0; font-weight: 500; color: var(--muted) }
+.secret-card .lbl { font-size: 12px; color: var(--muted); letter-spacing: .4px; text-transform: uppercase }
+.secret-card p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--text) }
+.secret-card button { justify-self: start; margin-top: 6px; font-size: 13px; padding: 6px 12px; border-radius: 8px; background: var(--pill) }
+.secret-card button:hover { background: var(--pill-hover) }
+@media (prefers-reduced-motion: reduce) { .time .colon { animation: none } .avatar { transition: none } }
+
+/* ---------- Loader: station counter that locks on 100 ---------- */
+.loader { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: grid; place-items: center; transition: opacity .45s cubic-bezier(.65,0,.35,1), transform .45s cubic-bezier(.65,0,.35,1) }
+.loader.done { opacity: 0; transform: translateY(-8px); pointer-events: none }
+.ld-inner { width: min(560px, 100%); display: grid; justify-items: center; gap: 22px; padding-bottom: 4vh }
+.ld-num { font: 600 76px/1 var(--body); letter-spacing: -2.4px; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 3ch; text-align: center }
+.ld-strip { width: 100%; height: 72px; display: block; overflow: visible }
+.ld-strip line { stroke: var(--ink); stroke-linecap: round }
+.ld-strip text { font: 500 11px var(--body); fill: var(--muted); letter-spacing: .2px }
+@media (max-width: 599px) { .ld-num { font-size: 60px; letter-spacing: -1.8px } }
+</style>
+</head>
+<body>
+<div class="loader" id="loader" role="status" aria-live="polite" aria-label="Loading">
+  <div class="ld-inner"><div class="ld-num" id="ldNum">0</div><svg class="ld-strip" id="ldStrip" aria-hidden="true"></svg></div>
+</div>
+<script>
+// Loader: the number follows real loading progress (page parsed, fonts ready, everything loaded)
+// and the tick strip slides under a fixed needle. It locks on 100, holds a beat, then fades out.
+(function () {
+  var loader = document.getElementById('loader'), num = document.getElementById('ldNum'), svg = document.getElementById('ldStrip');
+  var NS = 'http://www.w3.org/2000/svg', reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PROFILE = [104, 89, 86, 82, 77, 70, 63, 56, 49, 42, 36, 31, 26, 23, 20, 17, 16, 15, 14, 13, 13, 12];
+  function prof(d) { d = Math.abs(d); if (d >= PROFILE.length - 1) return 12; var i = Math.floor(d), t = d - i; return PROFILE[i] + (PROFILE[i + 1] - PROFILE[i]) * t; }
+  var ticks = [], labels = [], GAP = 9;
+  for (var i = 0; i <= 100; i++) {
+    var l = document.createElementNS(NS, 'line'); svg.appendChild(l); ticks.push(l);
+    if (i % 10 === 0) { var tx = document.createElementNS(NS, 'text'); tx.setAttribute('text-anchor', 'middle'); tx.textContent = i; svg.appendChild(tx); labels.push([i, tx]); }
+  }
+  var needle = document.createElementNS(NS, 'line'); svg.appendChild(needle);
+  function draw(v) {
+    var W = svg.clientWidth || 320, cx = W / 2, base = 46;
+    for (var i = 0; i <= 100; i++) {
+      var x = cx + (i - v) * GAP, d = Math.abs(i - v), b = (prof(d * .8) - 12) / 92, major = i % 10 === 0;
+      var L = (major ? 14 : 7) + b * 18, fade = Math.max(0, Math.min(1, Math.min(x - 4, W - 4 - x) / 48));
+      var t = ticks[i];
+      t.setAttribute('x1', x); t.setAttribute('x2', x); t.setAttribute('y1', base); t.setAttribute('y2', base - L);
+      t.setAttribute('stroke-width', major ? 1.6 : 1.1); t.setAttribute('stroke-opacity', ((.3 + .6 * b) * fade).toFixed(3));
+    }
+    labels.forEach(function (p) { var x = cx + (p[0] - v) * GAP; p[1].setAttribute('x', x); p[1].setAttribute('y', base + 20); p[1].setAttribute('opacity', Math.max(0, Math.min(1, Math.min(x - 12, W - 12 - x) / 48)).toFixed(3)); });
+    needle.setAttribute('x1', cx); needle.setAttribute('x2', cx); needle.setAttribute('y1', base + 2); needle.setAttribute('y2', base - 40); needle.setAttribute('stroke-width', 2.5);
+    num.textContent = Math.round(v);
+  }
+  // Progress checkpoints from real events; between them the target creeps forward so it never stalls.
+  var target = 8, shown = 0, done = false, start = performance.now(), MIN = 1100, MAX = 8000;
+  function bump(v) { target = Math.max(target, v); }
+  if (document.readyState !== 'loading') bump(45); else document.addEventListener('DOMContentLoaded', function () { bump(45); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { bump(75); });
+  function loaded() { bump(100); }
+  if (document.readyState === 'complete') loaded(); else window.addEventListener('load', loaded);
+  function finish() {
+    if (done) return; done = true;
+    setTimeout(function () {
+      loader.classList.add('done');
+      document.dispatchEvent(new Event('loader:done'));   // Home's typed name starts here
+      setTimeout(function () { loader.remove(); }, 500);
+    }, reduce ? 0 : 320);
+  }
+  var last = performance.now();
+  function frame(now) {
+    var dt = Math.min(64, now - last); last = now;
+    var elapsed = Math.max(0, now - start);             // frame clock can start a hair before the loader
+    if (elapsed > MAX) target = 100;                         // never trap a visitor on a slow asset
+    var soft = target < 100 ? Math.min(target + 12, 97) : 100; // creep toward the next checkpoint
+    var goal = elapsed < MIN && target === 100 ? Math.min(100, 100 * elapsed / MIN) : soft;
+    shown += (goal - shown) * (reduce ? 1 : Math.min(1, dt / 220));
+    if (target === 100 && goal === 100 && 100 - shown < .4) shown = 100;
+    shown = Math.max(0, Math.min(100, shown));
+    draw(shown);
+    if (shown >= 100) { finish(); return; }
+    requestAnimationFrame(frame);
+  }
+  draw(0); requestAnimationFrame(frame);
+})();
+</script>
+
+<div id="app">
+  <section class="panel" data-station="home">
+    <div class="trail" id="trail" aria-hidden="true"></div>
+    <canvas class="ripple-canvas" id="rippleCanvas" aria-hidden="true"></canvas>
+    <div class="time" id="time" tabindex="0"><span class="t-cta"><a class="t-book" id="bookCall" href="#" target="_blank" rel="noopener" data-href="" aria-label="Book a call"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="2.2"/><path d="M2.5 6.8h11M5.5 2v3M10.5 2v3"/><circle class="d" cx="8" cy="10.2" r=".9"/></svg><span class="tip">Book a call</span></a><span class="t-avail"><i></i><span id="tAvail">Open to new work</span></span></span><span class="t-now"><span id="clock">--:--</span>, Lagos 🇳🇬</span>
+      <div class="t-more"><span class="t-sky" id="tSky"></span></div>
+    </div>
+    <div class="hero">
+      <div class="avatar" id="avatar"><img src="assets/headshot.jpg" alt="Kingsley M." width="94" height="94"></div>
+      <h1 class="typer" id="typer" aria-label="Kingsley M." title="Click me"><span id="typed" aria-hidden="true">I'm Kingsley M.</span><span class="caret idle" id="caret" aria-hidden="true"></span></h1>
+      <div class="links"><a href="#" id="emailLink" data-email="">email</a><span>x</span><a href="#">github</a><span>x</span><a href="#">resume</a></div>
+      <div class="bio">
+        <p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>
+        <p>Previously, I led design at <span class="ref" tabindex="0">Kusnap<span class="ref-card" role="tooltip"><b>Kusnap</b><span class="k">Peer-to-peer marketplace · Head of Design</span><span class="n">50,000+</span><span class="k">users, designed from early stage</span></span></span>.</p>
+      </div>
+    </div>
+    <nav class="socials" aria-label="Social"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Instagram</a><a href="#">Medium</a></nav>
+  </section>
+  <div class="role-peek" id="rolePeek" aria-hidden="true"><img alt=""></div>
+  <div class="peek" id="peek" aria-hidden="true"></div>
+  <div class="secret" id="secret" hidden role="dialog" aria-modal="true" aria-label="Secret station">
+    <div class="secret-card">
+      <span class="lbl">Secret station</span>
+      <div class="f">99.9<small>FM</small></div>
+      <p>You found the late-night frequency.</p>
+      <p>Off air: I taught myself Python and Node.js to build my own tools, and I lead design for Open Source Community Africa.</p>
+      <button type="button" id="secretClose">Tune back to Home</button>
+    </div>
+  </div>
+
+  <section class="panel" data-station="designs" hidden aria-label="Designs">
+    <div class="scroller" id="scroller" tabindex="0"><div class="masonry" id="masonry"></div></div>
+    <svg id="ruler" aria-hidden="true"></svg>
+  </section>
+
+  <section class="panel" data-station="projects" hidden>
+    <div class="sheet">
+      <h2>Projects</h2>
+      <ul class="list">
+        <li><b>Kusnap</b><i>Head of Design</i><span>Peer-to-peer marketplace, designed from early stage to 50,000+ users.</span></li>
+        <li><b>Pingmart</b><i>Founder</i><span>WhatsApp-native multi-vendor commerce.</span></li>
+        <li><b>ShareBuddy</b><i>Founder</i><span>Social bill-splitting and group wallets.</span></li>
+        <li><b>Kauri</b><i>Concept</i><span>A cowrie-inspired payments brand for African SMEs.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" data-station="engineering" hidden>
+    <div class="sheet">
+      <h2>Engineering</h2>
+      <ul class="list">
+        <li><b>LineCraft</b><i>Figma plugin</i><span>Generative line and pattern tools for vectors.</span></li>
+        <li><b>MeshCraft</b><i>Figma plugin</i><span>3D wireframe shapes, drawn as editable vectors.</span></li>
+        <li><b>Recorder Studio</b><i>Playwright</i><span>Turns HTML interaction prototypes into social videos.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel" data-station="about" hidden>
+    <div class="sheet about">
+      <h2>About</h2>
+      <div class="about-intro">
+        <p>I'm Kingsley, a senior product designer and founder based in Lagos, with about five years of designing products from zero to one.</p>
+        <p>I led design at Kusnap, a peer-to-peer marketplace, from its early days to 50,000+ users. I'm a Design Maintainer at CHAOSS, part of the Linux Foundation, and I lead design for Open Source Community Africa.</p>
+        <p>I work across product, brand and 3D, and I write my own code when a tool doesn't exist yet: Figma plugins, prototypes and small bots in Python and Node.</p>
+      </div>
+      <h3 class="about-h">Skills</h3>
+      <ul class="list">
+        <li><b>Brand Design</b></li>
+        <li><b>Product Design</b></li>
+        <li><b>Digital Illustration</b></li>
+        <li><b>3D Design</b></li>
+        <li><b>Design Engineer</b></li>
+      </ul>
+      <div class="dock-wrap">
+        <h3 class="about-h dock-label">Tools I use</h3>
+        <div class="dock-row"><div class="dock" id="dock" role="list" aria-label="Tools"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="dial-layer" id="dialLayer">
+  <svg id="dialSvg" class="dial-fade" aria-hidden="true">
+    <circle id="ring" fill="none" stroke="var(--ring)"></circle>
+    <circle id="disc" fill="var(--disc)"></circle>
+    <g id="ticks"></g>
+    <line id="needle" class="needle"></line>
+    <circle id="hit"></circle>
+  </svg>
+  <div id="pills" class="dial-fade"></div>
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+  <div class="menu" id="menu" hidden role="dialog" aria-label="Menu"><ul class="menu-list" id="menuList"></ul></div>
+  <div id="tuner" tabindex="0" role="slider" aria-label="Navigation dial" aria-valuemin="94" aria-valuemax="102"
+    aria-valuenow="98" aria-valuetext="Home" style="position:absolute;left:0;top:50%;width:1px;height:1px;pointer-events:auto"></div>
+</div>
+<nav class="side-nav" id="sideNav" aria-label="Pages">
+  <ul class="nav-list" id="navList"><span class="nav-dash" id="navDash" aria-hidden="true"></span></ul>
+</nav>
+
+<script src="popkit.js"></script>
+<script>
+(function () {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const play = (n, trusted) => { if (trusted && window.Popkit) Popkit.play(n); };
+
+  const STATIONS = [
+    { f: 94,  id: 'about',       name: 'About' },
+    { f: 96,  id: 'engineering', name: 'Engineering' },
+    { f: 98,  id: 'home',        name: 'Home' },
+    { f: 100, id: 'designs',     name: 'Designs' },
+    { f: 102, id: 'projects',    name: 'Projects' }
+  ];
+  const STEP = 13.5;                       // degrees per MHz
+  const ang = f => (f - 98) * STEP;        // 98 faces the content; higher turns clockwise
+
+  // Length profile shared by the dial and the Feed ruler: index 0 is the active line.
+  const PROFILE = [104, 89, 86, 82, 77, 70, 63, 56, 49, 42, 36, 31, 26, 23, 20, 17, 16, 15, 14, 13, 13, 12];
+  function prof(d) {
+    d = Math.abs(d);
+    if (d >= PROFILE.length - 1) return 12;
+    const i = Math.floor(d), t = d - i;
+    return PROFILE[i] + (PROFILE[i + 1] - PROFILE[i]) * t;
+  }
+  const bump = d => (prof(d) - 12) / 92;   // 0..1
+
+  // ---------- Geometry ----------
+  let M = {};
+  function measure() {
+    const vw = innerWidth, vh = innerHeight;
+    if (vw >= 900) {
+      const S = 0.97 * Math.min(1.1, Math.max(0.68, vh / 1065));
+      M = { mode: 'left', S, cx: -91.75 * S, cy: 0.479 * vh, hx: 1, hy: 0, px: 0, py: 1 };
+      const contentLeft = Math.round(M.cx + 470 * S);
+      root.style.setProperty('--content-left', contentLeft + 'px');
+      root.style.setProperty('--hero-left', Math.round(Math.max(0.41 * vw, contentLeft + 40)) + 'px');
+      root.style.setProperty('--band', '0px');
+    } else if (vw < 600) {
+      // Phones: centre sits below the bottom edge (from the 428 x 926 mobile frame).
+      const S = 0.705 * Math.min(1.15, vw / 428);
+      M = { mode: 'bottom', S, cx: vw / 2, cy: vh + 118.7 * S / 0.705, hx: 0, hy: -1, px: -1, py: 0, tin: 272 };
+      root.style.setProperty('--band', '0px');
+      root.style.setProperty('--dial-top', Math.round(M.cy - 377 * S - 30) + 'px');
+    } else {
+      const S = 0.834 * Math.min(1, (vw - 8) / 600);
+      M = { mode: 'top', S, cx: vw / 2, cy: -79 * S, hx: 0, hy: 1, px: -1, py: 0 };
+      root.style.setProperty('--band', Math.round(343 * S) + 'px');
+    }
+    M.tin = M.tin || 300;                    // where ticks start, in dial units
+    root.classList.toggle('mode-top', M.mode === 'top');
+    root.classList.toggle('mode-bottom', M.mode === 'bottom');
+  }
+  const pt = (r, deg) => {
+    const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+    return [M.cx + r * M.S * (c * M.hx + s * M.px), M.cy + r * M.S * (c * M.hy + s * M.py)];
+  };
+
+  // ---------- Dial ----------
+  const svg = document.getElementById('dialSvg');
+  const ticksG = document.getElementById('ticks');
+  const ticks = [];
+  for (let k = 0; k <= 100; k++) {
+    const f = 88 + k / 5, major = k % 10 === 0;
+    const l = document.createElementNS(SVGNS, 'line');
+    l.setAttribute('class', major ? 't-major' : 't-minor');
+    ticksG.appendChild(l);
+    const st = major ? STATIONS.find(s => s.f === Math.round(f)) : null;
+    ticks.push({ el: l, a: ang(f), major, st });
+  }
+  const needle = document.getElementById('needle');
+  const hit = document.getElementById('hit');
+  const disc = document.getElementById('disc'), ring = document.getElementById('ring');
+
+  const pillsEl = document.getElementById('pills'), pills = {};
+  STATIONS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'pill'; b.textContent = s.name;
+    b.addEventListener('click', e => tuneTo(s, e.isTrusted));
+    pillsEl.appendChild(b); pills[s.id] = b;
+  });
+  // Each pill sits on its station's ray, pushed out until the whole pill clears the
+  // longest a tick can ever reach (wave at drag strength) plus a gap.
+  const TICK_REACH = 300 + 12 + 26 * 1.15;   // dial units
+  const PILL_GAP = 12;                       // px between the longest tick and a pill
+  function placePills() {
+    const clear = TICK_REACH * M.S + PILL_GAP;
+    STATIONS.forEach(s => {           // measure once; read back each frame on phones
+      const b = pills[s.id];
+      b.style.transform = 'none'; b.style.opacity = ''; b.style.pointerEvents = '';
+      b._w = b.offsetWidth; b._h = b.offsetHeight;
+    });
+    if (M.mode === 'bottom') { placeBottomPills(); return; }
+    STATIONS.forEach(s => {
+      const a = ang(s.f), b = pills[s.id];
+      const w = b.offsetWidth, h = b.offsetHeight;
+      let r = TICK_REACH, x = 0, y = 0;
+      for (let i = 0; i < 200; i++) {
+        [x, y] = pt(r, a);                  // pill centre
+        const nx = Math.max(x - w / 2, Math.min(M.cx, x + w / 2));
+        const ny = Math.max(y - h / 2, Math.min(M.cy, y + h / 2));
+        if (Math.hypot(nx - M.cx, ny - M.cy) >= clear) break;
+        r += 1;
+      }
+      // On narrow screens keep the pill on screen: pin it inside the edges, then slide it
+      // away from the dial (downward) until it clears the ticks again.
+      const minX = 8 + w / 2, maxX = innerWidth - 8 - w / 2;
+      if (x < minX || x > maxX) {
+        x = Math.max(minX, Math.min(maxX, x));
+        for (let i = 0; i < 400; i++) {
+          const nx = Math.max(x - w / 2, Math.min(M.cx, x + w / 2));
+          const ny = Math.max(y - h / 2, Math.min(M.cy, y + h / 2));
+          if (Math.hypot(nx - M.cx, ny - M.cy) >= clear) break;
+          y += M.mode === 'top' ? 1 : 0; x += M.mode === 'left' ? 1 : 0;
+        }
+      }
+      b.style.left = (x - w / 2) + 'px'; b.style.top = (y - h / 2) + 'px';
+    });
+  }
+
+  // Phones: labels ride the turning ring, tilted along it. At most two show: at rest the
+  // active station plus its right-hand neighbour; while turning, the two nearest the needle.
+  const R_PILL = 377;
+  function visiblePair() {
+    if (!dragging && !tween && active) {
+      const i = STATIONS.indexOf(active);
+      return [active, STATIONS[i - 1] || STATIONS[i + 1]];
+    }
+    return [...STATIONS].sort((a, b) => Math.abs(ang(a.f) - cur) - Math.abs(ang(b.f) - cur)).slice(0, 2);
+  }
+  function placeBottomPills() {
+    const show = visiblePair();
+    STATIONS.forEach(s => {
+      const b = pills[s.id], a = ang(s.f) - cur, [x, y] = pt(R_PILL, a), on = show.includes(s);
+      b.style.left = '0px'; b.style.top = '0px';
+      b.style.transform = `translate3d(${(x - b._w / 2).toFixed(1)}px, ${(y - b._h / 2).toFixed(1)}px, 0) rotate(${(-a).toFixed(2)}deg)`;
+      b.style.opacity = on ? 1 : 0; b.style.pointerEvents = on ? 'auto' : 'none';
+      b.tabIndex = on ? 0 : -1;
+    });
+  }
+
+  // The wave is always on around the needle; dragging gives it a slight boost.
+  const WAVE_REST = 1, WAVE_DRAG = 1.15;
+  // One easing for every station change: needle and page move together.
+  const EASE = 'cubic-bezier(.65,0,.35,1)', DUR = 560;
+  const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  let cur = 0, target = 0, tween = null, amp = WAVE_REST, ampTarget = WAVE_REST, dragging = false, raf = 0;
+  function setTarget(a) {
+    target = a;
+    tween = reduce ? null : { from: cur, to: a, t0: performance.now() };
+    if (reduce) cur = a;
+    kick();
+  }
+  function drawDial(force) {
+    const S = M.S;
+    disc.setAttribute('cx', M.cx); disc.setAttribute('cy', M.cy); disc.setAttribute('r', 246.5 * S);
+    ring.setAttribute('cx', M.cx); ring.setAttribute('cy', M.cy); ring.setAttribute('r', 264.5 * S); ring.setAttribute('stroke-width', 1.5 * S);
+    hit.setAttribute('cx', M.cx); hit.setAttribute('cy', M.cy); hit.setAttribute('r', (M.mode === 'bottom' ? 420 : 340) * S);
+    const turning = M.mode === 'bottom';     // phones turn the ring; elsewhere the needle turns
+    for (const t of ticks) {
+      const d = Math.abs(t.a - cur) / 2.7;              // distance in 0.2 MHz steps
+      const b = bump(d) * amp;
+      const len = Math.round((t.major ? 28 + b * 12 : 12 + b * 26) * 10) / 10;
+      const sa = turning ? t.a - cur : t.a;   // angle on screen
+      const key = len + (t.major && t.st === lit ? 'a' : '') + (turning ? '|' + sa.toFixed(2) : '');
+      if (!force && t.key === key) continue;   // skip unchanged ticks to keep frames light
+      t.key = key;
+      const [x1, y1] = pt(M.tin, sa), [x2, y2] = pt(M.tin + len, sa);
+      t.el.setAttribute('x1', x1); t.el.setAttribute('y1', y1); t.el.setAttribute('x2', x2); t.el.setAttribute('y2', y2);
+      if (t.major) t.el.setAttribute('stroke-width', ((t.st && t.st === lit) || !t.st ? 3 : 2) * S);
+      else { t.el.setAttribute('stroke-width', 1.5 * S); t.el.setAttribute('stroke-opacity', (0.38 + 0.5 * b).toFixed(3)); }
+    }
+    const na = turning ? 0 : cur;
+    const [nx1, ny1] = pt(190.5, na), [nx2, ny2] = pt(226.5, na);
+    needle.setAttribute('x1', nx1); needle.setAttribute('y1', ny1); needle.setAttribute('x2', nx2); needle.setAttribute('y2', ny2);
+    needle.setAttribute('stroke-width', 3 * S);
+    if (turning) placeBottomPills();
+  }
+  function loop() {
+    let moving = false;
+    if (!dragging && tween) {
+      const p = Math.min(1, (performance.now() - tween.t0) / DUR);
+      cur = tween.from + (tween.to - tween.from) * easeInOut(p);
+      if (p < 1) moving = true; else { cur = tween.to; tween = null; }
+    }
+    amp += (ampTarget - amp) * (reduce ? 1 : 0.16);
+    if (Math.abs(ampTarget - amp) < 0.003) amp = ampTarget; else moving = true;
+    drawDial();
+    raf = moving || dragging ? requestAnimationFrame(loop) : 0;
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+  let active = null, lit = null;
+  function light(s) {
+    if (lit === s) return false;
+    lit = s;
+    if (s && dragging && active && active.id === 'home') emitRipple();   // each station passed while turning
+    STATIONS.forEach(o => pills[o.id].classList.toggle('on', o === s));
+    ticks.forEach(t => t.st && t.el.classList.toggle('on', t.st === s));
+    return true;
+  }
+  const nearest = deg => STATIONS.reduce((a, b) => Math.abs(ang(b.f) - deg) < Math.abs(ang(a.f) - deg) ? b : a);
+
+  const LIM = ang(102) + 8;
+  const clampA = d => Math.max(-LIM, Math.min(LIM, d));
+  function rawAngle(e) {
+    const vx = e.clientX - M.cx, vy = e.clientY - M.cy;
+    return Math.atan2(vx * M.px + vy * M.py, vx * M.hx + vy * M.hy) * 180 / Math.PI;
+  }
+  const angleFrom = e => clampA(rawAngle(e));
+  let grabA = 0, grabCur = 0;               // phones: where the swipe started
+  const layer = document.getElementById('dialLayer');
+  hit.addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return;
+    dragging = true; layer.classList.add('dragging'); ampTarget = WAVE_DRAG;
+    hit.setPointerCapture(e.pointerId);
+    grabA = rawAngle(e); grabCur = cur;
+    move(e); kick();
+  });
+  function move(e) {
+    if (!dragging) return;
+    // Phones: swiping turns the ring, so the station under your finger moves toward the middle.
+    cur = M.mode === 'bottom' ? clampA(grabCur - (rawAngle(e) - grabA)) : angleFrom(e);
+    target = cur; tween = null;
+    if (light(nearest(cur))) play('detent', e.isTrusted);
+  }
+  hit.addEventListener('pointermove', move);
+  function end(e) {
+    if (!dragging) return;
+    dragging = false; layer.classList.remove('dragging'); ampTarget = WAVE_REST;
+    tuneTo(nearest(cur), e.isTrusted);
+  }
+  hit.addEventListener('pointerup', end);
+  hit.addEventListener('pointercancel', end);
+
+  document.getElementById('tuner').addEventListener('keydown', e => {
+    const i = STATIONS.indexOf(active);
+    const fwd = M.mode === 'left' ? ['ArrowDown', 'ArrowRight'] : ['ArrowLeft', 'ArrowUp'];
+    const back = M.mode === 'left' ? ['ArrowUp', 'ArrowLeft'] : ['ArrowRight', 'ArrowDown'];
+    if (menuOpen) return;
+    const d = fwd.includes(e.key) ? 1 : back.includes(e.key) ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const n = STATIONS[Math.max(0, Math.min(STATIONS.length - 1, i + d))];
+    if (n !== active) tuneTo(n, e.isTrusted);
+  });
+
+  // ---------- Station change with a dial-born reveal ----------
+  const panels = {};
+  document.querySelectorAll('.panel').forEach(p => panels[p.dataset.station] = p);
+  // Pages only ever use layers 1 (leaving) and 2 (arriving); the dial sits at 100.
+  function swap(from, to, dir, o) {
+    Object.values(panels).forEach(p => p.getAnimations().forEach(a => a.cancel()));
+    Object.values(panels).forEach(p => { if (p !== from && p !== to) p.hidden = true; });
+    if (from) from.style.zIndex = 1;
+    to.hidden = false; to.style.zIndex = 2;
+    // Do any layout work before the motion starts so no frame of the transition stalls.
+    if (to === panels.designs) { buildFeed(); sizeRuler(); }
+    if (!from || reduce) { if (from) from.hidden = true; return; }
+    // The new page opens as a circle growing out of the dial's ring while both pages
+    // turn slightly around the dial's centre. No blur, short timing, one easing.
+    const ox = o.x, oy = o.y, origin = `${ox}px ${oy}px`;
+    from.style.transformOrigin = origin; to.style.transformOrigin = origin;
+    const far = Math.ceil(Math.hypot(Math.max(Math.abs(innerWidth - ox), Math.abs(ox)), Math.max(oy, innerHeight - oy))) + 8;
+    const start = Math.round(o.r);
+    // The leaving page only fades (cheap for big pages like Feed); the arriving one carries the motion.
+    // Layer hints only while moving; cleared after so the browser repaints the page normally.
+    from.style.willChange = 'opacity'; to.style.willChange = 'clip-path, transform';
+    // The reveal is slower than the needle so the circle reads clearly: the old page stays visible and sinks
+    // back a little while the new one opens over it.
+    const REV = 620;   // quick, but long enough for the circle to read
+    if (to === panels.home) {
+      // Back to Home is the reverse: the page you're on closes into the dial as a shrinking circle while Home rises back into place underneath.
+      from.style.zIndex = 2; to.style.zIndex = 1;
+      from.style.willChange = 'clip-path, transform'; to.style.willChange = 'opacity, transform';
+      const close = from.animate([
+        { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg) scale(1)' },
+        { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg) scale(1.04)` }
+      ], { duration: REV, easing: EASE, fill: 'forwards' });
+      const rise = to.animate([
+        { opacity: 0, transform: 'scale(.96)' },
+        { opacity: .85, transform: 'scale(.975)', offset: .4 },
+        { opacity: 1, transform: 'scale(1)' }
+      ], { duration: REV, easing: EASE });
+      close.onfinish = () => {
+        if (active && panels[active.id] !== from) from.hidden = true;
+        close.cancel(); from.style.willChange = ''; from.style.clipPath = ''; from.style.transform = '';
+      };
+      rise.onfinish = rise.oncancel = () => {
+        to.style.willChange = ''; to.style.transform = ''; to.style.opacity = '';
+        to.style.visibility = 'hidden'; void to.offsetHeight; to.style.visibility = '';
+      };
+      return;
+    }
+    from.style.willChange = 'opacity, transform';
+    const fade = from.animate([
+      { opacity: 1, transform: 'scale(1)' },
+      { opacity: .85, transform: 'scale(.975)', offset: .6 },
+      { opacity: 0, transform: 'scale(.96)' }
+    ], { duration: REV, easing: EASE, fill: 'forwards' });
+    fade.onfinish = () => {
+      if (active && panels[active.id] !== from) from.hidden = true;
+      fade.cancel(); from.style.willChange = '';
+    };
+    const reveal = to.animate([
+      { clipPath: `circle(${start}px at ${ox}px ${oy}px)`, transform: `rotate(${-dir * o.rot}deg) scale(1.04)` },
+      { clipPath: `circle(${far}px at ${ox}px ${oy}px)`, transform: 'rotate(0deg) scale(1)' }
+    ], { duration: REV, easing: EASE });
+    const settle = () => {
+      to.style.willChange = ''; to.style.clipPath = ''; to.style.transform = ''; to.style.opacity = '';
+      // Nudge a fresh paint of the arrived page (works around a Safari blank-layer bug).
+      to.style.visibility = 'hidden'; void to.offsetHeight; to.style.visibility = '';
+    };
+    reveal.onfinish = settle; reveal.oncancel = () => { to.style.willChange = ''; };
+  }
+  function tuneTo(s, sound) {
+    const prev = active;
+    if (prev && prev.id === 'home') emitRipple(true);                    // the wave leaves as the page turns (no drawn line)
+    setTarget(ang(s.f)); light(s);
+    play('pop', sound);
+    if (prev === s) return;
+    active = s;
+    setInner(s); moveTag(s, !!prev);
+    // Pages to and from Home open out of the dial; between inner pages they open out of the menu tag.
+    let o = { x: M.cx, y: M.cy, r: 264.5 * M.S, rot: 3 };
+    const g = prev && prev.id !== 'home' && s.id !== 'home' && tagFor(s);
+    if (g) o = { x: g.x + g.w / 2, y: g.y, r: g.h / 2, rot: 0 };
+    swap(prev && panels[prev.id], panels[s.id], prev ? Math.sign(s.f - prev.f) : 1, o);
+    kickPx();
+    setTimeout(() => { syncVideos(); bendRemeasure(); }, 60);
+    const t = document.getElementById('tuner');
+    t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
+    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+  }
+
+  // ---------- Designs: projects come from content/designs.json (the CMS will edit that file) ----------
+  // Each project: title (required), images (one or more), and optional role, description and tags.
+  // The grid shows each project's first image; the rest (and the text) are kept for a future project page.
+  // If the file can't be read (e.g. opening index.html straight from disk), DESIGNS_FALLBACK is used instead.
+  const DESIGNS_FALLBACK = {"projects": [{"title": "Tennis ball and rackets", "images": [{"src": "assets/designs/tennis-ball-and-racket.jpg", "ratio": 1.3333}]}, {"title": "Tennis on court", "images": [{"src": "assets/designs/tennis-and-racket.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, blue", "images": [{"src": "assets/designs/tennis-in-motion-blue-background.jpg", "ratio": 0.8}]}, {"title": "Tennis in motion, dark blue", "images": [{"src": "assets/designs/tennis-in-motion-dark-blue-background.jpg", "ratio": 0.8}]}, {"title": "Debit card, floating", "images": [{"src": "assets/designs/debit-card-with-colorful-objects1.jpg", "ratio": 1.5}]}, {"title": "Debit card with shapes", "images": [{"src": "assets/designs/debit-card-with-colorful-objects.jpg", "ratio": 0.8}]}, {"title": "Pink debit card", "images": [{"src": "assets/designs/debit-card.jpg", "ratio": 0.8}]}, {"title": "Red padlock", "images": [{"src": "assets/designs/red-lock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Orange padlock", "images": [{"src": "assets/designs/bright-orange-padlock-with-robe.jpg", "ratio": 0.8}]}, {"title": "Safe with coins", "images": [{"src": "assets/designs/safe-with-coins.jpg", "ratio": 0.8}]}, {"title": "Ruler picker", "images": [{"src": "assets/designs/ruler-picker.jpg", "video": "assets/designs/videos/ruler-picker.mp4", "ratio": 0.8}]}, {"title": "Card holder with stickers", "images": [{"src": "assets/designs/card-holder-with-colorful-stickers.jpg", "ratio": 1.5}]}, {"title": "Award with ribbons", "images": [{"src": "assets/designs/colorful-award-with-ribbons.jpg", "ratio": 0.8}]}, {"title": "Paper plane with coin", "images": [{"src": "assets/designs/paper-plane-with-coin.jpg", "ratio": 0.8}]}, {"title": "Drink tumbler", "images": [{"src": "assets/designs/3d-tumbler-render.jpg", "ratio": 0.8}]}, {"title": "Badge", "images": [{"src": "assets/designs/badge-on-a-orange-background.jpg", "ratio": 0.8}]}, {"title": "Price tag and coins", "images": [{"src": "assets/designs/price-tag-and-coins.jpg", "ratio": 0.8}]}, {"title": "Badge in a box", "images": [{"src": "assets/designs/batch-in-a-box.jpg", "ratio": 0.8}]}, {"title": "Pawn in an archway", "images": [{"src": "assets/designs/pawn-in-an-archway.jpg", "ratio": 0.8}]}]};
+  let PROJECTS = DESIGNS_FALLBACK.projects;
+  const PALETTES = [['#EDE7DF', '#C9A98A'], ['#E6EAF2', '#8FA3C7'], ['#EFE6EC', '#C79BB3'], ['#E5EFEA', '#86B49C'], ['#F1ECE2', '#D2A45B'], ['#E9E8F1', '#9A92CC']];
+  const SHAPES = ['<circle cx="50" cy="50" r="22"/>', '<rect x="28" y="28" width="44" height="44" rx="10"/>', '<path d="M50 24l26 46H24z"/>',
+    '<path d="M24 62c10-24 42-24 52 0" fill="none" stroke-width="7" stroke-linecap="round"/>'];
+  function placeholder(seed) {
+    const [a, b] = PALETTES[seed % PALETTES.length];
+    const div = document.createElement('div'); div.className = 'art';
+    div.style.background = `linear-gradient(140deg, ${a}, ${a} 55%, ${b}22)`;
+    div.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" aria-hidden="true"><g fill="${b}" stroke="${b}" opacity=".85" transform="translate(0 -4)">${SHAPES[seed % SHAPES.length]}</g></svg>`;
+    return div;
+  }
+  fetch('content/designs.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).then(d => {
+    if (d && Array.isArray(d.projects) && d.projects.length) { PROJECTS = d.projects; if (active && active.id === 'designs') { buildFeed(true); sizeRuler(); } else cols = 0; }
+  }).catch(() => {});
+
+  const masonry = document.getElementById('masonry'), scroller = document.getElementById('scroller');
+  // Videos play only while visible on the Designs page, and pause otherwise (saves battery and data).
+  const vidIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
+    const v = en.target;
+    if (en.isIntersecting && active && active.id === 'designs' && !reduce) { const p = v.play(); if (p) p.catch(() => {}); } else v.pause();
+  }), { root: null, threshold: .15 }) : null;
+  function watchVideo(v) { if (vidIO) vidIO.observe(v); }
+  function syncVideos() {
+    masonry.querySelectorAll('video').forEach(v => {
+      if (!active || active.id !== 'designs' || reduce) { v.pause(); return; }
+      const r = v.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < innerHeight) { const p = v.play(); if (p) p.catch(() => {}); }
+    });
+  }
+  let cols = 0;
+  function buildFeed(force) {
+    const w = masonry.clientWidth;
+    if (!w) return;
+    const n = w >= 860 ? 4 : w >= 600 ? 3 : w >= 340 ? 2 : 1;
+    if (n === cols && !force) return;
+    cols = n; masonry.innerHTML = '';
+    const colEls = [], h = [];
+    for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'col'; masonry.appendChild(c); colEls.push(c); h.push(0); }
+    PROJECTS.forEach((pr, i) => {
+      const imgs = Array.isArray(pr.images) && pr.images.length ? pr.images : [{}];
+      const cover = pr.cover || imgs[0], r = +cover.ratio > 0 ? +cover.ratio : 4 / 5;
+      const k = h.indexOf(Math.min(...h));
+      const fig = document.createElement('figure');
+      fig.className = 'tile'; fig.style.aspectRatio = r;
+      if (cover.video) {
+        // A clip: muted, looping, inline; the still frame (src) shows until it plays. Plays only while on screen.
+        const v = document.createElement('video');
+        v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-label', pr.title || '');
+        if (cover.src) v.poster = cover.src;
+        v.src = cover.video;
+        fig.classList.add('is-video'); fig.appendChild(v); watchVideo(v);
+      } else if (cover.src) { const im = new Image(); im.src = cover.src; im.alt = pr.title || ''; im.loading = 'lazy'; im.decoding = 'async'; fig.appendChild(im); }
+      else fig.appendChild(placeholder(i));
+      const cap = document.createElement('figcaption'); cap.className = 'cap';
+      const name = document.createElement('span'); name.textContent = pr.title || 'Untitled';
+      cap.appendChild(name);
+      if (imgs.length > 1) {
+        const c = document.createElement('span'); c.className = 'count'; c.setAttribute('aria-label', `${imgs.length} images`);
+        c.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="4.5" width="9" height="9" rx="2"/><path d="M5 2.5h7a2 2 0 0 1 2 2v7"/></svg><b>${imgs.length}</b><span class="lbl"> images</span>`;
+        cap.appendChild(c);
+      }
+      fig.appendChild(cap);
+      colEls[k].appendChild(fig);
+      h[k] += 1 / r + 0.05;
+    });
+    kickPx();   // new tiles pick up the current parallax
+    bendRemeasure();
+  }
+
+  // ---------- Feed: graduated ruler tracks the scroll position ----------
+  const ruler = document.getElementById('ruler');
+  let rLines = [], rH = 0, rPos = 0, rTarget = 0, rRaf = 0;
+  const RW = 140, GAP = 12, EDGE = 13;
+  function sizeRuler() {
+    rH = ruler.getBoundingClientRect().height;
+    if (!rH) return;
+    const n = Math.max(2, Math.floor((rH - 12) / GAP) + 1);
+    ruler.setAttribute('viewBox', `0 0 ${RW} ${rH}`);
+    if (n !== rLines.length) {
+      ruler.innerHTML = ''; rLines = [];
+      for (let i = 0; i < n; i++) { const l = document.createElementNS(SVGNS, 'line'); ruler.appendChild(l); rLines.push(l); }
+    }
+    syncTarget(); rPos = rTarget; drawRuler();
+  }
+  function syncTarget() {
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    const p = max > 0 ? scroller.scrollTop / max : 0;
+    rTarget = p * (rLines.length - 1);
+  }
+  let lastIdx = -1;
+  function drawRuler() {
+    const cxr = RW - EDGE, idx = Math.round(rPos);
+    rLines.forEach((l, i) => {
+      const d = Math.abs(i - rPos), on = i === idx;
+      const L = on ? 104 : prof(d), b = (L - 12) / 92, y = 6 + i * GAP;
+      l.setAttribute('x1', cxr - L / 2); l.setAttribute('x2', cxr + L / 2);
+      l.setAttribute('y1', y); l.setAttribute('y2', y);
+      l.setAttribute('stroke', '#000');
+      l.setAttribute('stroke-width', on ? 3.5 : 2);
+      l.setAttribute('stroke-opacity', on ? 1 : (0.2 + 0.4 * b).toFixed(3));
+    });
+  }
+  function rulerLoop() {
+    rPos += (rTarget - rPos) * (reduce ? 1 : 0.22);
+    if (Math.abs(rTarget - rPos) < 0.002) rPos = rTarget;
+    drawRuler();
+    rRaf = rPos !== rTarget ? requestAnimationFrame(rulerLoop) : 0;
+  }
+  scroller.addEventListener('scroll', () => { syncTarget(); if (!rRaf) rRaf = requestAnimationFrame(rulerLoop); }, { passive: true });
+
+  // ---------- Designs: speed stretch ----------
+  // At rest the grid is perfectly still and even. Scrolling fast stretches each image a little along the
+  // scroll (taller and slightly narrower), which also tightens the gaps; when scrolling stops, a spring
+  // brings them back with a small bounce. Slow, gentle scrolling barely shows it. Off for reduced motion.
+  const STRETCH = { gain: .04, max: .11, k: .16, damp: .7 };   // stretch per px/ms of speed, cap, spring stiffness, damping
+  let stTiles = null, stLastTop = 0, stLastT = 0, stVel = 0, stS = 0, stV = 0, stRaf = 0;
+  function bendRemeasure() { stTiles = null; }
+  function bendKick() {}
+  function stretchFrame(now) {
+    if (!stTiles) stTiles = [...masonry.querySelectorAll('.tile')];
+    const top = scroller.scrollTop, dt = Math.max(1, now - stLastT);
+    const raw = (top - stLastTop) / dt;                     // px per ms, signed
+    stLastTop = top; stLastT = now;
+    stVel += (raw - stVel) * .35;                           // smooth out uneven wheel events
+    const target = Math.min(STRETCH.max, Math.abs(stVel) * STRETCH.gain);
+    stV = stV * STRETCH.damp + (target - stS) * STRETCH.k;  // spring toward the target stretch
+    stS += stV;
+    const sy = 1 + stS, sx = 1 - stS * .35, origin = stVel >= 0 ? '50% 0%' : '50% 100%';   // grows away from the direction of travel
+    const tf = Math.abs(stS) < .0008 ? '' : `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+    for (const t of stTiles) { t.style.transformOrigin = origin; t.style.transform = tf; }
+    if (Math.abs(stS) < .0008 && Math.abs(stV) < .0008 && Math.abs(stVel) < .002) { stRaf = 0; stS = stV = stVel = 0; return; }
+    stRaf = requestAnimationFrame(stretchFrame);
+  }
+  scroller.addEventListener('scroll', () => {
+    if (reduce || !active || active.id !== 'designs') return;
+    if (!stRaf) { stLastTop = scroller.scrollTop; stLastT = performance.now(); stRaf = requestAnimationFrame(stretchFrame); }
+  }, { passive: true });
+  addEventListener('resize', bendRemeasure);
+
+
+  // Drag or tap the ruler to scrub through the feed.
+  let scrubbing = false, lastSound = 0;
+  function scrubTo(e) {
+    const r = ruler.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (e.clientY - r.top - 6) / ((rLines.length - 1) * GAP)));
+    scroller.scrollTop = p * (scroller.scrollHeight - scroller.clientHeight);
+    const idx = Math.round(p * (rLines.length - 1));
+    const now = performance.now();
+    if (idx !== lastIdx && now - lastSound > 45) { if (lastIdx !== -1) play('detent', e.isTrusted); lastSound = now; }
+    lastIdx = idx;
+  }
+  ruler.addEventListener('pointerdown', e => { scrubbing = true; lastIdx = -1; ruler.setPointerCapture(e.pointerId); play('pop', e.isTrusted); scrubTo(e); });
+  ruler.addEventListener('pointermove', e => { if (scrubbing) scrubTo(e); });
+  const stopScrub = () => { scrubbing = false; };
+  ruler.addEventListener('pointerup', stopScrub); ruler.addEventListener('pointercancel', stopScrub);
+
+  // ---------- Layout ----------
+  // ---------- Tools dock ----------
+  // Icons load from assets/; if a file is missing, the tile shows a simple placeholder instead.
+  const TOOLS = [
+    { name: 'Adobe Illustrator', bg: '#F2A541', src: 'assets/illustrator.svg', icon: '<path d="M4 20l4-1 10-10-3-3L5 16z"/><path d="M14 7l3 3"/>' },
+    { name: 'Adobe Photoshop',   bg: '#4C8DF6', src: 'assets/photoshop.svg',   icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/>' },
+    { name: 'Adobe After Effects', bg: '#9B6BF2', src: 'assets/aftereffect.svg', icon: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M10 9.5v5l4-2.5z"/>' },
+    { name: 'Claude',            bg: '#E7735A', src: 'assets/claude.svg',      icon: '<path class="solid" d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>' },
+    { name: 'Blender',           bg: '#58C26A', src: 'assets/blender.svg',     icon: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/>' },
+    { name: 'Figma',             bg: '#9B6BF2', src: 'assets/figma.svg',       icon: '<path d="M8 3v18M16 3v18M3 8h18M3 16h18"/>' },
+    { name: 'ChatGPT',           bg: '#2F2F2F', src: 'assets/chatgpt.svg',     icon: '<path d="M4 5h16v11H9l-5 4z"/>' }
+  ];
+  const dock = document.getElementById('dock');
+  const toolEls = TOOLS.map(t => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tool'; b.setAttribute('role', 'listitem'); b.setAttribute('aria-label', t.name);
+    b.style.background = t.bg;
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${t.icon}</svg><span class="tip">${t.name}</span>`;
+    if (t.src) {                       // official icon, if the file exists
+      const im = new Image(); im.alt = '';
+      im.onload = () => { b.style.background = 'transparent'; b.querySelector('svg').remove(); b.prepend(im); };
+      im.src = t.src;
+    }
+    dock.appendChild(b);
+    return b;
+  });
+  // Magnify: tiles near the cursor grow, like a desktop dock. They grow in real size, so the
+  // row widens and the 12px gap between tiles is kept even at full magnification.
+  if (!reduce && matchMedia('(hover: hover)').matches) {
+    const BASE = 52, MAX = 76, REACH = 124;
+    // Each icon has its own note from a pentatonic scale, so sweeping the dock plays a soft run.
+    const NOTES = [784, 880, 1047, 1175, 1319, 1568, 1760, 2093];
+    let lastTile = -1, lastSoundAt = 0;
+    let centres = [];
+    dock.addEventListener('pointerenter', () => {
+      // Measure resting centres once so growing tiles don't chase the cursor.
+      toolEls.forEach(el => el.style.setProperty('--size', BASE + 'px'));
+      centres = toolEls.map(el => { const r = el.getBoundingClientRect(); return r.left + r.width / 2; });
+    });
+    dock.addEventListener('pointermove', e => {
+      // Soft pop when the cursor arrives on a new icon (not while it moves within one).
+      const over = toolEls.findIndex(el => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right; });
+      if (over !== -1 && over !== lastTile) {
+        const now = performance.now();
+        if (e.isTrusted && window.Popkit && now - lastSoundAt > 45) { Popkit.play('hover', { f: NOTES[over % NOTES.length] }); lastSoundAt = now; }
+      }
+      if (over !== -1) lastTile = over;
+      toolEls.forEach((el, i) => {
+        const k = Math.max(0, 1 - Math.abs(e.clientX - centres[i]) / REACH);
+        el.style.setProperty('--size', (BASE + (MAX - BASE) * k * k * (3 - 2 * k)).toFixed(1) + 'px');
+      });
+    });
+    dock.addEventListener('pointerleave', () => { lastTile = -1; toolEls.forEach(el => el.style.removeProperty('--size')); });
+  }
+
+  // ---------- Phone menu: the full list of stations ----------
+  const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu'), menuList = document.getElementById('menuList');
+  let menuOpen = false;
+  const menuItems = STATIONS.map(s => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'menu-item';
+    const name = document.createElement('span'); name.textContent = s.name;
+    const freq = document.createElement('span'); freq.className = 'freq'; freq.textContent = s.f.toFixed(1);
+    b.append(name, freq);
+    b.addEventListener('click', e => { setMenu(false, false); tuneTo(s, e.isTrusted); });
+    li.appendChild(b); menuList.appendChild(li);
+    return { s, b };
+  });
+  function setMenu(open, sound) {
+    if (open === menuOpen) return;
+    menuOpen = open;
+    root.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu.getAnimations().forEach(a => a.cancel());
+    if (sound) play(open ? 'open' : 'close', true);
+    if (open) {
+      menuItems.forEach(({ s, b }) => b.classList.toggle('on', s === active));
+      menu.hidden = false;
+      if (!reduce) {
+        menu.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: EASE });
+        menuItems.forEach(({ b }, i) => b.animate(
+          [{ opacity: 0, transform: 'translate3d(0,14px,0)' }, { opacity: 1, transform: 'none' }],
+          { duration: 420, delay: 40 + i * 35, easing: EASE, fill: 'backwards' }));
+      }
+      (menuItems.find(m => m.s === active) || menuItems[0]).b.focus({ preventScroll: true });
+    } else {
+      if (reduce) { menu.hidden = true; return; }
+      menu.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: EASE }).onfinish = () => { if (!menuOpen) menu.hidden = true; };
+    }
+  }
+  menuBtn.addEventListener('click', e => setMenu(!menuOpen, e.isTrusted));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) { setMenu(false, e.isTrusted); menuBtn.focus(); } });
+
+  // ---------- Side menu on inner pages ----------
+  const navEl = document.getElementById('sideNav'), navList = document.getElementById('navList'), navDash = document.getElementById('navDash');
+  const NAV_ORDER = ['home', 'designs', 'engineering', 'projects', 'about'];
+  const navBtns = {};
+  NAV_ORDER.forEach(id => {
+    const s = STATIONS.find(x => x.id === id), li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'nav-item'; b.textContent = s.name;
+    b.addEventListener('click', e => tuneTo(s, e.isTrusted));
+    li.appendChild(b); navList.appendChild(li); navBtns[id] = b;
+  });
+  function setInner(s) {
+    const inner = s.id !== 'home';
+    root.classList.toggle('inner', inner);
+    document.getElementById('tuner').tabIndex = inner ? -1 : 0;
+  }
+  // Where the tag sits for a page: the menu item's box, in page coordinates (the menu is pinned at 0,0).
+  function tagFor(s) {
+    const b = navBtns[s.id];
+    if (!b || !b.offsetWidth) return null;
+    return { x: b.offsetLeft + navList.offsetLeft, y: b.offsetTop + navList.offsetTop + b.offsetHeight / 2, w: b.offsetWidth, h: b.offsetHeight };
+  }
+  function markNav(s) { Object.entries(navBtns).forEach(([id, b]) => { b.classList.toggle('on', id === s.id); if (id === s.id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+  // The dash slides beside the current page; the first placement (and resizes) jump without motion.
+  function moveTag(s, animate) {
+    markNav(s);
+    const b = navBtns[s.id];
+    if (!b || !b.offsetWidth) return;
+    const y = b.offsetTop + b.offsetHeight / 2 - navDash.offsetHeight / 2;
+    navDash.classList.toggle('ready', !!animate && !reduce);
+    navDash.style.transform = `translateY(${y.toFixed(1)}px)`;
+  }
+
+  // ---------- Layout ----------
+  const socials = document.querySelector('.socials'), hero = document.querySelector('.hero'), homePanel = panels.home;
+  function layout() {
+    measure();
+    // Phones keep the social links in the flow under the bio; larger screens pin them low.
+    if (M.mode === 'bottom' && socials.parentNode !== hero) hero.appendChild(socials);
+    if (M.mode !== 'bottom' && socials.parentNode !== homePanel) homePanel.appendChild(socials);
+    if (M.mode !== 'bottom') setMenu(false, false);
+    placePills(); drawDial(true);
+    // Phones: start the intro around 23% down, but lift it on short screens so the
+    // social links always stay clear of the dial labels.
+    hero.style.top = '';
+    if (M.mode === 'bottom') {
+      const want = Math.min(Math.max(96, innerHeight * 0.227), 240);
+      const dialTop = M.cy - R_PILL * M.S - 24;
+      hero.style.top = Math.round(Math.max(72, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';
+    }
+    if (active) moveTag(active, false);
+    if (active && active.id === 'designs') { buildFeed(); sizeRuler(); }
+  }
+  addEventListener('resize', layout);
+
+  // ---------- Live Lagos time ----------
+  const timeEl = document.getElementById('time'), clockEl = document.getElementById('clock');
+  const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Lagos', hour: 'numeric', minute: '2-digit', hour12: true });
+  function clock() {
+    const parts = fmt.formatToParts(new Date());
+    const h = parts.find(p => p.type === 'hour').value, m = parts.find(p => p.type === 'minute').value;
+    const ap = (parts.find(p => p.type === 'dayPeriod') || { value: '' }).value.toLowerCase().replace(/[.\s]/g, '');
+    clockEl.innerHTML = `${h}<span class="colon">:</span>${m}${ap}`;
+    skyNow(+h % 12 + (ap === 'pm' ? 12 : 0));
+    setTimeout(clock, 1000 - (Date.now() % 1000) + 5);
+  }
+
+  // ---------- Mouse parallax ----------
+  // Content floats at different depths: as the cursor moves, near layers drift further than far ones.
+  // On Designs the columns sit at different depths and each picture also slides inside its tile,
+  // following both the cursor and the scroll. Navigation (dial, side menu, ruler) never moves.
+  // Uses the CSS `translate` property so it stacks on top of any existing transforms.
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let pxX = 0, pxY = 0, pxTX = 0, pxTY = 0, pxRaf = 0;
+  const COL_DEPTH = [9, 16, 11, 18];
+  const layerCache = {};
+  function layersFor(id) {
+    if (layerCache[id]) return layerCache[id];
+    const p = panels[id], L = [];
+    const add = (el, d) => el && L.push([el, d]);
+    if (id === 'home') {
+      // Home moves boldly: each layer drifts up to its depth in px when the cursor reaches the edge.
+      add(p.querySelector('.avatar'), 58); add(p.querySelector('h1'), 34); add(p.querySelector('.links'), 22);
+      p.querySelectorAll('.bio p').forEach((el, i) => add(el, 14 + i * 8));
+      add(document.querySelector('.socials'), 28); add(p.querySelector('.time'), 12);
+    } else if (id !== 'designs') {
+      add(p.querySelector('h2'), 14);
+      p.querySelectorAll('.list li').forEach((el, i) => add(el, 4 + (i % 3) * 3));
+      add(p.querySelector('.dock-label'), 6);
+    }
+    return (layerCache[id] = L);
+  }
+  const tr = (el, x, y) => { el.style.translate = `${x.toFixed(2)}px ${y.toFixed(2)}px`; };
+  function applyPx() {
+    if (!active) return;
+    if (active.id === 'designs') {
+      [...masonry.children].forEach((c, i) => { const d = COL_DEPTH[i % COL_DEPTH.length]; tr(c, -pxX * d, -pxY * d); });
+      // Inner pan (Medium): each picture sits low in its frame below the middle of the view and high above it,
+      // so as you scroll it drifts through the frame more slowly than the frame moves, like looking through a window.
+      // It eases toward its target each frame, so it glides behind the scroll.
+      const vr = scroller.getBoundingClientRect(), mid = vr.top + vr.height / 2;
+      masonry.querySelectorAll('.tile').forEach(fig => {
+        const im = fig.querySelector('img, video'); if (!im) return;
+        const r = fig.getBoundingClientRect();
+        if (r.bottom < vr.top - 200 || r.top > vr.bottom + 200) return;   // well off screen: leave it
+        const rel = Math.max(-1, Math.min(1, (r.top + r.height / 2 - mid) / (vr.height / 2 + r.height / 2)));
+        const lim = .148, ty = Math.max(-lim, Math.min(lim, -rel * PAN - pxY * .012)) * r.height, tx = -pxX * .012 * r.width;   // stays inside the zoom headroom
+        if (im._py === undefined) { im._py = ty; im._px = tx; }
+        im._py += (ty - im._py) * .14; im._px += (tx - im._px) * .14;
+        if (Math.abs(ty - im._py) > .15 || Math.abs(tx - im._px) > .15) panMoving = true;
+        tr(im, im._px, im._py);
+      });
+    } else {
+      // On Home, vertical drift is halved so stacked layers (photo, name, links, bio) never run into each other.
+      const ky = active.id === 'home' ? .5 : 1;
+      layersFor(active.id).forEach(([el, d]) => tr(el, -pxX * d, -pxY * d * ky));
+    }
+  }
+  const PAN = .14;          // inner pan strength: Medium
+  let panMoving = false;
+  function pxFrame() {
+    pxX += (pxTX - pxX) * 0.09; pxY += (pxTY - pxY) * 0.09;
+    const settled = Math.abs(pxTX - pxX) < 0.0015 && Math.abs(pxTY - pxY) < 0.0015;
+    if (settled) { pxX = pxTX; pxY = pxTY; }
+    panMoving = false;
+    applyPx();
+    pxRaf = settled && !panMoving ? 0 : requestAnimationFrame(pxFrame);
+  }
+  function kickPx() { if (!reduce && !pxRaf) pxRaf = requestAnimationFrame(pxFrame); }
+  if (!reduce) {
+    if (finePointer) {
+      addEventListener('pointermove', e => {
+        if (e.pointerType !== 'mouse') return;
+        pxTX = e.clientX / innerWidth * 2 - 1; pxTY = e.clientY / innerHeight * 2 - 1; kickPx();
+      }, { passive: true });
+      document.addEventListener('mouseout', e => { if (!e.relatedTarget) { pxTX = pxTY = 0; kickPx(); } });   // cursor left the window: drift home
+    }
+    scroller.addEventListener('scroll', kickPx, { passive: true });
+    addEventListener('resize', kickPx);
+    // Clicking a picture sends a ripple through that picture, outward from the click point.
+    scroller.addEventListener('click', e => {        // click, not press: a scroll on touch never fires it
+      if (e.button > 0) return;
+      const fig = e.target.closest('.tile');
+      if (!fig) return;
+      play('pop', e.isTrusted);
+      ripple(fig, e.clientX, e.clientY);
+    });
+  }
+
+  // ---------- Image ripple ----------
+  // A WebGL canvas is laid over the clicked picture (same size, zoom and parallax offset) and redraws
+  // it with a ring of displacement travelling out from the click, plus a faint highlight on the ring.
+  // Only one picture ripples at a time; the canvas is removed when the ring has faded.
+  const RIPPLE = { ms: 1150, speed: 0.75, amp: 16, width: 34 };   // duration, px per ms, push px, ring width px
+  const VERT = 'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  const FRAG = `precision mediump float;varying vec2 uv;uniform sampler2D tex;uniform vec2 size,c,cover;uniform float r,amp,wid,fade;
+    void main(){
+      vec2 px=uv*size, v=px-c; float d=length(v);
+      float band=exp(-pow((d-r)/wid,2.));
+      float band2=exp(-pow((d-r+wid*2.2)/(wid*.8),2.))*.45;      // a softer trailing ring
+      float off=amp*(band-band2)*fade;
+      vec2 q=(px-(d>0.?v/d:vec2(0.))*off)/size;
+      vec2 t=vec2(.5)+(q-vec2(.5))*cover;                          // object-fit: cover
+      vec4 col=texture2D(tex,clamp(t,0.,1.));
+      col.rgb+=.07*band*fade;
+      gl_FragColor=col;
+    }`;
+  let rip = null;
+  function endRipple() { if (!rip) return; cancelAnimationFrame(rip.raf); rip.cv.remove(); rip = null; }
+  function ripple(fig, x, y) {
+    const vid = fig.querySelector('video');
+    if (vid) { if (!reduce) vid.animate([{ scale: 1.3 }, { scale: 1.26 }, { scale: 1.32 }, { scale: 1.3 }], { duration: 520, easing: 'ease-out' }); return; }
+    const im = fig.querySelector('img');
+    if (!im || reduce) return;
+    const bounce = () => im.animate([{ scale: 1.3 }, { scale: 1.26 }, { scale: 1.32 }, { scale: 1.3 }], { duration: 520, easing: 'ease-out' });
+    if (!im.complete || !im.naturalWidth) return bounce();
+    endRipple();
+    const cv = document.createElement('canvas'); cv.className = 'ripple';
+    const gl = cv.getContext('webgl', { premultipliedAlpha: false });
+    if (!gl) return bounce();
+    const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+    const pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return bounce();
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+    ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(k => gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); }
+    catch (_) { return bounce(); }                                 // e.g. opened straight from disk
+    // Size the canvas to the picture's box (before zoom) and place the click in that box's pixels.
+    const W = fig.clientWidth, H = fig.clientHeight, dpr = Math.min(2, devicePixelRatio || 1);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    gl.viewport(0, 0, cv.width, cv.height);
+    const ir = im.getBoundingClientRect();                       // zoomed, shifted picture on screen
+    const cx = (x - ir.left) / ir.width * W, cy = (y - ir.top) / ir.height * H;
+    const ia = im.naturalWidth / im.naturalHeight, ba = W / H;
+    const U = n => gl.getUniformLocation(pr, n);
+    gl.uniform2f(U('size'), W, H); gl.uniform2f(U('c'), cx, cy);
+    gl.uniform2f(U('cover'), ia > ba ? ba / ia : 1, ia > ba ? 1 : ia / ba);
+    gl.uniform1f(U('amp'), RIPPLE.amp); gl.uniform1f(U('wid'), RIPPLE.width);
+    const uR = U('r'), uF = U('fade');
+    fig.insertBefore(cv, im.nextSibling);
+    rip = { cv, raf: 0 };
+    const t0 = performance.now();
+    (function draw(now) {
+      if (!rip || rip.cv !== cv) return;
+      const t = now - t0, p = Math.min(1, t / RIPPLE.ms);
+      cv.style.translate = im.style.translate;                  // ride along with the parallax
+      gl.uniform1f(uR, t * RIPPLE.speed); gl.uniform1f(uF, Math.pow(1 - p, 1.6));
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (p < 1) rip.raf = requestAnimationFrame(draw); else endRipple();
+    })(t0);
+  }
+
+  // ---------- Typed name on Home ----------
+  // After the loader, the name types out, then cycles through roles and settles back on the name.
+  // Between roles it only deletes back to what they share ("a "), like someone editing a line.
+  const TYPE_LINES = ["I'm Kingsley M.", 'a Product Designer', 'a Brand Designer', 'a Design Engineer', 'a 3D Designer'];
+  const TYPE_FINAL = "I'm Kingsley M.";
+  const typedEl = document.getElementById('typed'), caretEl = document.getElementById('caret');
+  const pause = ms => new Promise(r => setTimeout(r, ms));
+  let typeBusy = true;
+  async function typeLine(from, to) {
+    typeBusy = true;
+    caretEl.classList.remove('idle');
+    let keep = 0; while (keep < from.length && keep < to.length && from[keep] === to[keep]) keep++;
+    for (let i = from.length; i > keep; i--) { typedEl.textContent = from.slice(0, i - 1); await pause(34 + Math.random() * 18); }
+    if (from.length > keep) await pause(160);
+    for (let i = keep; i < to.length; i++) {
+      const ch = to[i]; typedEl.textContent = to.slice(0, i + 1);
+      await pause((ch === ' ' ? 120 : 62) + Math.random() * 70);   // uneven, human rhythm with a beat on spaces
+    }
+    caretEl.classList.add('idle');
+    typeBusy = false;
+  }
+  let typedOnce = false;
+  async function typeIntro() {
+    if (typedOnce) return; typedOnce = true;
+    // Only animate when Home is what the visitor is looking at; otherwise the name is simply there.
+    if (reduce || !active || active.id !== 'home') { typedEl.textContent = TYPE_FINAL; typeBusy = false; return; }
+    typedEl.textContent = '';                  // cleared while the loader is still fading, so it never visibly erases
+    await pause(380 + 350);
+    let shown = '';
+    for (const line of TYPE_LINES) { await typeLine(shown, line); shown = line; await pause(line === TYPE_LINES[0] ? 1700 : 1150); }
+    await typeLine(shown, TYPE_FINAL);
+    typeBusy = false;
+  }
+  if (document.getElementById('loader')) document.addEventListener('loader:done', typeIntro, { once: true });
+  else setTimeout(typeIntro, 300);
+
+  // ---------- Image trail on Home ----------
+  // Moving the mouse over Home drops a card every few pixels along the path, cycling through every
+  // Designs image (small copies from assets/designs/thumbs, falling back to the full image).
+  // Each card pops in, holds briefly, then blurs, shrinks and fades. Mouse only; off for reduced motion.
+  // Switched off for now: set TRAIL_ON to true to bring it back (thumbnails stay in assets/designs/thumbs).
+  const TRAIL_ON = false;
+  if (TRAIL_ON && !reduce && finePointer) {
+    const trail = document.getElementById('trail');
+    const POOL = 16, GAP = 26, LIFE = 1150;
+    const cards = [];
+    for (let i = 0; i < POOL; i++) {
+      const c = document.createElement('div'); c.className = 'card';
+      const im = document.createElement('img'); im.alt = ''; im.decoding = 'async';
+      im.onerror = () => { if (im.dataset.full && im.src.indexOf('/thumbs/') !== -1) im.src = im.dataset.full; };
+      c.appendChild(im); trail.appendChild(c); cards.push(c);
+    }
+    let pics = [], picIdx = 0, slot = 0, z = 1, lx = null, ly = null;
+    const loadPics = () => {
+      pics = [];
+      PROJECTS.forEach(pr => (pr.images || []).forEach(im => { if (im.src) pics.push(im.src); }));
+      pics.forEach(src => { const i = new Image(); i.src = src.replace(/([^/]+)$/, 'thumbs/$1'); });   // warm the cache
+    };
+    function drop(x, y) {
+      if (!pics.length) loadPics();
+      if (!pics.length) return;
+      const c = cards[slot]; slot = (slot + 1) % POOL;
+      const im = c.firstChild, full = pics[picIdx]; picIdx = (picIdx + 1) % pics.length;
+      im.dataset.full = full; im.src = full.replace(/([^/]+)$/, 'thumbs/$1');
+      c.getAnimations().forEach(a => a.cancel());
+      c.style.zIndex = z++;
+      const at = `translate3d(${(x - 42).toFixed(1)}px, ${(y - 52).toFixed(1)}px, 0)`;
+      c.animate([
+        { opacity: 0, transform: at + ' scale(.82)', filter: 'blur(0px)' },
+        { opacity: 1, transform: at + ' scale(1)', filter: 'blur(0px)', offset: .1 },
+        { opacity: 1, transform: at + ' scale(1)', filter: 'blur(0px)', offset: .32 },
+        { opacity: 0, transform: at + ' scale(.9)', filter: 'blur(10px)' }
+      ], { duration: LIFE, easing: 'cubic-bezier(.33,0,.2,1)', fill: 'forwards' });
+    }
+    panels.home.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || !active || active.id !== 'home' || dragging) { lx = null; return; }
+      const r = panels.home.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (lx === null) { lx = x; ly = y; return; }
+      const d = Math.hypot(x - lx, y - ly);
+      if (d < GAP) return;
+      // Fast moves fill the gap with several cards so the trail stays continuous.
+      const n = Math.min(4, Math.floor(d / GAP));
+      for (let i = 1; i <= n; i++) drop(lx + (x - lx) * i / n, ly + (y - ly) * i / n);
+      lx = x; ly = y;
+    });
+    panels.home.addEventListener('pointerleave', () => { lx = null; });
+  }
+
+  // ---------- Home micro-interactions ----------
+  // Small touches on the landing page. Hover effects need a mouse; everything respects reduced motion.
+  const EMAIL = document.getElementById('emailLink').dataset.email;   // set data-email on the email link
+  const AVAILABILITY = 'Open to new work';
+  // Book a call: set data-href on the calendar button to your booking page (e.g. a Cal.com or Calendly link).
+  const book = document.getElementById('bookCall');
+  if (book.dataset.href) book.href = book.dataset.href;
+  book.addEventListener('click', e => {
+    play('pop', e.isTrusted);
+    if (book.dataset.href) return;                     // opens the booking page in a new tab
+    e.preventDefault();
+    const tip = book.querySelector('.tip'); tip.textContent = 'Booking link coming soon';
+    setTimeout(() => { tip.textContent = 'Book a call'; }, 1600);
+  });
+  const SECRET_CODE = 'kingsley';
+  const thumb = src => src.replace(/([^/]+)$/, 'thumbs/$1');
+  const designPics = () => PROJECTS.flatMap(pr => (pr.images || []).map(i => i.src).filter(Boolean));
+  const homeOn = () => active && active.id === 'home';
+  let lastActive = performance.now();
+  ['pointermove', 'pointerdown', 'keydown', 'wheel'].forEach(t => addEventListener(t, () => { lastActive = performance.now(); }, { passive: true }));
+
+  // Lagos sky and availability under the time.
+  const sky = document.getElementById('tSky');
+  document.getElementById('tAvail').textContent = AVAILABILITY;
+  const SUN = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>';
+  const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 9.6A5.5 5.5 0 0 1 6.4 3a5.5 5.5 0 1 0 6.6 6.6z"/></svg>';
+  let skyState = '';
+  function skyNow(h24) {
+    const day = h24 >= 6 && h24 < 19, k = day ? 'day' : 'night';
+    if (k === skyState) return; skyState = k;
+    sky.innerHTML = (day ? SUN : MOON) + `<span>GMT+1 · ${day ? 'daytime' : 'night'} in Lagos</span>`;
+  }
+  timeEl.querySelector('.t-now').addEventListener('click', () => timeEl.classList.toggle('open'));   // taps on phones
+
+  // Copy email: the word swaps to "copied" for a moment.
+  const emailLink = document.getElementById('emailLink');
+  emailLink.addEventListener('click', e => {
+    e.preventDefault();
+    if (!EMAIL) { swapWord(emailLink, 'add email'); return; }
+    const done = () => { swapWord(emailLink, 'copied ✓'); play('pop', e.isTrusted); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(EMAIL).then(done, () => { location.href = 'mailto:' + EMAIL; });
+    else location.href = 'mailto:' + EMAIL;
+  });
+  function swapWord(a, word) {
+    if (a._t) clearTimeout(a._t); else a._orig = a.textContent;
+    a.textContent = word; a.classList.add('copied');
+    a._t = setTimeout(() => { a.textContent = a._orig; a.classList.remove('copied'); a._t = 0; }, 1500);
+  }
+
+  // Name: click types the next role; hovering shows a picture for the role on screen.
+  const typerEl = document.getElementById('typer'), peekRole = document.getElementById('rolePeek'), peekImg = peekRole.firstChild;
+  const CYCLE = [...TYPE_LINES];
+  const ROLE_PIC = { "I'm Kingsley M.": 'assets/headshot.jpg', 'a Product Designer': thumb('assets/designs/debit-card-with-colorful-objects.jpg'),
+    'a Brand Designer': thumb('assets/designs/card-holder-with-colorful-stickers.jpg'), 'a Design Engineer': thumb('assets/designs/paper-plane-with-coin.jpg'),
+    'a 3D Designer': thumb('assets/designs/3d-tumbler-render.jpg') };
+  typerEl.addEventListener('click', async e => {
+    if (typeBusy) return;
+    const cur = typedEl.textContent, i = CYCLE.indexOf(cur);
+    play('pop', e.isTrusted);
+    await typeLine(cur, CYCLE[(i + 1) % CYCLE.length]);
+    setPeekRole();
+  });
+  function setPeekRole() { const src = ROLE_PIC[typedEl.textContent]; if (src && !peekImg.src.endsWith(src)) peekImg.src = src; return !!src; }
+
+  if (finePointer && !reduce) {
+    typerEl.addEventListener('pointermove', e => {
+      if (!setPeekRole()) { peekRole.classList.remove('show'); return; }
+      peekRole.style.transform = `translate(${e.clientX + 18}px, ${e.clientY - 90}px) rotate(4deg)`;
+      peekRole.classList.add('show');
+    });
+    typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
+
+    // Photo: tilt toward the cursor.
+    const avatar = document.getElementById('avatar');
+    addEventListener('pointermove', e => {
+      if (!homeOn() || e.pointerType !== 'mouse') return;
+      const r = avatar.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      const k = Math.max(0, 1 - Math.hypot(dx, dy) / 700);
+      avatar.style.transform = `perspective(320px) rotateY(${(dx / 40 * k).toFixed(2)}deg) rotateX(${(-dy / 40 * k).toFixed(2)}deg)`;
+    }, { passive: true });
+
+    // Social pills lean toward the cursor.
+    const pillsS = [...document.querySelectorAll('.socials a')];
+    addEventListener('pointermove', e => {
+      if (!homeOn() || e.pointerType !== 'mouse') return;
+      pillsS.forEach(a => {
+        const r = a.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), d = Math.hypot(dx, dy);
+        const k = d < 90 ? (1 - d / 90) * .32 : 0;
+        a.style.translate = `${(dx * k).toFixed(1)}px ${(dy * k).toFixed(1)}px`;
+      });
+    }, { passive: true });
+
+    // Dial station preview: what's on that page, beside the hovered pill.
+    const peek = document.getElementById('peek');
+    const listOf = id => [...panels[id].querySelectorAll('.list b')].map(b => b.textContent);
+    STATIONS.forEach(st => {
+      if (st.id === 'home') return;
+      const b = pills[st.id];
+      b.addEventListener('pointerenter', () => {
+        if (!homeOn() || dragging) return;
+        let body;
+        if (st.id === 'designs') body = '<div class="pg">' + designPics().slice(0, 3).map(src => `<img src="${thumb(src)}" alt="">`).join('') + '</div>';
+        else body = '<div class="pl">' + listOf(st.id).slice(0, 3).map(t => `<div>${t}</div>`).join('') + '</div>';
+        peek.innerHTML = `<div class="ph">${st.name}<span>${st.f.toFixed(1)} MHz</span></div>${body}`;
+        const r = b.getBoundingClientRect();
+        let x = r.right + 12, y = r.top + r.height / 2 - 60;
+        if (x + 200 > innerWidth) x = r.left - 208;
+        peek.style.left = Math.max(8, x) + 'px'; peek.style.top = Math.max(8, Math.min(innerHeight - 140, y)) + 'px';
+        peek.classList.add('show');
+      });
+      b.addEventListener('pointerleave', () => peek.classList.remove('show'));
+      b.addEventListener('click', () => peek.classList.remove('show'));
+    });
+  }
+  // Press and squish: pressing the photo squishes it like a soft button; letting go springs it back with a pop.
+  // Uses the separate `scale` property so it stacks with the tilt (transform) and parallax (translate).
+  (function squish() {
+    const av = document.getElementById('avatar');
+    let down = false;
+    av.addEventListener('pointerdown', e => {
+      if (e.button > 0) return;
+      down = true;
+      av.getAnimations().forEach(a => a.cancel());
+      av.animate([{ scale: '1' }, { scale: '0.88 0.86' }], { duration: reduce ? 0 : 110, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' });
+    });
+    const release = e => {
+      if (!down) return;
+      down = false;
+      av.getAnimations().forEach(a => a.cancel());
+      if (!reduce) av.animate([{ scale: '0.88 0.86' }, { scale: '1.08 1.1', offset: .35 }, { scale: '0.97 0.96', offset: .65 }, { scale: '1.01', offset: .85 }, { scale: '1' }],
+        { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      if (e.type === 'pointerup') play('pop', e.isTrusted);
+    };
+    av.addEventListener('pointerup', release);
+    av.addEventListener('pointerleave', release);
+    av.addEventListener('pointercancel', release);
+  })();
+
+  // Signal bars on the social pills.
+  document.querySelectorAll('.socials a').forEach(a => a.insertAdjacentHTML('beforeend',
+    '<svg class="sig" viewBox="0 0 11 10" aria-hidden="true"><rect x="0" y="6" width="2.6" height="4" rx=".6"/><rect x="4.2" y="3" width="2.6" height="7" rx=".6"/><rect x="8.4" y="0" width="2.6" height="10" rx=".6"/></svg>'));
+
+  // Dial idle drift: after a quiet spell on Home, the needle wanders a hair off and back.
+  if (!reduce) setInterval(() => {
+    const now = performance.now();
+    if (!homeOn() || dragging || tween || secretOpen || now - lastActive < 7000 || now - (window._drift || 0) < 9000) return;
+    window._drift = now;
+    const home = ang(active.f);
+    setTarget(home + (Math.random() < .5 ? -2.4 : 2.4));
+    setTimeout(() => { if (homeOn() && !dragging && !secretOpen) setTarget(home); }, 700);
+  }, 1000);
+
+  // Secret station: type "kingsley" on Home to tune to 99.9.
+  const secret = document.getElementById('secret');
+  let typedKeys = '', secretOpen = false;
+  // Also the classic Konami code: up up down down left right left right B A.
+  const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konami = 0;
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konami = k === KONAMI[konami] ? konami + 1 : (k === KONAMI[0] ? 1 : 0);
+    if (konami === KONAMI.length) { konami = 0; if (homeOn() && !secretOpen) { e.preventDefault(); openSecret(e.isTrusted); } return; }
+    if (e.key.length !== 1) return;
+    typedKeys = (typedKeys + k).slice(-SECRET_CODE.length);
+    if (typedKeys === SECRET_CODE && homeOn() && !secretOpen) openSecret(e.isTrusted);
+  });
+  function openSecret(trusted) {
+    secretOpen = true; typedKeys = '';
+    setTarget(ang(99.9)); light(null);
+    play('pop', trusted);
+    secret.hidden = false;
+    if (!reduce) secret.firstElementChild.animate([{ opacity: 0, transform: 'translateY(10px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: EASE });
+    document.getElementById('secretClose').focus({ preventScroll: true });
+  }
+  function closeSecret() {
+    if (!secretOpen) return;
+    secretOpen = false; secret.hidden = true;
+    setTarget(ang(active.f)); light(active);
+  }
+  document.getElementById('secretClose').addEventListener('click', closeSecret);
+  secret.addEventListener('click', e => { if (e.target === secret) closeSecret(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeSecret(); });
+
+  // ---------- Dial ripple ----------
+  // Turning the dial on Home sends a ring out from the dial's centre. As it passes, each word, the photo,
+  // the name, the time and the pills are pushed out and pulled back (one push-pull swing), with a slight swell.
+  const RIP = { speed: 1.5, amp: 12, width: 64 };      // px per ms, push in px, wave width in px
+  const ripCanvas = document.getElementById('rippleCanvas'), ripCtx = ripCanvas.getContext('2d');
+  let ripples = [], ripRaf = 0, ripTargets = null;
+  function ripInit() {
+    // Split the bio and link text into word boxes so the wave can move each word on its own.
+    const wrapWords = el => {
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('.ref-card') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+      const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
+      nodes.forEach(n => {
+        if (!n.textContent.trim()) return;
+        const f = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) f.appendChild(document.createTextNode(part));
+          else { const w = document.createElement('span'); w.className = 'rw'; w.textContent = part; f.appendChild(w); }
+        });
+        n.replaceWith(f);
+      });
+    };
+    document.querySelectorAll('.hero .bio p').forEach(wrapWords);
+    const home = panels.home;
+    ripTargets = [
+      home.querySelector('.avatar img'), document.getElementById('typed'),
+      ...home.querySelectorAll('.links > *'), ...home.querySelectorAll('.bio .rw'),
+      ...home.querySelectorAll('.socials a'), home.querySelector('.t-avail'), home.querySelector('.t-now')
+    ].filter(Boolean);
+  }
+  function emitRipple(quiet) {
+    if (reduce) return;
+    if (!ripTargets) ripInit();
+    const now = performance.now(), cx = M.cx, cy = M.cy;
+    const list = ripTargets.map(el => {
+      const r = el.getBoundingClientRect(), x = r.left + r.width / 2 - cx, y = r.top + r.height / 2 - cy, d = Math.hypot(x, y) || 1;
+      return { el, d, ux: x / d, uy: y / d };
+    });
+    const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+    ripples.push({ t0: now, list, life: far / RIP.speed + 400, quiet });
+    if (ripples.length > 3) ripples.shift();
+    const dprR = Math.min(2, devicePixelRatio || 1);
+    if (ripCanvas.width !== innerWidth * dprR) { ripCanvas.width = innerWidth * dprR; ripCanvas.height = innerHeight * dprR; }
+    ripCtx.setTransform(dprR, 0, 0, dprR, 0, 0);
+    if (!ripRaf) ripRaf = requestAnimationFrame(ripFrame);
+  }
+  function ripFrame(now) {
+    ripples = ripples.filter(r => now - r.t0 < r.life);
+    const acc = new Map();
+    ripCtx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const r of ripples) {
+      const dt = Math.max(0, now - r.t0), R = dt * RIP.speed, fade = Math.max(0, 1 - dt / r.life);   // frame clock can start a hair early
+      // the visible ring: a hairline that thins out as it travels
+      if (!r.quiet) { ripCtx.beginPath(); ripCtx.arc(M.cx, M.cy, R, 0, Math.PI * 2);
+      ripCtx.strokeStyle = `rgba(0,0,0,${(.16 * fade).toFixed(3)})`; ripCtx.lineWidth = 1; ripCtx.stroke(); }
+      for (const t of r.list) {
+        const x = (t.d - R) / RIP.width;
+        if (x > 3 || x < -3) continue;
+        const g = Math.exp(-x * x), push = RIP.amp * -2 * x * g * fade, swell = .05 * g * fade;
+        const a = acc.get(t.el) || { x: 0, y: 0, s: 0 };
+        a.x += t.ux * push; a.y += t.uy * push; a.s += swell; acc.set(t.el, a);
+      }
+    }
+    ripTargets.forEach(el => {
+      const a = acc.get(el);
+      el.style.transform = a ? `translate(${a.x.toFixed(2)}px, ${a.y.toFixed(2)}px) scale(${(1 + a.s).toFixed(4)})` : '';
+    });
+    if (ripples.length) ripRaf = requestAnimationFrame(ripFrame);
+    else { ripRaf = 0; ripCtx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+
+  // ---------- Start ----------
+  layout();
+  const OLD_IDS = { feed: 'designs', contact: 'about', skills: 'about' };   // old links still land somewhere sensible
+  const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.slice(1);
+  const start = STATIONS.find(s => s.id === hashId) || STATIONS[2];
+  cur = target = ang(start.f); light(start); drawDial();
+  tuneTo(start, false);
+  clock();
+  // Pill widths change once Geist loads, so re-check the spacing then.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+})();
+</script>
+</body>
+</html>

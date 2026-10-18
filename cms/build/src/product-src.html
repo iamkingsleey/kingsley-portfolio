@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Product Case Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Product design (UI/UX) template. Opening: a pinned horizontal run where app screens sit scattered at
+   different heights and depths, with short notes between them (like the logo page's opening). Then vertical:
+   facts and story with outcome numbers, a scattered user flow whose connecting lines draw as you scroll,
+   alternating "experience notes" (a short write-up beside a loose cluster of screens), a before/after you
+   drag with the red needle, the system (colour, type, components), outcomes, statement, next on the dial.
+   Screens here are drawn stand-ins for a placeholder app; one plays your real Ruler picker loop. */
+@property --z { syntax: "<number>"; inherits: true; initial-value: 1 }
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f4f4f4; --on-ink: #ffffff;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --a1: #2b3bff; --a2: #c6f432; --a3: #f4efe6; --a4: #0e0e10;            /* the sample app's colours */
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  --ease: cubic-bezier(.2,.8,.2,1); --sweep: cubic-bezier(.7,0,.25,1);
+  --pop: cubic-bezier(.34,1.56,.64,1);
+  --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #121212; --on-ink: #000000;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+html { background: var(--bg) }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden }
+img, video { display: block; max-width: 100% }
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+figure { margin: 0 }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { padding: 0 var(--gut) }
+
+/* station readout + preview theme switch */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px }
+.station .nm { font-size: 13px; font-weight: 500 }
+.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
+
+/* ---------- the phone (device frames keep their rounded corners; pictures elsewhere stay sharp) ---------- */
+.ph { position: relative; width: var(--w, 240px); aspect-ratio: 9 / 19.5; border-radius: calc(var(--w, 240px) * .16); background: #050505; padding: calc(var(--w, 240px) * .035);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 30px 60px -20px rgb(0 0 0 / .55); flex: none }
+html:not([data-theme="dark"]) .ph { box-shadow: 0 0 0 1px rgb(0 0 0 / .1), 0 30px 60px -24px rgb(0 0 0 / .35) }
+.scr { position: relative; width: 100%; height: 100%; border-radius: calc(var(--w, 240px) * .13); overflow: hidden; background: var(--a4); color: #fff; font-family: var(--body); font-size: calc(var(--w, 240px) * .05) }
+.scr::before { content: ""; position: absolute; top: 2.2%; left: 50%; width: 30%; height: 3.2%; margin-left: -15%; border-radius: 99px; background: #000; z-index: 5 }   /* camera island */
+.scr video, .scr > img { width: 100%; height: 100%; object-fit: cover }
+.s-pad { position: absolute; inset: 9% 7% 5%; display: flex; flex-direction: column; gap: 4% }
+.s-t { font-weight: 600; font-size: 1.6em; letter-spacing: -.04em; line-height: 1 }
+.s-sm { font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .6 }
+.s-card { border-radius: .9em; padding: 7%; background: rgb(255 255 255 / .06) }
+.s-row { display: flex; align-items: center; gap: 6%; padding: 4% 0; border-bottom: 1px solid rgb(255 255 255 / .08) }
+.s-av { width: 2.3em; height: 2.3em; border-radius: .5em; flex: none }
+.s-btn { margin-top: auto; border-radius: 99px; padding: 5% 0; text-align: center; font-weight: 600; background: var(--a2); color: var(--a4) }
+.s-tabs { position: absolute; left: 7%; right: 7%; bottom: 3.5%; display: flex; justify-content: space-between; padding: 4% 6%; border-radius: 99px; background: rgb(255 255 255 / .08) }
+.s-tabs i { width: 1.1em; height: 1.1em; border-radius: 4px; background: rgb(255 255 255 / .35) } .s-tabs i.on { background: var(--a2) }
+.s-dial { position: relative; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #1b1b20 0 58%, transparent 59%), conic-gradient(from 200deg, var(--a1), var(--a2), var(--a1)); }
+.s-dial::after { content: ""; position: absolute; left: 50%; top: 8%; width: 3%; height: 22%; margin-left: -1.5%; background: var(--red); border-radius: 2px }
+.s-ruler { height: 2.4em; background: repeating-linear-gradient(90deg, rgb(255 255 255 / .55) 0 1px, transparent 1px 7%); mask: linear-gradient(90deg, transparent, #000 25% 75%, transparent); position: relative }
+.s-ruler::after { content: ""; position: absolute; left: 50%; top: -20%; bottom: -20%; width: 2px; background: var(--red) }
+.s-bars { display: flex; align-items: flex-end; gap: 4%; height: 3em } .s-bars i { flex: 1; border-radius: 2px; background: var(--a2) }
+
+/* ---------- web and tablet devices (Mobile + Web / Web + Tablet versions) ---------- */
+.ph.br, .ph.tb { aspect-ratio: auto; width: var(--w); height: auto }
+.ph.br { padding: 0; border-radius: 10px; background: #1a1a1d }
+.ph.br .bar { position: relative; height: calc(var(--w) * .042); display: flex; align-items: center; gap: calc(var(--w) * .008); padding: 0 2.2% }
+.ph.br .bar i { width: calc(var(--w) * .012); aspect-ratio: 1; border-radius: 50%; background: rgb(255 255 255 / .18) }
+.ph.br .bar span { position: absolute; left: 33%; width: 34%; height: 62%; border-radius: 99px; background: rgb(255 255 255 / .06); font: 500 calc(var(--w) * .014) var(--mono); color: rgb(255 255 255 / .45); display: grid; place-items: center }
+.ph.br .scr { height: auto; aspect-ratio: 16 / 10; border-radius: 0 0 9px 9px; font-size: calc(var(--w) * .019) }
+.ph.tb { padding: calc(var(--w) * .024); border-radius: calc(var(--w) * .045) }
+.ph.tb .scr { height: auto; aspect-ratio: 4 / 3; border-radius: calc(var(--w) * .022); font-size: calc(var(--w) * .023) }
+.ph.br .scr::before, .ph.tb .scr::before { display: none }
+.wv { position: absolute; inset: 0; display: grid; grid-template-columns: 17% 1fr; background: var(--a4); color: #fff }
+.wside { padding: 18% 14%; display: flex; flex-direction: column; gap: 1.1em; background: rgb(255 255 255 / .03); border-right: 1px solid rgb(255 255 255 / .06) }
+.wside b { font-weight: 700; letter-spacing: -.04em; font-size: 1.3em; margin-bottom: .8em }
+.wside span { opacity: .5; font-size: .85em } .wside span.on { opacity: 1; color: var(--a2) }
+.wmain { position: relative; padding: 4.5% 5.5%; display: flex; flex-direction: column; gap: .9em; min-width: 0; overflow: hidden }
+.wgrid { display: grid; gap: .9em }
+.wcard { border-radius: .6em; aspect-ratio: 1 }
+.wv.land { grid-template-columns: 1.1fr .9fr; align-items: center; padding: 0 8%; gap: 6%; background: linear-gradient(120deg, #2B3BFF, #0e0e10 65%) }
+.wv.land > div:first-child { display: flex; flex-direction: column; gap: .9em }
+.wv.white { display: grid; place-items: center; grid-template-columns: 1fr; background: #fff }
+.wv.white video { width: 100% !important; height: 100% !important; object-fit: contain !important }
+.pv { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill) }
+.pv button { height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .3s, color .3s }
+.pv button[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.pv #theme { color: var(--ink) }
+/* flow as a zigzag when the screens are wide */
+.flow.zz { grid-template-columns: 1fr 1fr; gap: 90px clamp(60px, 9vw, 160px); max-width: none }
+.flow.zz .node { margin-top: 0 !important }
+.flow.zz .node:nth-child(even) { translate: 0 160px }
+.ph.br .live, .ph.tb .live { padding: 5% 6%; gap: .5em } .ph.br .live .ld, .ph.tb .live .ld { width: 30%; margin-top: 1% } .ph.br .live .lf { font-size: 2.6em }
+
+/* ---------- 1 · opening run ---------- */
+.run { position: relative }
+.run .pin { position: sticky; top: 0; height: 100vh; overflow: hidden }
+.track { position: absolute; top: 0; left: 0; bottom: 72px; display: flex; align-items: stretch; will-change: transform }
+.intro { flex: none; position: relative; height: 100%; padding: 0 var(--gut) 40px }
+.intro .cat { position: absolute; left: var(--gut); top: 50%; transform: translateY(-50%) }
+.intro .go { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 12px }
+.intro .go svg { width: 34px; height: 10px; overflow: visible }
+.intro .go path { stroke: var(--ink); fill: none; stroke-width: 1.2 }
+.intro .go g { animation: nudge 1.6s var(--ease) infinite }
+@keyframes nudge { 50% { transform: translateX(6px) } }
+.intro .tt { position: absolute; left: var(--gut); right: 38%; bottom: 40px }
+.intro h1 { margin: 0 0 14px; color: var(--ink); font-size: clamp(52px, 7vw, 116px); line-height: .9; font-weight: 500; letter-spacing: -0.055em }
+.intro p { margin: 0; max-width: 46ch; font-size: 15px; line-height: 1.55 }
+.scatter { position: relative; flex: none; height: 100% }
+.scatter > * { position: absolute; will-change: transform }
+.note { width: 250px; padding: 18px 0 0; border-top: 1px solid var(--line) }
+.note b { display: block; margin: 10px 0 8px; color: var(--ink); font-size: 17px; font-weight: 500; letter-spacing: -.2px }
+.note p { margin: 0; font-size: 14px; line-height: 1.55 }
+.cap { margin-top: 12px; display: flex; justify-content: space-between; width: var(--w, 240px) }
+
+/* text arrivals, word rise, drawn rules (as on the other pages) */
+.rv { opacity: 0; transform: translateY(28px); transition: opacity .8s var(--ease), transform 1.2s var(--pop); transition-delay: var(--dl, 0s) }
+.rv.in { opacity: 1; transform: none }
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em }
+.w > span { display: inline-block; transform: translateY(105%); transition: transform 1.3s var(--pop); transition-delay: calc(var(--i) * 70ms + 250ms) }
+.w.in > span { transform: none }
+.rule { display: block; height: 1px; background: var(--line); transform: scaleX(0); transform-origin: left; transition: transform 1.2s var(--sweep) }
+.rule.in { transform: none }
+/* phones arrive with a springy rise */
+.ph.rise { opacity: 0; translate: 0 70px; transition: opacity .8s var(--ease), translate 1.3s var(--pop); transition-delay: var(--dl, 0s) }
+.ph.rise.in { opacity: 1; translate: 0 0 }
+
+/* ---------- 2 · title + split ---------- */
+.title { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; padding: 120px 0 36px }
+.title h2 { margin: 0; color: var(--ink); font-size: clamp(40px, 5.6vw, 88px); line-height: .92; font-weight: 500; letter-spacing: -0.05em }
+.info { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) }
+.facts { margin: 0; border-right: 1px solid var(--line); padding-right: 40px }
+.fact { padding: 22px 0; border-bottom: 1px solid var(--line) } .fact:last-child { border-bottom: 0 }
+.fact dt { margin-bottom: 10px } .fact dd { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--ink); background: var(--pill); padding: 8px 11px; transition: transform .5s var(--pop) }
+.chip:hover { transform: translateY(-3px) } .chip.cat { background: var(--red); color: #fff }
+.tools { display: flex; gap: 8px } .tools img { width: 34px; height: 34px; border-radius: 27%; box-shadow: 0 0 0 1px var(--edge) }
+.todo { color: var(--muted); font-weight: 400; font-style: italic }
+.story { padding: 22px 0 44px 40px; max-width: 760px }
+.story h3 { margin: 0 0 16px; font-size: 15px; font-weight: 600; color: var(--ink) }
+.story p { margin: 0 0 16px; font-size: 15px; line-height: 1.6 }
+.pr { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px }
+.pr div { border-top: 1px solid var(--line); padding-top: 14px } .pr p { margin: 8px 0 0; font-size: 14px }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
+.metric { padding: 30px 24px 26px 0; border-right: 1px solid var(--line) } .metric:last-child { border-right: 0 } .metric:not(:first-child) { padding-left: 24px }
+.metric b { display: block; color: var(--ink); font: 600 clamp(44px, 5.4vw, 80px)/1 var(--body); letter-spacing: -0.05em; font-variant-numeric: tabular-nums }
+.metric b sup { font-size: .4em; vertical-align: top; color: var(--red); margin-left: 4px }
+.metric span { display: block; margin-top: 12px }
+
+/* section heads */
+.shead { display: flex; justify-content: space-between; align-items: baseline; padding: 120px 0 24px; border-bottom: 1px solid var(--line) }
+.shead h4 { margin: 0; color: var(--ink); font-size: 24px; font-weight: 500; letter-spacing: -.4px }
+
+/* ---------- 3 · flow: screens as live nodes ----------
+   Five screens in a staggered row. The element you tap on each screen is its output port; the next screen
+   has an input port on its edge. Wires join them and a signal keeps travelling along them, screen to screen. */
+.flow { position: relative; margin-top: 24px; padding: 40px 0 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(80px, 14vw, 240px); max-width: 860px; margin-inline: auto; align-items: start }
+.node { position: relative; display: grid; justify-items: center; z-index: 2 }
+.node .ph.phone { --w: 260px !important }
+@media (max-width: 1240px) { .node .ph.phone { --w: 220px !important } }
+.node .meta { width: 100%; max-width: 230px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line) }
+.node .meta b { display: block; margin: 8px 0 6px; color: var(--ink); font-size: 15px; font-weight: 500 }
+.node .meta p { margin: 0; font-size: 13px; line-height: 1.5 }
+.node .meta .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font: 500 10px var(--mono); margin-right: 8px }
+.flow svg.net { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 3 }
+/* minimal, after the reference: soft lines that run frame to frame, fading at both ends, with a light that travels along them */
+.net .base { fill: none; stroke-width: 1.2 }
+.net .beam { fill: none; stroke-width: 1.6; stroke-linecap: round }
+.net .act { display: none }   /* the lines say enough */
+.node .ph { transition: box-shadow .4s }
+
+.port-hl { outline: 2px solid var(--red); outline-offset: 3px; border-radius: inherit }
+/* ---------- 4 · experience notes ---------- */
+.xp { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 0; padding: 96px 0; border-bottom: 1px solid var(--line) }
+.xp.flip .xt { order: 2; padding: 0 0 0 40px } .xp.flip .xc { order: 1 }
+.xt { padding-right: 40px; align-self: center }
+.xt h5 { margin: 12px 0 14px; color: var(--ink); font-size: clamp(24px, 2.6vw, 36px); line-height: 1.08; font-weight: 500; letter-spacing: -0.03em }
+.xt p { margin: 0 0 14px; font-size: 15px; line-height: 1.6; max-width: 44ch }
+.xt .tag { display: inline-flex; gap: 8px; align-items: center; margin-top: 10px; padding: 8px 12px; background: var(--pill); color: var(--ink); font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase }
+.xt .tag i { width: 6px; height: 6px; border-radius: 50%; background: var(--red) }
+.xc { position: relative; height: 640px }
+.xc > .ph { position: absolute }
+
+/* ---------- 5 · before / after with the needle ---------- */
+.ba { position: relative; height: 680px; margin-top: 16px; background: var(--panel); overflow: hidden; user-select: none; touch-action: pan-y; cursor: ew-resize }
+.ba .side { position: absolute; inset: 0; display: grid; place-items: center }
+.ba .after { clip-path: inset(0 0 0 var(--cut, 50%)) }
+.ba .lab { position: absolute; top: 18px; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.ba .before .lab { left: 20px } .ba .after .lab { right: 20px }
+.ba .needle { position: absolute; top: 0; bottom: 0; left: var(--cut, 50%); width: 3px; margin-left: -1.5px; background: var(--red); z-index: 4 }
+.ba .knob { position: absolute; top: 50%; left: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--red); display: grid; place-items: center; color: #fff; font: 500 10px var(--mono); box-shadow: 0 6px 18px rgb(255 74 28 / .35); transition: transform .4s var(--pop) }
+.ba:active .knob { transform: scale(1.12) }
+
+/* ---------- 6 · system ---------- */
+.sys { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px }
+.sys > div { background: var(--panel); padding: 52px 20px 20px; position: relative; min-height: 300px }
+.sys .lab { position: absolute; top: 16px; left: 20px; right: 20px; display: flex; justify-content: space-between }
+.sw4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px } .sw4 i { aspect-ratio: 4 / 3; display: flex; align-items: flex-end; padding: 8px; font: 500 10px var(--mono); font-style: normal }
+.tscale { display: grid; gap: 6px; color: var(--ink) } .tscale span { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 6px }
+.comp { display: grid; gap: 14px; justify-items: start }
+.comp .b1 { border-radius: 99px; padding: 12px 22px; background: var(--a2); color: var(--a4); font-weight: 600; font-size: 14px }
+.comp .b2 { border-radius: 99px; padding: 12px 22px; background: var(--pill); color: var(--ink); font-weight: 500; font-size: 14px }
+.comp .tg { display: flex; gap: 6px } .comp .tg span { padding: 6px 10px; border-radius: 99px; background: var(--a1); color: #fff; font: 500 11px var(--mono) }
+.comp .mini { width: 100%; height: 36px; background: repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 12px); opacity: .7; position: relative; mask: linear-gradient(90deg, transparent, #000 20% 80%, transparent) }
+.comp .mini::after { content: ""; position: absolute; left: 50%; top: -6px; bottom: -6px; width: 3px; background: var(--red) }
+
+/* ---------- statement + next ---------- */
+.statement { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 140px 0; border-bottom: 1px solid var(--line) }
+.statement p { margin: 0; padding-left: 40px; font-size: clamp(28px, 3.6vw, 52px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance }
+.statement p span { color: var(--faint); transition: color .35s } .statement p span.on { color: var(--ink) }
+.next { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 40px 0 180px; text-decoration: none }
+.next .r { display: flex; justify-content: space-between; align-items: end; gap: 32px; padding-left: 40px }
+.next h6 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .8s var(--pop) }
+.next:hover h6 { transform: translateX(12px) }
+
+
+/* ---------- new ideas ---------- */
+/* A · research voices: quotes from interviews, scattered like notes on a wall */
+.voices { position: relative; height: 760px; margin-top: 16px }
+.vq { position: absolute; width: 300px; padding: 20px 20px 18px; background: var(--panel); rotate: var(--r, 0deg); transition: rotate .8s var(--pop), translate .8s var(--pop); cursor: grab }
+.vq:hover { rotate: 0deg; translate: 0 -6px }
+.vq p { margin: 10px 0 14px; color: var(--ink); font-size: 18px; line-height: 1.3; letter-spacing: -.2px }
+.vq .who { display: flex; justify-content: space-between }
+.vq .pin { position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--red) }
+.vq.big { width: 380px } .vq.big p { font-size: 24px; letter-spacing: -.5px }
+.insight { position: absolute; left: 50%; top: 50%; translate: -50% -50%; text-align: center; max-width: 34ch; pointer-events: none }
+.insight b { display: block; color: var(--ink); font-size: clamp(26px, 2.8vw, 40px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; margin-top: 10px }
+
+/* B · iterations: four versions stacked; they fan out as you scroll and the final one lands on top */
+.iter { position: relative; height: 230vh }
+.ipin { position: sticky; top: 0; height: 100vh; display: grid; place-items: center }
+.ideck { position: relative; width: 260px; aspect-ratio: 9 / 19.5 }
+.ideck .ph { position: absolute; left: 0; top: 0; transform-origin: 50% 110% } .ideck .ph.phone { --w: 260px }
+.ideck .vlab { position: absolute; left: 50%; bottom: -46px; translate: -50% 0; white-space: nowrap; text-align: center }
+.ideck .vlab b { color: var(--ink); font-weight: 500 }
+.inote { position: absolute; left: var(--gut); top: 130px; max-width: 30ch }
+.inote h5 { margin: 12px 0 10px; color: var(--ink); font-size: 26px; font-weight: 500; letter-spacing: -.5px }
+.inote p { margin: 0; font-size: 15px; line-height: 1.6 }
+.icount { position: absolute; right: var(--gut); top: 130px; text-align: right }
+.icount b { display: block; color: var(--ink); font: 600 64px/1 var(--body); letter-spacing: -2px; font-variant-numeric: tabular-nums }
+
+/* C · annotated screen: red dots on the UI; each opens a note joined to it by a line */
+.annot { position: relative; display: grid; place-items: center; height: 820px; margin-top: 16px; background: var(--panel) }
+.annot .ph.phone { --w: 300px }
+.hot { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; background: var(--red); color: #fff; font: 500 10px var(--mono); display: grid; place-items: center; z-index: 6; cursor: pointer; box-shadow: 0 0 0 0 rgb(255 74 28 / .5); animation: ping 2.2s infinite }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(255 74 28 / .5) } 70%, 100% { box-shadow: 0 0 0 14px rgb(255 74 28 / 0) } }
+.hot.on { animation: none; transform: scale(1.15) }
+.acall { position: absolute; width: 250px; padding: 16px 0 0; border-top: 1px solid var(--line); opacity: .28; transition: opacity .4s, translate .6s var(--pop) }
+.acall.on { opacity: 1; translate: 0 -4px }
+.acall b { display: block; margin: 8px 0 6px; color: var(--ink); font-size: 16px; font-weight: 500 }
+.acall p { margin: 0; font-size: 13.5px; line-height: 1.5 }
+.annot svg.alines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none }
+.annot .aline { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 5; transition: stroke .3s }
+.annot .aline.on { stroke: var(--red); stroke-dasharray: none }
+
+/* D · try it: a working piece of the prototype */
+.try { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 0 0 40px; border-bottom: 1px solid var(--line) }
+.try .txt { padding: 40px 40px 0 0 }
+.try .txt h5 { margin: 12px 0 12px; color: var(--ink); font-size: clamp(24px, 2.6vw, 36px); line-height: 1.08; font-weight: 500; letter-spacing: -0.03em }
+.try .txt p { margin: 0; font-size: 15px; line-height: 1.6; max-width: 40ch }
+.try .stage { display: grid; place-items: center; background: var(--panel); height: 760px; margin-top: 16px }
+.live { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 22% 8% 8%; gap: 3% }
+.live .lf { font: 600 3.4em/1 var(--body); letter-spacing: -.05em; font-variant-numeric: tabular-nums }
+.live .ln { opacity: .7; min-height: 1.3em }
+.live .ld { position: relative; width: 86%; aspect-ratio: 1; margin-top: 6%; border-radius: 50%; touch-action: none; cursor: grab;
+  background: radial-gradient(circle, #1b1b20 0 56%, transparent 57%), conic-gradient(from 0deg, var(--a1), var(--a2), #ff4a1c, var(--a1)) }
+.live .ld:active { cursor: grabbing }
+.live .ld i { position: absolute; left: 50%; top: 50%; width: 3px; height: 46%; margin-left: -1.5px; background: #fff; border-radius: 2px; transform-origin: 50% 0; rotate: var(--a, 180deg) }
+.live .ld::after { content: ""; position: absolute; left: 50%; top: 2%; width: 4px; height: 14%; margin-left: -2px; background: var(--red); border-radius: 2px }
+.live .lh { margin-top: auto; font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .55 }
+@media (max-width: 899px) {
+  .voices { height: auto; display: grid; gap: 14px } .vq, .vq.big { position: static; width: auto } .insight { position: static; translate: none; padding: 20px 0 }
+  .ipin { padding-top: 150px } .ideck .ph.phone { --w: 180px } .ideck:not(.wd) { width: 180px } .inote { top: 100px; right: var(--gut) } .icount { top: auto; bottom: 110px }
+  .annot { height: auto; padding: 40px 0; display: flex; flex-direction: column; gap: 18px } .annot .ph.phone { --w: 240px } .acall { position: static; width: auto; padding: 14px 16px 0; opacity: 1 } .annot svg.alines { display: none }
+  .try { grid-template-columns: 1fr } .try .txt { padding: 24px 0 0 } .try .stage { height: 620px }
+}
+
+/* section dial */
+.sdial { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 30; pointer-events: none }
+.sdial::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 35%, transparent) }
+.sdial canvas { position: relative; width: 100%; height: 100% }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv, .w > span, .rule, .ph.rise { opacity: 1 !important; transform: none !important; translate: none !important; transition: none !important }
+  .intro .go g { animation: none }
+}
+@media (max-width: 899px) {
+  :root { --gut: 16px }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .intro .cat { top: 96px; transform: none } .intro .go { left: var(--gut); right: auto; top: auto; bottom: 24px; transform: none } .intro .tt { right: var(--gut); bottom: 64px }
+  .title { padding-top: 88px } .title .mono { display: none }
+  .info, .xp, .statement, .next { grid-template-columns: 1fr }
+  .facts { border-right: 0; padding-right: 0 } .story { padding: 26px 0 36px; border-top: 1px solid var(--line) }
+  .metrics { grid-template-columns: 1fr } .metric { border-right: 0; border-bottom: 1px solid var(--line); padding: 22px 0 !important }
+  .flow { grid-template-columns: 1fr; gap: 72px; padding-left: 0 } .node { margin-top: 0 !important } .node .ph.phone { --w: 220px !important } .flow.zz { grid-template-columns: 1fr } .flow.zz .node:nth-child(even) { translate: none }
+  .xp { padding: 64px 0 } .xp.flip .xt { order: 0; padding: 0 } .xt { padding: 0 0 24px } .xc { height: 470px } .xc > .ph { scale: .7; transform-origin: 0 0 }
+  .ba { height: 560px } .sys { grid-template-columns: 1fr }
+  .statement p { padding: 16px 0 0 } .next .r { padding: 16px 0 0 }
+}
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */ .next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer } .next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) } .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em } .next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) } .next:hover h5 { transform: translateX(10px) } .next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 } .next .th img { width: 100%; height: 100%; object-fit: cover; display: block } @media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } } </style>
+</head>
+<body>
+<div class="station"><a class="back" href="#" onclick="return false"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq">100.6</span><span class="nm">Tune · Product design</span></div>
+<div class="pv" role="group" aria-label="Preview" id="pv"></div>
+
+<!-- 1 · opening: pinned, moves sideways -->
+<section class="run" id="run" aria-label="Opening">
+  <div class="pin"><div class="track" id="track">
+    <div class="intro" id="intro">
+      <span class="cat mono">Product design · UI/UX · Placeholder app</span>
+      <span class="go mono">Scroll to explore <svg viewBox="0 0 34 10" aria-hidden="true"><g><path d="M0 5h32M28 1l4 4-4 4"/></g></svg></span>
+      <div class="tt"><h1 id="ttl">Tune</h1><p>A radio-first music app. Instead of endless lists, you turn a dial and land on stations, the way radio used to feel, with the precision of a modern app.</p></div>
+    </div>
+    <div class="scatter" id="scatter"></div>
+  </div></div>
+</section>
+
+<main class="wrap">
+  <header class="title rv"><h2>Making music feel<br>found, not searched</h2><span class="mono">06 / 19</span></header>
+  <i class="rule"></i>
+  <section class="info" id="sec-story" style="border-bottom:1px solid var(--line)">
+    <dl class="facts">
+      <div class="fact"><dt class="mono">Category</dt><dd><span class="chips"><span class="chip cat">Product design</span></span></dd></div>
+      <div class="fact"><dt class="mono">Role</dt><dd>Lead product designer</dd></div>
+      <div class="fact"><dt class="mono">Team · Timeline</dt><dd class="todo">Team size · Timeline</dd></div>
+      <div class="fact"><dt class="mono">Platform</dt><dd><span class="chips"><span class="chip">iOS</span><span class="chip">Android</span><span class="chip">Web</span></span></dd></div>
+      <div class="fact"><dt class="mono">Tools</dt><dd><span class="tools" id="tools"></span></dd></div>
+    </dl>
+    <div class="story rv">
+      <h3>Choice was the problem, not the catalogue</h3>
+      <p>People opened the app, scrolled for a minute and closed it without playing anything. Research showed they didn't want more options; they wanted to be handed something good, quickly, with a way to nudge it.</p>
+      <p>The dial became the whole idea: one gesture to move between moods, a tick you can feel on every station, and a needle that always tells you where you are.</p>
+      <div class="pr"><div><span class="mono">Problem</span><p>Long sessions of browsing, few plays.</p></div><div><span class="mono">Outcome</span><p>Music in under ten seconds, every time.</p></div></div>
+    </div>
+  </section>
+
+  <div class="shead rv" id="sec-flow"><h4>How it flows</h4><span class="mono">Live · the signal never stops</span></div>
+  <section class="flow" id="flow"></section>
+
+  <div class="shead rv" id="sec-xp"><h4>Experience notes</h4><span class="mono">Small decisions, felt</span></div>
+  <section id="xps"></section>
+
+
+  <div class="shead rv" id="sec-voices"><h4>What people told us</h4><span class="mono">12 interviews · 3 cities</span></div>
+  <section class="voices" id="voices"></section>
+
+  <div class="shead rv" id="sec-iter"><h4>Iterations</h4><span class="mono">Four rounds to the dial</span></div>
+  <section class="iter" id="iter"><div class="ipin">
+    <div class="inote"><span class="mono" id="ivn">Version 01</span><h5 id="ivh"></h5><p id="ivp"></p></div>
+    <div class="icount mono"><b id="ivc">01</b>of 03</div>
+    <div class="ideck" id="ideck"></div>
+  </div></section>
+
+  <div class="shead rv" id="sec-annot"><h4>Under the glass</h4><span class="mono">Tap a dot</span></div>
+  <section class="annot" id="annot"><svg class="alines" id="alines" aria-hidden="true"></svg></section>
+
+  <div class="shead rv" id="sec-try"><h4>Try it</h4><span class="mono">A working piece of the prototype</span></div>
+  <section class="try">
+    <div class="txt rv"><span class="mono">Live</span><h5>Turn the dial</h5><p>This is the real interaction, not a recording: drag around the dial and feel each station land. Stations snap, the needle bounces a little, and every one ticks.</p></div>
+    <div class="stage" id="stage"></div>
+  </section>
+  <div class="shead rv" id="sec-ba"><h4>Before and after</h4><span class="mono">Drag the needle</span></div>
+  <section class="ba" id="ba" aria-label="Before and after comparison">
+    <div class="side before"><span class="lab">Before · lists</span><div id="baB"></div></div>
+    <div class="side after"><span class="lab">After · the dial</span><div id="baA"></div></div>
+    <div class="needle"><span class="knob" aria-hidden="true">⇆</span></div>
+  </section>
+
+  <div class="shead rv" id="sec-sys"><h4>The system</h4><span class="mono">Colour · type · components</span></div>
+  <section class="sys">
+    <div><span class="lab mono"><span>Colour</span><span>04</span></span><div class="sw4"><i style="background:#2B3BFF;color:#fff">Signal #2B3BFF</i><i style="background:#C6F432;color:#0e0e10">Static #C6F432</i><i style="background:#F4EFE6;color:#0e0e10">Paper #F4EFE6</i><i style="background:#0E0E10;color:#fff;box-shadow:inset 0 0 0 1px var(--edge)">Night #0E0E10</i></div></div>
+    <div><span class="lab mono"><span>Type</span><span>Geist</span></span><div class="tscale"><span style="font-size:40px;letter-spacing:-.04em;font-weight:600">Display <em class="mono">40</em></span><span style="font-size:24px;letter-spacing:-.02em;font-weight:500">Title <em class="mono">24</em></span><span style="font-size:16px">Body <em class="mono">16</em></span><span style="font:500 12px var(--mono);text-transform:uppercase">Label <em class="mono">12</em></span></div></div>
+    <div><span class="lab mono"><span>Components</span><span>06</span></span><div class="comp"><span class="b1">Start listening</span><span class="b2">Save station</span><span class="tg"><span>Lo-fi</span><span>Jazz</span><span>Focus</span></span><span class="mini"></span></div></div>
+  </section>
+
+  <section class="statement rv" id="sec-out"><span class="mono">Product design · 06</span><p id="stmt">The best interface here was a single gesture you could do without looking.</p></section>
+  <a class="next rv" href="#" onclick="return false"><span class="mono">Next on the dial · 07 · Brand</span><span class="r"><h5>Card holder with stickers →</h5><span class="th"><img alt=""></span></span></a>
+</main>
+<div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const VIDEO = __VIDEO__, POSTER = __POSTER__, TOOL_SRC = __TOOLS__;
+  const $ = id => document.getElementById(id);
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  const snd = n => { if (window.Popkit) Popkit.play(n); };
+
+  // ---------- stand-in screens for the placeholder app ----------
+  const S = {
+    onboard: () => `<div class="s-pad" style="background:linear-gradient(180deg,#2B3BFF 0,#0e0e10 70%);inset:0;padding:22% 8% 9%"><span class="s-sm">Welcome</span><span class="s-t" style="font-size:2.3em">Turn the<br>dial.</span><span style="opacity:.7;font-size:.9em;line-height:1.4">Pick a mood, we tune the rest.</span><div class="s-dial" style="width:70%;margin:6% auto 0"></div><span class="s-btn">Start listening</span></div>`,
+    home: () => `<div class="s-pad"><span class="s-sm">Good evening</span><span class="s-t">Stations</span>${['#2B3BFF', '#C6F432', '#F4EFE6', '#ff4a1c'].map((c, k) => `<div class="s-row"><i class="s-av" style="background:${c}"></i><span style="flex:1"><b style="display:block;font-weight:600">${['Late night', 'Static', 'Paper', 'Ember'][k]}</b><span class="s-sm">${(88.1 + k * 3.3).toFixed(1)} FM</span></span></div>`).join('')}<div class="s-tabs"><i class="on"></i><i></i><i></i><i></i></div></div>`,
+    tune: () => `<div class="s-pad"><span class="s-sm" style="text-align:center">Now tuned</span><span class="s-t" style="text-align:center;font-size:2.6em">91.4</span><span style="text-align:center;opacity:.7">Static · lo-fi</span><div class="s-dial" style="width:84%;margin:4% auto"></div><div class="s-ruler"></div><div class="s-tabs"><i></i><i class="on"></i><i></i><i></i></div></div>`,
+    play: () => `<div class="s-pad"><div style="aspect-ratio:1;border-radius:1em;background:conic-gradient(from 90deg,#C6F432,#2B3BFF,#C6F432)"></div><span class="s-t" style="margin-top:4%">Night drive</span><span class="s-sm">Static · 91.4 FM</span><div class="s-bars">${[40, 70, 55, 90, 60, 80, 35, 65].map(h => `<i style="height:${h}%"></i>`).join('')}</div><span class="s-btn">Keep this station</span></div>`,
+    library: () => `<div class="s-pad"><span class="s-t">Kept</span><span class="s-sm">12 stations</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:6%">${['#2B3BFF', '#C6F432', '#ff4a1c', '#F4EFE6'].map(c => `<div style="aspect-ratio:1;border-radius:.8em;background:${c}"></div>`).join('')}</div><div class="s-tabs"><i></i><i></i><i class="on"></i><i></i></div></div>`,
+    list: () => `<div class="s-pad" style="background:#16161a;inset:0;padding:14% 7%"><span class="s-t" style="font-size:1.3em">Browse</span>${Array.from({ length: 9 }, (_, k) => `<div class="s-row"><i class="s-av" style="background:rgb(255 255 255 / ${.08 + (k % 3) * .05})"></i><span style="flex:1;height:.6em;border-radius:4px;background:rgb(255 255 255 / .12)"></span></div>`).join('')}</div>`,
+    real: () => `<video src="${VIDEO}" poster="${POSTER}" muted loop playsinline autoplay></video>`
+  };
+  // web versions of the same screens (browser window and tablet)
+  const shell = (on, main) => `<div class="wv"><aside class="wside"><b>tune</b>${['Stations', 'Tune', 'Kept', 'Search'].map((n, k) => `<span class="${k === on ? 'on' : ''}">${n}</span>`).join('')}</aside><main class="wmain">${main}</main></div>`;
+  const CL = ['#2B3BFF', '#C6F432', '#F4EFE6', '#ff4a1c'], NM = ['Late night', 'Static', 'Paper', 'Ember'];
+  const W = {
+    onboard: () => `<div class="wv land"><div><span class="s-sm">Tune for web</span><span class="s-t" style="font-size:3em">Turn the dial.</span><span style="opacity:.7">Pick a mood, we tune the rest.</span><span class="s-btn" style="width:56%;padding:4% 0">Start listening</span></div><div class="s-dial" style="width:82%;justify-self:center"></div></div>`,
+    home: () => shell(0, `<span class="s-sm">Good evening</span><span class="s-t">Stations</span><div class="wgrid" style="grid-template-columns:repeat(4,1fr)">${CL.map((c, k) => `<div><div class="wcard" style="background:${c}"></div><b style="display:block;margin-top:6%;font-weight:600">${NM[k]}</b><span class="s-sm">${(88.1 + k * 3.3).toFixed(1)} FM</span></div>`).join('')}</div>`),
+    tune: () => shell(1, `<div style="display:flex;flex-direction:column;align-items:center;gap:.6em;height:100%"><span class="s-sm">Now tuned</span><span class="s-t" style="font-size:3em">91.4</span><span style="opacity:.7">Static · lo-fi</span><div class="s-dial" style="width:34%;margin:1% 0"></div><div class="s-ruler" style="width:70%"></div></div>`),
+    play: () => shell(1, `<div style="display:grid;grid-template-columns:40% 1fr;gap:6%;align-items:center;height:100%"><div style="aspect-ratio:1;border-radius:1em;background:conic-gradient(from 90deg,#C6F432,#2B3BFF,#C6F432)"></div><div style="display:flex;flex-direction:column;gap:.7em"><span class="s-sm">Static · 91.4 FM</span><span class="s-t" style="font-size:2.4em">Night drive</span><div class="s-bars">${[40, 70, 55, 90, 60, 80, 35, 65, 50, 75].map(h => `<i style="height:${h}%"></i>`).join('')}</div><span class="s-btn" style="width:60%;margin-top:.6em">Keep this station</span></div></div>`),
+    library: () => shell(2, `<span class="s-t">Kept</span><span class="s-sm">12 stations</span><div class="wgrid" style="grid-template-columns:repeat(6,1fr)">${[...CL, ...CL, ...CL].map(c => `<div class="wcard" style="background:${c}"></div>`).join('')}</div>`),
+    list: () => shell(3, `<span class="s-t">Browse</span>${Array.from({ length: 8 }, (_, k) => `<div class="s-row"><i class="s-av" style="background:rgb(255 255 255 / ${.08 + (k % 3) * .05})"></i><span style="flex:1;height:.6em;border-radius:4px;background:rgb(255 255 255 / .12)"></span><span style="width:12%;height:.6em;border-radius:4px;background:rgb(255 255 255 / .08)"></span></div>`).join('')}`),
+    real: () => `<div class="wv white"><video src="${VIDEO}" poster="${POSTER}" muted loop playsinline autoplay></video></div>`
+  };
+  // which version: Mobile, Mobile + Web, Web + Tablet (preview switch; on the site this comes from the CMS)
+  const MODE = ({ '#mix': 'mix', '#web': 'web' })[location.hash] || 'mobile';
+  const wide = MODE !== 'mobile', narrow = innerWidth < 900;
+  // one device: phone (9:19.5), browser window (16:10 + bar), tablet (4:3). o = { extra, id, st (style), at (attributes) }
+  function dev(kind, type, w, o = {}) {
+    const sid = o.id ? ` id="${o.id}"` : '', at = o.at || '', st = o.st ? o.st + ';' : '', ex = o.extra || '';
+    if (type === 'phone') return `<div class="ph phone ${ex}" data-r="2.17" ${at} style="${st}--w:${w}px"><div class="scr"${sid}>${S[kind]()}</div></div>`;
+    if (narrow && !o.free) w = Math.min(w, innerWidth - 60);
+    w = Math.round(w);
+    if (type === 'br') return `<div class="ph br ${ex}" data-r=".67" ${at} style="${st}--w:${w}px"><div class="bar"><i></i><i></i><i></i><span>tune.fm</span></div><div class="scr"${sid}>${o.inner || W[kind]()}</div></div>`;
+    return `<div class="ph tb ${ex}" data-r=".8" ${at} style="${st}--w:${w}px"><div class="scr"${sid}>${o.inner || W[kind]()}</div></div>`;
+  }
+  // the device for the i-th screen in a sequence: all phones / phones and browsers alternating / browsers and tablets
+  const pick = (i, w) => MODE === 'mobile' ? ['phone', w] : MODE === 'web' ? (i % 2 ? ['tb', w * 2] : ['br', w * 2.5]) : (i % 2 ? ['br', w * 2.5] : ['phone', w]);
+  const devAt = (kind, i, w, o) => { const [t, ww] = pick(i, w); return dev(kind, t, ww, o); };
+  const phone = (kind, w, extra = '') => dev(kind, 'phone', w, { extra });
+
+  // ---------- 1 · opening: screens scattered across a sideways run, notes between them ----------
+  // [kind or note, x (px from the start of the scatter), y (share of height), width, depth (how much it lags), caption]
+  // one feature, not the whole app: the tuning moment. [screen, device, width, top %, depth, caption] or a note
+  const N1 = ['note', 'Why a dial', 'Lists ask you to decide. A dial lets you wander, and stop the moment something sounds right.', .15];
+  const N2 = ['note', 'Felt, not read', 'Every station lands with a small tick and a haptic, so you can tune without looking.', .2];
+  const SC = {
+    mobile: [N1, ['tune', 'phone', 270, 14, -.1, 'Tune'], N2, ['real', 'phone', 220, 18, .3, 'The ruler, in code'], ['play', 'phone', 240, 8, -.15, 'Land on a station']],
+    mix: [N1, ['tune', 'br', 960, 13, -.08, 'Tune, on the web'], N2, ['real', 'phone', 270, 12, .25, 'The ruler, in code']],
+    web: [N1, ['tune', 'br', 980, 12, -.08, 'Tune'], N2, ['real', 'tb', 700, 15, .2, 'The ruler, in code']]
+  }[MODE];
+  const scat = $('scatter');
+  let sx0 = 60, di = 0;
+  scat.innerHTML = SC.map(it => {
+    if (it[0] === 'note') { const h = `<div class="note" data-d="${it[3]}" style="left:${sx0}px;top:${di % 2 ? 14 : 62}%"><span class="mono">Note</span><b>${it[1]}</b><p>${it[2]}</p></div>`; sx0 += 300; return h; }
+    const [k, t, w0, top, d, c] = it; di++;
+    let w = narrow && t !== 'phone' ? Math.min(w0, Math.round((innerWidth - 30) / .72)) : w0;
+    w = Math.round(Math.min(w, (innerHeight - 72) * (t === 'phone' ? .78 : .66) / { phone: 2.17, br: .67, tb: .8 }[t]));   // same fit as sizeRun, so gaps stay even   // the run is drawn at 72% on phones
+    const h = `<figure data-d="${d}" style="left:${sx0}px;top:${top}%">${dev(k, t, w, { free: 1 })}<figcaption class="cap mono" style="--w:${w}px"><span>0${di} · ${c}</span></figcaption></figure>`;
+    sx0 += w + (t === 'phone' ? 110 : 140); return h;
+  }).join('');
+  const SW = sx0 + 40;
+  scat.style.width = SW + 'px';
+  const scatEls = [...scat.children];
+  const run = $('run'), track = $('track'), intro = $('intro');
+  let runLen = 0;
+  function sizeRun() {
+    const mob = innerWidth < 900;
+    intro.style.width = Math.round(innerWidth * (mob ? .9 : .6)) + 'px';
+    scat.style.transform = mob ? 'scale(.72)' : ''; scat.style.transformOrigin = '0 50%';
+    const H = innerHeight - 72;   // scale tall phones to the space we have
+    scatEls.forEach(el => { const ph = el.querySelector('.ph'); if (ph) { const w0 = parseFloat(ph.dataset.w0 || (ph.dataset.w0 = ph.style.getPropertyValue('--w'))); const cw = Math.min(w0, (H * (ph.classList.contains('phone') ? .78 : .66)) / +ph.dataset.r); ph.style.setProperty('--w', cw + 'px'); const fc = el.querySelector('figcaption'); if (fc) fc.style.setProperty('--w', cw + 'px'); } });
+    runLen = Math.max(0, intro.offsetWidth + SW * (mob ? .72 : 1) - innerWidth + 80);
+    run.style.height = (innerHeight + runLen * 1.25) + 'px';   // sideways at 80% of the scroll speed
+  }
+
+  // ---------- 3 · flow: live nodes ----------
+  // [screen, the element that leads on (output port), action on the wire, title, note, stagger in px]
+  const FL = [
+    ['tune', '.s-dial', 'Turn dial', 'Tune', 'The core loop: the biggest target and the only animation that never stops.', 0],
+    ['play', '.s-btn', '', 'Land', 'The needle settles, the station fades in. No list, no decision.', 120]
+  ];
+  const flow = $('flow');
+  // devices per step: phones / phone, browser, phone / browser, tablet, browser
+  const FLD = { mobile: ['phone', 'phone'], mix: ['br', 'phone'], web: ['br', 'tb'] }[MODE];
+  const FW = Math.min(680, (innerWidth - 300) / 2);
+  if (wide) flow.classList.add('zz');
+  flow.innerHTML = FL.map(([k, , , h, t, dy], i) => `<div class="node" style="margin-top:${dy}px">${dev(k, FLD[i], FLD[i] === 'phone' ? 240 : FLD[i] === 'tb' ? FW * .8 : FW, { extra: 'rise', st: `--dl:${i * .08}s` })}
+      <div class="meta rv" style="--dl:${i * .08 + .2}s"><span class="mono"><span class="n">${i + 1}</span>Step 0${i + 1}</span><b>${h}</b><p>${t}</p></div></div>`).join('') +
+    '<svg class="net" id="net" aria-hidden="true"></svg>';
+  const nodes = [...flow.querySelectorAll('.node')];
+  const net = $('net');
+  let links = [];
+  // build one wire per pair; paths are re-laid every frame so they follow the screens as they rise and drift
+  function drawWires() {
+    links = [];
+    net.innerHTML = '<defs>' + FL.slice(0, -1).map((f, i) => `<linearGradient id="lg${i}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--ink)" stop-opacity=".08"/><stop offset=".5" stop-color="var(--ink)" stop-opacity=".42"/><stop offset="1" stop-color="var(--ink)" stop-opacity=".08"/></linearGradient>
+      <linearGradient id="bg${i}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--ink)" stop-opacity="0"/><stop offset="1" stop-color="var(--ink)" stop-opacity=".95"/></linearGradient>`).join('') + '</defs>' +
+      FL.slice(0, -1).map((f, i) => `<g data-i="${i}"><path class="base" stroke="url(#lg${i})"/><path class="beam" stroke="url(#bg${i})"/><text class="act" dy="-8">${f[2]}</text></g>`).join('');
+    net.querySelectorAll('g').forEach((g, i) => {
+      links.push({ g, i, base: g.querySelector('.base'), beam: g.querySelector('.beam'), tx: g.querySelector('.act'), lg: net.querySelector('#lg' + i), bgr: net.querySelector('#bg' + i),
+        src: nodes[i].querySelector('.ph'), dst: nodes[i + 1].querySelector('.ph') });   // frame to frame
+    });
+  }
+  function layWires(now) {
+    const fr = flow.getBoundingClientRect();
+    if (fr.bottom < -200 || fr.top > innerHeight + 200) return;
+    const vert = innerWidth < 900;
+    links.forEach(L => {
+      const a = L.src.getBoundingClientRect(), b = L.dst.getBoundingClientRect();
+      // from the right edge of one device frame to the left edge of the next (on phones: right edge to right edge, down the margin)
+      // facing edges: next screen to the right → right edge to left edge; back to the left (zigzag) → left edge to right edge
+      const back = !vert && b.left < a.left - 4;
+      const x1 = (back ? a.left : a.right) - fr.left, y1 = a.top + a.height * .5 - fr.top;
+      const x2 = (vert || back ? b.right : b.left) - fr.left, y2 = b.top + b.height * (vert ? .3 : .5) - fr.top;
+      const xr = fr.width - 14, k = Math.max(50, Math.abs(x2 - x1) * .55) * (back ? -1 : 1);
+      const d = vert ? `M${x1},${y1} C${xr},${y1} ${xr},${y1 + 40} ${xr},${(y1 + y2) / 2} S${xr},${y2} ${x2},${y2}` : `M${x1},${y1} C${x1 + k},${y1} ${x2 - k},${y2} ${x2},${y2}`;
+      L.base.setAttribute('d', d); L.beam.setAttribute('d', d);
+      L.lg.setAttribute('x1', x1); L.lg.setAttribute('y1', y1); L.lg.setAttribute('x2', vert ? x1 : x2); L.lg.setAttribute('y2', vert ? y2 : y2);
+      const len = L.base.getTotalLength();
+      // a short light travels the line, frame to frame, eased; the next one leaves a moment after it arrives
+      const T = 2800, t = ((now + L.i * 420) % T) / T, e = t < .75 ? (q => q < .5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2)(t / .75) : 1;
+      const seg = Math.min(90, len * .28), head = e * (len + seg);
+      L.beam.style.strokeDasharray = `${seg} ${len + seg}`; L.beam.style.strokeDashoffset = (seg - head).toFixed(1);
+      L.beam.style.opacity = t < .75 ? 1 : 0;
+      const hp = L.base.getPointAtLength(Math.min(len, head)), tp = L.base.getPointAtLength(Math.max(0, head - seg));
+      L.bgr.setAttribute('x1', tp.x); L.bgr.setAttribute('y1', tp.y); L.bgr.setAttribute('x2', hp.x); L.bgr.setAttribute('y2', hp.y);
+      // the frame the light reaches glows for a moment
+      const glow = t > .7 && t < .95 ? Math.sin((t - .7) / .25 * Math.PI) : 0;
+      L.dst.style.boxShadow = glow > .01 ? `0 0 0 1px rgb(255 255 255 / ${(.08 + glow * .35).toFixed(3)}), 0 0 ${(30 * glow).toFixed(0)}px rgb(255 255 255 / ${(glow * .12).toFixed(3)}), 0 30px 60px -20px rgb(0 0 0 / .55)` : '';
+      const m = L.base.getPointAtLength(len / 2);
+      L.tx.setAttribute('x', vert ? m.x - 10 : m.x); L.tx.setAttribute('y', m.y); L.tx.setAttribute('text-anchor', vert ? 'end' : 'middle');
+    });
+  }
+
+  // ---------- 4 · experience notes: a write-up beside a loose cluster of screens ----------
+  const XP = [
+    ['01 · Haptics', 'Every station has a feel', 'A light tick as the needle passes a station and a firmer one when it lands. People stopped looking at the screen to tune within a day.', 'Detent on every station', [['tune', 24, 30, 270, .15]]],
+    ['02 · Landing', 'The first song chooses itself', 'Landing on a station plays straight away, faded in. One less decision at the moment people are least willing to make one.', 'Auto-play, faded in', [['play', 22, 60, 260, -.1]]]
+  ];
+  $('xps').innerHTML = XP.map(([lab, h, p, tag, ph], k) => `<div class="xp${k % 2 ? ' flip' : ''}">
+      <div class="xt rv"><span class="mono">${lab}</span><h5>${h}</h5><p>${p}</p><span class="tag"><i></i>${tag}</span></div>
+      <div class="xc">${ph.map(([kk, x, y, w, d], j) => {
+        // wide versions: a browser behind, and a phone (Mobile + Web) or a tablet (Web + Tablet) overlapping it
+        // web: one large browser; Mobile + Web: the browser with the phone beside it
+        // one screen per note: a browser on the web, a phone on mobile (Mobile + Web: browser, then phone)
+        const t = MODE === 'web' || (MODE === 'mix' && k === 0) ? 'br' : 'phone', ww = t === 'br' ? 720 : w;
+        const pos = t === 'br' ? 'left:0;top:90px' : `left:${x}%;top:${y}px`;
+        return dev(kk, t, ww, { extra: 'rise', at: `data-d="${d}"`, st: `${pos};--dl:${j * .12}s` });
+      }).join('')}</div></div>`).join('');
+
+  // ---------- 5 · before / after ----------
+  $('baB').innerHTML = wide ? dev('list', 'br', 760) : phone('list', 260); $('baA').innerHTML = wide ? dev('tune', 'br', 760) : phone('tune', 260);
+  const ba = $('ba');
+  let cut = 50, cutT = 50, dragging = false;
+  const setCut = e => { const r = ba.getBoundingClientRect(); cutT = Math.max(4, Math.min(96, (e.clientX - r.left) / r.width * 100)); };
+  ba.addEventListener('pointerdown', e => { dragging = true; ba.setPointerCapture(e.pointerId); setCut(e); snd('pop'); });
+  ba.addEventListener('pointermove', e => { if (dragging) setCut(e); });
+  ba.addEventListener('pointerup', () => { dragging = false; }); ba.addEventListener('pointercancel', () => { dragging = false; });
+
+
+  // ---------- A · research voices ----------
+  const VQ = [
+    [3, 30, -3, 'I open it, scroll, and close it. I never actually pick anything.', 'Ada · 27 · Lagos'],
+    [70, 0, 2.5, 'I miss the radio. Someone else chose, and it was usually good.', 'Tunde · 41 · Lagos', 'big'],
+    [62, 470, -2, 'I want to skip, not search.', 'Mira · 22 · London'],
+    [6, 430, 2, 'Playlists feel like homework.', 'Kemi · 33 · Accra'],
+    [33, 560, -1.5, 'Just give me something for the drive.', 'Sam · 38 · Lagos']
+  ];
+  $('voices').innerHTML = VQ.map(([x, y, r, q, w, c]) => `<figure class="vq rv ${c || ''}" style="left:${x}%;top:${y}px;--r:${r}deg"><i class="pin"></i><span class="mono">Interview</span><p>“${q}”</p><span class="who mono"><span>${w}</span></span></figure>`).join('') +
+    `<div class="insight rv"><span class="mono">Insight</span><b>People don't want more choice. They want a good first pick and an easy way to nudge it.</b></div>`;
+
+  // ---------- B · iterations ----------
+  const IV = [['list', 'Lists, but faster', 'A cleaner browse screen. Faster to scan, still a decision at every tap. Tests barely moved.'],
+    ['home', 'Stations, not songs', 'Grouping music into stations cut the choices from hundreds to a handful. Better, still a list.'],
+    ['tune', 'The dial, with a needle', 'The dial plus a ruler and a needle that always says where you are. This is the one that shipped.']];
+  const IW = narrow ? Math.min(300, innerWidth - 90) : 640;
+  if (wide) { $('ideck').classList.add('wd'); Object.assign($('ideck').style, { width: IW + 'px', aspectRatio: 'auto', height: Math.round(IW * .67) + 'px' }); }
+  $('ideck').innerHTML = IV.map(([k], i) => wide ? dev(k, i % 2 && MODE === 'web' ? 'br' : 'br', IW, { at: `data-i="${i}"` }) : `<div class="ph phone" data-i="${i}"><div class="scr">${S[k]()}</div></div>`).join('') + '<span class="vlab mono" id="ivl"></span>';
+  const ivEls = [...$('ideck').querySelectorAll('.ph')];
+  let ivLast = -1;
+
+  // ---------- C · annotated screen ----------
+  // dots: [x %, y % on the phone screen, note side, note top px, title, text]
+  const AN = [[76, 17, 'l', 120, 'Always know where you are', 'The frequency is the biggest thing on screen. It changes as you tune, so the screen itself is the feedback.'],
+    [50, 48, 'r', 260, 'One control, a big target', 'The dial takes half the screen, so you can tune with a thumb without looking down.'],
+    [50, 74, 'l', 520, 'A ruler for precision', 'The ruler under the dial is for fine moves between neighbouring stations.'],
+    [72, 92, 'r', 610, 'Tabs stay quiet', 'Navigation is pushed down and dimmed. Most sessions never leave this screen.']];
+  const annot = $('annot');
+  if (wide) {   // hotspots on the browser layout
+    [[58, 30], [58, 58], [58, 84], [9, 30]].forEach((xy, k) => { AN[k][0] = xy[0]; AN[k][1] = xy[1]; });
+    AN[3][4] = 'Navigation steps aside'; AN[3][5] = 'On the web the sidebar holds everything else, quiet and narrow. The dial keeps the middle of the screen.';
+  }
+  annot.insertAdjacentHTML('beforeend', wide ? dev('tune', 'br', 720, { id: 'ascr' }) : dev('tune', 'phone', 300, { id: 'ascr' }));
+  annot.insertAdjacentHTML('beforeend', AN.map(([x, y, side, top, h, t], i) => `<div class="acall" data-i="${i}" style="${side === 'l' ? 'left:var(--gut)' : 'right:var(--gut)'};top:${top}px"><span class="mono">0${i + 1}</span><b>${h}</b><p>${t}</p></div>`).join(''));
+  const ascr = $('ascr');
+  ascr.insertAdjacentHTML('beforeend', AN.map(([x, y], i) => `<button type="button" class="hot" data-i="${i}" style="left:${x}%;top:${y}%" aria-label="Note ${i + 1}">${i + 1}</button>`).join(''));
+  let anOn = 0;
+  function anSet(i) {
+    anOn = i;
+    annot.querySelectorAll('.hot, .acall').forEach(el => el.classList.toggle('on', +el.dataset.i === i));
+    annot.querySelectorAll('.aline').forEach((l, k) => l.classList.toggle('on', k === i));
+  }
+  function anLines() {
+    const ar = annot.getBoundingClientRect(), svg = $('alines');
+    svg.setAttribute('viewBox', `0 0 ${ar.width} ${ar.height}`);
+    svg.innerHTML = [...ascr.querySelectorAll('.hot')].map((h, i) => {
+      const a = h.getBoundingClientRect(), c = annot.querySelector(`.acall[data-i="${i}"]`).getBoundingClientRect();
+      const x1 = a.left + a.width / 2 - ar.left, y1 = a.top + a.height / 2 - ar.top, left = AN[i][2] === 'l';
+      const x2 = (left ? c.right : c.left) - ar.left, y2 = c.top - ar.top;
+      return `<path class="aline${i === anOn ? ' on' : ''}" d="M${x1},${y1} L${(x1 + x2) / 2},${y2} L${x2},${y2}"/>`;
+    }).join('');
+  }
+  ascr.addEventListener('click', e => { const h = e.target.closest('.hot'); if (h) { snd('pop'); anSet(+h.dataset.i); } });
+  anSet(0);
+
+  // ---------- D · try it: the dial works ----------
+  const ST = [['88.1', 'Late night'], ['91.4', 'Static · lo-fi'], ['94.7', 'Paper · acoustic'], ['98.0', 'Ember · afrobeats'], ['101.3', 'Signal · jazz'], ['104.6', 'Night drive'], ['107.9', 'Focus']];
+  const LIVE = `<div class="live"><span class="s-sm">Now tuned</span><span class="lf" id="lf">88.1</span><span class="ln" id="ln">Late night</span><div class="ld" id="ld"><i></i></div><span class="lh">Drag the dial</span></div>`;
+  $('stage').innerHTML = wide ? dev('tune', 'br', 840, { inner: shell(1, LIVE) }) : `<div class="ph phone" style="--w:300px"><div class="scr">${LIVE}</div></div>`;
+  const ld = $('ld');
+  let la = 0, lv = 0, lt = 0, ldrag = null, lst = 0;                 // angle, velocity, target (degrees)
+  ld.addEventListener('pointerdown', e => { ld.setPointerCapture(e.pointerId); const r = ld.getBoundingClientRect(); ldrag = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, a0: Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)), t0: lt }; snd('pop'); });
+  ld.addEventListener('pointermove', e => { if (!ldrag) return; let a = Math.atan2(e.clientY - ldrag.cy, e.clientX - ldrag.cx) - ldrag.a0; a = Math.atan2(Math.sin(a), Math.cos(a)); ldrag.t0 += a * 180 / Math.PI; ldrag.a0 += a; lt = ldrag.t0; });
+  const lend = () => { if (!ldrag) return; ldrag = null; lt = Math.round(lt / (360 / ST.length)) * (360 / ST.length); };   // snap to a station
+  ld.addEventListener('pointerup', lend); ld.addEventListener('pointercancel', lend);
+
+  // ---------- small things ----------
+  $('tools').innerHTML = ['figma', 'claude', 'aftereffects'].map(t => `<img src="${TOOL_SRC[t]}" alt="${t}" title="${t}">`).join('');
+  const ttl = $('ttl'); ttl.innerHTML = ttl.textContent.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
+  requestAnimationFrame(() => document.querySelectorAll('.w').forEach(w => w.classList.add('in')));
+  const stmt = $('stmt'); stmt.innerHTML = stmt.textContent.split(' ').map(w => `<span>${w}</span>`).join(' ');
+  const stmtWords = [...stmt.children];
+  function buildPv() {
+    const V = [['mobile', 'Mobile'], ['mix', narrow ? 'Mix' : 'Mobile + Web'], ['web', narrow ? 'Web' : 'Web + Tablet']];
+    $('pv').innerHTML = V.map(([k, l]) => `<button type="button" data-m="${k}" aria-pressed="${MODE === k}">${l}</button>`).join('') + `<button type="button" id="theme">${document.documentElement.dataset.theme === 'light' ? 'Dark' : 'Light'}</button>`;
+    $('pv').querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (b.dataset.m === MODE) return; history.replaceState(null, '', b.dataset.m === 'mobile' ? location.pathname : '#' + b.dataset.m); scrollTo(0, 0); location.reload(); });
+    $('theme').onclick = () => { const d = document.documentElement.dataset.theme === 'light'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; buildPv(); };
+  }
+  buildPv();
+
+  // numbers count up (elastic landing) when the metrics arrive
+  function countUp(el) {
+    const to = +el.dataset.to, dec = to % 1 ? 1 : 0, sup = el.querySelector('sup').outerHTML, t0 = performance.now();
+    (function f(now) { const k = Math.min(1, (now - t0) / 1300), e = 1 - Math.pow(1 - k, 4); el.innerHTML = (to * e).toFixed(dec) + sup; if (k < 1) requestAnimationFrame(f); })(t0);
+  }
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in');
+  }), { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.rv, .rule, .ph.rise').forEach(el => reduce ? el.classList.add('in') : io.observe(el));
+
+  // ---------- smooth scrolling (mouse and trackpad) ----------
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, mine: false };
+  if (smooth) {
+    addEventListener('wheel', e => { if (e.ctrlKey) return; e.preventDefault(); const raw = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1); SS.target = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, SS.target + Math.max(-140, Math.min(140, raw * .85)))); }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
+  }
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  if (!reduce && matchMedia('(pointer: fine)').matches) addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; } }, { passive: true });
+
+  // ---------- per frame ----------
+  const SECN = ['Intro', 'Story', 'Flow', 'Notes', 'Voices', 'Versions', 'Details', 'Try it', 'Before', 'System', 'Next'];
+  const secs = ['sec-story', 'sec-flow', 'sec-xp', 'sec-voices', 'sec-iter', 'sec-annot', 'sec-try', 'sec-ba', 'sec-sys', 'sec-out'].map($);
+  const sd = $('sdial'), sx = sd.getContext('2d');
+  let prevT = performance.now(), sp = 0, sv = 0, lastSt = -1, hx = 0;
+  function frame(now) {
+    const dt = Math.min(64, now - prevT); prevT = now; const vh = innerHeight;
+    if (smooth) { SS.cur += (SS.target - SS.cur) * (1 - Math.exp(-dt / 150)); if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target; if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); } }
+    const k = 1 - Math.exp(-dt / 140); mx += (tmx - mx) * k; my += (tmy - my) * k;
+    // opening run: sideways, each piece at its own depth, plus a little mouse drift
+    const r = run.getBoundingClientRect(), p = runLen ? Math.max(0, Math.min(1, -r.top / (r.height - vh))) : 0;
+    hx += (p * runLen - hx) * (smooth ? 1 : 1 - Math.exp(-dt / 120));
+    track.style.transform = `translate3d(${(-hx).toFixed(1)}px,0,0)`;
+    if (!reduce) scatEls.forEach(el => { const d = +el.dataset.d; el.style.translate = `${(hx * d * .12 - mx * 14 * (1 + d)).toFixed(1)}px ${(-my * 10 * (1 + d)).toFixed(1)}px`; });
+    // flow: live wires between the screens
+    layWires(now);
+    // experience clusters: screens drift at their own depth with the scroll and the mouse
+    if (!reduce) document.querySelectorAll('.xc .ph').forEach(el => { const b = el.parentElement.getBoundingClientRect(); if (b.bottom < -100 || b.top > vh + 100) return; const d = +el.dataset.d; el.style.transform = `translate3d(${(-mx * 16 * (1 + d)).toFixed(1)}px,${((b.top + b.height / 2 - vh / 2) * d * .35 - my * 10).toFixed(1)}px,0)`; });
+
+    // iterations: fan out with the scroll, the current version lifts to the front
+    { const r = $('iter').getBoundingClientRect(), q = Math.max(0, Math.min(.999, -r.top / Math.max(1, r.height - vh))), f = q * (IV.length - 1), cur = Math.round(f);
+      ivEls.forEach((el, i) => { const d = i - f, spread = (innerWidth < 900 ? 42 : 120) * (wide ? 1.7 : 1);
+        el.style.transform = reduce ? '' : `translate3d(${(d * spread).toFixed(1)}px,${(Math.abs(d) * 22).toFixed(1)}px,0) rotate(${(d * 7).toFixed(2)}deg) scale(${(1 - Math.min(.18, Math.abs(d) * .07)).toFixed(3)})`;
+        el.style.zIndex = 10 - Math.round(Math.abs(d) * 2); el.style.opacity = i <= cur + 1 ? 1 : .35; });
+      if (cur !== ivLast) { if (ivLast >= 0) snd('detent'); ivLast = cur; $('ivc').textContent = '0' + (cur + 1); $('ivn').textContent = 'Version 0' + (cur + 1); $('ivh').textContent = IV[cur][1]; $('ivp').textContent = IV[cur][2]; $('ivl').innerHTML = `<b>v${cur + 1}</b>${cur === IV.length - 1 ? ' · shipped' : ''}`; } }
+    // try-it dial: a spring toward the target, a detent each time it passes a station
+    { const a2 = (lt - la) * 260 - lv * 22; lv += a2 * dt / 1000; la += lv * dt / 1000;
+      ld.style.setProperty('--a', (180 + la).toFixed(2) + 'deg');
+      const n = ((Math.round(la / (360 / ST.length)) % ST.length) + ST.length) % ST.length;
+      if (n !== lst) { lst = n; snd('detent'); $('lf').textContent = ST[n][0]; $('ln').textContent = ST[n][1]; } }
+    // before/after needle springs toward where you dragged
+    const a = (cutT - cut) * 170 - sv * 18; sv += a * dt / 1000; cut += sv * dt / 1000; ba.style.setProperty('--cut', cut.toFixed(2) + '%');
+    // statement
+    const sr = stmt.getBoundingClientRect(), sq = Math.max(0, Math.min(1, (vh * .82 - sr.top) / (sr.height + vh * .35))), n = Math.round(sq * stmtWords.length); stmtWords.forEach((w, i) => w.classList.toggle('on', i < n));
+    // section dial
+    const mid = vh / 2; let f = 0;
+    secs.forEach((el, i) => { const b = el.getBoundingClientRect(); if (b.top < mid) f = i + 1; });
+    sp += (f - sp) * (1 - Math.exp(-dt / 110));
+    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const dpr = Math.min(2, devicePixelRatio || 1), W = sd.clientWidth, H = sd.clientHeight;
+    if (sd.width !== Math.round(W * dpr)) { sd.width = Math.round(W * dpr); sd.height = Math.round(H * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);
+    const SP = 30, base = H - 22, col = ink();
+    for (let q = -20; q <= (SECN.length - 1) * 5 + 20; q++) {
+      const x = W / 2 + q * SP - sp * 5 * SP; if (x < -10 || x > W + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(x - W / 2) / SP;
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = (major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(x, base); sx.lineTo(x, base - L); sx.stroke();
+      if (major) { sx.globalAlpha = d < 2.5 ? 1 : .5; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'center'; sx.fillText(SECN[q / 5].toUpperCase(), x, base + 15); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(W / 2 - 1.5, base - 34, 3, 36);
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', () => { sizeRun(); drawWires(); anLines(); });
+  setTimeout(anLines, 400); (document.fonts ? document.fonts.ready : Promise.resolve()).then(anLines);
+  sizeRun();
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { sizeRun(); drawWires(); });
+  setTimeout(drawWires, 300);
+  document.querySelectorAll('video').forEach(v => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

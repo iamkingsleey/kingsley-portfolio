@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logo Case Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Logo design template. Top: a pinned horizontal run (after lpas.com) where vertical scrolling slides the
+   logo's "stations" past a tick ruler and red needle. Then vertical (after Onda): split facts/story,
+   construction drawing with annotations, palette as frequencies, type specimen, landscape/portrait media
+   rhythm, statement, next on the dial. Station readout top-left, section
+   dial at the bottom, as on the rest of the site. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --pill: #f2f2f2; --panel: #f4f4f4; --on-ink: #ffffff;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --b1: #2b3bff; --b2: #c6f432; --b3: #f4efe6; --b4: #0e0e10;     /* the sample brand's colours */
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  --ease: cubic-bezier(.2,.8,.2,1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --pill: #1c1c1c; --panel: #121212; --on-ink: #000000;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased }
+img, svg { display: block; max-width: 100% }
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+figure { margin: 0 }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { padding: 0 var(--gut) }
+
+/* station readout */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px }
+.station .nm { font-size: 13px; font-weight: 500 }
+
+/* title words rise out of a mask */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em }
+.w > span { display: inline-block; transform: translateY(105%); transition: transform .9s var(--ease); transition-delay: calc(var(--i) * 70ms + 200ms) }
+.w.in > span { transform: none }
+
+/* ---------- 1 · horizontal run (three frames, then vertical) ----------
+   Frame 1: the intro panel, with the next column peeking in on the right.
+   Frame 2: the row slides left; two columns of stacked media and the edge of a third.
+   Frame 3: the split lines inside the columns slide (or, in "row moves" mode, the row keeps going).
+   Each slot holds an image or a video, chosen in the CMS. */
+.run { position: relative }                       /* height set in JS */
+.run .pin { position: sticky; top: 0; height: 100vh; overflow: hidden }
+.track { position: absolute; top: 0; left: 0; bottom: 72px; display: flex; will-change: transform }
+.intro { flex: none; position: relative; height: 100%; padding: 0 var(--gut) 40px }
+.intro .cat { position: absolute; left: var(--gut); top: 50%; transform: translateY(-50%) }
+.intro .go { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 12px }
+.intro .go svg { width: 34px; height: 10px; overflow: visible }
+.intro .go svg path { stroke: var(--ink); fill: none; stroke-width: 1.2 }
+.intro .go .arr { animation: nudge 1.6s var(--ease) infinite }
+@keyframes nudge { 0%, 100% { transform: translateX(0) } 50% { transform: translateX(6px) } }
+.intro .tt { position: absolute; left: var(--gut); right: 40%; bottom: 40px }
+.intro h1 { margin: 0 0 14px; color: var(--ink); font-size: clamp(52px, 7vw, 116px); line-height: .9; font-weight: 500; letter-spacing: -0.055em }
+.intro p { margin: 0; max-width: 44ch; font-size: 15px; line-height: 1.55 }
+.col { flex: none; height: 100%; display: flex; flex-direction: column }
+.slot { position: absolute; inset: 0; overflow: hidden; background: var(--panel); will-change: clip-path }
+.slot > img, .slot > video, .slot > .gfx { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform }
+.slot .gfx { display: grid; place-items: center }
+.slot .lab { position: absolute; top: 0; margin-top: -30px; will-change: transform; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; color: #fff; mix-blend-mode: difference; pointer-events: none }
+/* ruler under the run */
+.split-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; margin-top: -1.5px; will-change: transform; background: var(--red); z-index: 4; pointer-events: none; opacity: 0 }
+.split-tag { position: absolute; top: -11px; right: 12px; z-index: 5; will-change: transform; padding: 4px 8px; background: var(--red); color: #fff; font: 500 10px var(--mono); letter-spacing: .5px; opacity: 0; pointer-events: none }
+.col { position: relative }
+
+/* ---------- 2 · info split ---------- */
+.title { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; border-bottom: 1px solid var(--line); padding: 120px 0 36px }
+.title h2 { margin: 0; color: var(--ink); font-size: clamp(40px, 5.6vw, 88px); line-height: .92; font-weight: 500; letter-spacing: -0.05em }
+.info { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); border-bottom: 1px solid var(--line) }
+.facts { margin: 0; border-right: 1px solid var(--line); padding-right: 40px }
+.fact { padding: 24px 0; border-bottom: 1px solid var(--line) }
+.fact:last-child { border-bottom: 0 }
+.fact dt { margin-bottom: 12px }
+.fact dd { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--ink); background: var(--pill); padding: 8px 11px }
+.chip.cat { background: var(--red); color: #fff }
+.tools { display: flex; gap: 8px }
+.tools img { width: 34px; height: 34px; border-radius: 27%; box-shadow: 0 0 0 1px var(--edge) }
+.todo { color: var(--muted); font-weight: 400; font-style: italic }
+.story { padding: 26px 0 44px 40px; max-width: 720px }
+.story h3 { margin: 0 0 18px; font-size: 15px; font-weight: 600; color: var(--ink) }
+.story p { margin: 0 0 16px; font-size: 15px; line-height: 1.6 }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px }
+.btn { display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 500; transition: background .2s, color .2s }
+.btn.solid { background: var(--ink); color: var(--on-ink) }
+.btn:hover { background: var(--red); color: #fff }
+
+/* section heads */
+.shead { display: flex; justify-content: space-between; align-items: baseline; padding: 112px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 16px }
+.shead h4 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.3px }
+
+/* ---------- 3 · construction ---------- */
+.build { position: relative; aspect-ratio: 16 / 9; background: var(--panel); overflow: hidden }
+.build svg { position: absolute; inset: 0; width: 100%; height: 100% }
+.build .g { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset 1.6s var(--ease); transition-delay: var(--d, 0s) }
+.build .g.r { stroke: var(--red) }
+.build.in .g { stroke-dashoffset: 0 }
+.build .mark { fill: var(--ink); opacity: 0; transition: opacity 1s .9s }
+.build.in .mark { opacity: 1 }
+.build .note { font: 500 11px var(--mono); letter-spacing: .5px; text-transform: uppercase; fill: var(--red); opacity: 0; transition: opacity .6s; transition-delay: calc(var(--d, 0s) + .8s) }
+.build.in .note { opacity: 1 }
+
+/* ---------- 4 · palette as frequencies ---------- */
+.freqs { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 0; min-height: 420px }
+.fq-sw { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; font: 500 11px var(--mono); letter-spacing: .4px; text-transform: uppercase; overflow: hidden }
+.fq-sw .big { font: 500 clamp(28px, 3.4vw, 52px) var(--body); letter-spacing: -0.04em; text-transform: none }
+
+/* ---------- 5 · type specimen ---------- */
+.type { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); background: var(--panel) }
+.type .aa { padding: 40px; font-size: clamp(140px, 20vw, 320px); line-height: .8; letter-spacing: -0.06em; font-weight: 600; color: var(--ink) }
+.type .meta { padding: 40px; border-left: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; gap: 24px }
+.type .glyphs { color: var(--ink); font-size: 22px; line-height: 1.45; letter-spacing: -.02em; word-break: break-all }
+.type .weights { display: grid; gap: 8px; color: var(--ink); font-size: 28px; letter-spacing: -.03em }
+
+/* ---------- 6 · media rhythm ---------- */
+.seq { display: grid; gap: 16px; padding: 16px 0 }
+.panel { position: relative; overflow: hidden; background: var(--panel) }
+.panel > img { width: 100%; height: 100%; object-fit: cover }
+.panel .plab { position: absolute; top: 14px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; color: #fff; mix-blend-mode: difference; pointer-events: none }
+.full { aspect-ratio: 16 / 9 } .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } .two .panel { aspect-ratio: 4 / 5 }
+/* arrival: tune in (blocky signal that locks sharp) */
+/* arrival: the frame opens upward while the picture settles from a slight zoom */
+.reveal { clip-path: inset(100% 0 0 0); transition: clip-path 1.2s cubic-bezier(.16,1,.3,1) }
+.reveal > img { transform: scale(1.14); transition: transform 1.8s cubic-bezier(.16,1,.3,1) }
+.reveal.in { clip-path: inset(0 0 0 0) } .reveal.in > img { transform: none }
+.panel canvas.tune { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; image-rendering: pixelated }
+
+/* ---------- 8 · statement + next ---------- */
+.statement { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 140px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 96px }
+.statement p { margin: 0; padding-left: 40px; color: var(--ink); font-size: clamp(28px, 3.4vw, 48px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance }
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none }
+.next > .mono, .next > .fq { grid-column: 1; grid-row: 1 } .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em } .next .th { grid-column: 2; grid-row: 1 / 3 }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s var(--ease) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel) }
+.next .th img { width: 100%; height: 100%; object-fit: cover }
+
+/* fade for text blocks */
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease) }
+.rv.in { opacity: 1; transform: none }
+
+/* ---------- section dial (bottom) ---------- */
+.sdial { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 30; pointer-events: none; transition: opacity .3s }
+.sdial canvas { width: 100%; height: 100% }
+
+/* preview: theme */
+.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
+
+@media (prefers-reduced-motion: reduce) {
+  .w > span, .rv { transform: none !important; opacity: 1 !important; transition: none !important }
+  .build .g { stroke-dashoffset: 0; transition: none } .build .mark, .build .note { opacity: 1; transition: none }
+  .intro .hint i::after { animation: none }
+  .reveal, .reveal > img { clip-path: none; transform: none; transition: none }
+}
+@media (max-width: 899px) {
+  :root { --gut: 16px }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .title { padding-top: 88px } .title .mono { display: none }
+  .info, .statement, .next, .type { grid-template-columns: 1fr }
+  .facts { border-right: 0; padding-right: 0 }
+  .story { padding: 28px 0 36px; border-top: 1px solid var(--line) }
+  .freqs { grid-template-columns: 1fr 1fr; min-height: 0 } .fq-sw { min-height: 200px } .fq-sw:first-child { grid-column: 1 / -1 }
+  .type .meta { border-left: 0; border-top: 1px solid var(--line); padding: 24px } .type .aa { padding: 24px }
+  .two { grid-template-columns: 1fr; gap: 12px }
+  .statement { padding: 80px 0 } .statement p { padding: 16px 0 0 }
+  .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px }
+  .build { aspect-ratio: 4 / 5 }
+  .icons { gap: 16px }
+  .intro .cat { top: 96px; transform: none }
+  .intro .go { left: var(--gut); right: auto; top: auto; bottom: 24px; transform: none }
+  .intro .tt { right: var(--gut); bottom: 64px }
+  .theme { right: var(--gut) }
+}
+
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
+.next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
+@media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+</style>
+</head>
+<body>
+<div class="station"><a class="back" href="#" onclick="return false"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq">21</span><span class="nm">Nova · Logo design</span></div>
+<button class="theme" type="button" id="theme">Light</button>
+
+<!-- 1 · horizontal run: three frames, then the page continues vertically -->
+<section class="run" id="run" aria-label="Project opening">
+  <div class="pin">
+    <div class="track" id="track">
+      <div class="intro" id="intro">
+        <span class="cat mono">Logo design · Placeholder brand</span>
+        <span class="go mono">Scroll to explore <svg viewBox="0 0 34 10" aria-hidden="true"><g class="arr"><path d="M0 5h32M28 1l4 4-4 4"/></g></svg></span>
+        <div class="tt"><h1 id="ttl">Nova</h1><p>A mark for a radio-first music app: a dial, a band of signal running through it, and a notch where the needle lands. Built to work at 16 pixels and on a billboard.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <!-- 2 · info split -->
+  <header class="title rv"><h2>Tuning a brand<br>into one mark</h2><span class="mono">21 / 24</span></header>
+  <section class="info">
+    <dl class="facts">
+      <div class="fact"><dt class="mono">Category</dt><dd><span class="chips"><span class="chip cat">Logo design</span></span></dd></div>
+      <div class="fact"><dt class="mono">Industry</dt><dd><span class="chips"><span class="chip">Music</span><span class="chip">Consumer app</span></span></dd></div>
+      <div class="fact"><dt class="mono">Client · Year</dt><dd class="todo">Client name · Year</dd></div>
+      <div class="fact"><dt class="mono">What I did</dt><dd><span class="chips"><span class="chip">Naming</span><span class="chip">Logo design</span><span class="chip">Brand identity</span><span class="chip">Icon system</span><span class="chip">Guidelines</span></span></dd></div>
+      <div class="fact"><dt class="mono">Tools</dt><dd><span class="tools" id="tools"></span></dd></div>
+    </dl>
+    <div class="story rv">
+      <h3>One shape that has to do everything</h3>
+      <p>Nova lives in an app icon, a lock screen widget and the corner of a video. The mark had to read in a 16 pixel favicon and still feel like an object on a billboard.</p>
+      <p>Everything comes from a radio dial: the circle is the dial, the band is the signal passing through, and the notch is the moment the needle lands on a station. Three parts, nothing extra.</p>
+      <div class="btns"><a class="btn solid" href="#" onclick="return false">View on Behance ↗</a><a class="btn" href="#" onclick="return false">Brand guidelines ↗</a></div>
+    </div>
+  </section>
+
+  <!-- 3 · construction -->
+  <div class="shead rv"><h4>Construction</h4><span class="mono">Drawn on a 12-unit grid</span></div>
+  <figure class="build" id="build"><svg viewBox="0 0 1600 900" id="buildSvg" aria-label="How the mark is built"></svg></figure>
+
+  <!-- 4 · palette -->
+  <div class="shead rv"><h4>Colour, as frequencies</h4><span class="mono">Each colour has a station</span></div>
+  <section class="freqs" id="freqs"></section>
+
+  <!-- 5 · type -->
+  <div class="shead rv"><h4>Typeface</h4><span class="mono">Geist · Geist Mono</span></div>
+  <section class="type">
+    <div class="aa">Aa</div>
+    <div class="meta"><span class="mono">Primary · Geist</span>
+      <div class="glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 ↗ → ·</div>
+      <div class="weights"><span style="font-weight:400">Regular 400</span><span style="font-weight:500">Medium 500</span><span style="font-weight:600">Semibold 600</span></div>
+    </div>
+  </section>
+
+  <!-- 6 · media rhythm: landscape, then a portrait pair -->
+  <div class="shead rv"><h4>Applications</h4><span class="mono">Stand-ins from your brand pieces</span></div>
+  <section class="seq">
+    <figure class="panel full reveal"><div class="plab mono"><span>Merch</span><span>06</span></div><img data-img="1" alt=""></figure>
+    <div class="two"><figure class="panel reveal"><div class="plab mono"><span>Badge</span><span>07</span></div><img data-img="2" alt=""></figure><figure class="panel reveal"><div class="plab mono"><span>Packaging</span><span>08</span></div><img data-img="3" alt=""></figure></div>
+  </section>
+
+
+  <!-- 8 · statement + next -->
+  <section class="statement rv"><span class="mono">Logo design · 21</span><p>A good mark is a station people can find again with their eyes closed.</p></section>
+  <a class="next rv" href="#" onclick="return false"><span class="mono">Next on the dial · 22 · Product design</span><span class="r"><h5>Ruler picker →</h5><span class="th"><img data-img="7" alt=""></span></span></a>
+</main>
+
+<div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMGS = __IMGS__;          // stand-in photos (your brand pieces)
+  const VIDEO = __VIDEO__;        // stand-in video (the ruler picker loop)
+  const TOOL_SRC = __TOOLS__;
+  const $ = id => document.getElementById(id);
+  const ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  const RED = '#ff4a1c';
+
+  // ---------- the sample mark: dial + signal band + notch ----------
+  // viewBox 0 0 120 120: circle r 54, a horizontal band cut through the middle, a notch bitten from the right edge.
+  function markSVG(size, fill, bg) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="Nova mark" role="img">
+      <defs><mask id="m${size}${fill.replace('#', '')}"><rect width="120" height="120" fill="#fff"/>
+        <rect x="0" y="54" width="120" height="12" fill="#000"/><circle cx="114" cy="60" r="16" fill="#000"/></mask></defs>
+      <circle cx="60" cy="60" r="54" fill="${fill}" mask="url(#m${size}${fill.replace('#', '')})"/>
+      <circle cx="60" cy="60" r="7" fill="${fill}"/></svg>`;
+  }
+  document.querySelectorAll('[data-mark]').forEach(el => el.innerHTML = markSVG(+el.dataset.mark, el.dataset.fill));
+  document.querySelectorAll('[data-word]').forEach(el => { el.innerHTML = 'nova'; el.style.cssText += `;color:${el.dataset.word};font-weight:600;letter-spacing:-0.06em;line-height:1`; });
+  document.querySelectorAll('[data-lockup]').forEach(el => {
+    el.style.cssText = 'display:flex;align-items:center;gap:clamp(16px,2vw,28px)';
+    el.innerHTML = markSVG(Math.min(160, innerWidth * .14), el.dataset.lockup) + `<span style="color:${el.dataset.lockup};font-weight:600;letter-spacing:-0.06em;font-size:clamp(70px,9vw,150px);line-height:1">nova</span>`;
+  });
+  document.querySelectorAll('[data-img]').forEach(im => im.src = IMGS[+im.dataset.img % IMGS.length]);
+  $('tools').innerHTML = ['illustrator', 'figma', 'blender'].map(t => `<img src="${TOOL_SRC[t]}" alt="${t}" title="${t}">`).join('');
+
+  // title words
+  const ttl = $('ttl'); ttl.innerHTML = ttl.textContent.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
+  requestAnimationFrame(() => document.querySelectorAll('.w').forEach(w => w.classList.add('in')));
+
+  // ---------- 1 · horizontal run ----------
+  // Columns of two stacked slots. Each slot is an image, a video or (for logos) a graphic, as the CMS says.
+  // Scroll 1: the row slides to columns 1–2. Scroll 2: on to columns 3–4. Scroll 3: the split lines in the
+  // visible columns slide (split: [before, after] = where the line between the two slots sits). Then vertical.
+  const COLS = [
+    { split: [.46, .46], top: { kind: 'graphic', g: 'mark', bg: '#2B3BFF', lab: 'The mark' }, bot: { kind: 'image', src: 0, lab: 'Card holder' } },
+    { split: [.62, .30], top: { kind: 'image', src: 3, lab: 'Price tag' }, bot: { kind: 'video', lab: 'Icon in motion' } },
+    { split: [.28, .76], top: { kind: 'graphic', g: 'word', bg: '#F4EFE6', lab: 'Wordmark' }, bot: { kind: 'image', src: 4, lab: 'Debit card' } },
+    { split: [.72, .22], top: { kind: 'image', src: 1, lab: 'Badge' }, bot: { kind: 'graphic', g: 'lock', bg: '#0E0E10', lab: 'Lockup' } },
+    { split: [.52, .34], top: { kind: 'image', src: 6, lab: 'Pink card' }, bot: { kind: 'image', src: 2, lab: 'Badge in a box' } }
+  ];
+  const track = $('track'), run = $('run'), intro = $('intro');
+  const gfx = (g, bg) => {
+    const fill = bg === '#F4EFE6' ? '#0E0E10' : '#ffffff';
+    if (g === 'mark') return `<div class="gfx" style="background:${bg}">${markSVG(180, fill)}</div>`;
+    if (g === 'word') return `<div class="gfx" style="background:${bg};color:${fill};font-weight:600;letter-spacing:-0.06em;font-size:clamp(64px,8vw,140px);line-height:1">nova</div>`;
+    return `<div class="gfx" style="background:${bg}"><span style="display:flex;align-items:center;gap:18px">${markSVG(90, fill)}<span style="color:${fill};font-weight:600;letter-spacing:-0.06em;font-size:clamp(48px,5vw,84px);line-height:1">nova</span></span></div>`;
+  };
+  const slotHTML = (s, n) => {
+    const media = s.kind === 'image' ? `<img src="${IMGS[s.src]}" alt="${s.lab}">`
+      : s.kind === 'video' ? `<video src="${VIDEO}" poster="${IMGS[7]}" muted loop playsinline autoplay></video>` : gfx(s.g, s.bg);
+    return `<figure class="slot" style="margin:0">${media}<div class="lab mono"><span>${s.lab}</span><span>${String(n).padStart(2, '0')} · ${s.kind}</span></div></figure>`;
+  };
+  track.insertAdjacentHTML('beforeend', COLS.map((c, k) => `<div class="col">${slotHTML(c.top, k * 2 + 1)}${slotHTML(c.bot, k * 2 + 2)}<i class="split-line"></i><span class="split-tag"></span></div>`).join(''));
+  const colEls = [...track.querySelectorAll('.col')];
+  track.querySelectorAll('video').forEach(v => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
+
+  // scroll distance (in screens) at which each frame sits; the split step gets a longer stretch so it reads clearly
+  const STOPS = [0, 1, 2, 3.4], HOLD = .35;
+  let W = 0, H = 0, introW = 0, colW = 0, colH = 0;
+  function sizeRun() {
+    W = innerWidth; H = innerHeight;
+    const mob = W < 900;
+    introW = Math.round(W * (mob ? .86 : .83)); colW = Math.round(W * (mob ? .86 : .415));
+    colH = H - 72;
+    intro.style.width = introW + 'px';
+    colEls.forEach(c => { c.style.width = colW + 'px'; });
+    run.style.height = (H + (STOPS[3] + HOLD) * H) + 'px';
+  }
+  const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const toFrame = d => { for (let k = 0; k < 3; k++) if (d <= STOPS[k + 1] * H) return k + Math.max(0, d - STOPS[k] * H) / ((STOPS[k + 1] - STOPS[k]) * H); return 3; };
+  let sm = 0;
+  // f: 0 = intro, 1 = columns 1–2, 2 = columns 3–4, 3 = their splits have slid
+  function layout(f) {
+    const a = Math.min(1, Math.max(0, f)), b = Math.min(1, Math.max(0, f - 1)), c = Math.min(1, Math.max(0, f - 2));
+    const steps = W < 900 ? 1 : 2;                       // on phones a column fills the screen, so step one at a time
+    const x = -introW * easeIO(a) - steps * colW * easeIO(b);
+    track.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+    const ec = easeIO(c), glow = Math.sin(Math.PI * c);  // the red line shows only while the split is moving
+    COLS.forEach((col, k) => {
+      const sp = col.split[0] + (col.split[1] - col.split[0]) * ec;
+      const el = colEls[k], [t, bo, line, tag] = el.children;
+      const cut = sp * colH;
+      t.style.clipPath = `inset(0 0 ${(100 - sp * 100).toFixed(2)}% 0)`;
+      bo.style.clipPath = `inset(${(sp * 100).toFixed(2)}% 0 0 0)`;
+      // each picture keeps itself roughly centred in its visible part, and pans a little against the row's movement
+      const cx = x + el.offsetLeft + colW / 2 - W / 2, px = (-cx * .06).toFixed(1);
+      t.firstElementChild.style.transform = `translate3d(${px}px,${(-(colH - cut) * .42).toFixed(1)}px,0) scale(1.16)`;
+      bo.firstElementChild.style.transform = `translate3d(${px}px,${(cut * .42).toFixed(1)}px,0) scale(1.16)`;
+      t.querySelector('.lab').style.transform = `translate3d(0,${cut.toFixed(1)}px,0)`;
+      bo.querySelector('.lab').style.transform = `translate3d(0,${colH.toFixed(1)}px,0)`;
+      const moves = col.split[0] !== col.split[1];
+      line.style.transform = tag.style.transform = `translate3d(0,${cut.toFixed(1)}px,0)`;
+      line.style.opacity = moves ? glow.toFixed(3) : 0;
+      tag.style.opacity = moves ? Math.min(1, glow * 1.6).toFixed(3) : 0;
+      if (moves) tag.textContent = `${Math.round(sp * 100)} / ${100 - Math.round(sp * 100)}`;
+    });
+  }
+  // ---------- smooth scrolling ----------
+  // Mouse wheels and trackpads: the page glides toward where you scrolled instead of jumping in steps.
+  // Touch keeps the phone's own scrolling. Keyboard and scrollbar still work (we follow them).
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, lastWheel: 0, mine: false };
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  if (smooth) {
+    addEventListener('wheel', e => {
+      if (e.ctrlKey) return;                                 // pinch-zoom
+      e.preventDefault();
+      const dy = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1);
+      SS.target = Math.max(0, Math.min(maxY(), SS.target + dy));
+      SS.lastWheel = performance.now(); settle = null;
+    }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) { SS.cur = SS.target = scrollY; } SS.mine = false; }, { passive: true });
+  }
+  // when scrolling stops inside the opening, glide to the nearest frame
+  let settle = null, lastNative = 0, touching = false;
+  addEventListener('scroll', () => { if (!smooth) lastNative = performance.now(); }, { passive: true });
+  addEventListener('touchstart', () => { touching = true; settle = null; }, { passive: true });
+  addEventListener('touchend', () => { touching = false; lastNative = performance.now(); }, { passive: true });
+  const easeOut = t => 1 - Math.pow(1 - t, 4);
+  let prevT = performance.now();
+  function runFrame(now) {
+    const dt = Math.min(64, now - prevT); prevT = now;
+    const y0 = run.offsetTop;
+    if (smooth) {
+      // settle: once the wheel has been still for a moment and the glide has nearly stopped
+      const d = SS.target - y0;
+      if (now - SS.lastWheel > 220 && SS.lastWheel && Math.abs(SS.target - SS.cur) < 60 && d > -2 && d < (STOPS[3] + .15) * H) {
+        let best = 0; STOPS.forEach((st, k) => { if (Math.abs(d - st * H) < Math.abs(d - STOPS[best] * H)) best = k; });
+        SS.target = y0 + STOPS[best] * H; SS.lastWheel = 0;
+      }
+      const k = 1 - Math.exp(-dt / 110);                    // time-based easing: same feel at 60 or 120 Hz
+      SS.cur += (SS.target - SS.cur) * k;
+      if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target;
+      if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); }
+    } else if (!reduce) {
+      const d = scrollY - y0;
+      if (!settle && !touching && lastNative && now - lastNative > 160 && d > -2 && d < (STOPS[3] + .15) * H) {
+        let best = 0; STOPS.forEach((st, k) => { if (Math.abs(d - st * H) < Math.abs(d - STOPS[best] * H)) best = k; });
+        const ty = y0 + STOPS[best] * H;
+        if (Math.abs(scrollY - ty) > 2) settle = { from: scrollY, to: ty, t0: now };
+        lastNative = 0;
+      }
+      if (settle) { const t = Math.min(1, (now - settle.t0) / 700); scrollTo(0, settle.from + (settle.to - settle.from) * easeOut(t)); lastNative = 0; if (t >= 1) settle = null; }
+    }
+    const d = Math.max(0, (smooth ? SS.cur : scrollY) - y0);
+    const f = toFrame(d);
+    sm = smooth || reduce ? f : sm + (f - sm) * (1 - Math.exp(-dt / 90));
+    layout(sm);
+    requestAnimationFrame(runFrame);
+  }
+
+  // ---------- 3 · construction drawing ----------
+  (function build() {
+    const cx = 800, cy = 450, R = 300, s = R / 54;
+    const L = [];   // [svg element, length, delay, isRed]
+    const g = (el, len, d, red) => L.push(`<${el.split(' ')[0]} class="g${red ? ' r' : ''}" style="--len:${len};--d:${d}s" ${el.slice(el.indexOf(' ') + 1)}/>`);
+    // grid
+    for (let k = -6; k <= 6; k++) { g(`line x1="${cx + k * R / 6}" y1="60" x2="${cx + k * R / 6}" y2="840"`, 780, .02 * (k + 6)); }
+    for (let k = -3; k <= 3; k++) { g(`line x1="380" y1="${cy + k * R / 3}" x2="1220" y2="${cy + k * R / 3}"`, 840, .04 * (k + 3)); }
+    g(`circle cx="${cx}" cy="${cy}" r="${R}"`, 1885, .3, true);
+    g(`circle cx="${cx + 54 * s}" cy="${cy}" r="${16 * s}"`, 560, .6, true);
+    g(`line x1="200" y1="${cy - 6 * s}" x2="1400" y2="${cy - 6 * s}"`, 1200, .7, true);
+    g(`line x1="200" y1="${cy + 6 * s}" x2="1400" y2="${cy + 6 * s}"`, 1200, .75, true);
+    g(`circle cx="${cx}" cy="${cy}" r="${7 * s}"`, 270, .9, true);
+    const mark = `<g class="mark" transform="translate(${cx - 60 * s} ${cy - 60 * s}) scale(${s})"><defs><mask id="bm"><rect width="120" height="120" fill="#fff"/><rect x="0" y="54" width="120" height="12" fill="#000"/><circle cx="114" cy="60" r="16" fill="#000"/></mask></defs><circle cx="60" cy="60" r="54" mask="url(#bm)"/><circle cx="60" cy="60" r="7"/></g>`;
+    const notes = [[1180, 170, 'Dial · the circle', .3], [1260, 410, 'Notch · where the needle lands', .6], [210, cy - 6 * s - 14, 'Signal · a band of 1/10', .7], [cx + 60, cy + 6 * s + 120, 'Core · the station', .9]]
+      .map(([x, y, t, d]) => `<text class="note" x="${x}" y="${y}" style="--d:${d}s">${t}</text>`).join('');
+    $('buildSvg').innerHTML = L.join('') + mark + notes;
+  })();
+
+  // ---------- 4 · palette as frequencies ----------
+  const PAL = [['Signal blue', '#2B3BFF', '88.1', '#fff'], ['Static lime', '#C6F432', '91.4', '#0e0e10'], ['Paper', '#F4EFE6', '96.7', '#0e0e10'], ['Night', '#0E0E10', '104.3', '#fff']];
+  $('freqs').innerHTML = PAL.map(([n, h, f, c], k) => `<div class="fq-sw" style="background:${h};color:${c}"><span style="display:flex;justify-content:space-between"><span>${f} FM</span><span>${String(k + 1).padStart(2, '0')}</span></span><span><span class="big">${n}</span><br>${h} · RGB ${[1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join(' ')}</span></div>`).join('');
+
+  // ---------- arrivals: text fades up, photos tune in, the construction draws itself ----------
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in');
+  }), { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.rv, .reveal, .build').forEach(el => reduce ? (el.classList.add('in', 'done')) : io.observe(el));
+
+  // ---------- section dial (bottom), as on the site ----------
+    const secEls = [document.querySelector('.info'), $('build'), $('freqs'), document.querySelector('.type'), document.querySelector('.seq'), document.querySelector('.statement')];
+  const SECN = ['01', '02', '03', '04', 'Story', 'Build', 'Colour', 'Type', 'Use', 'Next'];   // 01–04: the opening frames
+  const sd = $('sdial'), sx = sd.getContext('2d');
+  let sp = 0;
+  function sdFrame() {
+    const mid = innerHeight / 2;
+    let f = sm; secEls.forEach((el, k) => { const r = el.getBoundingClientRect(); if (r.top < mid) f = 4 + k + Math.min(1, Math.max(0, (mid - r.top) / Math.max(1, r.height))) * .999; });
+    if (f < 4 && sm >= 2.999) { const r = secEls[0].getBoundingClientRect(); f = 3 + Math.min(1, Math.max(0, 1 - (r.top - mid) / innerHeight)); }   // between the run and Story
+    sp += (f - sp) * .15;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = sd.clientWidth, H = sd.clientHeight;
+    if (sd.width !== Math.round(W * dpr)) { sd.width = Math.round(W * dpr); sd.height = Math.round(H * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);
+    const SP = 30, base = H - 22, col = ink();
+    for (let q = -20; q <= (SECN.length - 1) * 5 + 20; q++) {
+      const x = W / 2 + q * SP - sp * 5 * SP; if (x < -10 || x > W + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(x - W / 2) / SP;
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = (major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(x, base); sx.lineTo(x, base - L); sx.stroke();
+      if (major) { sx.globalAlpha = d < 2.5 ? 1 : .5; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'center'; sx.fillText(SECN[q / 5].toUpperCase(), x, base + 15); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(W / 2 - 1.5, base - 34, 3, 36);
+    requestAnimationFrame(sdFrame);
+  }
+
+  // theme
+  $('theme').addEventListener('click', () => { const d = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; $('theme').textContent = d ? 'Light' : 'Dark'; });
+
+  addEventListener('resize', sizeRun);
+  sizeRun();
+  requestAnimationFrame(runFrame); requestAnimationFrame(sdFrame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+/* opening section versions */
+.isheet { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; border-bottom: 1px solid var(--line) }
+.isheet > div { padding: 22px 20px 26px 0; border-right: 1px solid var(--line); margin-right: 20px } .isheet > div:last-child { border-right: 0; margin-right: 0 }
+.isheet dt { margin-bottom: 12px } .isheet dd { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.info.isht, .info.iread, .info.ispl { display: block; border-bottom: 0 }
+.istory { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 72px 0; border-bottom: 1px solid var(--line) }
+.istory h3 { margin: 0; color: var(--ink); font-size: clamp(30px, 3.4vw, 50px); line-height: 1.02; font-weight: 500; letter-spacing: -0.035em; max-width: 12ch }
+.istory p { margin: 0 0 18px; padding-left: 40px; font-size: 18px; line-height: 1.6; max-width: 56ch } .istory p:last-child { margin-bottom: 0 }
+.ibrief { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line) }
+.ibrief > div { padding: 36px 40px 44px 0 } .ibrief > div + div { padding-left: 40px; border-left: 1px solid var(--line) }
+.ibrief .mono { display: block; margin-bottom: 16px } .ibrief p { margin: 0; color: var(--ink); font-size: clamp(20px, 1.8vw, 26px); line-height: 1.35; letter-spacing: -0.015em; font-weight: 500 }
+.iwords { margin: 0; padding: 96px 0; border-bottom: 1px solid var(--line); font-size: clamp(30px, 3.8vw, 58px); line-height: 1.1; font-weight: 500; letter-spacing: -0.035em; max-width: 24ch }
+.iwords span { color: var(--line); transition: color .35s var(--ease) } .iwords span.on { color: var(--ink) }
+.iswin { height: 200vh; margin: 0 calc(-1 * var(--gut)) } .ispin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden }
+.isp { position: absolute; inset: 0; display: grid; align-content: center; gap: 26px; padding: 0 var(--gut); background: var(--panel) }
+.isp.b { background: var(--ink) } .isp.b p, .isp.b .mono { color: var(--bg) }
+.isp p { margin: 0; color: var(--ink); font-size: clamp(34px, 4.6vw, 72px); line-height: 1.04; font-weight: 500; letter-spacing: -0.04em; max-width: 20ch }
+.isl { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: var(--red); z-index: 3 } .isl .split-tag { opacity: 1; top: 120px; right: auto; left: 10px }
+.info.istn { display: block; border-bottom: 0; margin: 0 calc(-1 * var(--gut)) }
+.istpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; padding: 0 var(--gut) }
+.istl { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px }
+.istl li { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--line) }
+.istl li b { color: var(--muted); font-size: 22px; font-weight: 500; letter-spacing: -0.02em; transition: color .3s, transform .5s var(--ease) }
+.istl li.on b { color: var(--ink); transform: translateX(8px) } .istl li.on .mono { color: var(--red) }
+.istv { position: relative; height: 260px; padding-left: 40px }
+.istc { position: absolute; left: 40px; right: 0; top: 50%; translate: 0 -50%; opacity: 0; transform: translateY(18px); transition: opacity .45s var(--ease), transform .6s var(--ease); color: var(--ink); font-size: clamp(36px, 4.6vw, 72px); font-weight: 500; letter-spacing: -0.04em; line-height: 1 }
+.istc.on { opacity: 1; transform: none }
+.istc .chips { gap: 12px } .istc .chip { font-size: clamp(16px, 1.6vw, 22px); padding: 14px 18px } .istc .tools img { width: 72px; height: 72px }
+@media (max-width: 899px) { .isheet, .istory, .ibrief, .istpin { grid-template-columns: 1fr } .isheet > div { border-right: 0; margin-right: 0; border-bottom: 1px solid var(--line) } .istory p { padding: 16px 0 0 } .ibrief > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line) } .istv { padding-left: 0 } .istc { left: 0 } }
+

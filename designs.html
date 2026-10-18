@@ -1080,6 +1080,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       const v0 = $('dmedia').querySelector('video'); if (v0) { v0.muted = true; const pr = v0.play(); if (pr) pr.catch(() => {}); }
       $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage((i + 1) % N) : swapDetail((i + 1) % N); });
       $('fq').textContent = pad(i); $('nm').textContent = it.t;
+      if (window.KMtrack) KMtrack('/designs/' + slugOf(it.t), it.t);   // analytics: which pieces people open
       $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';
       $('back').setAttribute('aria-label', 'Back to Designs, 100.0');
       measureSecs();

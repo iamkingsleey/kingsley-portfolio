@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMS · Kingsley FM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<aside class="side">
+  <div class="brand"><b>Kingsley FM</b><span class="mono">CMS</span></div>
+  <nav id="nav"></nav>
+  <div class="side-foot mono" id="sidefoot">Saved to this Mac</div>
+</aside>
+<main class="main">
+  <header class="top">
+    <div><span class="mono" id="crumb"></span><h1 id="title"></h1></div>
+    <div class="acts">
+      <span class="dirty" id="dirty" hidden>Unsaved changes</span>
+      <a class="btn ghost" id="view" href="/site/index.html" target="_blank" rel="noopener">View site ↗</a>
+      <button class="btn" id="save" type="button">Save &amp; rebuild</button>
+    </div>
+  </header>
+  <section class="view" id="view-root"></section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true"><header><b id="mtitle"></b><button class="x" type="button" id="mclose" aria-label="Close">×</button></header><div class="mbody" id="mbody"></div></div></div>
+<script src="app.js"></script>
+</body>
+</html>

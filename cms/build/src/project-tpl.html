@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project · Kingsley M.</title>
+<script>
+  // theme from Home's toggle (dark if never chosen); the page opens as a circle from where you tapped
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    document.documentElement.dataset.theme = t || 'dark';
+    var e = null; try { e = JSON.parse(sessionStorage.getItem('km-enter') || 'null'); sessionStorage.removeItem('km-enter'); } catch (_) {}
+    if (e && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('entering');
+      document.documentElement.style.setProperty('--ex', (e.x * 100) + '%'); document.documentElement.style.setProperty('--ey', (e.y * 100) + '%');
+    } })();
+</script>
+__TUNER__
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- fonts load without holding up the first paint (they are usually cached from Designs already) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<style>
+/* Split project page, refined. Station readout top-left, project/theme switch top-right (preview only),
+   section dial along the bottom. Top to bottom: notched hero, title on a drawn rule, facts | story split,
+   two-up gallery, a statement that fills in as you read, sticky text beside a stack, palette, wide image,
+   next on the dial. Every picture arrives behind the red needle, which carries a tuning readout. */
+@property --z { syntax: "<number>"; inherits: true; initial-value: 1 }
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f4f4f4; --on-ink: #ffffff;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  --ease: cubic-bezier(.2,.8,.2,1); --sweep: cubic-bezier(.7,0,.25,1);
+  --pop: cubic-bezier(.34,1.56,.64,1);
+  --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);   /* elastic: overshoots, settles */
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #121212; --on-ink: #000000;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+html { background: var(--bg) }
+html.entering body { clip-path: circle(0px at var(--ex) var(--ey)) }
+html.entering.go body { clip-path: circle(150vmax at var(--ex) var(--ey)); transition: clip-path .55s cubic-bezier(.3,0,.2,1) }
+.pagecover { position: fixed; inset: 0; z-index: 90; background: var(--bg); pointer-events: none; clip-path: circle(0px at var(--rx) var(--ry)); transition: clip-path .6s cubic-bezier(.65,0,.35,1) }
+.pagecover.on { clip-path: circle(150vmax at var(--rx) var(--ry)) }
+.pagecover.out { clip-path: circle(0px at var(--rx) var(--ry)); transition-duration: .7s }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; transition: background .4s, color .4s }
+img { display: block; max-width: 100% }
+.sw > .m > img, .lay img { max-width: none }   /* oversized on purpose: room to drift */
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+figure { margin: 0 }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { padding: 0 var(--gut) }
+
+/* station readout */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px; font-variant-numeric: tabular-nums }
+.station .nm { font-size: 13px; font-weight: 500 }
+
+/* ---------- needle sweep: the frame opens behind a red needle that carries a tuning readout ---------- */
+.sw { position: relative; overflow: hidden; background: var(--panel) }
+.sw > .m { position: absolute; inset: 0; clip-path: inset(0 100% 0 0); transition: clip-path 1.25s var(--sweep) }
+.sw[data-dir="l"] > .m { clip-path: inset(0 0 0 100%) }
+.sw.in > .m { clip-path: inset(0 0 0 0) }
+.sw.hero > .m { transition-duration: .85s } .sw.hero.in .needle { animation-duration: .85s }
+.sw > .m > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.sw > .m > img { position: absolute; left: -6%; top: -8%; width: 112%; height: 116%; object-fit: cover; transform: translate3d(calc(var(--px, 0px) + var(--mx, 0) * 22px), calc(var(--py, 0px) + var(--my, 0) * 14px), 0) scale(var(--z)); --z: 1.12; transition: --z 1.8s var(--ease); will-change: transform }
+.sw.in > .m > img { --z: 1 }
+.needle { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: var(--red); z-index: 3; opacity: 0; pointer-events: none }
+.needle i { position: absolute; top: 14px; left: 8px; font: 500 10px var(--mono); letter-spacing: .5px; color: #fff; background: var(--red); padding: 3px 6px; white-space: nowrap; font-style: normal }
+.sw[data-dir="l"] .needle i { left: auto; right: 8px }
+.sw.in .needle { animation: needleR 1.25s var(--sweep) forwards }
+.sw[data-dir="l"].in .needle { animation-name: needleL }
+@keyframes needleR { 0% { left: 0; opacity: 1 } 88% { opacity: 1 } 100% { left: 100%; opacity: 0 } }
+@keyframes needleL { 0% { left: 100%; opacity: 1 } 88% { opacity: 1 } 100% { left: 0; opacity: 0 } }
+.sw .lab { position: absolute; top: 14px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 2; color: #fff; mix-blend-mode: difference; pointer-events: none; opacity: 0; transition: opacity .6s .9s }
+.sw.in .lab { opacity: 1 }
+
+/* mouse parallax (as on Designs): frames drift against the cursor by their depth, pictures pan inside them,
+   and the text moves a touch the other way, so the page has layers */
+.sw, .frame { translate: calc(var(--mx, 0) * var(--dep, 12) * -1px) calc(var(--my, 0) * var(--dep, 12) * -.55px) }
+.title h1, .story, .facts, .statement p, .swap .txt h3, .next h3 { translate: calc(var(--mx, 0) * 6px) calc(var(--my, 0) * 4px) }
+/* text and rules */
+.rv { opacity: 0; transform: translateY(28px); transition: opacity .8s var(--ease), transform 1.2s var(--pop); transition-delay: var(--dl, 0s) }
+.rv.in { opacity: 1; transform: none }
+.rule { display: block; height: 1px; background: var(--line); transform: scaleX(0); transform-origin: left; transition: transform 1.2s var(--sweep); transition-delay: var(--dl, 0s) }
+.rule.in { transform: none }
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em }
+.w > span { display: inline-block; transform: translateY(105%); transition: transform 1.3s var(--pop); transition-delay: calc(var(--i) * 60ms + 250ms) }
+.w.in > span { transform: none }
+
+/* hero */
+.hero { margin-top: 96px; height: min(80vh, 780px) }
+.notch { position: absolute; width: 7%; background: var(--bg); z-index: 4; transition: background .4s }
+.notch.l { left: 0; top: 39%; height: 26% } .notch.r { right: 0; top: 30%; height: 24% }
+
+/* title */
+.title { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; padding: 64px 0 40px }
+.title h1 { margin: 0; color: var(--ink); font-size: clamp(48px, 8vw, 132px); line-height: .9; font-weight: 500; letter-spacing: -0.055em; text-wrap: balance }
+
+/* split */
+.info { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); position: relative }
+.info .vline { position: absolute; top: 0; bottom: 0; left: calc(5 / 12 * 100%); width: 1px; background: var(--line); transform: scaleY(0); transform-origin: top; transition: transform 1.2s var(--sweep) .2s }
+.info.in .vline { transform: none }
+.facts { margin: 0; padding-right: 40px }
+.fact { padding: 24px 0 0 }
+.fact dt { margin-bottom: 12px }
+.fact dd { margin: 0 0 24px; color: var(--ink); font-size: 15px; font-weight: 500 }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { transition: transform .5s var(--pop), background .2s, color .2s; font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--ink); background: var(--pill); padding: 8px 11px; transition: background .2s, color .2s }
+.chip:hover { background: var(--ink); color: var(--on-ink); transform: translateY(-3px) }
+.chip.cat { background: var(--red); color: #fff }
+.tools { display: flex; gap: 8px }
+.tools img { width: 34px; height: 34px; border-radius: 27%; box-shadow: 0 0 0 1px var(--edge); transition: transform .5s var(--pop) }
+.tools img:hover { transform: translateY(-3px) }
+.todo { color: var(--muted); font-weight: 400; font-style: italic }
+.story { padding: 26px 0 48px 40px; max-width: 720px }
+.story h2 { margin: 0 0 18px; font-size: 15px; font-weight: 600; color: var(--ink) }
+.story p { margin: 0 0 16px; font-size: 15px; line-height: 1.6 }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px }
+.btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 500; isolation: isolate }
+.btn.solid { background: var(--ink); color: var(--on-ink) }
+.btn::before { content: ""; position: absolute; inset: 0; background: var(--red); transform: translateX(-101%); transition: transform .45s var(--sweep); z-index: -1 }
+.btn:hover { color: #fff } .btn:hover::before { transform: none }
+
+/* gallery */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 0 }
+.two .sw, .stack .sw { aspect-ratio: 4 / 5 }
+.full { aspect-ratio: 16 / 9; margin: 16px 0 }
+
+/* horizontal gallery */
+.hrun { position: relative; margin: 0 calc(-1 * var(--gut)) }
+.hpin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center }
+.hhead { position: absolute; top: 100px; left: var(--gut); right: var(--gut); display: flex; justify-content: space-between; align-items: baseline }
+.hhead b { color: var(--ink); font-weight: 500 }
+.htrack { display: flex; gap: 16px; padding: 0 var(--gut); width: max-content; will-change: transform }
+.htrack .sw { flex: none; height: min(64vh, 700px); aspect-ratio: 4 / 5 }
+.htrack .sw.wide { aspect-ratio: 16 / 10 }
+.htrack .sw > .m > img { left: -8%; width: 116% }
+.hbar { position: absolute; left: var(--gut); right: var(--gut); bottom: 92px; height: 1px; background: var(--line) }
+.hbar i { position: absolute; inset: 0; background: var(--red); transform: scaleX(0); transform-origin: left }
+/* statement: words fill in as you read */
+.statement { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding: 140px 0 }
+.statement p { margin: 0; padding-left: 40px; font-size: clamp(28px, 3.6vw, 52px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance }
+.statement p span { color: var(--faint); transition: color .35s }
+.statement p span.on { color: var(--ink) }
+
+/* sticky text + stack */
+.sticky { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin: 48px 0 }
+.sticky .txt { position: sticky; top: 120px; align-self: start; padding-right: 40px }
+.sticky .txt h3 { margin: 12px 0 14px; color: var(--ink); font-size: 24px; font-weight: 500; letter-spacing: -.4px }
+.sticky .txt p { margin: 0; font-size: 15px; line-height: 1.6; max-width: 38ch }
+.sticky .count { margin-top: 28px; display: flex; align-items: baseline; gap: 6px }
+.sticky .count b { color: var(--ink); font: 500 28px var(--body); letter-spacing: -.5px; font-variant-numeric: tabular-nums }
+.stack { display: grid; gap: 16px }
+
+/* pinned text, pictures swap in place */
+.swap { position: relative; margin: 48px calc(-1 * var(--gut)) 48px 0 }
+.spin { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) }
+.swap .txt { padding: 150px 40px 0 0 }
+.swap .txt h3 { margin: 12px 0 14px; color: var(--ink); font-size: 30px; font-weight: 500; letter-spacing: -.6px }
+.swap .txt p { margin: 0; font-size: 16px; line-height: 1.6; max-width: 38ch }
+.swap .count { margin-top: 36px; display: flex; align-items: baseline; gap: 6px }
+.swap .count b { color: var(--ink); font: 500 40px var(--body); letter-spacing: -1px; font-variant-numeric: tabular-nums }
+.swap .ticks { display: flex; gap: 6px; margin-top: 14px }
+.swap .ticks i { width: 26px; height: 2px; background: var(--line); transform-origin: left; transition: background .4s, transform .8s var(--pop) }
+.swap .ticks i.on { transform: scaleY(2) }
+.swap .ticks i.on { background: var(--red) }
+.frame { position: relative; overflow: hidden; background: var(--panel); margin-bottom: 64px }
+.lay { position: absolute; inset: 0; clip-path: inset(0 100% 0 0); transition: clip-path 1.15s var(--sweep) }
+.lay:first-child, .lay.on { clip-path: inset(0 0 0 0) }
+.lay img { position: absolute; left: -4%; top: -4%; width: 108%; height: 108%; object-fit: cover; translate: calc(var(--mx, 0) * 20px) calc(var(--my, 0) * 12px); transform: scale(var(--z)); --z: 1; transition: --z 1s var(--ease), filter 1s var(--ease) }
+.lay.under img { --z: .93; filter: brightness(.5) }
+.lay.pop img { animation: layPop 1.4s var(--pop) }
+@keyframes layPop { from { transform: scale(1.14) } to { transform: scale(1) } }
+.swap .count b { display: inline-block; overflow: hidden; height: 1em; line-height: 1 }
+.swap .count b span { display: inline-block; animation: roll .9s var(--pop) }
+@keyframes roll { from { transform: translateY(100%) } to { transform: none } }
+.swap .txt, .frame { will-change: transform, clip-path }
+.lay .lab { position: absolute; top: 96px; left: 20px; right: 20px; display: flex; justify-content: space-between; color: #fff; mix-blend-mode: difference }
+.frame .needle { z-index: 5 }
+.frame .needle.go { animation: needleR 1.15s var(--sweep) forwards }
+.frame .needle.back { animation: needleL 1.15s var(--sweep) forwards }
+/* palette */
+.pal { margin: 16px 0; background: var(--panel); padding: 52px 16px 16px; position: relative }
+.pal .lab { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between }
+.pal .row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) }
+.chipc { aspect-ratio: 4 / 3; display: flex; align-items: flex-end; padding: 12px; font: 500 11px var(--mono); clip-path: inset(100% 0 0 0); transition: clip-path .9s var(--sweep); transition-delay: calc(var(--k) * 90ms) }
+.pal.in .chipc { clip-path: inset(0 0 0 0) }
+
+/* next */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 180px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq { grid-column: 1; grid-row: 1 } .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em } .next .th { grid-column: 2; grid-row: 1 / 3 }
+.next h3 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .8s var(--pop) }
+.next:hover h3 { transform: translateX(12px) }
+.next .sw { aspect-ratio: 4 / 5 }
+.next:hover .sw > .m > img { --z: 1.05 }
+
+/* section dial */
+.sdial { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 30; pointer-events: none }
+.sdial::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 35%, transparent); }
+.sdial canvas { position: relative; width: 100%; height: 100% }
+
+@media (prefers-reduced-motion: reduce) {
+  .sw > .m, .rv, .rule, .info .vline, .chipc, .w > span { clip-path: none !important; transform: none !important; opacity: 1 !important; transition: none !important }
+  .sw > .m > img { --z: 1; transition: none } .needle { display: none } .sw .lab { opacity: 1; transition: none }
+}
+@media (max-width: 899px) {
+  :root { --gut: 16px }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .hero { margin-top: 116px; height: 58vh }
+  .title { padding: 36px 0 24px } .title .mono { display: none }
+  .info, .statement, .sticky, .next { grid-template-columns: 1fr }
+  .info .vline { display: none } .facts { padding-right: 0 }
+  .story { padding: 28px 0 40px }
+  .two { grid-template-columns: 1fr; gap: 12px }
+  .htrack { gap: 12px } .htrack .sw { height: 52vh } .hhead { top: 120px } .hbar { bottom: 84px }
+  .statement { padding: 80px 0 } .statement p { padding: 16px 0 0 }
+  .swap { margin-right: calc(-1 * var(--gut)) } .spin { grid-template-columns: 1fr; grid-template-rows: auto 1fr }
+  .swap .txt { padding: 112px 0 16px } .swap .txt h3 { font-size: 22px } .swap .txt p { font-size: 14px } .swap .count { margin-top: 14px } .swap .count b { font-size: 28px }
+  .lay .lab { top: 14px } .frame { margin: 0 0 64px calc(-1 * var(--gut)) }
+  .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px }
+  .chipc { font-size: 9px; padding: 6px }
+}
+
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
+.next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
+@media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+</style>
+</head>
+<body>
+<div class="station" data-readout><a class="back" href="__BACK__" id="back"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="fq"></span><span class="nm" id="nm"></span></div>
+<main class="wrap" id="page"></main>
+<div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
+
+__POPKIT__<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const A = __ITEMS__, TOOL_SRC = __TOOLS__;   // pieces by category (as on Designs) and the tool icons
+  const CAT = { '3d': '3D', brand: 'Brand', motion: 'Motion', product: 'Product' };
+  const all = []; for (const k of ['3d', 'product', 'brand', 'motion']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
+  const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const idx = t => all.findIndex(x => x.t === t);
+  const pad = i => String(i + 1).padStart(2, '0');
+  const FQ = i => +(100 + (i + 1) / 10).toFixed(1);
+  const $ = id => document.getElementById(id);
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}   // Home's sound switch
+  const snd = n => { if (soundOn && window.Popkit) Popkit.play(n); };
+
+  // stand-in copy per category; real projects carry their own
+  const COPY = {
+    Brand: { lead: 'Giving the brand something to hold', did: ['Brand identity', '3D modelling', 'Art direction', 'Illustration'], tools: ['blender', 'figma'],
+      p: ['The brief was simple: take the identity off the screen. I started from the system itself, its colours, marks and tone of voice, and asked where it could live as a physical thing.',
+          'Each object was modelled and dressed in the brand’s language, down to the stickers, stitching and texture, so it works as merch, campaign imagery or a hero visual on its own.'],
+      statement: 'A brand you can hold is a brand people remember.',
+      side: ['Details', 'Small things carry the identity', 'Stickers, stitching and surface texture do most of the talking. Each one was drawn in the brand’s own shapes before it was modelled.'] },
+    Motion: { lead: 'A single frame that still feels fast', did: ['Animation', '3D', 'Art direction', 'Lighting'], tools: ['blender', 'aftereffects'],
+      p: ['I animated the full move first, then hunted for the frame where the motion reads best: the moment just before or after the peak.',
+          'Motion blur, camera angle and colour were pushed together so each still carries the energy of the loop it came from.'],
+      statement: 'Speed is something you feel before you see it.',
+      side: ['Frames', 'Choosing the moment', 'Out of a few hundred frames, only a handful hold the whole move. These are the ones that made it.'] },
+    '3D': { lead: 'Everyday objects, made to feel precious', did: ['3D modelling', 'Lighting', 'Materials', 'Art direction'], tools: ['blender', 'photoshop'],
+      p: ['Each piece starts as a plain object and a single idea about how it should feel: weightless, safe, rewarding.',
+          'Light and material do the rest. Soft shadows, saturated backdrops and a little exaggeration in form make them read instantly at any size.'],
+      statement: 'Light does most of the storytelling.',
+      side: ['Process', 'From clay to colour', 'Every render begins grey. Form and light are settled first, colour and material come last.'] },
+    Product: { lead: 'A small control with real weight', did: ['Interaction design', 'Prototyping', 'Front-end'], tools: ['figma', 'claude'],
+      p: ['I mapped every state of the control first: idle, hover, drag, snap and settle.', 'Then I built it in code with timing, easing and sound tuned by hand.'],
+      statement: 'Feel is a feature.', side: ['States', 'Every state mapped', 'Idle, hover, drag, snap and settle.'] }
+  };
+  const TOOL = { blender: 'Blender', figma: 'Figma', photoshop: 'Adobe Photoshop', aftereffects: 'Adobe After Effects', claude: 'Claude' };
+  // which project: the address says (project.html#card-holder-with-stickers)
+  const fromHash = () => { const i = all.findIndex(x => slug(x.t) === decodeURIComponent(location.hash.slice(1))); return i >= 0 ? i : 0; };
+  let cur = fromHash();
+  if (location.hash && all[cur].page) location.replace(all[cur].page);   // this piece uses another layout (CMS)
+  const HN = 5;   // pictures in the horizontal gallery
+  const SWN = 4;  // pictures that swap in place beside the pinned text
+  // Pacing. Each swapped picture gets a little over a screen of scrolling; the gallery row moves at 60% of
+  // the scroll speed; both hold still for a moment at the start and end so nothing flashes past.
+  const SW_PER = 1.15, H_SPEED = .6, HOLD = .18;
+
+  // a picture that arrives behind the needle. fq = the station the needle tunes to as it crosses
+  let swN = 0;
+  const sw = (x, a, b, cls = '', dir) => {
+    const k = swN++, d = dir || (k % 2 ? 'l' : 'r');
+    return `<figure class="sw ${cls}" data-dir="${d}" data-fq="${(88.1 + k * 2.3).toFixed(1)}"><div class="m">${x.video && cls.includes('hero') ? `<video src="${x.video}" poster="${x.src}" muted loop playsinline autoplay></video>` : (cls.includes('hero') ? `<img src="${x.src}" alt="${x.t}" fetchpriority="high">` : `<img src="${x.src}" alt="${x.t}" loading="lazy" decoding="async">`)}</div><span class="needle"><i>87.5</i></span><div class="lab mono"><span>${a}</span><span>${b}</span></div></figure>`;
+  };
+  const page = $('page');
+  function render() {
+    swN = 0;
+    const it = all[cur], c = COPY[it.cat], nx = all[(cur + 1) % all.length];
+    const others = all.filter((x, j) => j !== cur && x.cat === it.cat).concat(all.filter(x => x.cat !== it.cat));
+    const g = k => others[k % others.length];
+    $('fq').textContent = FQ(cur).toFixed(1); $('nm').textContent = it.t;   // each piece has its own station just above Designs' 100.0
+    const words = t => t.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
+    const fact = (k, v, dl) => `<div class="fact rv" style="--dl:${dl}s"><dt class="mono">${k}</dt><dd>${v}</dd></div><i class="rule" style="--dl:${dl + .1}s"></i>`;
+    page.innerHTML = `
+      ${sw(it, '', '', 'hero', 'r')}
+      <header class="title"><h1>${words(it.t)}</h1><span class="mono rv" style="--dl:.5s">${pad(cur)} / ${all.length} · ${it.cat}</span></header>
+      <i class="rule"></i>
+      <section class="info" id="sec-story"><i class="vline"></i>
+        <dl class="facts">
+          ${fact('Category', `<span class="chips"><span class="chip cat">${it.cat}</span></span>`, 0)}
+          ${fact('Client', '<span class="todo">Client name</span>', .06)}
+          ${fact('Year', '<span class="todo">Year</span>', .12)}
+          ${fact('What I did', `<span class="chips">${c.did.map(d => `<span class="chip">${d}</span>`).join('')}</span>`, .18)}
+          <div class="fact rv" style="--dl:.24s"><dt class="mono">Tools</dt><dd><span class="tools">${c.tools.map(t => `<img src="${TOOL_SRC[t]}" alt="${TOOL[t]}" title="${TOOL[t]}">`).join('')}</span></dd></div>
+        </dl>
+        <div class="story rv" style="--dl:.15s"><h2>${c.lead}</h2>${c.p.map(p => `<p>${p}</p>`).join('')}
+          <div class="btns"><a class="btn solid" href="#" onclick="return false">View on Behance ↗</a><a class="btn" href="#" onclick="return false">Live site ↗</a></div></div>
+      </section>
+      <i class="rule"></i>
+      <section class="hrun" id="sec-gallery"><div class="hpin">
+        <div class="hhead"><span class="mono">Gallery · scroll</span><span class="mono"><b id="hc">01</b> / 0${HN}</span></div>
+        <div class="htrack" id="htrack">${[0, 1, 5, 6, 7].map((n, k) => sw(g(n), g(n).t, '0' + (k + 1), k === 2 ? 'wide' : '', 'r')).join('')}</div>
+        <div class="hbar"><i id="hbar"></i></div>
+      </div></section>
+      <i class="rule"></i>
+      <section class="statement" id="sec-statement"><span class="mono">${it.cat} · ${pad(cur)}</span><p id="stmt">${c.statement.split(' ').map(w => `<span>${w}</span>`).join(' ')}</p></section>
+      <i class="rule"></i>
+      <section class="swap" id="sec-detail" style="height:${(SWN * SW_PER + HOLD * 2) * 100 + 100}vh"><div class="spin">
+        <div class="txt"><span class="mono">${c.side[0]}</span><h3>${c.side[1]}</h3><p>${c.side[2]}</p>
+          <div class="count mono"><b id="cnt"><span>01</span></b> / 0${SWN}</div><div class="ticks">${Array.from({ length: SWN }, (_, k) => `<i data-k="${k}"></i>`).join('')}</div></div>
+        <div class="frame" id="frame">${[2, 3, 8, 9].map((n, k) => `<figure class="lay${k ? '' : ' on'}"><img src="${g(n).src}" alt="${g(n).t}"><div class="lab mono"><span>${g(n).t}</span><span>0${k + 1}</span></div></figure>`).join('')}
+          <span class="needle" id="sneedle"><i>87.5</i></span></div>
+      </div></section>
+      <section id="sec-palette"><figure class="pal" id="pal"><div class="lab mono"><span>Palette</span><span>Sampled from the piece</span></div><div class="row" id="palrow"></div></figure>
+        ${sw(g(4), g(4).t, '05 · In context', 'full', 'r')}</section>
+      <i class="rule"></i>
+      <a class="next" href="#" id="next"><span class="mono rv">Next on the dial · ${pad((cur + 1) % all.length)} · ${nx.cat}</span>
+        <span class="r"><h3 class="rv" style="--dl:.1s">${nx.t} →</h3>${sw(nx, '', '', '', 'r')}</span></a>`;
+    palette(it.src);
+    $('next').addEventListener('click', e => { e.preventDefault(); snd('pop'); const n = all[(cur + 1) % all.length];
+      if (n.page && window.Tuner) { Tuner.go({ from: FQ(cur), to: FQ((cur + 1) % all.length), name: n.t, href: n.page }); return; }   // a piece with its own layout (CMS)
+      cover(e.clientX, e.clientY, () => { location.hash = slug(n.t); }); });
+    document.title = it.t + ' · Kingsley M.';
+    try { sessionStorage.setItem('km-return', it.t); } catch (_) {}   // Designs reopens on this piece
+    page.querySelectorAll('.sw').forEach((el, k) => el.style.setProperty('--dep', el.classList.contains('hero') ? 8 : 10 + (k % 3) * 7));
+    observe();
+    secs = ['sec-story', 'sec-gallery', 'sec-statement', 'sec-detail', 'sec-palette', 'next'].map($);
+    stmtWords = [...$('stmt').children];
+    swapSec = $('sec-detail'); lays = [...document.querySelectorAll('#frame .lay')]; swapIdx = 0;
+    hrun = $('sec-gallery'); htrack = $('htrack'); hpanels = [...htrack.children]; sizeH();
+  }
+  function go() { SS.cur = SS.target = 0; scrollTo(0, 0); render(); }
+  // a circle of the page colour grows from (x, y); then() runs under it; it opens again from the same point
+  function cover(x, y, then) {
+    const c = document.createElement('div'); c.className = 'pagecover'; c.style.setProperty('--rx', x + 'px'); c.style.setProperty('--ry', y + 'px');
+    document.body.appendChild(c);
+    if (reduce) { then(); c.remove(); return; }
+    requestAnimationFrame(() => c.classList.add('on'));
+    setTimeout(() => { then(); requestAnimationFrame(() => { c.classList.add('out'); setTimeout(() => c.remove(), 750); }); }, 620);
+  }
+  addEventListener('hashchange', () => { const i = fromHash(); if (all[i].page) { location.replace(all[i].page); return; } if (i !== cur) { cur = i; go(); } });
+  $('back').addEventListener('click', e => {
+    if (reduce || e.metaKey || e.ctrlKey) return;
+    e.preventDefault(); snd('pop');
+    const href = e.currentTarget.href;
+    if (window.Tuner) { Tuner.go({ from: FQ(cur), to: 100, name: 'Designs', href }); return; }
+    const r = e.currentTarget.getBoundingClientRect();
+    cover(r.left + r.width / 2, r.top + r.height / 2, () => { location.href = href; });
+  });
+  addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('.pagecover').forEach(c => c.remove()); });
+  if (document.documentElement.classList.contains('entering')) {
+    requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('go')));
+    setTimeout(() => document.documentElement.classList.remove('entering', 'go'), 650);
+  }
+
+  function palette(src) {
+    const im = new Image(); im.onload = () => {
+      if (!im.width) return;
+      const c = document.createElement('canvas'), w = 64, h = Math.max(1, Math.round(64 * im.height / im.width)); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data, b = {};
+      for (let k = 0; k < d.length; k += 4) { const key = (d[k] >> 4) + ',' + (d[k + 1] >> 4) + ',' + (d[k + 2] >> 4); const o = b[key] || (b[key] = { n: 0, r: 0, g: 0, b: 0 }); o.n++; o.r += d[k]; o.g += d[k + 1]; o.b += d[k + 2]; }
+      const cols = Object.values(b).sort((a, z) => z.n - a.n).map(o => [o.r / o.n, o.g / o.n, o.b / o.n]), out = [];
+      for (const col of cols) { if (out.every(o => Math.hypot(o[0] - col[0], o[1] - col[1], o[2] - col[2]) > 60)) out.push(col); if (out.length === 5) break; }
+      const hex = v => '#' + v.map(n => Math.round(n).toString(16).padStart(2, '0')).join('').toUpperCase();
+      const el = $('palrow'); if (!el) return;
+      el.innerHTML = out.map((o, k) => { const l = .299 * o[0] + .587 * o[1] + .114 * o[2]; return `<div class="chipc" style="--k:${k};background:${hex(o)};color:${l > 150 ? '#000' : '#fff'}">${hex(o)}</div>`; }).join('');
+    }; im.src = src;
+  }
+
+  // ---------- arrivals ----------
+  // the needle's readout counts up to the panel's station while it crosses, and a detent ticks as it lands
+  function sweepTag(fig) {
+    const tag = fig.querySelector('.needle i'); if (!tag) return;
+    const to = +fig.dataset.fq, t0 = performance.now();
+    (function f(now) { const k = Math.min(1, (now - t0) / 1150), e = 1 - Math.pow(1 - k, 3); tag.textContent = (87.5 + (to - 87.5) * e).toFixed(1); if (k < 1) requestAnimationFrame(f); })(t0);
+  }
+  let io = null;
+  function observe() {
+    if (io) io.disconnect();
+    const els = page.querySelectorAll('.sw, .rv, .rule, .info, .pal');
+    if (reduce) { els.forEach(e => e.classList.add('in')); page.querySelectorAll('.w').forEach(w => w.classList.add('in')); return; }
+    io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in');
+      if (e.target.classList.contains('sw')) sweepTag(e.target);
+    }), { rootMargin: '0px 0px -12% 0px', threshold: .02 });
+    const hero = page.querySelector('.sw.hero'); if (hero) { hero.classList.add('in'); sweepTag(hero); }
+    els.forEach(e => { if (e !== hero) io.observe(e); });
+    requestAnimationFrame(() => page.querySelectorAll('.w').forEach(w => w.classList.add('in')));
+  }
+
+  // ---------- smooth scrolling (mouse and trackpad; touch keeps native scrolling) ----------
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, mine: false };
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  if (smooth) {
+    addEventListener('wheel', e => {
+      if (e.ctrlKey) return; e.preventDefault();
+      const raw = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1);
+      SS.target = Math.max(0, Math.min(maxY(), SS.target + Math.max(-140, Math.min(140, raw * .85))));
+    }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
+  }
+
+  // a spring: chases its target, overshoots a little, settles
+  const spring = (k = 170, c = 16) => ({ x: 0, v: 0, step(t, dt) { const s = Math.min(dt, 32) / 1000; this.v += (k * (t - this.x) - c * this.v) * s; this.x += this.v * s; return this.x; } });
+  const dialS = spring(140, 17), enterS = spring(90, 14);
+  // ---------- per frame: smooth scroll, parallax, statement fill, stack counter, section dial ----------
+  // horizontal gallery: the section is as tall as the row is wide, so scrolling down moves the row sideways
+  let hrun = null, htrack = null, hpanels = [], hlen = 0, hlast = -1, hx = 0;
+  function sizeH() { if (!htrack) return; hlen = Math.max(0, htrack.scrollWidth - innerWidth); hrun.style.height = (innerHeight * (1 + HOLD * 2) + hlen / H_SPEED) + 'px'; }
+  addEventListener('resize', sizeH);
+  let secs = [], stmtWords = [], swapSec = null, lays = [], swapIdx = 0, prevT = performance.now(), sp = 0, lastSt = -1;
+  const SECN = ['Intro', 'Story', 'Gallery', 'Statement', 'Detail', 'Palette', 'Next'];
+  const sd = $('sdial'), sx = sd.getContext('2d');
+  // mouse position, -1…1 from the centre, eased so the layers glide (mouse and trackpad only)
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  if (!reduce && matchMedia('(pointer: fine)').matches) {
+    addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return; tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+    document.addEventListener('mouseleave', () => { tmx = tmy = 0; });
+  }
+  function frame(now) {
+    const dt = Math.min(64, now - prevT); prevT = now;
+    if (smooth) {
+      SS.cur += (SS.target - SS.cur) * (1 - Math.exp(-dt / 150));
+      if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target;
+      if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); }
+    }
+    const vh = innerHeight;
+    if (tmx || tmy || Math.abs(mx) + Math.abs(my) > .0005) {
+      const k = 1 - Math.exp(-dt / 140); mx += (tmx - mx) * k; my += (tmy - my) * k;
+      document.documentElement.style.setProperty('--mx', mx.toFixed(4)); document.documentElement.style.setProperty('--my', my.toFixed(4));
+    }
+    const hero = page.querySelector('.hero');
+    if (hero && !reduce) { const r = hero.getBoundingClientRect(), p = Math.max(0, Math.min(1, -r.top / r.height)); hero.style.transform = `scale(${(1 - p * .08).toFixed(4)})`; hero.style.opacity = (1 - p * .5).toFixed(3); }
+    if (!reduce) page.querySelectorAll('.sw > .m > img').forEach(im => {      // pictures drift inside their frames
+      const r = im.parentElement.getBoundingClientRect();
+      if (r.bottom < -50 || r.top > vh + 50) return;
+      im.style.setProperty('--py', ((r.top + r.height / 2 - vh / 2) * -.06).toFixed(1) + 'px');
+    });
+    if (htrack) {
+      const r = hrun.getBoundingClientRect(), span = r.height - vh, hold = vh * HOLD;
+      const p = span > 2 * hold ? Math.max(0, Math.min(1, (-r.top - hold) / (span - 2 * hold))) : 0;
+      hx += (p * hlen - hx) * (smooth ? 1 : 1 - Math.exp(-dt / 120));   // touch: soften the phone's own scroll a little
+      htrack.style.transform = `translate3d(${(-hx).toFixed(1)}px,0,0)`;
+      $('hbar').style.transform = `scaleX(${(hlen ? hx / hlen : 0).toFixed(4)})`;
+      let best = 0, bd = 1e9;
+      hpanels.forEach((el, k) => {
+        const b = el.getBoundingClientRect(), c = b.left + b.width / 2 - innerWidth / 2;
+        if (Math.abs(c) < bd) { bd = Math.abs(c); best = k; }
+        const im = el.querySelector('img'); if (im && !reduce) im.style.setProperty('--px', (c * -.07).toFixed(1) + 'px');
+        if (!reduce) el.style.transform = `scale(${(1 - Math.min(.1, Math.abs(c) / innerWidth * .16)).toFixed(4)})`;
+      });
+      if (best !== hlast) { if (hlast >= 0) snd('detent'); hlast = best; $('hc').textContent = '0' + (best + 1); }
+    }
+    if (stmtWords.length) {                                                       // statement fills in as you read
+      const r = $('stmt').getBoundingClientRect(), p = Math.max(0, Math.min(1, (vh * .82 - r.top) / (r.height + vh * .35)));
+      const n = Math.round(p * stmtWords.length); stmtWords.forEach((w, k) => w.classList.toggle('on', k < n));
+    }
+    if (swapSec) {                                       // pinned text, pictures change in place, then the page moves on
+      const r = swapSec.getBoundingClientRect(), span = r.height - vh;
+      const hold = vh * HOLD, p = span > 2 * hold ? Math.max(0, Math.min(.9999, (-r.top - hold) / (span - 2 * hold))) : 0, k = Math.floor(p * SWN);
+      if (k !== swapIdx) swapTo(k);
+      const q = enterS.step(Math.max(0, Math.min(1, 1 - r.top / vh)), dt);              // 0 = section below the screen, 1 = arrived
+      if (!reduce) {
+        const g = Math.max(0, 1 - q);
+        $('frame').style.clipPath = `inset(${(g * 14).toFixed(2)}% ${(g * 10).toFixed(2)}% ${(g * 14).toFixed(2)}% ${(g * 10).toFixed(2)}%)`;
+        swapSec.querySelector('.txt').style.transform = `translate3d(0,${(g * 80).toFixed(1)}px,0)`;
+        swapSec.querySelector('.txt').style.opacity = Math.min(1, q * 1.3).toFixed(3);
+      }
+    }
+    // section dial
+    const mid = vh / 2; let f = 0;
+    secs.forEach((el, k) => { if (!el) return; const r = el.getBoundingClientRect(); if (r.top < mid) { const fr = Math.min(1, Math.max(0, (mid - r.top) / Math.max(1, r.height))), e = Math.max(0, (fr - .8) / .2); f = k + 1 + e * e * (3 - 2 * e) * .999; } });   // rests on a section's label, moves on near its end
+    sp = reduce ? f : dialS.step(f, dt);
+    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const dpr = Math.min(2, devicePixelRatio || 1), W = sd.clientWidth, H = sd.clientHeight;
+    if (sd.width !== Math.round(W * dpr)) { sd.width = Math.round(W * dpr); sd.height = Math.round(H * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);
+    const SP = 30, base = H - 22, col = ink();
+    for (let q = -20; q <= (SECN.length - 1) * 5 + 20; q++) {
+      const x = W / 2 + q * SP - sp * 5 * SP; if (x < -10 || x > W + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(x - W / 2) / SP;
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = (major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(x, base); sx.lineTo(x, base - L); sx.stroke();
+      if (major) { sx.globalAlpha = d < 2.5 ? 1 : .5; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'center'; sx.fillText(SECN[q / 5].toUpperCase(), x, base + 15); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(W / 2 - 1.5, base - 34, 3, 36);
+    requestAnimationFrame(frame);
+  }
+
+  // the next picture sweeps in over the last behind the needle (or back out, scrolling up)
+  function swapTo(k) {
+    const fwd = k > swapIdx; swapIdx = k;
+    lays.forEach((l, j) => { l.classList.toggle('on', j <= k); l.classList.toggle('under', j < k); l.classList.remove('pop'); });
+    if (fwd && !reduce) { void lays[k].offsetWidth; lays[k].classList.add('pop'); }
+    $('cnt').innerHTML = `<span>0${k + 1}</span>`;
+    document.querySelectorAll('.swap .ticks i').forEach((t, j) => t.classList.toggle('on', j <= k));
+    snd('detent');
+    if (reduce) return;
+    const n = $('sneedle'), tag = n.querySelector('i');
+    n.classList.remove('go', 'back'); void n.offsetWidth; n.classList.add(fwd ? 'go' : 'back');
+    const to = 88.1 + (k + 4) * 2.3, from = 87.5, t0 = performance.now();
+    (function f(now) { const q = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - q, 3); tag.textContent = (from + (to - from) * e).toFixed(1); if (q < 1) requestAnimationFrame(f); })(t0);
+  }
+  render(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
