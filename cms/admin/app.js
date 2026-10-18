@@ -441,7 +441,9 @@
   async function vSettings(v) {
     head('Site', 'Settings');
     C.site.analytics = C.site.analytics || { goatcounter: '' };
+    if (C.site.available === undefined) C.site.available = true;
     const tok = el('input', { type: 'text', placeholder: HAS_TOKEN ? 'Saved on this Mac · paste a new one to replace it' : 'Paste your GoatCounter API token' });
+    v.append(form([{ title: 'Availability', help: 'Shown on Home (“Open to new work”), on About (On air) and in the For recruiters card.', fields: [{ k: 'available', label: 'Taking new work', type: 'bool' }] }], C.site, 'site'));
     v.append(form([{ title: 'Analytics', help: 'Free and private: GoatCounter counts visits without cookies. Make an account at goatcounter.com, then put your site code here.', fields: [{ k: 'goatcounter', label: 'GoatCounter code', ph: 'kingsley', help: 'The first part of your GoatCounter address: kingsley.goatcounter.com → kingsley' }] }], C.site.analytics, 'site'),
       el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Analytics API token' }), el('p', { class: 'help', text: 'So this CMS can show your numbers. In GoatCounter: Settings → API → New token, tick “Read statistics”. It stays on this Mac (it is never published).' }),
         el('div', { class: 'f' }, tok), el('button', { class: 'btn small', type: 'button', style: 'justify-self:start', text: 'Save token', onclick: async () => { if (!tok.value.trim()) return; await api('/api/secrets', { method: 'PUT', body: JSON.stringify({ goatcounter_token: tok.value.trim() }) }); HAS_TOKEN = true; tok.value = ''; tok.placeholder = 'Saved on this Mac'; toast('Token saved'); } })));

@@ -54,6 +54,9 @@ figure:has(> .pn.vfirst.land) .cap { max-width: none !important }
 .txt.brief { padding-top: 0 }                     /* sits right under the overview, as one block */
 .inote { margin: 22px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); max-width: 60ch }
 .cam .pn { overflow: hidden }
+.cam.still .pin { position: relative; top: auto }   /* a still picture: it scrolls by like the rest of the page */
+.cam.still .pin .pn.fit { height: min(calc(100svh - 120px), calc((100vw - 96px) / 1.35)) }   /* taller: nearly a full screen */
+.cam.still .pin { height: auto; padding: 40px 0 }
 .camonly .pin .pn.fit { height: min(calc(100svh - 260px), calc((100vw - 400px) / 1.5)) }   /* just the picture, so it can be bigger */ .cam .cw { position: absolute; inset: 0 }
 .cam .cw .camimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
 /* flow */
@@ -143,7 +146,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
       const ST = [[.5, .5, 1, SH[0][1], SH[0][3]], [.3, .34, 2, E[1][0][0], E[1][0][1]], [.7, .46, 2.1, E[1][1][0], E[1][1][1]], [.5, .72, 1.8, SH[0][1], CS.blurb]];
       body.innerHTML = `<section class="flw" ${pinH(4)}><div class="pin"><div class="fwin"><div class="frow" id="frow">${S4.map((s, i) => `<div class="pn fcard${i === 1 || i === 2 ? ' tall' : ''}"><div class="in shotw">${shot(s[0])}</div><span class="fst mono">0${i + 1} · ${FQ4[i]}</span></div>`).join('')}</div><i class="fneedle"></i></div>
         ${CAPBOX('fc')}</div></section>${EXP}
-        <section class="cam camonly" id="camsec" ${pinH(4)}><div class="pin"><div class="pn on fit" id="cpn"><div class="cw" id="cw">${shot(SH[0][0], 'shot camimg')}</div></div></div></section>`;
+        <section class="cam camonly still" id="camsec"><div class="pin"><div class="pn on fit" id="cpn"><div class="cw" id="cw">${shot(SH[0][0], 'shot camimg')}</div></div></div></section>`;
       const fsec = body.firstChild, row = $('frow'), cards = [...row.children], csec = $('camsec'), cw = $('cw');
       let fcur = -1, ccur = -1;
       tick = (dt, vh) => {
@@ -154,11 +157,11 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
         cards.forEach((c, i) => { const d = Math.abs(q - i); c.style.opacity = (1 - Math.min(1, d) * .55).toFixed(3); c.style.transform = `scale(${(1 - Math.min(1, d) * .08).toFixed(3)})`; });
         const fc = Math.round(q);
         if (fc !== fcur) { if (fcur >= 0) snd('detent'); fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
-        const r = prog(csec, 4, vh), j = Math.min(2, Math.floor(r)), u = r - j, A = ST[j], B = ST[j + 1];
+        /* the closing picture is still now (no camera moving across it)
         const sc = A[2] + (B[2] - A[2]) * u, fx = A[0] + (B[0] - A[0]) * u, fy = A[1] + (B[1] - A[1]) * u, bw = cw.offsetWidth, bh = cw.offsetHeight;
         cw.style.transform = `translate3d(${((.5 - fx) * bw * sc).toFixed(1)}px,${((.5 - fy) * bh * sc).toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
         const cc = Math.round(r);
-        if (cc !== ccur) { if (ccur >= 0) snd('detent'); ccur = cc; }
+        if (cc !== ccur) { if (ccur >= 0) snd('detent'); ccur = cc; } */
       };
     }
     body.insertAdjacentHTML('beforeend', IMP);

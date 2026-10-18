@@ -108,6 +108,8 @@ _dsn = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-
 _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
 _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
 open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
+_site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
+SITEJS = '<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False}) + ';</script>\n'   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
 FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
   'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'
@@ -133,6 +135,7 @@ for _p in PAGES:
     if ANALYTICS and '</head>' in _s: _s = _s.replace('</head>', ANALYTICS + '</head>', 1)
     if 'src="nav.js"' not in _s: _s = _s.replace('</body>', NAV + '</body>', 1)
     if _p == 'index.html' and 'src="homebg.js"' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
+    if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
     if 'src="protips.js"' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
     if _p == 'index.html' and 'src="home.js"' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
     if _p in ('index.html', 'designs.html') and 'src="flow.js"' not in _s:

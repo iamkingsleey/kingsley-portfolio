@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>window.KM_SITE = {"available": true};</script>
+
 <meta charset="utf-8">
 <script>
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
@@ -130,7 +132,12 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .onair { background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 22px; min-height: 420px }
 .onair .lt { display: flex; align-items: center; gap: 10px }
 .onair .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--faint) }
-.onair.live .lamp { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 22%, transparent) }
+.onair .lamp { position: relative }
+.onair.live .lamp { background: #2fb35b }   /* the same green on-air light as Home's "Open to new work", rippling outwards */
+.onair.live .lamp::before, .onair.live .lamp::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgb(47 179 91 / .7); animation: lampring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
+.onair.live .lamp::after { animation-delay: 1.2s }
+@keyframes lampring { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.4); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .onair.live .lamp::before, .onair.live .lamp::after { animation: none; opacity: 0 } }
 .onair .clock { color: var(--ink); font: 500 clamp(56px, 6vw, 88px)/1 var(--body); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
 .onair .clock small { font-size: .32em; color: var(--muted); margin-left: 8px; letter-spacing: 0 }
 .onair dl { margin: auto 0 0; display: grid; gap: 14px }
@@ -151,6 +158,13 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call.sent .done { opacity: 1; pointer-events: auto }
 .call .done b { display: block; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em; margin-top: 12px }
 .call .done .lamp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); vertical-align: middle; margin-right: 8px }
+/* the email, said plainly: in the Call in card, and as the page's sign-off */
+.cmail { color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -.02em; text-decoration: none; margin-top: -6px; width: fit-content; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px }
+.bigmail { display: grid; gap: 14px; padding: calc(var(--sp) + 20px) 0 0; text-decoration: none; color: var(--ink) }
+.bigmail b { font-size: clamp(34px, 6.1vw, 96px); line-height: .98; font-weight: 600; letter-spacing: -.055em; transition: opacity .25s }
+.bigmail b span { white-space: nowrap; display: inline-block }   /* if it has to wrap, it wraps after the @ */
+.bigmail:hover b { opacity: .72 }
+.bigmail i { font-style: normal; color: var(--muted) }
 .foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
 
 @media (max-width: 899px) {
@@ -375,7 +389,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610181817#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610181859#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js" defer></script>

@@ -71,6 +71,48 @@
       "case": "3d-collection"
     },
     {
+      "title": "Gold coins and glass cursor",
+      "category": "3d",
+      "case": "3d-collection",
+      "images": [
+        {
+          "src": "assets/designs/gold-coins-glassy-mouse.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#8e8674",
+      "dark": false,
+      "desc": "A ribbon of gold coins trailing after a glass cursor: money that moves with a click. Modelled and lit in Blender."
+    },
+    {
+      "title": "Silver coins and glass cursor",
+      "category": "3d",
+      "case": "3d-collection",
+      "images": [
+        {
+          "src": "assets/designs/silver-coins-glassy-mouse.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#727272",
+      "dark": true,
+      "desc": "Dark silver coins coiling towards a glass cursor. Modelled and lit in Blender."
+    },
+    {
+      "title": "Stacked coins with cursor",
+      "category": "3d",
+      "case": "3d-collection",
+      "images": [
+        {
+          "src": "assets/designs/stacked-coins-with-mouse.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#bfb4a1",
+      "dark": false,
+      "desc": "An arch of orange coins with a blue cursor resting on top. Modelled and lit in Blender."
+    },
+    {
       "title": "Wine glass",
       "category": "brand",
       "images": [

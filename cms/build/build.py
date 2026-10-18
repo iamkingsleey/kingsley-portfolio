@@ -19,10 +19,8 @@ def rep(s, a, b, n=1):
     return s.replace(a, b)
 
 # ---------------------------------------------------------------- archive
-os.makedirs(f'{REPO}/iteration-3', exist_ok=True)
-arc = rep(orig, '<head>\n', '<head>\n<base href="../">\n')
-arc = rep(arc, '<title>Kingsley M.</title>', '<title>Kingsley M. Iteration 3</title>')
-open(f'{REPO}/iteration-3/index.html', 'w', encoding='utf-8').write(arc)
+# (no longer written here: iteration-3/ is a full copy of the site as it was before iteration 4, taken from git,
+#  so it can be compared with the live site. Build never touches the iteration-* folders.)
 
 # ---------------------------------------------------------------- shared theme bootstrap (no flash of the wrong theme)
 THEME_BOOT = """<script>
