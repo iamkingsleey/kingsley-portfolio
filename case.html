@@ -267,6 +267,17 @@ h1 .w.in > span { translate: 0 0 }
 }
 @media (prefers-reduced-motion: reduce) { .pn > .in, .rv, h1 .w > span { transition: none; translate: none; opacity: 1 } .ld.hint { animation: none } }
 
+/* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
+.next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
+.next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
+.next:hover h5 { transform: translateX(10px) }
+.next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
+.next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
+.next .th { position: relative } .next .th > .cblk { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 600; font-size: 28px; letter-spacing: -.04em }
+@media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+
 /* ---------- case study additions ---------- */
 .pn { aspect-ratio: 3 / 2 } .pn.tall { aspect-ratio: 4 / 5 }
 .pn > .in.shotw { position: absolute; inset: -4%; display: block }
@@ -328,7 +339,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610181229" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610181254" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
 
 <!-- opening: sideways first, then the page continues down -->
 <section class="run" id="run" aria-label="Project opening"><div class="rpin"><div class="track" id="track">
@@ -357,7 +368,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     <h2 class="rv">Credits</h2>
     <dl class="rv" id="cred"></dl>
   </section>
-  <a class="next" href="#" id="next"><span><span class="fq" id="nfq"></span><b><span id="nnm"></span> <i>→</i></b></span></a>
+  <a class="next" href="#" id="next"><span class="fq" id="nfq"></span><span class="r"><h5 id="nnm"></h5><span class="th" id="nth"></span></span></a>
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
 
@@ -408,7 +419,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
   if (CS.problem) $('s-over').insertAdjacentHTML('afterend', `<section class="txt brief" id="s-brief"><h2 class="rv">The brief</h2><div class="cols rv"><div><h3>Problem</h3><p>${esc(CS.problem)}</p></div><div><h3>Goal</h3><p>${esc(CS.goal)}</p></div></div></section>`);
   $('cred').innerHTML = `<div><dt>Year</dt><dd>${yr}</dd></div><div><dt>Client</dt><dd>${esc(CS.client)}</dd></div>
     <div><dt>Deliverables</dt><dd>${CS.did.map(esc).join('<br>')}</dd></div><div><dt>Design</dt><dd>Kingsley Mkpandiok · ${esc(CS.role)}</dd></div>`;
-  $('nfq').textContent = 'Next case study · ' + NX.fq + ' · ' + NX.kind; $('nnm').textContent = NX.title; $('next').href = (NX.page && NX.page !== 'case.html' ? NX.page : '') + '#' + NX.slug;
+  $('nfq').textContent = 'Next case study · ' + NX.fq + ' · ' + NX.kind; $('nnm').innerHTML = esc(NX.title) + ' →'; $('nth').innerHTML = shot(NX.cover, ''); $('next').href = (NX.page && NX.page !== 'case.html' ? NX.page : '') + '#' + NX.slug;
   const SH = CS.shots, heroM = SH[0][0];
   document.documentElement.dataset.cv = CV;
   $('hcap').textContent = SH[0][1]; $('hfq').textContent = SH[0][2];
@@ -792,7 +803,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610181229#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610181254#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>
