@@ -1,3 +1,5 @@
 .DS_Store
 # Original full-size renders; the site uses the web copies in assets/designs/
 img/
+assets/*.mp3
+tools/
