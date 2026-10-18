@@ -108,7 +108,7 @@
     // (the page itself is fetched, not pre-built: a page built in the background loses its WebGL grid and its scroll handling)
     try { const sr = document.createElement('script'); sr.type = 'speculationrules'; sr.textContent = JSON.stringify({ prefetch: [next, prev].filter(Boolean).map(u => ({ source: 'list', urls: [u] })) }); document.head.append(sr); } catch (_) {}
     [next, prev].filter(Boolean).forEach(u => fetch(u, { credentials: 'same-origin' }).then(r => r.text()).then(t => {
-      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 60 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = s; /* fetched the same way Designs asks for them, so the cached copy works there */ } });
+      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = s; /* fetched the same way Designs asks for them, so the cached copy works there */ } });
     }).catch(() => {}));
   };
   (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warm, { timeout: 2500 });

@@ -114,7 +114,7 @@ SITEJS = '<script>window.KM_SITE = ' + json.dumps({'available': _site.get('avail
 FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
   'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'
   'if(document.prerendering)document.addEventListener("prerenderingchange",on,{once:true});else on()})()</script>'
-  '<style>html.flow-up body>*:not(.kmn-scale):not(.ov){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale){animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}'
+  '<style>html.flow-up body>*:not(.kmn-scale):not(.ov):not([class^="pt-"]),html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation-name:flfade}'   # the tips and the recruiter card are left out: they stay hidden until asked for
   'html.flow-up .ov{animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}@keyframes flfade{from{opacity:.15}}'
   'html.flow-up{--fl:36px}@keyframes flin{from{translate:0 var(--fl);opacity:.15}}</style>')
 # Home: the design pieces, blurred, floating behind the intro (cms/build/src/homebg.js; pictures from content/designs.json)
@@ -123,7 +123,9 @@ _dz = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8
 _bg = []
 for _d in _dz:
     _im = next((m for m in _d.get('images', []) if isinstance(m, dict) and m.get('src') and not m.get('video')), None)
-    if _im: _bg.append({'src': _im['src'], 'ratio': _im.get('ratio', 1)})
+    if _im:
+        _t = _im['src'].replace('assets/designs/', 'assets/designs/thumbs/', 1)   # the trail is small and blurred: the thumbnail is plenty
+        _bg.append({'src': _t if _t != _im['src'] and os.path.exists(f'{REPO}/{_t}') else _im['src'], 'ratio': _im.get('ratio', 1)})
 HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
 INDEX = {}
 for _p in PAGES:

@@ -800,7 +800,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       active = a; setCaption(a);
       if (prevCat && prevCat !== items[a].cat) { scanDir = a > prevIdx ? 1 : -1; stationJump(items[a].cat); }
     }
-    drawField(L0, L1, t); present(); overlaysFX();
+    if (!document.body.classList.contains('all')) { drawField(L0, L1, t); present(); overlaysFX(); }   // the old row view sits hidden behind All: don't paint it
     drawStatic();
     // bassFollow(openIdx >= 0 || ovOpen ? 0 : Math.abs(p - prev));   // movement hum: off for now, sound TBD
     // caption tracks the active piece and fades while it is between stops
@@ -1577,9 +1577,18 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     }
   }
   if (!ogl) ov2d = ovc.getContext('2d');      // no WebGL: show the grid flat
+  // only redraw the grid when something on it changed (scroll, size, filter, theme, a picture arriving), plus a
+  // short settle after each change for the tiles' own fade-in; when nothing moves, the page does no work at all
+  let ovKey = '', ovSettle = 0;
+  const tileCache = new Map();
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
-      const dpr = Math.min(2, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;
+      let nLoaded = 0; texCache.forEach(im => { if (im.complete) nLoaded++; });
+      const key = [ov.scrollTop, innerWidth, innerHeight, devicePixelRatio, nLoaded, document.documentElement.dataset.theme, ov.className, document.body.className].join('|');
+      const now = performance.now();
+      if (key !== ovKey) { ovKey = key; ovSettle = now + 1400; }
+      if (now > ovSettle) { requestAnimationFrame(ovWarp); return; }
+      const dpr = Math.min(1.5, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;   // 1.5x is sharp under the blur-free drum and much lighter than 2x
       const on = !reduce && !!ogl, mid = vh / 2, R = vh * DRUM.radius, M = on ? Math.round(vh * DRUM.margin) : 0;
       if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) {
         ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr);
@@ -1606,7 +1615,11 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         if (sw && okDraw(src)) {
           const ia = sw / sh, ba = r.width / r.height;
           const cw = ia > ba ? sh * ba : sw, ch = ia > ba ? sh : sw / ba, cx0 = (sw - cw) / 2, cy0 = (sh - ch) / 2;
-          oc.drawImage(src, cx0, cy0, cw, ch, r.left, r.top, r.width, r.height);
+          // each picture is scaled to its tile once and kept, so scrolling only copies small ready-made pictures
+          const tw = Math.max(1, Math.round(r.width * dpr)), thh = Math.max(1, Math.round(r.height * dpr)), ck = src.src + '|' + tw + 'x' + thh;
+          let pc = tileCache.get(ck);
+          if (!pc) { pc = document.createElement('canvas'); pc.width = tw; pc.height = thh; pc.getContext('2d').drawImage(src, cx0, cy0, cw, ch, 0, 0, tw, thh); tileCache.set(ck, pc); if (tileCache.size > 120) tileCache.delete(tileCache.keys().next().value); }
+          oc.drawImage(pc, r.left, r.top, r.width, r.height);
         }
         if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
       }
