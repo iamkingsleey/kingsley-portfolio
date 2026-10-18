@@ -27,8 +27,9 @@
   .pt-rec { position: fixed; z-index: 150; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(48px + env(safe-area-inset-top, 0px)); height: 36px; padding: 0 14px; border-radius: 999px; border: 0;
     background: var(--pill, #f2f2f2); color: var(--ink, #111); font: 500 13px Geist, system-ui, sans-serif; cursor: pointer; transition: background .2s }
   .pt-rec:hover { background: var(--pill-hover, #e8e8e8) }
-  .pt-rec { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 14px }
-  .pt-rec svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
+  .pt-rec { display: inline-flex; align-items: center; gap: 8px; padding: 0 6px 0 14px }
+  /* the arrow sits in a small circle in the page colour (black in dark mode, white in light) */
+  .pt-rec svg { box-sizing: border-box; width: 26px; height: 26px; padding: 4px; border-radius: 50%; background: var(--bg, #fff); fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
   .pt-rec[aria-expanded="true"] svg { transform: rotate(180deg) }
   .pt-card { position: fixed; z-index: 152; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(96px + env(safe-area-inset-top, 0px)); width: min(320px, calc(100vw - 32px)); padding: 18px 18px 18px; border-radius: 20px;
     background: var(--bg, #fff); color: var(--text, #333); box-shadow: 0 0 0 1px var(--edge, rgb(0 0 0 / .07)), 0 24px 60px rgb(0 0 0 / .18); font: 14px/1.5 Geist, system-ui, sans-serif;
