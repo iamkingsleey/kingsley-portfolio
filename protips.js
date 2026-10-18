@@ -1,14 +1,12 @@
 // helping a recruiter get around in seconds.
 //  1 · First visit: a one-line tip under the nav while the red tick sweeps once across the stations.
 //  2 · Home: a small "Scroll for work" cue at the bottom, until they've scrolled once.
-//  3 · Every page: pointing at a station says what's there.
 //  4 · Home: "For recruiters" opens a three-line card (who, availability, where to look).
 //  A small "?" next to sound and theme replays the tip.
 (function () {
   const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase(), home = file === 'index.html';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const get = k => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set = k => { try { localStorage.setItem(k, '1'); } catch (_) {} };
-  const HINT = { Home: 'Start here', Designs: '29 pieces · 7 case studies', Engineering: 'Plugins and tools I build', About: 'My story and how to reach me' };
   const st = document.createElement('style');
   st.textContent = `
   .pt-pill { position: fixed; z-index: 151; left: 50%; top: calc(88px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -6px); opacity: 0; pointer-events: none;
@@ -16,9 +14,6 @@
     box-shadow: 0 10px 30px rgb(0 0 0 / .14); transition: opacity .3s, transform .45s cubic-bezier(.2,.8,.2,1) }
   .pt-pill.on { opacity: 1; transform: translate(-50%, 0) }
   .pt-pill b { font-weight: 500; color: #ff4a1c }
-  .pt-hint { position: fixed; z-index: 151; transform: translate(-50%, -4px); opacity: 0; pointer-events: none; padding: 5px 9px; border-radius: 7px; background: var(--ink, #111); color: var(--bg, #fff);
-    font: 500 12px Geist, system-ui, sans-serif; white-space: nowrap; transition: opacity .15s, transform .25s cubic-bezier(.2,.8,.2,1) }
-  .pt-hint.on { opacity: 1; transform: translate(-50%, 0) }
   .pt-cue { position: fixed; z-index: 30; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: grid; justify-items: center; gap: 2px;
     font: 500 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--muted, #888); background: none; border: 0; cursor: pointer; transition: opacity .3s }
   .pt-cue svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: ptb 1.6s cubic-bezier(.45,0,.55,1) infinite }
@@ -60,13 +55,7 @@
   const start = () => {
     const S = document.querySelector('.kmn-scale'); if (!S) return;
     const btns = [...S.querySelectorAll('button')], nd = S.querySelector('.nd');
-    // 3 · what's at each station
-    const hint = document.createElement('div'); hint.className = 'pt-hint'; document.body.append(hint); let hide = null;
-    btns.forEach(b => {
-      b.addEventListener('pointerenter', e => { if (e.pointerType !== 'mouse') return; const t = HINT[b.textContent.trim()]; if (!t) return;
-        hide && hide(); const r = b.getBoundingClientRect(); hint.textContent = t; hint.style.left = (r.left + r.width / 2) + 'px'; hint.style.top = (S.getBoundingClientRect().bottom + 8) + 'px'; hint.classList.add('on'); });
-      b.addEventListener('pointerleave', () => hint.classList.remove('on'));
-    });
+    let hide = null;   // (the station hover hints were removed)
     if (!home) return;
     // 1 · the one-line tip, with the tick sweeping once across the stations
     const pill = document.createElement('div'); pill.className = 'pt-pill'; pill.setAttribute('role', 'status');
