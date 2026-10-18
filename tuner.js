@@ -17,11 +17,11 @@
        element on the page (station readout, dials, rulers) jump to the body's own position while it is applied */
   var css = '' +
 
-    '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .35s cubic-bezier(.65,0,.35,1)}' +
+    '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .2s cubic-bezier(.65,0,.35,1)}' +
     '.tuner::before{content:"";position:absolute;inset:0;background:rgb(11 11 11 / .6);background:color-mix(in srgb,var(--bg,#0b0b0b) 62%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}' +
     '.tuner.on{opacity:1}' +
     // leaving the screen it settles in place (a little smaller, fading), it never travels anywhere
-    '.tuner .tin{transition:transform .5s cubic-bezier(.2,.8,.2,1)}' +
+    '.tuner .tin{transition:transform .25s cubic-bezier(.2,.8,.2,1)}' +
     '.tuner.out .tin{transform:translate(-50%,-56%) scale(.94)}' +
     // the page's own readout (top left) waits until the centre one has gone, so the number never seems to jump there
     'html.tuning [data-readout]{opacity:0!important;transition:none}' +
@@ -79,7 +79,7 @@
   function go(o) {
     if (going) return; going = true;
     if (reduce) { location.href = o.href; return; }
-    var span = Math.abs(o.to - o.from), total = Math.min(1100, 520 + span * 260), leg = Math.round(total * LEG);
+    var span = Math.abs(o.to - o.from), total = Math.min(520, 260 + span * 70), leg = Math.round(total * LEG);
     var mid = o.from + (o.to - o.from) * LEG;
     document.documentElement.classList.add('tuning');
     build(o.name); draw(o.from);
@@ -103,12 +103,12 @@
       el.classList.remove('now');
       document.documentElement.classList.add('tuned');   // the page sharpens…
       requestAnimationFrame(function () { el.classList.add('out'); el.classList.remove('on'); });   // the readout fades where it is
-      setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } }, 500);
+      setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } }, 200);
     };
-    var begin = function () { count(+arr.v, +arr.to, Math.max(260, +arr.ms || 400), easeOut, function () { counted = true; setTimeout(finish, 160); }); };
+    var begin = function () { count(+arr.v, +arr.to, Math.max(140, +arr.ms || 200), easeOut, function () { counted = true; finish(); }); };
     requestAnimationFrame(begin);
     var loaded = function () { ready = true; finish(); };
-    if (document.readyState === 'complete') loaded(); else addEventListener('load', loaded);
+    if (document.readyState !== 'loading') loaded(); else addEventListener('DOMContentLoaded', loaded);   // the page itself, not every picture: only a slow connection holds the readout up
     setTimeout(loaded, 2400);                          // never hold a visitor on a slow picture
   }
   // back/forward cache: never come back to a blurred page

@@ -1,253 +1,273 @@
 {
- "projects": [
-  {
-   "title": "Paper plane with coin",
-   "category": "3d",
-   "images": [
+  "projects": [
     {
-     "src": "assets/designs/paper-plane-with-coin.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#171c6f",
-   "dark": true,
-   "desc": "A paper plane carrying a coin: money that gets where it needs to go. Modelled and lit in Blender."
-  },
-  {
-   "title": "Drink tumbler",
-   "category": "3d",
-   "images": [
+      "title": "Paper plane with coin",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/paper-plane-with-coin.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#171c6f",
+      "dark": true,
+      "desc": "A paper plane carrying a coin: money that gets where it needs to go. Modelled and lit in Blender.",
+      "case": "3d-collection"
+    },
     {
-     "src": "assets/designs/3d-tumbler-render.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#111c52",
-   "dark": true,
-   "desc": "A tumbler rendered as a product shot, soft light and clean reflections."
-  },
-  {
-   "title": "Safe with coins",
-   "category": "3d",
-   "images": [
+      "title": "Drink tumbler",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/3d-tumbler-render.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#111c52",
+      "dark": true,
+      "desc": "A tumbler rendered as a product shot, soft light and clean reflections.",
+      "case": "3d-collection"
+    },
     {
-     "src": "assets/designs/safe-with-coins.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#c58e2c",
-   "dark": false,
-   "desc": "An open safe spilling coins, part of a set of 3D objects for fintech brands."
-  },
-  {
-   "title": "Pawn in an archway",
-   "category": "3d",
-   "images": [
+      "title": "Safe with coins",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/safe-with-coins.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#c58e2c",
+      "dark": false,
+      "desc": "An open safe spilling coins, part of a set of 3D objects for fintech brands.",
+      "case": "3d-collection"
+    },
     {
-     "src": "assets/designs/pawn-in-an-archway.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#020201",
-   "dark": true,
-   "desc": "A single chess pawn in a lit archway. Strategy, in one quiet frame."
-  },
-  {
-   "title": "Award with ribbons",
-   "category": "3d",
-   "images": [
+      "title": "Pawn in an archway",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/pawn-in-an-archway.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#020201",
+      "dark": true,
+      "desc": "A single chess pawn in a lit archway. Strategy, in one quiet frame.",
+      "case": "3d-collection"
+    },
     {
-     "src": "assets/designs/colorful-award-with-ribbons.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#98969b",
-   "dark": false,
-   "desc": "A colourful award with ribbons, made for celebrating wins in a product."
-  },
-  {
-   "title": "Wine glass",
-   "category": "brand",
-   "images": [
+      "title": "Award with ribbons",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/colorful-award-with-ribbons.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#98969b",
+      "dark": false,
+      "desc": "A colourful award with ribbons, made for celebrating wins in a product.",
+      "case": "3d-collection"
+    },
     {
-     "src": "assets/uploads/glass-of-wine1.png",
-     "ratio": 1
-    }
-   ],
-   "bg": "#13100f",
-   "dark": true,
-   "desc": "A card holder covered in bright stickers, for a playful payments brand.",
-   "credits": []
-  },
-  {
-   "title": "Badge",
-   "category": "brand",
-   "images": [
+      "title": "Wine glass",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/uploads/glass-of-wine1.png",
+          "ratio": 1
+        }
+      ],
+      "bg": "#13100f",
+      "dark": true,
+      "desc": "A card holder covered in bright stickers, for a playful payments brand.",
+      "credits": []
+    },
     {
-     "src": "assets/designs/badge-on-a-orange-background.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#c1902e",
-   "dark": false,
-   "desc": "A badge on an orange background, part of a set of reward objects."
-  },
-  {
-   "title": "Badge in a box",
-   "category": "brand",
-   "images": [
+      "title": "Badge",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/badge-on-a-orange-background.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#c1902e",
+      "dark": false,
+      "desc": "A badge on an orange background, part of a set of reward objects."
+    },
     {
-     "src": "assets/designs/batch-in-a-box.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#cc8d35",
-   "dark": false,
-   "desc": "A badge packed in its box, the unboxing moment of a reward."
-  },
-  {
-   "title": "Price tag and coins",
-   "category": "brand",
-   "images": [
+      "title": "Badge in a box",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/batch-in-a-box.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#cc8d35",
+      "dark": false,
+      "desc": "A badge packed in its box, the unboxing moment of a reward."
+    },
     {
-     "src": "assets/designs/price-tag-and-coins.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#050607",
-   "dark": true,
-   "desc": "A price tag and coins, an illustration of value for commerce brands."
-  },
-  {
-   "title": "Debit card, floating",
-   "category": "brand",
-   "images": [
+      "title": "Price tag and coins",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/price-tag-and-coins.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#050607",
+      "dark": true,
+      "desc": "A price tag and coins, an illustration of value for commerce brands."
+    },
     {
-     "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
-     "ratio": 1.5
-    }
-   ],
-   "bg": "#5b94d5",
-   "dark": false,
-   "desc": "A debit card floating among colourful objects."
-  },
-  {
-   "title": "Debit card with shapes",
-   "category": "brand",
-   "images": [
+      "title": "Debit card, floating",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#5b94d5",
+      "dark": false,
+      "desc": "A debit card floating among colourful objects."
+    },
     {
-     "src": "assets/designs/debit-card-with-colorful-objects.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#638db5",
-   "dark": true,
-   "desc": "A debit card surrounded by soft, colourful shapes."
-  },
-  {
-   "title": "Pink debit card",
-   "category": "brand",
-   "images": [
+      "title": "Debit card with shapes",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/debit-card-with-colorful-objects.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#638db5",
+      "dark": true,
+      "desc": "A debit card surrounded by soft, colourful shapes."
+    },
     {
-     "src": "assets/designs/debit-card.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#aa4b78",
-   "dark": true,
-   "desc": "A pink debit card, styled as a hero image for a card launch."
-  },
-  {
-   "title": "Tennis ball and rackets",
-   "category": "motion",
-   "images": [
+      "title": "Pink debit card",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/debit-card.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#aa4b78",
+      "dark": true,
+      "desc": "A pink debit card, styled as a hero image for a card launch."
+    },
     {
-     "src": "assets/designs/tennis-ball-and-racket.jpg",
-     "ratio": 1.3333
-    }
-   ],
-   "bg": "#585858",
-   "dark": true,
-   "desc": "A tennis ball between two rackets, lit like a studio product shot."
-  },
-  {
-   "title": "Tennis in motion, blue",
-   "category": "motion",
-   "images": [
+      "title": "Tennis ball and rackets",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-ball-and-racket.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#585858",
+      "dark": true,
+      "desc": "A tennis ball between two rackets, lit like a studio product shot."
+    },
     {
-     "src": "assets/designs/tennis-in-motion-blue-background.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#4a6892",
-   "dark": true,
-   "desc": "A tennis ball and racket caught mid-swing, on blue."
-  },
-  {
-   "title": "Tennis in motion, dark blue",
-   "category": "motion",
-   "images": [
+      "title": "Tennis in motion, blue",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-in-motion-blue-background.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#4a6892",
+      "dark": true,
+      "desc": "A tennis ball and racket caught mid-swing, on blue."
+    },
     {
-     "src": "assets/designs/tennis-in-motion-dark-blue-background.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#102a3a",
-   "dark": true,
-   "desc": "The same swing on dark blue, for a darker brand."
-  },
-  {
-   "title": "Tennis on court",
-   "category": "motion",
-   "images": [
+      "title": "Tennis in motion, dark blue",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-in-motion-dark-blue-background.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#102a3a",
+      "dark": true,
+      "desc": "The same swing on dark blue, for a darker brand."
+    },
     {
-     "src": "assets/designs/tennis-and-racket.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#338189",
-   "dark": true,
-   "desc": "A tennis ball and racket on court."
-  },
-  {
-   "title": "Red padlock",
-   "category": "motion",
-   "images": [
+      "title": "Tennis on court",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-and-racket.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#338189",
+      "dark": true,
+      "desc": "A tennis ball and racket on court."
+    },
     {
-     "src": "assets/designs/red-lock-with-robe.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#b52f23",
-   "dark": true,
-   "desc": "A red padlock with a rope, an image of security that still feels friendly."
-  },
-  {
-   "title": "Orange padlock",
-   "category": "motion",
-   "images": [
+      "title": "Red padlock",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/red-lock-with-robe.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#b52f23",
+      "dark": true,
+      "desc": "A red padlock with a rope, an image of security that still feels friendly."
+    },
     {
-     "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
-     "ratio": 0.8
-    }
-   ],
-   "bg": "#ccbfc1",
-   "dark": false,
-   "desc": "A bright orange padlock with a rope, from the same security set."
-  },
-  {
-   "title": "Ruler picker",
-   "category": "product",
-   "images": [
+      "title": "Orange padlock",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#ccbfc1",
+      "dark": false,
+      "desc": "A bright orange padlock with a rope, from the same security set."
+    },
     {
-     "src": "assets/designs/ruler-picker.jpg",
-     "video": "assets/designs/videos/ruler-picker.mp4",
-     "ratio": 0.8
+      "title": "3D collection",
+      "category": "product",
+      "caseStudy": true,
+      "layout": "3d",
+      "images": [
+        {
+          "src": "assets/designs/colorful-award-with-ribbons.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#98969b",
+      "dark": false,
+      "desc": "A set of everyday objects modelled and lit in Blender, made to feel precious."
+    },
+    {
+      "title": "Ruler picker",
+      "category": "product",
+      "images": [
+        {
+          "src": "assets/designs/ruler-picker.jpg",
+          "video": "assets/designs/videos/ruler-picker.mp4",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A ruler picker: a value control you drag like a tape measure, with ticks that snap. Built in code."
     }
-   ],
-   "bg": "#ffffff",
-   "dark": false,
-   "desc": "A ruler picker: a value control you drag like a tape measure, with ticks that snap. Built in code."
-  }
- ]
+  ]
 }

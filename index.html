@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610181420";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610181817";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -429,6 +429,7 @@ h1.typer { position: relative }
 .caret { opacity: 0; width: 0 !important; margin-left: 0 !important; animation: none !important }
 .fm-wave { position: absolute; left: 0; top: 0; pointer-events: none }
 </style>
+<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};if(document.prerendering)document.addEventListener("prerenderingchange",on,{once:true});else on()})()</script><style>html.flow-up body>*:not(.kmn-scale):not(.ov){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale){animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}html.flow-up .ov{animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}@keyframes flfade{from{opacity:.15}}html.flow-up{--fl:36px}@keyframes flin{from{translate:0 var(--fl);opacity:.15}}</style>
 </head>
 <body>
 <div class="station" id="station" aria-label="Station">
@@ -1623,12 +1624,7 @@ h1.typer { position: relative }
   function setPeekRole() { const src = ROLE_PIC[typedEl.textContent]; if (src && !peekImg.src.endsWith(src)) peekImg.src = src; return !!src; }
 
   if (finePointer && !reduce) {
-    typerEl.addEventListener('pointermove', e => {
-      if (!setPeekRole()) { peekRole.classList.remove('show'); return; }
-      peekRole.style.transform = `translate(${e.clientX + 18}px, ${e.clientY - 90}px) rotate(4deg)`;
-      peekRole.classList.add('show');
-    });
-    typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
+    // (the picture that followed the cursor over the name is off: the blurred trail behind Home does that job now)
 
     // Photo: tilt toward the cursor.
     const avatar = document.getElementById('avatar');
@@ -1891,5 +1887,11 @@ h1.typer { position: relative }
       if (on) Popkit.play('pop');
     }, true); })();
 </script>
+<script src="nav.js" defer></script>
+<script>window.KM_HOMEBG = [{"src": "assets/designs/paper-plane-with-coin.jpg", "ratio": 0.8}, {"src": "assets/designs/3d-tumbler-render.jpg", "ratio": 0.8}, {"src": "assets/designs/safe-with-coins.jpg", "ratio": 0.8}, {"src": "assets/designs/pawn-in-an-archway.jpg", "ratio": 0.8}, {"src": "assets/designs/colorful-award-with-ribbons.jpg", "ratio": 0.8}, {"src": "assets/uploads/glass-of-wine1.png", "ratio": 1}, {"src": "assets/designs/badge-on-a-orange-background.jpg", "ratio": 0.8}, {"src": "assets/designs/batch-in-a-box.jpg", "ratio": 0.8}, {"src": "assets/designs/price-tag-and-coins.jpg", "ratio": 0.8}, {"src": "assets/designs/debit-card-with-colorful-objects1.jpg", "ratio": 1.5}, {"src": "assets/designs/debit-card-with-colorful-objects.jpg", "ratio": 0.8}, {"src": "assets/designs/debit-card.jpg", "ratio": 0.8}];</script>
+<script src="homebg.js" defer></script>
+<script src="protips.js" defer></script>
+<script src="home.js" defer></script>
+<script src="flow.js" defer></script>
 </body>
 </html>

@@ -1486,12 +1486,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   function setPeekRole() { const src = ROLE_PIC[typedEl.textContent]; if (src && !peekImg.src.endsWith(src)) peekImg.src = src; return !!src; }
 
   if (finePointer && !reduce) {
-    typerEl.addEventListener('pointermove', e => {
-      if (!setPeekRole()) { peekRole.classList.remove('show'); return; }
-      peekRole.style.transform = `translate(${e.clientX + 18}px, ${e.clientY - 90}px) rotate(4deg)`;
-      peekRole.classList.add('show');
-    });
-    typerEl.addEventListener('pointerleave', () => peekRole.classList.remove('show'));
+    // (the picture that followed the cursor over the name is off: the blurred trail behind Home does that job now)
 
     // Photo: tilt toward the cursor.
     const avatar = document.getElementById('avatar');

@@ -201,7 +201,8 @@
 
   // ---------------------------------------------------------------- schemas
   const mname = p => !p ? 'empty' : typeof p === 'object' ? (p.color ? 'Colour · ' + (p.word || p.color) : 'Video · ' + String(p.video || '').split('/').pop()) : String(p).split('/').pop().split('?')[0];
-  const CASE_SLUGS = () => [['', 'None'], ...(C.cases.cases || []).map(c => [c.slug, c.title])];
+  const CASE_SLUGS = () => [['', 'None'], ...(C.cases.cases || []).map(c => [c.slug, c.title]),
+    ...((C.designs && C.designs.projects) || []).filter(p => p.caseStudy).map(p => [p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), p.title])];
   const PAIR = (a, b) => ({ type: 'tuple', fields: [{ label: a }, { label: b }] });
   const CASE = [
     { title: 'Basics', cols: 2, fields: [
@@ -243,9 +244,10 @@
   const DESIGN = [
     { title: 'The piece', cols: 2, fields: [
       { k: 'title', label: 'Title' },
-      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Product']] },
+      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Case study']] },
       { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a case study', type: 'select', options: CASE_SLUGS, help: 'Adds “Read case study” to its page' },
       { k: 'desc', label: 'Project info', type: 'textarea', full: true },
+      { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
       { k: 'hidden', label: 'Hide this piece from the site', type: 'bool', full: true } ] },
     { title: 'Picture', fields: [ { k: '_img', label: 'Picture', type: 'media', accept: 'image/*', help: 'Its shape and colour are read automatically when you upload.' },
       { k: '_vid', label: 'Video (optional)', type: 'media', accept: 'video/*', help: 'If set, the video plays and the picture is its poster.' } ] },
@@ -283,7 +285,7 @@
     }
     if (name === 'designs') for (const p of d.projects) {
       const im = p.images[0]; im.src = p._img; if (p._vid) im.video = p._vid; else delete im.video; if (p._ratio) im.ratio = +p._ratio;
-      delete p._img; delete p._vid; delete p._ratio; for (const k of ['case', 'link', 'layout', 'year']) if (!p[k]) delete p[k];
+      delete p._img; delete p._vid; delete p._ratio; for (const k of ['case', 'link', 'layout', 'year', 'caseStudy']) if (!p[k]) delete p[k];
     }
     if (name === 'about') for (const ch of d.chapters) { [ch.stat, ch.statLabel] = ch.s1; [ch.stat2, ch.stat2Label] = ch.s2; delete ch.s1; delete ch.s2; }
     if (name === 'engineering') for (const t of d.tools) { [t.stat, t.statLabel] = t.s; delete t.s; }
@@ -295,7 +297,7 @@
     ['grp', 'Overview'], ['dashboard', 'Analytics', ''],
     ['grp', 'Content'], ['cases', 'Case studies', 'cases'], ['designs', 'Designs', 'designs'], ['about', 'About', 'about'], ['engineering', 'Engineering', 'engineering'], ['projects', 'Projects page', 'projects'],
     ['grp', 'Everything else'], ['text', 'Page text', 'text'], ['media', 'Pictures & videos', 'media'],
-    ['grp', 'Site'], ['settings', 'Settings & publish', 'site']
+    ['grp', 'Site'], ['publish', 'Publish', ''], ['settings', 'Settings', 'site']
   ];
   function nav() {
     const n = $('nav'); n.innerHTML = '';
@@ -309,7 +311,7 @@
   const head = (crumb, title) => { $('crumb').textContent = crumb; $('title').textContent = title; };
   function render() {
     const v = $('view-root'); v.innerHTML = '';
-    ({ dashboard: vDash, cases: vCases, designs: vDesigns, about: vAbout, engineering: vEng, projects: vProjects, text: vText, media: vMedia, settings: vSettings }[route] || vDash)(v);
+    ({ dashboard: vDash, publish: vPublish, cases: vCases, designs: vDesigns, about: vAbout, engineering: vEng, projects: vProjects, text: vText, media: vMedia, settings: vSettings }[route] || vDash)(v);
   }
 
   function thumb(m) { const d = el('div', { class: 'th' }); if (!m) return d; if (typeof m === 'object' && m.color) { d.style.background = m.color; d.style.color = m.ink || '#fff'; d.textContent = m.word || ''; return d; } if (typeof m === 'object') m = m.poster || m.video || ''; if (isVid(m)) d.append(el('video', { src: src(m), muted: true, autoplay: true, loop: true, playsinline: true })); else d.style.backgroundImage = `url("${src(m)}")`; return d; }
@@ -437,25 +439,61 @@
   }
 
   async function vSettings(v) {
-    head('Site', 'Settings & publish');
+    head('Site', 'Settings');
     C.site.analytics = C.site.analytics || { goatcounter: '' };
     const tok = el('input', { type: 'text', placeholder: HAS_TOKEN ? 'Saved on this Mac · paste a new one to replace it' : 'Paste your GoatCounter API token' });
     v.append(form([{ title: 'Analytics', help: 'Free and private: GoatCounter counts visits without cookies. Make an account at goatcounter.com, then put your site code here.', fields: [{ k: 'goatcounter', label: 'GoatCounter code', ph: 'kingsley', help: 'The first part of your GoatCounter address: kingsley.goatcounter.com → kingsley' }] }], C.site.analytics, 'site'),
       el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Analytics API token' }), el('p', { class: 'help', text: 'So this CMS can show your numbers. In GoatCounter: Settings → API → New token, tick “Read statistics”. It stays on this Mac (it is never published).' }),
         el('div', { class: 'f' }, tok), el('button', { class: 'btn small', type: 'button', style: 'justify-self:start', text: 'Save token', onclick: async () => { if (!tok.value.trim()) return; await api('/api/secrets', { method: 'PUT', body: JSON.stringify({ goatcounter_token: tok.value.trim() }) }); HAS_TOKEN = true; tok.value = ''; tok.placeholder = 'Saved on this Mac'; toast('Token saved'); } })));
-    const pub = el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Publish' }), el('p', { class: 'help', text: 'Sends your saved changes live: commits them and pushes to GitHub with your own git setup.' }));
-    const changes = el('div', { class: 'mono', text: 'Checking…' }), msg = el('input', { type: 'text', value: 'Update content', placeholder: 'What changed' }), out = el('div');
-    const btn = el('button', { class: 'btn', type: 'button', text: 'Publish', style: 'justify-self:start', onclick: async () => {
+  }
+
+  // ---------------------------------------------------------------- publish: review what changed since the last publish, then send it live
+  async function vPublish(v) {
+    head('Site', 'Publish');
+    const body = el('div', {}, el('div', { class: 'mono', text: 'Looking at your changes…' }));
+    v.append(el('p', { class: 'lead', text: 'Everything you have saved since you last published. Check it, then press Publish to send it live.' }));
+    if (dirty.size) v.append(el('div', { class: 'note', style: 'margin-bottom:18px' }, 'You have changes that aren’t saved yet, so they aren’t listed here. ', el('button', { class: 'btn small', type: 'button', text: 'Save & rebuild now', onclick: async () => { await save(); render(); } })));
+    v.append(body);
+    let c; try { c = await api('/api/changes'); } catch (e) { body.innerHTML = ''; body.append(el('div', { class: 'err', text: e.message })); return; }
+    body.innerHTML = '';
+    const BADGE = { added: 'New', edited: 'Edited', removed: 'Removed', reordered: 'Reordered' };
+    if (!c.total) body.append(el('div', { class: 'empty' }, el('h2', { text: 'Nothing new to publish' }), el('div', { text: 'Your live site already has everything you’ve saved.' })));
+    const shortSrc = p => typeof p === 'string' ? p.split('/').pop().split('?')[0] : p && p.color ? 'Colour · ' + (p.word || p.color) : p && p.video ? 'Video · ' + String(p.video).split('/').pop() : '';
+    for (const g of c.groups) {
+      const box = el('div', { class: 'group', style: 'margin-bottom:18px' }, el('h2', { text: g.section }));
+      for (const it of g.items) {
+        const card = el('div', { class: 'chg ' + it.status },
+          el('div', { class: 'chh' }, it.thumb ? el('div', { class: 'cth' }, preview(it.thumb)) : null,
+            el('div', { class: 'cht' }, el('b', { text: it.title || 'Untitled' }), el('span', { class: 'badge ' + it.status, text: BADGE[it.status] || it.status })),
+            it.link && it.status !== 'removed' ? el('a', { class: 'btn ghost small', href: '/site/' + it.link, target: '_blank', text: 'View ↗' }) : null));
+        const rows = el('div', { class: 'chr' });
+        for (const f of it.fields.slice(0, 40)) {
+          if (f.media) rows.append(el('div', { class: 'cr media' }, f.field ? el('span', { class: 'mono', text: f.field }) : null,
+            el('div', { class: 'ba' }, el('figure', {}, preview(f.before), el('figcaption', { text: f.before ? shortSrc(f.before) : 'None' })), el('i', { text: '→' }), el('figure', {}, preview(f.after), el('figcaption', { text: f.after ? shortSrc(f.after) : 'None' })))));
+          else rows.append(el('div', { class: 'cr' }, el('span', { class: 'mono', text: f.field }), el('div', { class: 'tx' },
+            f.before ? el('del', { text: f.before }) : null, el('ins', { text: f.after || '(removed)' }))));
+        }
+        if (it.fields.length > 40) rows.append(el('div', { class: 'mono', text: '+ ' + (it.fields.length - 40) + ' more' }));
+        if (it.fields.length) card.append(rows);
+        box.append(card);
+      }
+      body.append(box);
+    }
+    if (c.uploads.length) {
+      const g = el('div', { class: 'lib', style: 'grid-template-columns:repeat(auto-fill,minmax(120px,1fr))' });
+      c.uploads.forEach(p => g.append(el('a', { href: '/site/' + p, target: '_blank', style: 'display:grid;gap:6px;text-decoration:none;border:1px solid var(--line);border-radius:10px;overflow:hidden' }, preview(p), el('span', { text: p.replace('assets/', '') }))));
+      body.append(el('div', { class: 'group', style: 'margin-bottom:18px' }, el('h2', { text: 'New pictures & videos' }), el('p', { class: 'help', text: c.uploads.length + ' file' + (c.uploads.length > 1 ? 's' : '') + ' you uploaded' }), g));
+    }
+    const msg = el('input', { type: 'text', value: 'Update content', placeholder: 'What changed' }), out = el('div');
+    const btn = el('button', { class: 'btn', type: 'button', text: c.total ? `Publish ${c.total} change${c.total > 1 ? 's' : ''}` : 'Publish', disabled: !c.total && !c.pages, style: 'justify-self:start', onclick: async () => {
       if (dirty.size && !confirm('You have unsaved changes. Publish without them?')) return;
       btn.classList.add('busy'); btn.textContent = 'Publishing…';
       try { const r = await api('/api/publish', { method: 'POST', body: JSON.stringify({ message: msg.value }) }); out.innerHTML = ''; out.append(el('pre', { class: 'log', text: r.log }));
-        toast(r.ok ? 'Published. GitHub updates the site in a minute or two.' : 'Publish stopped, see the log', !r.ok); status(); }
+        toast(r.ok ? 'Published. GitHub updates the site in a minute or two.' : 'Publish stopped, see the log', !r.ok); if (r.ok) setTimeout(render, 1200); }
       catch (e) { toast(e.message, true); }
       btn.classList.remove('busy'); btn.textContent = 'Publish'; } });
-    pub.append(changes, el('div', { class: 'f' }, el('label', { text: 'Message' }), msg), btn, out);
-    v.append(pub);
-    const status = async () => { try { const s = await api('/api/status'); changes.textContent = s.ok ? (s.changes.length ? s.changes.length + ' changed file' + (s.changes.length > 1 ? 's' : '') + ' ready to publish' : 'Nothing new to publish') : 'Git: ' + s.log; } catch (e) { changes.textContent = e.message; } };
-    status();
+    body.append(el('div', { class: 'group' }, el('h2', { text: 'Send it live' }), el('p', { class: 'help', text: 'Commits these changes under your name and pushes them to GitHub. The site updates a minute or two later.' }),
+      el('div', { class: 'f' }, el('label', { text: 'What changed (a short note for your history)' }), msg), btn, out));
   }
 
   // ---------------------------------------------------------------- analytics
@@ -471,7 +509,7 @@
       body.append(el('div', { class: 'empty' }, el('h2', { text: 'See where your visitors come from' }),
         el('div', { text: 'Visits, pages, countries, where people found you, devices, and which designs get opened. Private, no cookies, free for personal sites.' }),
         el('ol', {}, el('li', {}, 'Make a free account at ', el('a', { href: 'https://www.goatcounter.com/signup', target: '_blank', text: 'goatcounter.com' }), ' and pick a code (e.g. kingsley).'),
-          el('li', { text: 'Put that code in Settings & publish → Analytics, then Save & rebuild and Publish. The site starts counting.' }),
+          el('li', { text: 'Put that code in Settings → Analytics, then Save & rebuild and Publish. The site starts counting.' }),
           el('li', { text: 'In GoatCounter, make an API token with “Read statistics” and paste it under Settings → Analytics API token.' })),
         el('button', { class: 'btn', type: 'button', style: 'margin-top:16px', text: 'Open settings', onclick: () => go('settings') })));
       return;

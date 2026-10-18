@@ -32,7 +32,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
 
 /* ---------- Station indicator: where you are, and the way back to Home (98.0) ---------- */
-.station { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); top: 80px; z-index: 20; display: flex; align-items: center; gap: 6px }
+.station { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); top: 108px; z-index: 20;   /* level with the filter row */ display: flex; align-items: center; gap: 6px }
 .back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px var(--mono); color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
 .back span { font-family: var(--body); font-size: 13px; letter-spacing: -.1px }
@@ -53,7 +53,7 @@ body { transition: opacity .35s }
 body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transition: opacity .4s, filter .4s }
 
 /* ---------- Top right: category chips + count ---------- */
-.top { position: fixed; right: max(48px, env(safe-area-inset-right, 0px)); top: 80px; z-index: 20; display: flex; align-items: center; gap: 18px }
+.top { position: fixed; left: 50%; transform: translateX(-50%); top: 106px; z-index: 20; display: flex; align-items: center; gap: 18px }
 .chips { display: flex; gap: 4px }
 .chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
 .chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
@@ -126,7 +126,7 @@ body.open .px { opacity: 0; pointer-events: none }
 @media (max-width: 899px) {
   .station { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)) }
   .now .fq { font-size: 22px }
-  .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between }
+  .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between; transform: none }
   .chips { overflow-x: auto; scrollbar-width: none }
   .chips button { padding: 6px 9px; font-size: 12px }
   .chips button sup { display: none }
@@ -242,7 +242,7 @@ canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(10
 .row { transition: transform .6s cubic-bezier(.65,0,.35,1), opacity .45s }
 body.all .row { transform: scale(.42); opacity: 0; pointer-events: none }
 body.all .cap { visibility: hidden }
-body.all .dial, body.all .hint, body.all .px, body.all .chips, body.all .count { opacity: 0; pointer-events: none; transition: opacity .3s }
+body.all .dial, body.all .hint, body.all .px, body.all .count { opacity: 0; pointer-events: none; transition: opacity .3s }
 .ov { position: fixed; inset: 0; z-index: 12; overflow-y: auto; padding: 150px max(48px, env(safe-area-inset-right, 0px)) 80px max(48px, env(safe-area-inset-left, 0px)); visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .4s; scrollbar-width: none }
 .ov::-webkit-scrollbar { display: none }
 body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, visibility 0s }
@@ -259,7 +259,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 .ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
 /* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
    category starts, a fixed needle in the middle. It moves with the page; drag it or tap a label to travel. */
-.ov { padding-right: max(124px, env(safe-area-inset-right, 0px)) }
+.ov { padding-right: max(48px, env(safe-area-inset-right, 0px)) }   /* the side ruler is off, so the grid's margins match */
 .vrul { position: fixed; right: 0; top: 0; bottom: 0; width: 96px; z-index: 13; cursor: ns-resize; touch-action: none; opacity: 0; pointer-events: none; transition: opacity .3s }
 body.all .vrul { opacity: 1; pointer-events: auto; transition: opacity .4s .2s }
 .vrul canvas { display: block; width: 100%; height: 100% }
@@ -288,6 +288,25 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
 
 /* ---------- Radio physics preview ---------- */
 .fmwave { position: fixed; left: 0; right: 0; width: 100%; height: 30px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 13; pointer-events: none }
+/* the side ruler is off for now (delete this rule to bring it back) */
+.vrul { display: none !important }
+@media (max-width: 899px) { .ov { padding-right: 16px !important } }
+/* a piece's own page: back to the grid */
+.dback { position: fixed; z-index: 19; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px;
+  background: var(--pill, #1a1a1a); color: var(--ink); font: 500 13px var(--body, Geist), system-ui, sans-serif; cursor: pointer; opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1), background .2s }
+.dback svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.2,.8,.2,1) }
+.dback:hover svg { transform: translateX(-2px) }
+body.open .dback { opacity: 1; transform: none; pointer-events: auto; transition-delay: .35s, .35s, 0s }
+@media (min-width: 900px) { body.open .station { left: calc(max(48px, env(safe-area-inset-left, 0px)) + 150px); transition: left .35s cubic-bezier(.2,.8,.2,1) } }
+@media (max-width: 899px) { .dback { left: 16px; top: calc(56px + env(safe-area-inset-top, 0px)) } }
+/* filtering: the grid dips out and back in */
+.ov .ov-grid { transition: opacity .16s } .ov.refilt .ov-grid { opacity: 0 }
+.ov-t[hidden] { display: none }
+/* Designs is the All grid now, so its "All" toggle goes too */
+.allbtn { display: none !important }
+/* COMMENTED OUT for now: the piece dial along the bottom, its FM wave line and the "Drag the dial" hint. Delete this rule to bring them back. Scroll, swipe and arrow keys still move through the pieces. */
+.dial, .fmwave, .hint > span { display: none !important }
+.hint { bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important }
 .noisefloor { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(100% - 96px); z-index: 7; pointer-events: none; opacity: 0; mix-blend-mode: overlay; image-rendering: pixelated }
 .bcast { position: fixed; z-index: 30; width: 0; height: 0; border-radius: 50%; pointer-events: none; border: 1.5px solid var(--ink);
   transform: translate(-50%, -50%); animation: bcast 1.2s cubic-bezier(.2,.7,.3,1) both }
@@ -340,6 +359,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 
 <div class="vp" id="vp" aria-hidden="true">View project</div>
 <article class="detail" id="detail" aria-label="Project"><div class="d-wrap" id="dwrap"></div></article>
+<button type="button" class="dback" id="dback" aria-label="Back to all designs"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>All designs</button>
 <div class="sdial" id="sdial" role="slider" tabindex="0" aria-label="Sections" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><svg id="sstrip" aria-hidden="true"></svg><div class="needle" aria-hidden="true"></div></div>
 <div class="hint"><span>Drag the dial · scroll · ← →</span><button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button><button type="button" id="snd" aria-label="Mute ticks" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button></div>
 <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Scroll through designs" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1">
@@ -387,7 +407,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   }
   const CATS = [
     { k: '3d', name: '3D', tools: 'Blender' },
-    { k: 'product', name: 'Product', tools: 'Figma · Code' },
+    { k: 'product', name: 'Case study', tools: 'Figma · Code' },
     { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
     { k: 'motion', name: 'Motion', tools: 'Blender' }
   ];
@@ -439,12 +459,26 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   });
   const chips = $('chips');
   const firstOf = CATS.map(c => items.findIndex(x => x.cat === c.name));
+  // The chips are the Designs page's own nav and filter: All (the default) shows every piece; a category shows only its pieces.
+  let filt = null;
+  const chipAll = document.createElement('button'); chipAll.type = 'button'; chipAll.className = 'on'; chipAll.innerHTML = `All<sup>${items.length}</sup>`;
+  chipAll.addEventListener('click', () => { tap(); setFilter(null); }); chips.appendChild(chipAll);
   const chipEls = CATS.map((c, ci) => {
     const b = document.createElement('button'); b.type = 'button';
     b.innerHTML = `${c.name}<sup>${A[c.k].length}</sup>`;
-    b.addEventListener('click', () => { tap(); goTo(firstOf[ci]); });
+    b.addEventListener('click', () => { tap(); setFilter(c.name); });
     chips.appendChild(b); return b;
   });
+  function setFilter(name) {
+    if (filt === name) return; filt = name;
+    chipAll.classList.toggle('on', !name); chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === name));
+    const ovEl = document.getElementById('ov'); if (!ovEl) return;
+    ovEl.classList.add('refilt');
+    setTimeout(() => {
+      ovEl.querySelectorAll('.ov-t').forEach(t => { t.hidden = !!name && items[+t.dataset.i].cat !== name; });
+      ovEl.scrollTop = 0; ovEl.classList.remove('refilt');
+    }, 160);
+  }
 
   // ---------- Geometry ----------
   // The piece on the needle is full size; every other piece sits at scale S. Positions are packed edge to edge
@@ -508,7 +542,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     $('capM').innerHTML = [it.client && `<b>Client</b> ${it.client}`, `<b>Category</b> ${it.cat}${it.year ? ' · ' + it.year : ''}`, `<b>Tools</b> ${toolIcons(it.tools)}`].filter(Boolean).join('<br>');
     $('count').innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b> / ${N}`;
     $('dial').setAttribute('aria-valuenow', i + 1);
-    chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === it.cat));
+    // (the chips show the filter now, not the piece on the old row's needle)
     slots.forEach((s, j) => {
       s.classList.toggle('active', j === i);
       const v = s.querySelector('video'); if (!v) return;
@@ -850,7 +884,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     clearTimeout(wt); wt = setTimeout(() => { target = clamp(Math.round(target)); maybeTick(); }, 140);
   }, { passive: false });
   addEventListener('keydown', e => {
-    if (ovOpen) { if (e.key === 'Escape') { e.preventDefault(); closeOverview(-1); } return; }
+    if (ovOpen && openIdx < 0) return;   // All is the Designs page now: nothing to close back to
     if (openIdx >= 0) {
       if (e.key === 'Escape') { e.preventDefault(); closeDetail(); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); swapDetail(Math.min(N - 1, openIdx + 1)); }
@@ -1271,12 +1305,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     setOrigin(x, y);
     document.body.classList.add('open');
     await flyTo(f, from, m.getBoundingClientRect(), 760);
-    if (fr) { document.body.classList.add('noanim'); closeOverview(i); setTimeout(() => document.body.classList.remove('noanim'), 60); }   // the All view closes out of sight, behind the small view, so closing that lands on this piece in the row
+    // (the All view now stays open underneath; closing the small view flies the piece back into its tile)   // the All view closes out of sight, behind the small view, so closing that lands on this piece in the row
     if (rp) await rp.done;
     m.classList.remove('hidden'); f.remove(); flyIdx = -1;
     requestAnimationFrame(() => m.classList.add('in'));
     detail.focus({ preventScroll: true }); busy = false;
   }
+  document.getElementById('dback').addEventListener('click', () => closeDetail());
   async function closeDetail() {
     if (busy || openIdx < 0) return; busy = true;
     const i = openIdx; target = p = i; openIdx = -1;
@@ -1286,7 +1321,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     $('fq').textContent = '100.0'; $('nm').textContent = 'Designs';
     $('bkF').textContent = '98.0'; $('bkN').textContent = 'Home'; $('back').setAttribute('aria-label', 'Tune back to Home, 98.0');
     await new Promise(r => requestAnimationFrame(r));
-    const to = slots[i].getBoundingClientRect();
+    const tl = ovOpen && ov.querySelector(`.ov-t[data-i="${i}"] .ov-im`);
+    const to = (tl || slots[i]).getBoundingClientRect();
     setOrigin(to.left + to.width / 2, to.top + to.height / 2);   // the page closes back into the piece
     document.body.classList.remove('open');
     flyIdx = i;
@@ -1557,6 +1593,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       const f = y => on ? mid + R * Math.sin(th(y)) : y;                                   // where a line of the grid lands
       const fade = y => on ? Math.max(0, Math.cos(th(y))) ** .6 : 1;
       for (const o of ovTiles) {
+        if (o.t.hidden) continue;                                   // filtered out
         const r = o.im.getBoundingClientRect();
         // caption rides the drum and fades as it turns away (off-screen captions stay put, so the scroll length stays honest)
         const cr = o.c.getBoundingClientRect(), base = cr.top - o.cy;
@@ -1597,14 +1634,14 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   let vrDrag = null, vrAnim = null;
   const ovCols = () => getComputedStyle(ov.querySelector('.ov-grid')).gridTemplateColumns.split(' ').length;
   function vrModel() {
-    const n = ovCols(), centres = [], vh = innerHeight, st = ov.scrollTop;
-    for (let k = 0; k < ovTiles.length; k += n) { const r = ovTiles[k].im.getBoundingClientRect(); centres.push(st + r.top + r.height / 2 - vh / 2); }
+    const n = ovCols(), centres = [], vh = innerHeight, st = ov.scrollTop, vis = ovTiles.filter(o => !o.t.hidden);
+    for (let k = 0; k < vis.length; k += n) { const r = vis[k].im.getBoundingClientRect(); centres.push(st + r.top + r.height / 2 - vh / 2); }
     let fr = 0;
     if (centres.length < 2) fr = 0;
     else if (st <= centres[0]) fr = (st - centres[0]) / (centres[1] - centres[0]);
     else { fr = centres.length - 1; for (let k = 0; k < centres.length - 1; k++) if (st <= centres[k + 1]) { fr = k + (st - centres[k]) / (centres[k + 1] - centres[k]); break; } }
     const cats = [];
-    ovTiles.forEach(o => { const c = items[o.i].cat; if (!cats.find(x => x.c === c)) cats.push({ c, row: Math.floor(o.i / n) }); });
+    vis.forEach((o, k) => { const c = items[o.i].cat; if (!cats.find(x => x.c === c)) cats.push({ c, row: Math.floor(k / n) }); });
     return { rows: centres.length, fr, cats, centres, max: ov.scrollHeight - ov.clientHeight };
   }
   function vrScrollFor(fr) {
@@ -1660,13 +1697,16 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   vrul.addEventListener('pointerup', vrEnd); vrul.addEventListener('pointercancel', vrEnd);
   vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
+  // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
+  ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
   // a tile in the All view opens the piece in the small view, or the page the CMS points it to
   ov.addEventListener('click', e => {
     const t = e.target.closest('.ov-t'); if (!t) return;
     const i = +t.dataset.i;
-    if (items[i].link && window.Tuner) { tap();
+    const dest = items[i].link || (items[i].cs && items[i].page);   // a case study goes straight to it; "link" points a piece anywhere
+    if (dest && window.Tuner) { tap();
       try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
-      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: items[i].link });
+      Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest });
       return;
     }
     const r = (t.querySelector('.ov-im') || t).getBoundingClientRect(), cx = e.clientX, cy = e.clientY;
@@ -1810,7 +1850,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   }
   // 8 Broadcast: opening a project sends rings out from the tap across the page
   function broadcast(x, y) {
-    if (!PHY.broadcast || reduce) return;
+    return;   // off: opening a piece ripples the picture itself, without rings across the page
     for (let k = 0; k < 3; k++) {
       const r = document.createElement('i'); r.className = 'bcast';
       r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.animationDelay = (k * 140) + 'ms';

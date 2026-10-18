@@ -89,6 +89,106 @@ def analytics(days):
         out['error'] = f'Could not reach GoatCounter: {e}'
     return out
 
+# ---------------------------------------------------------------- what changed since the last publish (for the review before Publish)
+LABELS = {'title': 'Title', 'slug': 'Address', 'kind': 'Type', 'fq': 'Station', 'tag': 'Tag', 'role': 'Role', 'year': 'Year', 'client': 'Client',
+          'industry': 'Industry', 'did': 'What I did', 'headline': 'Headline', 'blurb': 'Summary', 'stat': 'Headline number', 'cover': 'Cover picture',
+          'story': 'Overview', 'run': 'Opening run', 'statement': 'Closing statement', 'shots': 'Screens', 'exp': 'Feature notes', 'impact': 'Impact',
+          'problem': 'Problem', 'goal': 'Goal', 'impactNote': 'How impact was measured', 'heroVideo': 'Opening video', 'heroPoster': 'Video poster',
+          'brandVer': 'Brand page sections', 'type': 'Typefaces', 'colors': 'Brand colours', 'hidden': 'Hidden', 'category': 'Category', 'images': 'Picture',
+          'bg': 'Background colour', 'dark': 'Dark picture', 'desc': 'Project info', 'case': 'Part of case study', 'credits': 'Credits', 'link': 'Opens',
+          'layout': 'Layout page', 'where': 'Where', 'what': 'Description', 'years': 'Years', 'statLabel': 'Number label', 'stat2': 'Second number',
+          'stat2Label': 'Second number label', 'name': 'Name', 'tech': 'Made with', 'sub': 'Under the heading', 'tools': 'Tools', 'chapters': 'Chapters'}
+MEDIA_RE = re.compile(r'\.(jpe?g|png|webp|gif|svg|mp4|webm|mov)(\?|$)', re.I)
+def _is_media(v): return isinstance(v, str) and bool(MEDIA_RE.search(v)) or isinstance(v, dict) and ('video' in v or 'color' in v)
+def _short(v):
+    if v is None or v == '' or v == [] or v == {}: return ''
+    if isinstance(v, str): return re.sub(r'<br\s*/?>', ' / ', v)
+    if isinstance(v, bool): return 'Yes' if v else 'No'
+    if isinstance(v, (int, float)): return str(v)
+    if isinstance(v, list) and all(isinstance(x, str) for x in v): return ' · '.join(_short(x) for x in v)
+    return json.dumps(v, ensure_ascii=False)[:300]
+def _diff(a, b, path, out):   # field-level differences, media kept whole so they can be shown as pictures
+    if a == b: return
+    if _is_media(a) or _is_media(b):
+        out.append({'field': path, 'media': True, 'before': a, 'after': b}); return
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in list(dict.fromkeys(list(a) + list(b))):
+            if k.startswith('_'): continue
+            _diff(a.get(k), b.get(k), path + [k], out)
+        return
+    if isinstance(a, list) and isinstance(b, list) and (any(isinstance(x, (list, dict)) or _is_media(x) for x in a + b)):
+        for i in range(max(len(a), len(b))):
+            _diff(a[i] if i < len(a) else None, b[i] if i < len(b) else None, path + [i], out)
+        return
+    out.append({'field': path, 'media': False, 'before': _short(a), 'after': _short(b)})
+def _label(path):
+    P = list(path)
+    if P[:1] == ['images']: return {'src': 'Picture', 'video': 'Video', 'ratio': 'Shape'}.get(P[-1], 'Picture')
+    if P[:1] == ['shots'] and len(P) >= 2:
+        return f'Screen {P[1] + 1}' + (' › ' + ['Picture', 'Label', 'Where', 'Note'][P[2]] if len(P) > 2 and isinstance(P[2], int) and P[2] < 4 else '')
+    if P[:1] == ['run'] and len(P) >= 2: return f'Opening run › picture {P[1] + 1}'
+    if P[:1] == ['story'] and len(P) >= 2: return 'Overview › ' + ('heading' if P[1] == 0 else f'paragraph {P[2] + 1}' if len(P) > 2 else 'paragraphs')
+    if P[:1] == ['exp'] and len(P) >= 2: return 'Feature notes › ' + ('heading' if P[1] == 0 else f'note {P[2] + 1}' + (' › ' + ['title', 'text'][P[3]] if len(P) > 3 else '') if len(P) > 2 else 'notes')
+    if P[:2] == ['impact', 'stats'] and len(P) >= 3: return f'Impact › number {P[2] + 1}'
+    if P[:1] in (['credits'], ['type'], ['colors']) and len(P) >= 2: return f'{LABELS[P[0]]} › {P[1] + 1}'
+    parts = []
+    for p in path:
+        if isinstance(p, int): parts.append(f'#{p + 1}')
+        else: parts.append(LABELS.get(p, p))
+    return ' › '.join(parts) or 'Value'
+def _head_json(name):
+    code, out = run(['git', 'show', f'HEAD:content/{name}.json'])
+    if code: return None
+    try: return json.loads(out)
+    except Exception: return None
+def changes():
+    out, groups = {'groups': [], 'uploads': [], 'pages': 0}, []
+    def collection(name, listkey, key, title_of, label, link=None):
+        old = (_head_json(name) or {}).get(listkey, []); cur = (read_json(os.path.join(CONTENT, name + '.json'), {}) or {}).get(listkey, [])
+        om = {key(x, i): x for i, x in enumerate(old)}; nm = {key(x, i): x for i, x in enumerate(cur)}
+        items = []
+        for k, x in nm.items():
+            if k not in om: items.append({'status': 'added', 'title': title_of(x), 'thumb': _thumb(x), 'link': link(x) if link else None, 'fields': []})
+            else:
+                d = []; _diff(om[k], x, [], d)
+                if d: items.append({'status': 'edited', 'title': title_of(x), 'thumb': _thumb(x), 'link': link(x) if link else None, 'fields': [dict(f, field=_label(f['field'])) for f in d]})
+        for k, x in om.items():
+            if k not in nm: items.append({'status': 'removed', 'title': title_of(x), 'thumb': _thumb(x), 'fields': []})
+        if [key(x, i) for i, x in enumerate(old) if key(x, i) in nm] != [key(x, i) for i, x in enumerate(cur) if key(x, i) in om]:
+            items.append({'status': 'reordered', 'title': 'New order', 'fields': [{'field': 'Order', 'media': False, 'before': ' · '.join(title_of(x) for x in old if key(x, 0) in nm), 'after': ' · '.join(title_of(x) for x in cur if key(x, 0) in om)}]})
+        if items: groups.append({'section': label, 'items': items})
+    def _thumb(x):
+        for k in ['cover', 'images']:
+            v = x.get(k)
+            if k == 'images' and v: v = v[0].get('video') or v[0].get('src')
+            if v: return v
+        return None
+    collection('cases', 'cases', lambda x, i: x.get('slug') or f'#{i}', lambda x: x.get('title', ''), 'Case studies', lambda x: ('brand' if x.get('kind') == 'Brand' else 'case') + '.html#' + x.get('slug', ''))
+    collection('designs', 'projects', lambda x, i: x.get('title') or f'#{i}', lambda x: x.get('title', ''), 'Designs', lambda x: 'designs.html')
+    collection('about', 'chapters', lambda x, i: (x.get('where') or '') + '|' + (x.get('role') or ''), lambda x: ' · '.join(filter(None, [x.get('where'), x.get('role')])), 'About', lambda x: 'about.html')
+    collection('engineering', 'tools', lambda x, i: x.get('name') or f'#{i}', lambda x: x.get('name', ''), 'Engineering', lambda x: 'engineering.html')
+    for name, label, page in [('engineering', 'Engineering page', 'engineering.html'), ('projects', 'Projects page', 'projects.html'), ('site', 'Settings', None)]:
+        old = _head_json(name) or {}; cur = read_json(os.path.join(CONTENT, name + '.json'), {}) or {}
+        d = []; _diff({k: v for k, v in old.items() if k != 'tools'}, {k: v for k, v in cur.items() if k != 'tools'}, [], d)
+        if d: groups.append({'section': label, 'items': [{'status': 'edited', 'title': label, 'link': page, 'fields': [dict(f, field=_label(f['field'])) for f in d]}]})
+    for name, label, media in [('text', 'Page text', False), ('media', 'Pictures & videos', True)]:
+        old = _head_json(name) or {}; cur = read_json(os.path.join(CONTENT, name + '.json'), {}) or {}
+        items = []
+        for page in sorted(set(old) | set(cur)):
+            o, n = old.get(page, {}), cur.get(page, {}); f = []
+            for k in list(dict.fromkeys(list(o) + list(n))):
+                if o.get(k) != n.get(k): f.append({'field': '' if media else k, 'media': media, 'before': o.get(k) or k, 'after': n.get(k) or k})
+            if f: items.append({'status': 'edited', 'title': page.replace('.html', '').replace('index', 'home').capitalize(), 'link': page, 'fields': f})
+        if items: groups.append({'section': label, 'items': items})
+    code, st = run(['git', 'status', '--porcelain', '--untracked-files=all'])
+    for l in st.splitlines():
+        p = l[3:].strip('"')
+        if l.startswith('??') and p.startswith('assets/') and MEDIA_RE.search(p): out['uploads'].append(p)
+        if p.endswith('.html') and '/' not in p: out['pages'] += 1
+    out['groups'] = groups
+    out['total'] = sum(len(g['items']) for g in groups) + len(out['uploads'])
+    return out
+
 # ---------------------------------------------------------------- publish (git)
 def git_status():
     code, out = run(['git', 'status', '--porcelain'])
@@ -136,6 +236,7 @@ class H(SimpleHTTPRequestHandler):
             if u.path == '/api/media': return self._json({'files': media_library()})
             if u.path == '/api/analytics': return self._json(analytics(max(1, min(366, int((q.get('days') or ['30'])[0])))))
             if u.path == '/api/status': return self._json(git_status())
+            if u.path == '/api/changes': return self._json(changes())
             return self._json({'error': 'not found'}, 404)
         return super().do_GET()
 

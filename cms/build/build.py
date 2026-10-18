@@ -317,6 +317,7 @@ for p in pj:
         e['layout'] = lay
         e['page'] = LAYOUT_PAGE[lay] + '#' + slugify(p['title'])
     if p.get('desc'): e['desc'] = p['desc']
+    if p.get('caseStudy'): e['cs'] = True   # optional: shown as a case study (its layout page is the case study)
     for f_ in ('year', 'case', 'credits', 'link'):   # optional: year, the case study it belongs to (slug), credits [[role, name]], link (a page to open instead of the small view)
         if p.get(f_): e[f_] = p[f_]
     A.setdefault(p.get('category', '3d'), []).append(e)

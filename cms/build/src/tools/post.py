@@ -1,7 +1,7 @@
 # The last step of the build (run from build.py):
 #  1. lists every piece of text and every picture/video on each page, so the CMS can show them (cms/build/.index.json)
 #  2. applies your edits from content/text.json and content/media.json
-#  3. adds analytics (content/site.json) to every page
+#  3. adds analytics (content/site.json) and the navigation (nav.js) to every page
 import json, re, os, html as _html
 PAGES = ['index.html', 'about.html', 'engineering.html', 'projects.html', 'designs.html', 'case.html', 'brand.html',
          'logo.html', 'product.html', 'project.html', 'showcase.html']
@@ -97,6 +97,32 @@ ANALYTICS = ('' if not GC else
   '  window.KMtrack = function (path, title) { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };</script>\n'
   f'<script data-goatcounter="https://{GC}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n')
 
+# the one navigation (cms/build/src/nav.js) on every page
+import shutil as _sh
+_sh.copy(f'{KFM}/nav.js', f'{REPO}/nav.js')
+NAV = '<script src="nav.js" defer></script>\n'
+# iteration 4: Home's intro status (home.js), Home ↔ Designs by scrolling (flow.js), tips for getting around (protips.js)
+_sh.copy(f'{KFM}/home.js', f'{REPO}/home.js'); _sh.copy(f'{KFM}/flow.js', f'{REPO}/flow.js')
+_cases = json.load(open(f'{REPO}/content/cases.json', encoding='utf-8')).get('cases', [])
+_dsn = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8')).get('projects', []) if not p.get('hidden')]
+_ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
+_hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
+open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
+# arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
+FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
+  'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'
+  'if(document.prerendering)document.addEventListener("prerenderingchange",on,{once:true});else on()})()</script>'
+  '<style>html.flow-up body>*:not(.kmn-scale):not(.ov){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale){animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}'
+  'html.flow-up .ov{animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}@keyframes flfade{from{opacity:.15}}'
+  'html.flow-up{--fl:36px}@keyframes flin{from{translate:0 var(--fl);opacity:.15}}</style>')
+# Home: the design pieces, blurred, floating behind the intro (cms/build/src/homebg.js; pictures from content/designs.json)
+_sh.copy(f'{KFM}/homebg.js', f'{REPO}/homebg.js')
+_dz = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8')).get('projects', []) if not p.get('hidden')]
+_bg = []
+for _d in _dz:
+    _im = next((m for m in _d.get('images', []) if isinstance(m, dict) and m.get('src') and not m.get('video')), None)
+    if _im: _bg.append({'src': _im['src'], 'ratio': _im.get('ratio', 1)})
+HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
 INDEX = {}
 for _p in PAGES:
     _f = f'{REPO}/{_p}'
@@ -105,6 +131,12 @@ for _p in PAGES:
     INDEX[_p] = index_page(_s)
     _s = apply(_p, _s)
     if ANALYTICS and '</head>' in _s: _s = _s.replace('</head>', ANALYTICS + '</head>', 1)
+    if 'src="nav.js"' not in _s: _s = _s.replace('</body>', NAV + '</body>', 1)
+    if _p == 'index.html' and 'src="homebg.js"' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
+    if 'src="protips.js"' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
+    if _p == 'index.html' and 'src="home.js"' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
+    if _p in ('index.html', 'designs.html') and 'src="flow.js"' not in _s:
+        _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1).replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')
