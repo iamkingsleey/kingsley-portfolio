@@ -10,7 +10,7 @@
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js"></script>
+<script src="tuner.js?v=584c79d8"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Engineering · Kingsley M.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -211,7 +211,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
 
-<script src="popkit.js"></script>
+<script src="popkit.js?v=5e99f4b0"></script>
 <script>
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
@@ -372,7 +372,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
         if (window.Tuner) Tuner.go({ from: 96, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
   </script>
-  <script src="nav.js" defer></script>
-<script src="protips.js" defer></script>
+  <script src="nav.js?v=a13b3d33" defer></script>
+<script src="protips.js?v=458b1f57" defer></script>
 </body>
 </html>

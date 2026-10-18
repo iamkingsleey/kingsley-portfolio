@@ -10,7 +10,7 @@
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js"></script>
+<script src="tuner.js?v=584c79d8"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Case study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -344,7 +344,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610181928" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610182053" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
 
 <!-- opening: sideways first, then the page continues down -->
 <section class="run" id="run" aria-label="Project opening"><div class="rpin"><div class="track" id="track">
@@ -377,7 +377,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
 
-<script src="popkit.js"></script>
+<script src="popkit.js?v=5e99f4b0"></script>
 <script>
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
@@ -808,11 +808,11 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610181928#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610182053#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>
-<script src="nav.js" defer></script>
-<script src="protips.js" defer></script>
+<script src="nav.js?v=a13b3d33" defer></script>
+<script src="protips.js?v=458b1f57" defer></script>
 </body>
 </html>

@@ -127,6 +127,13 @@ for _d in _dz:
         _t = _im['src'].replace('assets/designs/', 'assets/designs/thumbs/', 1)   # the trail is small and blurred: the thumbnail is plenty
         _bg.append({'src': _t if _t != _im['src'] and os.path.exists(f'{REPO}/{_t}') else _im['src'], 'ratio': _im.get('ratio', 1)})
 HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
+import hashlib as _hl
+_vers = {}
+def _ver(n):
+    if n not in _vers:
+        try: _vers[n] = _hl.md5(open(f'{REPO}/{n}.js', 'rb').read()).hexdigest()[:8]
+        except OSError: _vers[n] = '0'
+    return _vers[n]
 INDEX = {}
 for _p in PAGES:
     _f = f'{REPO}/{_p}'
@@ -135,14 +142,16 @@ for _p in PAGES:
     INDEX[_p] = index_page(_s)
     _s = apply(_p, _s)
     if ANALYTICS and '</head>' in _s: _s = _s.replace('</head>', ANALYTICS + '</head>', 1)
-    if 'src="nav.js"' not in _s: _s = _s.replace('</body>', NAV + '</body>', 1)
-    if _p == 'index.html' and 'src="homebg.js"' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
+    if 'src="nav.js' not in _s: _s = _s.replace('</body>', NAV + '</body>', 1)
+    if _p == 'index.html' and 'src="homebg.js' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
-    if 'src="protips.js"' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
-    if _p == 'index.html' and 'src="home.js"' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
-    if _p in ('index.html', 'designs.html') and 'src="flow.js"' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
+    if 'src="protips.js' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
+    if _p == 'index.html' and 'src="home.js' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
+    if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
         _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
         if _p == 'index.html': _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
+    # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
+    _s = re.sub(r'src="(nav|protips|home|flow|homebg|tuner|popkit)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')

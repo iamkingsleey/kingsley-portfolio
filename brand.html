@@ -10,7 +10,7 @@
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js"></script>
+<script src="tuner.js?v=584c79d8"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brand case study</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -281,7 +281,7 @@ figure { margin: 0 }
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610181928" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">98.0</span><span class="nm" id="snm">Brand</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610182053" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">98.0</span><span class="nm" id="snm">Brand</span></div>
 
 <!-- 1 · horizontal run: three frames, then the page continues vertically -->
 <section class="run" id="run" aria-label="Project opening">
@@ -328,7 +328,7 @@ figure { margin: 0 }
 
 <div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
 
-<script src="popkit.js"></script>
+<script src="popkit.js?v=5e99f4b0"></script>
 <script>
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
@@ -679,11 +679,11 @@ figure { margin: 0 }
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610181928#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610182053#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>
-<script src="nav.js" defer></script>
-<script src="protips.js" defer></script>
+<script src="nav.js?v=a13b3d33" defer></script>
+<script src="protips.js?v=458b1f57" defer></script>
 </body>
 </html>
