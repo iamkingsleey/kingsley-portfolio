@@ -66,17 +66,18 @@
    "desc": "A colourful award with ribbons, made for celebrating wins in a product."
   },
   {
-   "title": "Card holder with stickers",
+   "title": "Wine glass",
    "category": "brand",
    "images": [
     {
-     "src": "assets/designs/card-holder-with-colorful-stickers.jpg",
-     "ratio": 1.5
+     "src": "assets/uploads/glass-of-wine1.png",
+     "ratio": 1
     }
    ],
-   "bg": "#23252f",
+   "bg": "#13100f",
    "dark": true,
-   "desc": "A card holder covered in bright stickers, for a playful payments brand."
+   "desc": "A card holder covered in bright stickers, for a playful payments brand.",
+   "credits": []
   },
   {
    "title": "Badge",
