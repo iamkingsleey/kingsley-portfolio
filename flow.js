@@ -45,7 +45,8 @@
       const fx = [...e.children].filter(k => getComputedStyle(k).position === 'fixed');
       if (getComputedStyle(e).position !== 'fixed' && fx.length) T.push(...fx); else T.push(e);
     });
-    T.forEach(e => e.animate([{ translate: '0 0', opacity: 1 }, { translate: `0 ${dir > 0 ? -28 : 28}vh`, opacity: 0 }], { duration: MS, easing: E, fill: 'forwards' }));
+    // leave hidden things hidden (the recruiter card, tips): animate each from its own current opacity, and skip the invisible ones
+    T.filter(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && +c.opacity > 0.01; }).forEach(e => e.animate([{ translate: '0 0', opacity: getComputedStyle(e).opacity }, { translate: `0 ${dir > 0 ? -28 : 28}vh`, opacity: 0 }], { duration: MS, easing: E, fill: 'forwards' }));
     cover.animate([{ transform: `translateY(${dir > 0 ? 100 : -100}%)` }, { transform: 'none' }], { duration: MS, easing: E, fill: 'forwards' });
     setTimeout(() => { location.href = to; }, MS / 2);       // start loading half way; this page stays on screen until the next one can paint
   };

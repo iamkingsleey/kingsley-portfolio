@@ -27,6 +27,9 @@
   .pt-rec { position: fixed; z-index: 150; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(48px + env(safe-area-inset-top, 0px)); height: 36px; padding: 0 14px; border-radius: 999px; border: 0;
     background: var(--pill, #f2f2f2); color: var(--ink, #111); font: 500 13px Geist, system-ui, sans-serif; cursor: pointer; transition: background .2s }
   .pt-rec:hover { background: var(--pill-hover, #e8e8e8) }
+  .pt-rec { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 14px }
+  .pt-rec svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
+  .pt-rec[aria-expanded="true"] svg { transform: rotate(180deg) }
   .pt-card { position: fixed; z-index: 152; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(96px + env(safe-area-inset-top, 0px)); width: min(320px, calc(100vw - 32px)); padding: 18px 18px 18px; border-radius: 20px;
     background: var(--bg, #fff); color: var(--text, #333); box-shadow: 0 0 0 1px var(--edge, rgb(0 0 0 / .07)), 0 24px 60px rgb(0 0 0 / .18); font: 14px/1.5 Geist, system-ui, sans-serif;
     opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left; pointer-events: none; transition: opacity .2s, transform .3s cubic-bezier(.2,.8,.2,1) }
@@ -88,7 +91,7 @@
       addEventListener('wheel', () => set('km-scrolled'), { passive: true, once: true });
     }
     // 4 · for recruiters
-    const rec = document.createElement('button'); rec.type = 'button'; rec.className = 'pt-rec'; rec.textContent = 'For recruiters'; rec.setAttribute('aria-expanded', 'false');
+    const rec = document.createElement('button'); rec.type = 'button'; rec.className = 'pt-rec'; rec.innerHTML = 'For recruiters<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>'; rec.setAttribute('aria-expanded', 'false');
     const card = document.createElement('div'); card.className = 'pt-card'; card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'For recruiters');
     const cv = [...document.querySelectorAll('a')].find(a => a.textContent.trim().toLowerCase() === 'resume');
     // the short route through the site: what to open first (nothing the landing page already says)
