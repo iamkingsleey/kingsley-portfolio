@@ -80,6 +80,11 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 .slot .cstag::before, .cap .csc::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #ff4a1c }
 .cap .csc { display: inline-flex; align-items: center; gap: 6px; color: var(--ink) }
 /* the small view for a design shot: the picture, its title and a line about it */
+/* small view: two columns, the picture on the left and its details on the right (they stay put as you scroll) */
+.d-mini .d-cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: start }
+.d-mini .d-info { position: sticky; top: 140px; margin-top: 0; max-width: none }
+.d-mini .d-frame.m { width: min(100%, calc((100svh - 200px) * var(--r))) }
+@media (max-width: 899px) { .d-mini .d-cols { grid-template-columns: 1fr; gap: 36px } .d-mini .d-info { position: static } }
 .d-mini .d-frame.m { height: auto; overflow: hidden; background: var(--tile) }
 .d-mini .d-frame.m .d-pic { inset: 0 }
 .d-info { display: grid; gap: 44px; max-width: 620px; margin-top: 44px }
@@ -256,6 +261,7 @@ body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, vi
 .ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
 body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
 .ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
+.ov.flat .ov-im { opacity: 1; background-size: cover; background-position: center }   /* fallback: the plain pictures, when the canvas can't draw them */
 .ovc { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0 }
 .ov-grid { position: relative; z-index: 1 }
 .ov-t:hover .ov-c b { color: var(--ink) }
@@ -598,7 +604,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     glc.style.display = shader ? '' : 'none';
     if (!shader) return;
     if (glc.width !== field.width || glc.height !== field.height) { glc.width = field.width; glc.height = field.height; gl.viewport(0, 0, glc.width, glc.height); }
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, field);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, field); }
+    catch (_) { glProg = null; field.style.opacity = ''; glc.style.display = 'none'; return; }   // pictures from another origin: keep the plain dial
     edgeSpeed += (Math.min(1, Math.abs(vel) * 40) - edgeSpeed) * .12;
     gl.uniform1f(glU.mode, EDGE === 'bulge' ? 1 : EDGE === 'curve' ? 2 : 3);
     gl.uniform1f(glU.amt, W < 900 ? .6 : 1);
@@ -1043,19 +1050,19 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     document.body.classList.toggle('mini', true);
     if (true) {                                     // every piece: picture, title, info, credits, next (the CMS can point a piece elsewhere with "link")
       dwrap.classList.add('d-mini');
-      // the piece whole, in its own shape (no cuts), then its details stacked under it; a piece from a bigger project links to that case study
+      // the piece whole, in its own shape (no cuts), with its details beside it; a piece from a bigger project links to that case study
       const parent = it.cs ? it : it.case ? items.find(y => y.cs && (y.page || '').split('#')[1] === it.case) : null;
       const credits = it.credits && it.credits.length ? it.credits : [['Design', 'Kingsley Mkpandiok']];
       dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
-        <div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};width:min(100%, calc((100svh - 220px) * ${it.r}))">
+        <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
           <div class="d-pic" id="dpic">${media}</div>
-        </div>
+        </div></div>
         <div class="d-info">
           <div class="d-ih"><h1>${it.t}</h1>${it.year ? `<span class="d-yr">${it.year}</span>` : ''}<span class="d-chip">${it.cat}</span></div>
           <div class="d-ib"><h3>Project info</h3><p>${it.summary || c.sum}</p>${parent ? `<a class="d-read" href="${parent.page}" id="dread">Read case study</a>` : ''}</div>
           <div class="d-ib"><h3>Credits</h3><dl class="d-cred">${credits.map(([r, n]) => `<div><dt>${r}</dt><dd>${n}</dd></div>`).join('')}</dl></div>
-        </div>
+        </div></div>
       </section>
       <section class="d-sec" data-s="1">
         <div class="d-next next" id="dnext">
@@ -1580,13 +1587,15 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
       }
       if (ogl) {
-        ogl.texImage2D(ogl.TEXTURE_2D, 0, ogl.RGBA, ogl.RGBA, ogl.UNSIGNED_BYTE, ovFlat);
+        // pictures from another origin can't be read into WebGL (it throws); then the grid shows flat, with the plain pictures
+        try { ogl.texImage2D(ogl.TEXTURE_2D, 0, ogl.RGBA, ogl.RGBA, ogl.UNSIGNED_BYTE, ovFlat); }
+        catch (_) { ogl = null; ovc.style.display = 'none'; ov.classList.add('flat'); requestAnimationFrame(ovWarp); return; }
         ogl.uniform2f(oglU.res, ovc.width, ovc.height);
         ogl.uniform1f(oglU.mid, mid * dpr); ogl.uniform1f(oglU.R, R * dpr); ogl.uniform1f(oglU.narrow, DRUM.narrow);
         ogl.uniform1f(oglU.cx, cx * dpr); ogl.uniform1f(oglU.M, M * dpr); ogl.uniform1f(oglU.topClear, (vw < 900 ? 64 : 104) * dpr); ogl.uniform1f(oglU.fadeT, 90 * dpr); ogl.uniform1f(oglU.fadeB, vh * DRUM.fade * dpr); ogl.uniform1f(oglU.on, on ? 1 : 0);   // nothing shows behind the station pill; the fade starts below it
         ogl.clearColor(0, 0, 0, 0); ogl.clear(ogl.COLOR_BUFFER_BIT);
         ogl.drawArrays(ogl.TRIANGLE_STRIP, 0, 4);
-      } else { ov2d.setTransform(1, 0, 0, 1, 0, 0); ov2d.clearRect(0, 0, ovc.width, ovc.height); ov2d.drawImage(ovFlat, 0, 0); }
+      } else if (ov2d) { try { ov2d.setTransform(1, 0, 0, 1, 0, 0); ov2d.clearRect(0, 0, ovc.width, ovc.height); ov2d.drawImage(ovFlat, 0, 0); ov2d.getImageData(0, 0, 1, 1); } catch (_) { ov2d = null; ovc.style.display = 'none'; ov.classList.add('flat'); } }
       drawVRuler();
     } else vrLastRow = null;
     requestAnimationFrame(ovWarp);
