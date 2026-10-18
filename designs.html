@@ -437,12 +437,17 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const N = items.length;
 
   // ---------- Build ----------
+  // pictures from another site (the case-study covers) are fetched with CORS, so the dial's bend and the All view's drum can still use them;
+  // if that site refuses, the picture loads plainly and the canvases leave it out instead of breaking the effect
+  const remote = u => /^https?:/i.test(u || '') && !String(u).startsWith(location.origin);
+  const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
+  const okDraw = im => !(im && im.dataset && im.dataset.nox);
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '') + (it.cs ? ' cs' : '');
     s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
     if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; s.appendChild(v); }
-    else { const im = new Image(); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
+    else { const im = xo(new Image(), it.src); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
     row.appendChild(s);
     return s;
   });
@@ -670,6 +675,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       if (src.tagName === 'IMG' && !src.naturalWidth) { const th = thumbFor(items[i].src); if (th && th.naturalWidth) src = th; }   // small preview until the full image lands
       if (isA && hoverAmt > .01 && items[i].alt && altImg(i).naturalWidth) src = altImg(i);   // second angle while hovered
       if (src.tagName === 'VIDEO' && src.readyState < 2) src = texImg(items[i].poster);   // poster until frames arrive
+      if (!okDraw(src)) continue;
       const sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
       if (!sw) continue;
       const ia = sw / sh, ba = w / h;                                  // object-fit: cover crop
@@ -1180,7 +1186,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     return im;
   }
   items.forEach(it => thumbFor(still(it)));
-  function texImg(src) { let im = texCache.get(src); if (!im) { im = new Image(); im.src = src; texCache.set(src, im); } return im; }
+  function texImg(src) { let im = texCache.get(src); if (!im) { im = xo(new Image(), src); im.src = src; texCache.set(src, im); } return im; }
   const warm = () => { slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } }); items.forEach(it => texImg(still(it))); };
   if (document.readyState === 'complete') setTimeout(warm, 200); else addEventListener('load', () => setTimeout(warm, 200));          // warm up so the first tap can ripple
   function makeRipple(src, W, H, cx, cy) {
@@ -1393,7 +1399,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 
   // ---------- Hover preview ----------
   const altCache = {};
-  function altImg(i) { if (!altCache[i]) { altCache[i] = new Image(); altCache[i].src = items[i].alt; } return altCache[i]; }
+  function altImg(i) { if (!altCache[i]) { altCache[i] = xo(new Image(), items[i].alt); altCache[i].src = items[i].alt; } return altCache[i]; }
   function setHover(on) {
     if (on === hovering) return;
     hovering = on;
@@ -1579,7 +1585,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         if (r.bottom < -M || r.top > vh + M) continue;
         const it = items[o.i], full = texImg(still(it)), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
         const sw = src.naturalWidth, sh = src.naturalHeight;
-        if (sw) {
+        if (sw && okDraw(src)) {
           const ia = sw / sh, ba = r.width / r.height;
           const cw = ia > ba ? sh * ba : sw, ch = ia > ba ? sh : sw / ba, cx0 = (sw - cw) / 2, cy0 = (sh - ch) / 2;
           oc.drawImage(src, cx0, cy0, cw, ch, r.left, r.top, r.width, r.height);
