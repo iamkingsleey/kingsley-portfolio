@@ -242,7 +242,7 @@ figure { margin: 0 }
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="designs.html?v=202610181918" id="back"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="fq"></span><span class="nm" id="nm"></span></div>
+<div class="station" data-readout><a class="back" href="designs.html?v=202610181928" id="back"><span aria-hidden="true">‹</span><b>100.0</b> Designs</a><span class="fq" id="fq"></span><span class="nm" id="nm"></span></div>
 <main class="wrap" id="page"></main>
 <div class="sdial" aria-hidden="true"><canvas id="sdial"></canvas></div>
 
@@ -488,7 +488,7 @@ figure { margin: 0 }
         const im = el.querySelector('img'); if (im && !reduce) im.style.setProperty('--px', (c * -.07).toFixed(1) + 'px');
         if (!reduce) el.style.transform = `scale(${(1 - Math.min(.1, Math.abs(c) / innerWidth * .16)).toFixed(4)})`;
       });
-      if (best !== hlast) { if (hlast >= 0) snd('detent'); hlast = best; $('hc').textContent = '0' + (best + 1); }
+      if (best !== hlast) { hlast = best; $('hc').textContent = '0' + (best + 1); }
     }
     if (stmtWords.length) {                                                       // statement fills in as you read
       const r = $('stmt').getBoundingClientRect(), p = Math.max(0, Math.min(1, (vh * .82 - r.top) / (r.height + vh * .35)));
@@ -510,7 +510,7 @@ figure { margin: 0 }
     const mid = vh / 2; let f = 0;
     secs.forEach((el, k) => { if (!el) return; const r = el.getBoundingClientRect(); if (r.top < mid) { const fr = Math.min(1, Math.max(0, (mid - r.top) / Math.max(1, r.height))), e = Math.max(0, (fr - .8) / .2); f = k + 1 + e * e * (3 - 2 * e) * .999; } });   // rests on a section's label, moves on near its end
     sp = reduce ? f : dialS.step(f, dt);
-    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const st = Math.round(sp); if (st !== lastSt) { lastSt = st; }   /* no tick: the section dial is hidden */
     const dpr = Math.min(2, devicePixelRatio || 1), W = sd.clientWidth, H = sd.clientHeight;
     if (sd.width !== Math.round(W * dpr)) { sd.width = Math.round(W * dpr); sd.height = Math.round(H * dpr); }
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);

@@ -443,7 +443,7 @@ h1 .w.in > span { translate: 0 0 }
       const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * (N - 1), q = reduce ? Math.round(p) : held(p);
       lays.forEach((l, i) => { const d = q - i, o = clamp(1 - Math.abs(d) * 1.6, 0, 1); l.style.opacity = o; l.style.transform = `translate3d(0,${(-d * 60).toFixed(1)}px,0) scale(${(.94 + o * .06).toFixed(3)})`; l.style.visibility = o < .01 ? 'hidden' : ''; });
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; swap(['tci', 'tcx'], () => { $('tci').innerHTML = `<b>0${c + 1}</b> · ${SHOTS[c][4]} FM`; $('tch').textContent = SHOTS[c][2]; $('tcp').textContent = SHOTS[c][3]; }); }
+      if (c !== cur) { cur = c; swap(['tci', 'tcx'], () => { $('tci').innerHTML = `<b>0${c + 1}</b> · ${SHOTS[c][4]} FM`; $('tch').textContent = SHOTS[c][2]; $('tcp').textContent = SHOTS[c][3]; }); }
       // the ruler: one tick per 0.1, the frequency under the needle follows the screens
       const i0 = Math.floor(q), fr = FQ[i0] + (FQ[Math.min(N - 1, i0 + 1)] - FQ[i0]) * (q - i0);
       const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
@@ -471,7 +471,7 @@ h1 .w.in > span { translate: 0 0 }
     let cur = -1;
     return (dt, vh) => {
       let best = 0, bd = 1e9; pans.forEach((p, i) => { const b = p.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - vh / 2); if (d < bd) { bd = d; best = i; } });
-      if (best !== cur) { if (cur >= 0) snd('detent'); cur = best; items.forEach((it, i) => it.classList.toggle('on', i === cur)); const it = items[cur]; $('sn').style.translate = `0 ${it.offsetTop}px`; $('sn').style.height = Math.max(30, it.offsetHeight - 30) + 'px'; }
+      if (best !== cur) { cur = best; items.forEach((it, i) => it.classList.toggle('on', i === cur)); const it = items[cur]; $('sn').style.translate = `0 ${it.offsetTop}px`; $('sn').style.height = Math.max(30, it.offsetHeight - 30) + 'px'; }
     };
   }
   // ---- Camera: one large screen; the view glides to each detail and holds there ----
@@ -496,7 +496,7 @@ h1 .w.in > span { translate: 0 0 }
       const s = A[2] + (B[2] - A[2]) * t, fx = A[0] + (B[0] - A[0]) * t, fy = A[1] + (B[1] - A[1]) * t;
       cw.style.transform = `translate3d(${((.5 - fx) * bw * s).toFixed(1)}px,${((.5 - fy) * bh * s).toFixed(1)}px,0) scale(${s.toFixed(3)})`;
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; dots.forEach((d, k) => d.classList.toggle('on', k === c)); swap(['cci', 'ccx'], () => { $('cci').innerHTML = `<b>0${c + 1}</b> of 0${N}`; $('cch').textContent = ST[c][3]; $('ccp').textContent = ST[c][4]; }); }
+      if (c !== cur) { cur = c; dots.forEach((d, k) => d.classList.toggle('on', k === c)); swap(['cci', 'ccx'], () => { $('cci').innerHTML = `<b>0${c + 1}</b> of 0${N}`; $('cch').textContent = ST[c][3]; $('ccp').textContent = ST[c][4]; }); }
     };
   }
   // ---- Devices: one frame reshapes from phone to tablet to browser as you scroll ----
@@ -527,7 +527,7 @@ h1 .w.in > span { translate: 0 0 }
       $('mlp').style.setProperty('--w', (pw - pw * .07) + 'px'); $('mlp').style.opacity = clamp(1 - q * 2.2, 0, 1);   // the phone layout keeps its own size while it fades
       $('mlw').style.setProperty('--w', sw + 'px'); $('mlw').style.opacity = clamp(q * 1.6 - .4, 0, 1);
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; labs.forEach((l, k) => l.classList.toggle('on', k === c)); swap(['dci', 'dcx'], () => { $('dci').innerHTML = `<b>0${c + 1}</b> · ${D[c][1]}`; $('dch').textContent = D[c][0]; $('dcp').textContent = D[c][2]; }); }
+      if (c !== cur) { cur = c; labs.forEach((l, k) => l.classList.toggle('on', k === c)); swap(['dci', 'dcx'], () => { $('dci').innerHTML = `<b>0${c + 1}</b> · ${D[c][1]}`; $('dch').textContent = D[c][0]; $('dcp').textContent = D[c][2]; }); }
     };
   }
   // captions change with a quick fade so the words never just snap
@@ -682,7 +682,7 @@ h1 .w.in > span { translate: 0 0 }
     // section dial
     let f = 0; secs.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
     sp += (f - sp) * (1 - Math.exp(-dt / 110));
-    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const st = Math.round(sp); if (st !== lastSt) { lastSt = st; }   /* no tick: the section dial is hidden */
     const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
     if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);
@@ -710,7 +710,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610181918';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610181928';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {

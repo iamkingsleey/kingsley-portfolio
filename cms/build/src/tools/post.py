@@ -140,8 +140,9 @@ for _p in PAGES:
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
     if 'src="protips.js"' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
     if _p == 'index.html' and 'src="home.js"' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
-    if _p in ('index.html', 'designs.html') and 'src="flow.js"' not in _s:
-        _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1).replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
+    if _p in ('index.html', 'designs.html') and 'src="flow.js"' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
+        _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
+        if _p == 'index.html': _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')

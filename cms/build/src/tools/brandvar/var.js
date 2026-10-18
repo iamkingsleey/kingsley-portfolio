@@ -20,7 +20,7 @@
     box.addEventListener('pointermove', e => { if (drag) at(e); }); box.addEventListener('pointerup', () => drag = false);
     VT.push(dt => { if (!seen) { const r = box.getBoundingClientRect(); ct = clampV(.9 - clampV((innerHeight - r.top) / (innerHeight + r.height), 0, 1) * .8, .08, .92); }
       cx += (ct - cx) * (1 - Math.exp(-dt / 90)); $('mkfin').style.clipPath = `inset(0 0 0 ${(cx * 100).toFixed(2)}%)`; $('mkline').style.left = (cx * 100).toFixed(2) + '%';
-      const pc = Math.round(cx * 100); if (pc !== last) { $('mktag').textContent = `${pc} / ${100 - pc}`; if (pc % 10 === 0) sndV('detent'); last = pc; } });
+      const pc = Math.round(cx * 100); if (pc !== last) { $('mktag').textContent = `${pc} / ${100 - pc}`; last = pc; } });
   }
 
   // Colour · Dial: the screen floods with each colour as the needle tunes to its station

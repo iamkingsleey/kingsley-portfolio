@@ -693,7 +693,7 @@ html:not([data-theme="dark"]) .ph { box-shadow: 0 0 0 1px rgb(0 0 0 / .1), 0 30p
     const mid = vh / 2; let f = 0;
     secs.forEach((el, i) => { const b = el.getBoundingClientRect(); if (b.top < mid) f = i + 1; });
     sp += (f - sp) * (1 - Math.exp(-dt / 110));
-    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const st = Math.round(sp); if (st !== lastSt) { lastSt = st; }   /* no tick: the section dial is hidden */
     const dpr = Math.min(2, devicePixelRatio || 1), W = sd.clientWidth, H = sd.clientHeight;
     if (sd.width !== Math.round(W * dpr)) { sd.width = Math.round(W * dpr); sd.height = Math.round(H * dpr); }
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);

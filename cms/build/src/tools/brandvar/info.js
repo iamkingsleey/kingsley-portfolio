@@ -13,7 +13,7 @@
       sec.className = 'info iread'; sec.innerHTML = `${strip()}<p class="iwords">${(CS.story[0] + '. ' + P.join(' ')).split(/\s+/).map(w => `<span>${esc(w)} </span>`).join('')}</p>${briefH()}`;
       fillStrip(sec); const ws = [...sec.querySelectorAll('.iwords span')], box = sec.querySelector('.iwords'); let lit = -1;
       VT.push(() => { const r = box.getBoundingClientRect(), t = clampV((innerHeight * .78 - r.top) / (r.height + innerHeight * .25), 0, 1), n = Math.round(t * ws.length);
-        if (n !== lit) { ws.forEach((w, i) => w.classList.toggle('on', i < n)); if (lit >= 0 && Math.floor(n / 8) !== Math.floor(lit / 8)) sndV('detent'); lit = n; } });
+        if (n !== lit) { ws.forEach((w, i) => w.classList.toggle('on', i < n)); lit = n; } });
     } else if (IV === 'split') {   // the brief as one panel: the red line moves across it, from the problem to the goal
       sec.className = 'info ispl'; sec.innerHTML = `${strip()}<div class="istory"><h3>${esc(CS.story[0])}</h3><div>${P.map(p => `<p>${esc(p)}</p>`).join('')}</div></div>
         ${B.length ? `<div class="iswin" id="iswin"><div class="ispin"><div class="isp a"><span class="mono">01 · Problem</span><p>${esc(B[0][1])}</p></div><div class="isp b" id="ispb"><span class="mono">02 · Goal</span><p>${esc(B[1][1])}</p></div><i class="isl" id="isl"><span class="split-tag" id="istag">Problem</span></i></div></div>` : ''}`;
@@ -21,7 +21,7 @@
       if (B.length) { const w = $('iswin'); let cx = 1, side = 0;
         VT.push(dt => { const r = w.getBoundingClientRect(), t = clampV(-r.top / Math.max(1, r.height - innerHeight), 0, 1), tg = 1 - clampV((t - .15) / .7, 0, 1);
           cx += (tg - cx) * (1 - Math.exp(-dt / 90)); $('ispb').style.clipPath = `inset(0 0 0 ${(cx * 100).toFixed(2)}%)`; $('isl').style.left = (cx * 100).toFixed(2) + '%';
-          const s = cx < .5 ? 1 : 0; if (s !== side) { side = s; $('istag').textContent = s ? 'Goal' : 'Problem'; sndV('detent'); } }); }
+          const s = cx < .5 ? 1 : 0; if (s !== side) { side = s; $('istag').textContent = s ? 'Goal' : 'Problem'; } }); }
     } else if (IV === 'stations') { // the facts are stations: scroll tunes through them, each one large in turn; the story follows
       const FQ = ['88.1', '91.4', '94.7', '98.0', '101.3'].slice(0, F.length);
       sec.className = 'info istn'; sec.style.height = (F.length * 55 + 60) + 'vh';

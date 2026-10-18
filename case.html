@@ -344,7 +344,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610181918" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610181928" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
 
 <!-- opening: sideways first, then the page continues down -->
 <section class="run" id="run" aria-label="Project opening"><div class="rpin"><div class="track" id="track">
@@ -518,7 +518,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
         row.style.transform = `translate3d(${(W / 2 - m).toFixed(1)}px,0,0)`;
         cards.forEach((c, i) => { const d = Math.abs(q - i); c.style.opacity = (1 - Math.min(1, d) * .55).toFixed(3); c.style.transform = `scale(${(1 - Math.min(1, d) * .08).toFixed(3)})`; });
         const fc = Math.round(q);
-        if (fc !== fcur) { if (fcur >= 0) snd('detent'); fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
+        if (fc !== fcur) { fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
         /* the closing picture is still now (no camera moving across it)
         const sc = A[2] + (B[2] - A[2]) * u, fx = A[0] + (B[0] - A[0]) * u, fy = A[1] + (B[1] - A[1]) * u, bw = cw.offsetWidth, bh = cw.offsetHeight;
         cw.style.transform = `translate3d(${((.5 - fx) * bw * sc).toFixed(1)}px,${((.5 - fy) * bh * sc).toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
@@ -547,7 +547,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
       const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * (N - 1), q = reduce ? Math.round(p) : held(p);
       lays.forEach((l, i) => { const d = q - i, o = clamp(1 - Math.abs(d) * 1.6, 0, 1); l.style.opacity = o; l.style.transform = `translate3d(0,${(-d * 60).toFixed(1)}px,0) scale(${(.94 + o * .06).toFixed(3)})`; l.style.visibility = o < .01 ? 'hidden' : ''; });
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; swap(['tci', 'tcx'], () => { $('tci').innerHTML = `<b>0${c + 1}</b> · ${SHOTS[c][4]} FM`; $('tch').textContent = SHOTS[c][2]; $('tcp').textContent = SHOTS[c][3]; }); }
+      if (c !== cur) { cur = c; swap(['tci', 'tcx'], () => { $('tci').innerHTML = `<b>0${c + 1}</b> · ${SHOTS[c][4]} FM`; $('tch').textContent = SHOTS[c][2]; $('tcp').textContent = SHOTS[c][3]; }); }
       // the ruler: one tick per 0.1, the frequency under the needle follows the screens
       const i0 = Math.floor(q), fr = FQ[i0] + (FQ[Math.min(N - 1, i0 + 1)] - FQ[i0]) * (q - i0);
       const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
@@ -575,7 +575,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     let cur = -1;
     return (dt, vh) => {
       let best = 0, bd = 1e9; pans.forEach((p, i) => { const b = p.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - vh / 2); if (d < bd) { bd = d; best = i; } });
-      if (best !== cur) { if (cur >= 0) snd('detent'); cur = best; items.forEach((it, i) => it.classList.toggle('on', i === cur)); const it = items[cur]; $('sn').style.translate = `0 ${it.offsetTop}px`; $('sn').style.height = Math.max(30, it.offsetHeight - 30) + 'px'; }
+      if (best !== cur) { cur = best; items.forEach((it, i) => it.classList.toggle('on', i === cur)); const it = items[cur]; $('sn').style.translate = `0 ${it.offsetTop}px`; $('sn').style.height = Math.max(30, it.offsetHeight - 30) + 'px'; }
     };
   }
   // ---- Camera: one large screen; the view glides to each detail and holds there ----
@@ -600,7 +600,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
       const s = A[2] + (B[2] - A[2]) * t, fx = A[0] + (B[0] - A[0]) * t, fy = A[1] + (B[1] - A[1]) * t;
       cw.style.transform = `translate3d(${((.5 - fx) * bw * s).toFixed(1)}px,${((.5 - fy) * bh * s).toFixed(1)}px,0) scale(${s.toFixed(3)})`;
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; dots.forEach((d, k) => d.classList.toggle('on', k === c)); swap(['cci', 'ccx'], () => { $('cci').innerHTML = `<b>0${c + 1}</b> of 0${N}`; $('cch').textContent = ST[c][3]; $('ccp').textContent = ST[c][4]; }); }
+      if (c !== cur) { cur = c; dots.forEach((d, k) => d.classList.toggle('on', k === c)); swap(['cci', 'ccx'], () => { $('cci').innerHTML = `<b>0${c + 1}</b> of 0${N}`; $('cch').textContent = ST[c][3]; $('ccp').textContent = ST[c][4]; }); }
     };
   }
   // ---- Devices: one frame reshapes from phone to tablet to browser as you scroll ----
@@ -631,7 +631,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
       $('mlp').style.setProperty('--w', (pw - pw * .07) + 'px'); $('mlp').style.opacity = clamp(1 - q * 2.2, 0, 1);   // the phone layout keeps its own size while it fades
       $('mlw').style.setProperty('--w', sw + 'px'); $('mlw').style.opacity = clamp(q * 1.6 - .4, 0, 1);
       const c = Math.round(q);
-      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; labs.forEach((l, k) => l.classList.toggle('on', k === c)); swap(['dci', 'dcx'], () => { $('dci').innerHTML = `<b>0${c + 1}</b> · ${D[c][1]}`; $('dch').textContent = D[c][0]; $('dcp').textContent = D[c][2]; }); }
+      if (c !== cur) { cur = c; labs.forEach((l, k) => l.classList.toggle('on', k === c)); swap(['dci', 'dcx'], () => { $('dci').innerHTML = `<b>0${c + 1}</b> · ${D[c][1]}`; $('dch').textContent = D[c][0]; $('dcp').textContent = D[c][2]; }); }
     };
   }
   // captions change with a quick fade so the words never just snap
@@ -767,7 +767,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     // section dial
     let f = 0; secs.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
     sp += (f - sp) * (1 - Math.exp(-dt / 110));
-    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const st = Math.round(sp); if (st !== lastSt) { lastSt = st; }   /* no tick: the section dial is hidden */
     const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
     if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);
@@ -794,7 +794,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     const ob = new IntersectionObserver(es => { if (!es[0].isIntersecting) return; ob.disconnect();
       const t0 = performance.now(), D = 1400; let lastQ = -1;
       const step = now => { const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 4), v = end * e; b.textContent = fmt(dec ? +v.toFixed(dec) : Math.round(v));
-        const q = Math.floor(e * 5); if (q !== lastQ) { if (lastQ >= 0) snd('detent'); lastQ = q; }
+        const q = Math.floor(e * 5); if (q !== lastQ) { lastQ = q; }
         if (t < 1) requestAnimationFrame(step); else b.classList.add('count'); };
       requestAnimationFrame(step); }, { rootMargin: '0px 0px -20% 0px' });
     ob.observe(b);
@@ -808,7 +808,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610181918#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610181928#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>

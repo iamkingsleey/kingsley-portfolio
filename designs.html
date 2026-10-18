@@ -1401,7 +1401,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     if (openIdx >= 0) heroParallax(now || 0);
     if (openIdx >= 0) {
       const t = secFromScroll(); sp += (t - sp) * (reduce ? 1 : .2);
-      const r = Math.round(t); if (r !== lastSec) { lastSec = r; tick(); sdial.setAttribute('aria-valuenow', r + 1); }
+      const r = Math.round(t); if (r !== lastSec) { lastSec = r; sdial.setAttribute('aria-valuenow', r + 1); }
       SSP = innerWidth < 900 ? 96 : 150;
       const cx = innerWidth / 2;
       sticks.forEach(({ l, v, major }) => {
@@ -1699,7 +1699,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const m = vrModel(), mid = h / 2, right = w - (w < 60 ? 10 : 18);
     // the dial's detent each time a row crosses the needle (scroll, drag or a label jump)
     const row = Math.round(m.fr);
-    if (vrLastRow !== null && row !== vrLastRow && soundOn && window.Popkit) Popkit.play('detent');
+    /* (no tick: the side ruler is off) */
     vrLastRow = row;
     vrx.strokeStyle = vrx.fillStyle = THEME.ink;
     for (let q = -8; q <= m.rows * 4 + 4; q++) {                 // minor ticks every quarter row, majors on rows
@@ -1918,6 +1918,5 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 </script>
 <script src="nav.js" defer></script>
 <script src="protips.js" defer></script>
-<script src="flow.js" defer></script>
 </body>
 </html>

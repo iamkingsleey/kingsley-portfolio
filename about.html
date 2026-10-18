@@ -451,7 +451,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     ticks.forEach(f => f(dt));
     let f = 0; secEls.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
     sp += (f - sp) * (1 - Math.exp(-dt / 110));
-    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const st = Math.round(sp); if (st !== lastSt) { lastSt = st; }   /* no tick: the section dial is hidden */
     const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
     if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);

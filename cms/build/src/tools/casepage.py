@@ -156,7 +156,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
         row.style.transform = `translate3d(${(W / 2 - m).toFixed(1)}px,0,0)`;
         cards.forEach((c, i) => { const d = Math.abs(q - i); c.style.opacity = (1 - Math.min(1, d) * .55).toFixed(3); c.style.transform = `scale(${(1 - Math.min(1, d) * .08).toFixed(3)})`; });
         const fc = Math.round(q);
-        if (fc !== fcur) { if (fcur >= 0) snd('detent'); fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
+        if (fc !== fcur) { fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
         /* the closing picture is still now (no camera moving across it)
         const sc = A[2] + (B[2] - A[2]) * u, fx = A[0] + (B[0] - A[0]) * u, fy = A[1] + (B[1] - A[1]) * u, bw = cw.offsetWidth, bh = cw.offsetHeight;
         cw.style.transform = `translate3d(${((.5 - fx) * bw * sc).toFixed(1)}px,${((.5 - fy) * bh * sc).toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
@@ -209,7 +209,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     const ob = new IntersectionObserver(es => { if (!es[0].isIntersecting) return; ob.disconnect();
       const t0 = performance.now(), D = 1400; let lastQ = -1;
       const step = now => { const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 4), v = end * e; b.textContent = fmt(dec ? +v.toFixed(dec) : Math.round(v));
-        const q = Math.floor(e * 5); if (q !== lastQ) { if (lastQ >= 0) snd('detent'); lastQ = q; }
+        const q = Math.floor(e * 5); if (q !== lastQ) { lastQ = q; }
         if (t < 1) requestAnimationFrame(step); else b.classList.add('count'); };
       requestAnimationFrame(step); }, { rootMargin: '0px 0px -20% 0px' });
     ob.observe(b);

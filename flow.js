@@ -8,7 +8,7 @@
   const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const at = ORDER.indexOf(file); if (at < 0) return;
   // only between Home and Designs: Home flows down into Designs, and Designs flows back up to Home
-  const ALLOW = { 'index.html': [1], 'designs.html': [-1] }[file] || [];
+  const ALLOW = { 'index.html': [1] }[file] || [];   // only Home → Designs for now (scrolling back up from Designs is off)
   if (!ALLOW.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const home = file === 'index.html';
