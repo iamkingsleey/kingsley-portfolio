@@ -1,188 +1,195 @@
 {
-  "projects": [
+ "projects": [
+  {
+   "title": "Tennis ball and rackets",
+   "images": [
     {
-      "title": "Tennis ball and rackets",
-      "layout": "3d",
-      "images": [
-        {
-          "src": "assets/designs/tennis-ball-and-racket.jpg",
-          "ratio": 1.3333
-        }
-      ]
-    },
-    {
-      "title": "Tennis on court",
-      "images": [
-        {
-          "src": "assets/designs/tennis-and-racket.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Tennis in motion, blue",
-      "layout": "product-story",
-      "images": [
-        {
-          "src": "assets/designs/tennis-in-motion-blue-background.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Tennis in motion, dark blue",
-      "images": [
-        {
-          "src": "assets/designs/tennis-in-motion-dark-blue-background.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Debit card, floating",
-      "images": [
-        {
-          "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
-          "ratio": 1.5
-        }
-      ]
-    },
-    {
-      "title": "Debit card with shapes",
-      "images": [
-        {
-          "src": "assets/designs/debit-card-with-colorful-objects.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Pink debit card",
-      "layout": "illustration",
-      "images": [
-        {
-          "src": "assets/designs/debit-card.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Red padlock",
-      "layout": "illustration",
-      "images": [
-        {
-          "src": "assets/designs/red-lock-with-robe.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Orange padlock",
-      "layout": "product-panels",
-      "images": [
-        {
-          "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Safe with coins",
-      "layout": "3d",
-      "images": [
-        {
-          "src": "assets/designs/safe-with-coins.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Ruler picker",
-      "layout": "product-panels",
-      "images": [
-        {
-          "src": "assets/designs/ruler-picker.jpg",
-          "video": "assets/designs/videos/ruler-picker.mp4",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Card holder with stickers",
-      "images": [
-        {
-          "src": "assets/designs/card-holder-with-colorful-stickers.jpg",
-          "ratio": 1.5
-        }
-      ]
-    },
-    {
-      "title": "Award with ribbons",
-      "layout": "logo",
-      "images": [
-        {
-          "src": "assets/designs/colorful-award-with-ribbons.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Paper plane with coin",
-      "layout": "logo",
-      "images": [
-        {
-          "src": "assets/designs/paper-plane-with-coin.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Drink tumbler",
-      "layout": "product-story",
-      "images": [
-        {
-          "src": "assets/designs/3d-tumbler-render.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Badge",
-      "images": [
-        {
-          "src": "assets/designs/badge-on-a-orange-background.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Price tag and coins",
-      "layout": "logo",
-      "images": [
-        {
-          "src": "assets/designs/price-tag-and-coins.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Badge in a box",
-      "images": [
-        {
-          "src": "assets/designs/batch-in-a-box.jpg",
-          "ratio": 0.8
-        }
-      ]
-    },
-    {
-      "title": "Pawn in an archway",
-      "layout": "logo",
-      "images": [
-        {
-          "src": "assets/designs/pawn-in-an-archway.jpg",
-          "ratio": 0.8
-        }
-      ]
+     "src": "assets/designs/tennis-ball-and-racket.jpg",
+     "ratio": 1.3333
     }
-  ]
+   ],
+   "desc": "A tennis ball between two rackets, lit like a studio product shot."
+  },
+  {
+   "title": "Tennis on court",
+   "images": [
+    {
+     "src": "assets/designs/tennis-and-racket.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A tennis ball and racket on court."
+  },
+  {
+   "title": "Tennis in motion, blue",
+   "images": [
+    {
+     "src": "assets/designs/tennis-in-motion-blue-background.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A tennis ball and racket caught mid-swing, on blue."
+  },
+  {
+   "title": "Tennis in motion, dark blue",
+   "images": [
+    {
+     "src": "assets/designs/tennis-in-motion-dark-blue-background.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "The same swing on dark blue, for a darker brand."
+  },
+  {
+   "title": "Debit card, floating",
+   "images": [
+    {
+     "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
+     "ratio": 1.5
+    }
+   ],
+   "desc": "A debit card floating among colourful objects."
+  },
+  {
+   "title": "Debit card with shapes",
+   "images": [
+    {
+     "src": "assets/designs/debit-card-with-colorful-objects.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A debit card surrounded by soft, colourful shapes."
+  },
+  {
+   "title": "Pink debit card",
+   "images": [
+    {
+     "src": "assets/designs/debit-card.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A pink debit card, styled as a hero image for a card launch."
+  },
+  {
+   "title": "Red padlock",
+   "images": [
+    {
+     "src": "assets/designs/red-lock-with-robe.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A red padlock with a rope, an image of security that still feels friendly."
+  },
+  {
+   "title": "Orange padlock",
+   "images": [
+    {
+     "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A bright orange padlock with a rope, from the same security set."
+  },
+  {
+   "title": "Safe with coins",
+   "images": [
+    {
+     "src": "assets/designs/safe-with-coins.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "An open safe spilling coins, part of a set of 3D objects for fintech brands."
+  },
+  {
+   "title": "Ruler picker",
+   "images": [
+    {
+     "src": "assets/designs/ruler-picker.jpg",
+     "video": "assets/designs/videos/ruler-picker.mp4",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A ruler picker: a value control you drag like a tape measure, with ticks that snap. Built in code."
+  },
+  {
+   "title": "Card holder with stickers",
+   "images": [
+    {
+     "src": "assets/designs/card-holder-with-colorful-stickers.jpg",
+     "ratio": 1.5
+    }
+   ],
+   "desc": "A card holder covered in bright stickers, for a playful payments brand."
+  },
+  {
+   "title": "Award with ribbons",
+   "images": [
+    {
+     "src": "assets/designs/colorful-award-with-ribbons.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A colourful award with ribbons, made for celebrating wins in a product."
+  },
+  {
+   "title": "Paper plane with coin",
+   "images": [
+    {
+     "src": "assets/designs/paper-plane-with-coin.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A paper plane carrying a coin: money that gets where it needs to go. Modelled and lit in Blender."
+  },
+  {
+   "title": "Drink tumbler",
+   "images": [
+    {
+     "src": "assets/designs/3d-tumbler-render.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A tumbler rendered as a product shot, soft light and clean reflections."
+  },
+  {
+   "title": "Badge",
+   "images": [
+    {
+     "src": "assets/designs/badge-on-a-orange-background.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A badge on an orange background, part of a set of reward objects."
+  },
+  {
+   "title": "Price tag and coins",
+   "images": [
+    {
+     "src": "assets/designs/price-tag-and-coins.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A price tag and coins, an illustration of value for commerce brands."
+  },
+  {
+   "title": "Badge in a box",
+   "images": [
+    {
+     "src": "assets/designs/batch-in-a-box.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A badge packed in its box, the unboxing moment of a reward."
+  },
+  {
+   "title": "Pawn in an archway",
+   "images": [
+    {
+     "src": "assets/designs/pawn-in-an-archway.jpg",
+     "ratio": 0.8
+    }
+   ],
+   "desc": "A single chess pawn in a lit archway. Strategy, in one quiet frame."
+  }
+ ]
 }

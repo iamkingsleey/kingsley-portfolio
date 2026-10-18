@@ -88,7 +88,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .band { margin: calc(240px - 50vh) 0 calc(var(--sp) + 30px - 50vh) }   /* the pinned card sits mid-screen; pull the neighbours in so the gaps match the rest */
 .bpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: center; padding: 0 }
 .bruler { position: relative; height: 72vh } .bruler canvas { width: 100%; height: 100%; display: block; cursor: pointer }
-.bcard { position: relative; min-height: 340px }
+.bcard { position: relative; min-height: 400px }
 .bcard .ch { position: absolute; inset: 0; opacity: 0; translate: 0 30px; transition: opacity .5s var(--ease), translate .9s var(--pop); pointer-events: none }
 .bcard .ch.on { opacity: 1; translate: 0 0; pointer-events: auto }
 .bcard .fqv { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .5px }
@@ -163,6 +163,19 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   .shead { flex-direction: column; align-items: start }
 }
 @media (prefers-reduced-motion: reduce) { .rv { transition: none; translate: none; opacity: 1 } }
+.bcard .ch.cs { display: block; text-decoration: none; color: inherit }
+.cs-tag { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 16px; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--ink) }
+.cs-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red) }
+.bcard .fqv { display: block }
+.bcard .more { display: inline-flex; gap: 10px; margin-top: 28px; color: var(--ink); font-size: 14px; font-weight: 500 }
+.bcard .more i { font-style: normal; transition: transform .4s var(--ease) }
+.bcard .ch.cs:hover .more i { transform: translateX(6px) }
+.bcard .th { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); clip-path: inset(12% 0 0 0); transition: clip-path 1s cubic-bezier(.16,1,.3,1) }
+.bcard .th > img, .bcard .th > .gfx { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); transition: transform 1.4s cubic-bezier(.16,1,.3,1) }
+.bcard .th > .gfx { display: grid; place-items: center; color: #fff; font-size: clamp(26px, 2.6vw, 40px); font-weight: 600; letter-spacing: -.04em }
+.bcard .ch.on .th { clip-path: inset(0 0 0 0) } .bcard .ch.on .th > * { transform: scale(1) }
+.bcard .ch.cs:hover .th > * { transform: scale(1.04) }
+@media (max-width: 899px) { .bcard .ch.cs { grid-template-columns: 1fr; gap: 20px } .bcard .th { max-width: 220px; order: -1 } }
 </style>
 </head>
 <body>
@@ -184,10 +197,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
 <main class="wrap">
   <!-- 2 · one statement, lit word by word as you scroll -->
-  <section class="stmt" id="s-stmt"><span class="mono">102.0 · Projects</span><p id="stmt">Products I’ve designed and the ones I’m building myself. Marketplaces, commerce and payments, mostly for people in Africa.</p></section>
+  <section class="stmt" id="s-stmt"><span class="mono">102.0 · Projects</span><p id="stmt">Case studies: the whole story of a product or a brand, from the problem to what changed. Marketplaces, fintech, property and brands, mostly for people in Africa.</p></section>
 
   <!-- 3 · career band -->
-  <div class="shead" id="s-band"><div><h2>On the dial</h2><p>Scroll to tune through them. Each one is a station.</p></div><span class="mono">Projects</span></div>
+  <div class="shead" id="s-band"><div><h2>Case studies</h2><p>Scroll to tune through them. Each one is a station; open one for the full story.</p></div><span class="mono">Six stations</span></div>
   <section class="band" id="band"><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
 
   <div class="foot"><span class="mono">Kingsley M. · 102.0 Projects</span><a class="mono" href="index.html#home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
@@ -243,14 +256,17 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
   const CH = [
-    ['88.1', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace, designed from its early stage to more than fifty thousand users.', '50,000+', 'users', 'Marketplace'],
-    ['92.5', 'Pingmart', 'Founder', 'Multi-vendor commerce that lives inside WhatsApp, where the buyers already are.', '', '', 'Commerce'],
-    ['96.9', 'ShareBuddy', 'Founder', 'Social bill-splitting and group wallets, so paying back friends takes one tap.', '', '', 'Fintech'],
-    ['101.3', 'Kauri', 'Concept', 'A payments brand for African small businesses, built around the cowrie shell, the region’s first currency.', '', '', 'Brand · Payments']
+    ['88.1', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace for buying and selling across Africa, designed from its early stage to more than fifty thousand users.', '50,000+', 'users', 'Product · Marketplace', 'kusnap', 'https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400', 'case.html'],
+    ['91.4', 'Bulvds', 'UX Designer', 'Short-lets and rentals made simpler for renters, agents and homeowners. I designed the wallet that holds payments, refunds and commissions.', '', '', 'Product · Proptech', 'bulvds', 'https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400', 'case.html'],
+    ['94.7', 'ShareBuddy', 'Founder', 'Social bill-splitting and group wallets for young Nigerians, so paying friends back takes one tap.', '', '', 'Product · Fintech', 'sharebuddy', {'color': '#E8273A', 'word': 'ShareBuddy'}, 'case.html'],
+    ['98.0', 'Oghosa', 'Brand designer', 'Brand identity and strategy for a forward-looking investment and management company.', '', '', 'Brand · Investment', 'oghosa', 'https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400', 'brand.html'],
+    ['101.3', 'Kauri', 'Brand designer', 'A payments brand for small businesses and startups trading between African cities, starting with Lagos and Cairo.', '', '', 'Brand · Fintech', 'kauri', {'color': '#111111', 'word': 'Kauri'}, 'brand.html'],
+    ['104.6', 'HD Verse', 'Brand designer', 'A marketplace for licensing and buying intellectual property across film, TV, books, music and art.', '', '', 'Brand · IP marketplace', 'hd-verse', 'https://framerusercontent.com/images/rlkGxUkKWAnnPlovxKOxWPgzQ.png?scale-down-to=2400', 'brand.html']
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
-  band.style.height = (CH.length * 70 + 40) + 'vh';
-  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM · ${c[6]}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
+  band.style.height = (CH.length * 56 + 40) + 'vh';
+  const thumb = m => typeof m === 'string' ? `<img src="${m}" alt="" loading="lazy" decoding="async">` : `<div class="gfx" style="background:${m.color}">${m.word}</div>`;
+  bcard.innerHTML = CH.map(c => `<a class="ch cs" href="${c[9]}#${c[7]}" data-fq="${c[0]}" data-nm="${c[1]}"><div class="tx"><span class="cs-tag">Case study</span><span class="fqv">${c[0]} FM · ${c[6]}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div></div>` : ''}<span class="more">Read the case study <i>→</i></span></div></a>`).join('');
   const chs = [...bcard.children]; let bcur = -1, bsp = 0;
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
   brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);
@@ -290,7 +306,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
   }
   function go(y) { y = clamp(y, 0, maxY()); if (smooth) SS.target = y; else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); }
-  const SECN = ['Projects', 'On the dial'], secEls = ['s-band'].map($);   // with the hero back: ['Hello', 'About', …] and 's-stmt' first   // add 'How' / 's-how' back with the section
+  const SECN = ['Projects', 'Cases'], secEls = ['s-band'].map($);   // with the hero back: ['Hello', 'About', …] and 's-stmt' first   // add 'How' / 's-how' back with the section
   const sd = $('sdial'), sx = sd.getContext('2d'); let sp = 0, lastSt = -1;
   sd.addEventListener('click', e => { const r = sd.getBoundingClientRect(), k = clamp(Math.round(sp + (e.clientY - r.top - r.height / 2) / 150), 0, SECN.length - 1); go(k ? secEls[k - 1].getBoundingClientRect().top + scrollY - 40 : 0); snd('pop'); });
   // ---------- fluid motion: everything floats on springs ----------
@@ -342,5 +358,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
         if (window.Tuner) Tuner.go({ from: 102, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
   </script>
-  </body>
+  <script>
+  document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610181229#' + hp[1];
+    if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
+</script>
+</body>
 </html>

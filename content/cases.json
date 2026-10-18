@@ -1,0 +1,1166 @@
+{
+ "cases": [
+  {
+   "slug": "kusnap",
+   "title": "Kusnap",
+   "kind": "Product",
+   "tag": "Marketplace",
+   "role": "Head of Design",
+   "year": "2020 – Now",
+   "client": "Kusnap Africa Limited",
+   "industry": [
+    "E-commerce",
+    "Marketplace"
+   ],
+   "did": [
+    "Product design",
+    "User research",
+    "UX strategy",
+    "Prototyping"
+   ],
+   "headline": "Making a marketplace<br>people can trust",
+   "blurb": "A peer-to-peer marketplace for buying and selling across Africa, designed from its early stage to more than fifty thousand users.",
+   "stat": [
+    "50,000+",
+    "users"
+   ],
+   "cover": "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
+   "story": [
+    "A verification system that kept signing up fast",
+    [
+     "Kusnap launched with no verification at all, so anyone could list in seconds. Listings grew quickly, and so did fraud reports and calls from worried buyers and sellers.",
+     "I designed a verification system in two parts: one for individual buyers and sellers, one for business-owned stores. The aim was more trust without making onboarding slower."
+    ]
+   ],
+   "run": [
+    "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
+    "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400",
+    {
+     "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
+     "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
+    },
+    "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400",
+    "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/BtD6uLaddiRFiYI6Tlcl5tlvBA.png?scale-down-to=2400"
+   ],
+   "sections": [
+    {
+     "h": "Overview",
+     "p": [
+      "Kusnap is an e-commerce platform for buying and selling across Africa. I designed the experience for its active users, with trust and ease of use first."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Key feature",
+     "p": [
+      "Verification: identity checks and badges that tell a buyer who they are dealing with before any money moves."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Pain points",
+     "p": [
+      "Fast, open listing brought growth and then trust problems. I interviewed buyers and sellers to find where trust broke and what would make them feel safe again."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/GhcET0PPsIu9JGObSBX6KoMRDFs.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "UX strategy",
+     "list": [
+      [
+       "Problem",
+       "No verification made signing up easy, but fraud reports and trust issues kept rising."
+      ],
+      [
+       "Goal",
+       "Strengthen trust in the marketplace while keeping onboarding simple."
+      ],
+      [
+       "Approach",
+       "Simple, so verifying is quick. Visible, so trust shows as badges. Scalable, so it grows with the user base."
+      ]
+     ],
+     "media": [
+      "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/H7WcabwraavJ4jjDLBtZBr7W50.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "High fidelity",
+     "p": [
+      "Phone verification by one-time code, then identity with a government-issued ID. Secure, without adding friction."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Business shops",
+     "p": [
+      "Responsive screens for verifying business-owned stores, so a shop can show buyers it is the real thing."
+     ],
+     "media": [
+      {
+       "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
+       "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
+      },
+      "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400",
+      "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Impact",
+     "stats": [
+      [
+       "72%",
+       "fewer fraud complaints in three months"
+      ],
+      [
+       "40%",
+       "more successful sales for verified sellers"
+      ],
+      [
+       "65%",
+       "of verified sales got positive feedback"
+      ],
+      [
+       "50%",
+       "fewer scam-related support calls"
+      ]
+     ],
+     "media": [
+      "https://framerusercontent.com/images/BtD6uLaddiRFiYI6Tlcl5tlvBA.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/5cgx7cDSzXovP0Dmw3fJT66imo.png?scale-down-to=2400"
+     ]
+    }
+   ],
+   "statement": "Trust has to be visible before anyone pays.",
+   "shots": [
+    [
+     "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
+     "Verification",
+     "Mobile",
+     "Verification for buyers, sellers and shops, built into the flow people already use."
+    ],
+    [
+     "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400",
+     "Verified badges",
+     "Mobile",
+     "A badge tells buyers who they are dealing with before any money moves."
+    ],
+    [
+     "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
+     "Phone check",
+     "Mobile",
+     "Step one: a one-time code confirms the phone number."
+    ],
+    [
+     "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400",
+     "ID check",
+     "Mobile",
+     "Step two: a government-issued ID confirms the person."
+    ],
+    [
+     {
+      "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
+      "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
+     },
+     "Verifying a business shop",
+     "Web",
+     "Business-owned stores get their own check, on the web too."
+    ]
+   ],
+   "exp": [
+    "The feature",
+    [
+     [
+      "Verifying people",
+      "A one-time code for the phone, then a government-issued ID. Verified buyers and sellers get a badge everyone can see."
+     ],
+     [
+      "Verifying shops",
+      "Business-owned stores go through their own check, so a shop can show buyers it is the real thing."
+     ]
+    ]
+   ],
+   "impact": {
+    "stats": [
+     [
+      "72%",
+      "fewer fraud complaints in three months"
+     ],
+     [
+      "40%",
+      "more successful sales for verified sellers"
+     ],
+     [
+      "65%",
+      "of verified sales got positive feedback"
+     ],
+     [
+      "50%",
+      "fewer scam-related support calls"
+     ]
+    ]
+   },
+   "problem": "Anyone could list in seconds, with no checks at all. As the marketplace grew, so did fraud reports and calls from worried buyers and sellers.",
+   "goal": "Make buyers and sellers trust each other, without making signing up any slower.",
+   "impactNote": "Measured over the three months after verification launched. Sales figures compare verified sellers with unverified ones.",
+   "ver": "mix",
+   "page": "case.html",
+   "fq": "88.1"
+  },
+  {
+   "slug": "bulvds",
+   "title": "Bulvds",
+   "kind": "Product",
+   "tag": "Proptech",
+   "role": "UX Designer",
+   "year": "2025",
+   "client": "Bulvds, Lagos",
+   "industry": [
+    "Proptech",
+    "Short-lets"
+   ],
+   "did": [
+    "Product design",
+    "UX strategy",
+    "Wallet design",
+    "Prototyping"
+   ],
+   "headline": "One wallet for every<br>part of a booking",
+   "blurb": "Short-lets and rentals made simpler for renters, agents and homeowners. I designed the wallet that holds payments, refunds and commissions.",
+   "stat": [
+    "",
+    ""
+   ],
+   "cover": "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
+   "story": [
+    "Money you can see, from booking to payout",
+    [
+     "Managers weren’t sure when they’d be paid, renters worried about getting deposits back, and payments often happened off the platform.",
+     "The Bulvds Wallet puts payments, refunds and commissions in one place, with balances that say exactly what is ready, what is coming and what has gone."
+    ]
+   ],
+   "run": [
+    "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400",
+    {
+     "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
+     "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"
+    },
+    "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/MDiSmbakazviy2RhiYiNIc2wTJ8.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400"
+   ],
+   "sections": [
+    {
+     "h": "Overview",
+     "p": [
+      "Bulvds simplifies short-let and rental stays for renters, agents and homeowners, with transparency, trust and convenience at every step."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Key feature",
+     "p": [
+      "The Bulvds Wallet handles payments, refunds and commissions in one place."
+     ],
+     "list": [
+      [
+       "Fund it any way",
+       "Card, bank transfer or crypto."
+      ],
+      [
+       "Cash out",
+       "Agents and renters withdraw straight to a bank account."
+      ],
+      [
+       "Every transaction",
+       "Payments, commissions, refunds and withdrawals in one history."
+      ],
+      [
+       "Clear balances",
+       "Total, ready to withdraw, and incoming."
+      ]
+     ],
+     "media": [
+      "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Pain points",
+     "list": [
+      [
+       "Payouts",
+       "Managers never knew when they’d be paid."
+      ],
+      [
+       "Refunds",
+       "Renters worried about getting deposits back."
+      ],
+      [
+       "Trust",
+       "Too little transparency broke it."
+      ],
+      [
+       "Payments",
+       "Clunky, and often off the platform."
+      ],
+      [
+       "Guests",
+       "International visitors couldn’t pay easily."
+      ]
+     ],
+     "media": [
+      "https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "UX strategy",
+     "p": [
+      "The goal: clarity, trust and accessibility. Four principles: transparency first, flows without dead ends, payment options that fit local and international guests, and features that build trust."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/8x6g6Q3OQvJ32Uzj79Qe4WDD0.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/zqPSR0NdXGgi8hpLR3MhwxF6M.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "High fidelity",
+     "p": [
+      "Wallet home, funding, checkout with wallet pay, pending transactions, withdrawals and the transaction timeline."
+     ],
+     "media": [
+      {
+       "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
+       "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"
+      },
+      "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "More screens",
+     "p": [
+      "Coupons, property add-ons and rebooking."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/pCnh0sRjFaGRPSzTnWdKjNiY3DY.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/Rb90O37OWKkoeQYKIwAQ9SLPg.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Impact",
+     "list": [
+      [
+       "Fewer disputes",
+       "Clear balances and timelines settled arguments before they started."
+      ],
+      [
+       "Better checkout",
+       "Paying from the wallet removed steps."
+      ],
+      [
+       "Confident payouts",
+       "People trusted withdrawals."
+      ],
+      [
+       "Loyal agents",
+       "Commissions arrived where agents could see them."
+      ]
+     ],
+     "media": []
+    }
+   ],
+   "statement": "When people can see their money, they stop worrying about it.",
+   "shots": [
+    [
+     "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
+     "The wallet",
+     "Mobile",
+     "Payments, refunds and commissions in one wallet."
+    ],
+    [
+     "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400",
+     "Balances",
+     "Mobile",
+     "Total balance, what is ready to withdraw and what is still coming."
+    ],
+    [
+     "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400",
+     "Fund the wallet",
+     "Mobile",
+     "Top up by card, bank transfer or crypto."
+    ],
+    [
+     "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400",
+     "Withdraw",
+     "Mobile",
+     "Cash out to a bank account in a couple of taps."
+    ],
+    [
+     {
+      "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
+      "poster": "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400"
+     },
+     "Booking with the wallet",
+     "Prototype",
+     "Paying for a booking straight from the wallet."
+    ]
+   ],
+   "exp": [
+    "The feature",
+    [
+     [
+      "Money in",
+      "Fund the wallet by card, bank transfer or crypto, so local and international guests can both pay."
+     ],
+     [
+      "Money out",
+      "Agents and renters cash out to a bank account. Balances say what is ready, what is coming and what has gone."
+     ]
+    ]
+   ],
+   "impact": {
+    "list": [
+     [
+      "Fewer disputes",
+      "Clear balances and timelines settled arguments before they started."
+     ],
+     [
+      "Better checkout",
+      "Paying from the wallet removed steps."
+     ],
+     [
+      "Confident payouts",
+      "People trusted withdrawals."
+     ],
+     [
+      "Loyal agents",
+      "Commissions arrived where agents could see them."
+     ]
+    ]
+   },
+   "problem": "Managers didn’t know when they’d be paid, renters worried about getting deposits back, and payments kept drifting off the platform.",
+   "goal": "One place where every payment, refund and commission is visible, for local and international guests alike.",
+   "impactNote": "",
+   "ver": "mix",
+   "page": "case.html",
+   "fq": "91.4"
+  },
+  {
+   "slug": "sharebuddy",
+   "title": "ShareBuddy",
+   "kind": "Product",
+   "tag": "Fintech",
+   "role": "Founder",
+   "year": "Year",
+   "client": "ShareBuddy",
+   "industry": [
+    "Fintech",
+    "Social"
+   ],
+   "did": [
+    "Product",
+    "Brand identity",
+    "Product design",
+    "Go-to-market"
+   ],
+   "headline": "Splitting the bill<br>without the awkward bit",
+   "blurb": "Social bill-splitting and group wallets for young Nigerians, so paying friends back takes one tap.",
+   "stat": [
+    "",
+    ""
+   ],
+   "cover": {
+    "color": "#E8273A",
+    "word": "ShareBuddy"
+   },
+   "story": [
+    "A group wallet with a friend in it",
+    [
+     "Splitting rent, trips and dinners in Lagos usually ends with screenshots, reminders and someone left out of pocket.",
+     "ShareBuddy gives a group one wallet, splits the bill and keeps track of who has paid. Buddy, the mascot, does the nudging so friends don’t have to."
+    ]
+   ],
+   "run": [
+    {
+     "color": "#E8273A",
+     "word": "ShareBuddy"
+    },
+    {
+     "color": "#111111",
+     "word": "Buddy"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "Split it.",
+     "ink": "#E8273A"
+    },
+    {
+     "color": "#E8273A",
+     "word": "₦"
+    },
+    {
+     "color": "#111111",
+     "word": "Circles"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "Paid.",
+     "ink": "#111111"
+    },
+    {
+     "color": "#E8273A",
+     "word": "Wallet"
+    },
+    {
+     "color": "#111111",
+     "word": "Streaks"
+    }
+   ],
+   "sections": [
+    {
+     "h": "Overview",
+     "p": [
+      "A social bill-splitting and group wallet app for Nigerians aged 18 to 35, starting in Lagos."
+     ],
+     "media": []
+    },
+    {
+     "h": "The plan",
+     "list": [
+      [
+       "Version 1",
+       "Naira wallets for groups, powered by Paystack."
+      ],
+      [
+       "Version 2",
+       "Stablecoins as a way to fund the wallet, which stays in naira."
+      ]
+     ],
+     "media": []
+    },
+    {
+     "h": "Brand",
+     "p": [
+      "A bright red, #E8273A, and Buddy, a mascot who reminds people to pay so their friends don’t have to."
+     ],
+     "media": []
+    }
+   ],
+   "statement": "Money between friends should feel like a favour, not a debt.",
+   "todo": true,
+   "shots": [
+    [
+     {
+      "color": "#E8273A",
+      "word": "ShareBuddy"
+     },
+     "The brand",
+     "Brand",
+     "A bright red brand with a friend in it."
+    ],
+    [
+     {
+      "color": "#111111",
+      "word": "Split it."
+     },
+     "Splitting a bill",
+     "Mobile",
+     "Split a bill between a group in one go."
+    ],
+    [
+     {
+      "color": "#F4F4F4",
+      "word": "Buddy",
+      "ink": "#E8273A"
+     },
+     "Buddy",
+     "Brand",
+     "Buddy does the nudging, so friends don’t have to."
+    ],
+    [
+     {
+      "color": "#E8273A",
+      "word": "₦"
+     },
+     "Group wallet",
+     "Mobile",
+     "One wallet for the whole group, in naira."
+    ],
+    [
+     {
+      "color": "#111111",
+      "word": "Paid."
+     },
+     "Settled up",
+     "Mobile",
+     "Everyone settled, nobody chasing."
+    ]
+   ],
+   "exp": [
+    "The plan",
+    [
+     [
+      "Version 1",
+      "Group wallets in naira, powered by Paystack."
+     ],
+     [
+      "Version 2",
+      "Stablecoins as a way to fund the wallet, which stays in naira."
+     ]
+    ]
+   ],
+   "impact": null,
+   "problem": "Splitting rent, trips and dinners between friends ends in screenshots, reminders and someone left out of pocket.",
+   "goal": "A group wallet that splits the bill and keeps track, so nobody has to chase anyone.",
+   "impactNote": "",
+   "ver": "mix",
+   "page": "case.html",
+   "fq": "94.7"
+  },
+  {
+   "slug": "oghosa",
+   "title": "Oghosa",
+   "kind": "Brand",
+   "tag": "Investment",
+   "role": "Brand designer",
+   "year": "Year",
+   "client": "Oghosa Holdings",
+   "industry": [
+    "Investment",
+    "Management"
+   ],
+   "did": [
+    "Brand strategy",
+    "Logo design",
+    "Brand identity"
+   ],
+   "headline": "A brand that holds<br>many businesses",
+   "blurb": "Brand identity and strategy for a forward-looking investment and management company.",
+   "stat": [
+    "",
+    ""
+   ],
+   "cover": "https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400",
+   "story": [
+    "Protection, drawn as a bag",
+    [
+     "Oghosa Holdings invests in and manages many different businesses. The mark puts those units inside a bag: protected, held together, looked after."
+    ]
+   ],
+   "run": [
+    "https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/L7Z51AV2C7wLjOw6cMNYvOdYM6A.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/cpe1idsCmwnKaMHqRL0VIK3a57I.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/8tL75vMng90RocoQDpUd3Kt0A.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/KPkA7Hz7qs4qUnMwDMgVd6UeSDs.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400"
+   ],
+   "sections": [
+    {
+     "h": "Intro",
+     "p": [
+      "Oghosa Holdings is a forward-looking investment and management company. I worked on its brand strategy and identity."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/hH1tBmGuUknZuZQYX8C0XGVTzZE.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Logo",
+     "p": [
+      "The company’s units sit inside a bag: a symbol of protecting and managing a range of businesses."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/Iy8SMFRnxOxzLj1KpFkjpbM0.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Colour and type",
+     "p": [
+      "Very dark and dark greys, beige, golden sand and coffee brown, with a serif that carries credibility."
+     ],
+     "chips": [
+      "Very dark grey",
+      "Dark grey",
+      "Beige",
+      "Golden sand",
+      "Coffee brown"
+     ],
+     "media": [
+      "https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Personality",
+     "p": [
+      "Contemporary and vibrant, with imagery borrowed from pop culture to balance credibility with creativity."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/bmcMRR4XGJRAqaZvHbK7g7KIR0s.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Mockups",
+     "p": [
+      "The identity across professional and lifestyle pieces."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/Wp7WvNxzYx9PZB2ANlhjaTFi90w.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/5lyHlMlBcTBRaVekUNMK9Cg1ug.png?scale-down-to=2400"
+     ]
+    }
+   ],
+   "statement": "Serious about money, never dull about it.",
+   "shots": [
+    [
+     "https://framerusercontent.com/images/hH1tBmGuUknZuZQYX8C0XGVTzZE.png?scale-down-to=2400",
+     "The identity",
+     "Brand",
+     "An identity for an investment and management company."
+    ],
+    [
+     "https://framerusercontent.com/images/Iy8SMFRnxOxzLj1KpFkjpbM0.png?scale-down-to=2400",
+     "The logo",
+     "Brand",
+     "Business units held inside a bag: protected, together."
+    ],
+    [
+     "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
+     "In use",
+     "Mockup",
+     "The identity at work."
+    ],
+    [
+     "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400",
+     "In use",
+     "Mockup",
+     "And in everyday pieces."
+    ],
+    [
+     "https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400",
+     "Colour and type",
+     "Brand",
+     "Greys, beige, golden sand and coffee brown, with a serif."
+    ]
+   ],
+   "exp": [
+    "The identity",
+    [
+     [
+      "Colour",
+      "Very dark and dark greys, beige, golden sand and coffee brown."
+     ],
+     [
+      "Personality",
+      "A serif for credibility, with pop-culture imagery that keeps it lively."
+     ]
+    ]
+   ],
+   "impact": null,
+   "problem": "A company that invests in and manages many different businesses needed one identity that felt credible without feeling dull.",
+   "goal": "A mark and a system that say protection and care, and still feel lively.",
+   "impactNote": "",
+   "page": "brand.html",
+   "type": [
+    [
+     "Primary",
+     "Serif"
+    ]
+   ],
+   "brandVer": {
+    "info": "split",
+    "type": "dial",
+    "col": "dial",
+    "mark": "sketch"
+   },
+   "fq": "98.0"
+  },
+  {
+   "slug": "kauri",
+   "title": "Kauri",
+   "kind": "Brand",
+   "tag": "Fintech",
+   "role": "Brand designer",
+   "year": "Year",
+   "client": "Personal project",
+   "industry": [
+    "Fintech",
+    "Payments"
+   ],
+   "did": [
+    "Naming",
+    "Brand identity",
+    "Research"
+   ],
+   "headline": "Money that moves<br>between African cities",
+   "blurb": "A payments brand for small businesses and startups trading between African cities, starting with Lagos and Cairo.",
+   "stat": [
+    "",
+    ""
+   ],
+   "cover": {
+    "color": "#111111",
+    "word": "Kauri"
+   },
+   "story": [
+    "Named after the first money",
+    [
+     "Kauri is a respelling of cowrie, the shell that was traded as money across Africa for centuries. Said KOW-ree.",
+     "The brand is for small businesses and startups in Africa’s top and emerging cities that need to pay one another easily, starting with Lagos and Cairo."
+    ]
+   ],
+   "run": [
+    {
+     "color": "#111111",
+     "word": "Kauri"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "KOW-ree",
+     "ink": "#111111"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "Lagos",
+     "ink": "#111111"
+    },
+    {
+     "color": "#111111",
+     "word": "Cairo"
+    },
+    {
+     "color": "#111111",
+     "word": "→"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "Paid.",
+     "ink": "#111111"
+    },
+    {
+     "color": "#F4F4F4",
+     "word": "SMEs",
+     "ink": "#111111"
+    },
+    {
+     "color": "#111111",
+     "word": "Cowrie"
+    }
+   ],
+   "sections": [
+    {
+     "h": "Intro",
+     "p": [
+      "A side project to stretch my brand and product design: a payments brand that makes it easy for African small businesses and startups to trade with one another across borders."
+     ],
+     "media": []
+    },
+    {
+     "h": "Name",
+     "p": [
+      "Kauri respells cowrie, the shell once traded as money across the continent. A name that carries trade in its history, and still reads as modern."
+     ],
+     "media": []
+    },
+    {
+     "h": "Focus",
+     "list": [
+      [
+       "Who",
+       "Small businesses and startups in top and emerging African cities."
+      ],
+      [
+       "Where first",
+       "Lagos and Cairo."
+      ],
+      [
+       "What",
+       "Paying one another as easily as paying someone down the road."
+      ]
+     ],
+     "media": []
+    }
+   ],
+   "statement": "The oldest money on the continent, for the newest businesses on it.",
+   "todo": true,
+   "shots": [
+    [
+     {
+      "color": "#111111",
+      "word": "Kauri"
+     },
+     "The name",
+     "Brand",
+     "Kauri: cowrie, the first money traded across Africa."
+    ],
+    [
+     {
+      "color": "#F4F4F4",
+      "word": "KOW-ree",
+      "ink": "#111111"
+     },
+     "Said like cowrie",
+     "Brand",
+     "Said KOW-ree."
+    ],
+    [
+     {
+      "color": "#111111",
+      "word": "Lagos"
+     },
+     "First city",
+     "Brand",
+     "Starting in Lagos."
+    ],
+    [
+     {
+      "color": "#F4F4F4",
+      "word": "Cairo",
+      "ink": "#111111"
+     },
+     "Second city",
+     "Brand",
+     "And Cairo."
+    ],
+    [
+     {
+      "color": "#111111",
+      "word": "Lagos → Cairo"
+     },
+     "Paying across borders",
+     "Brand",
+     "Paying across borders as easily as down the road."
+    ]
+   ],
+   "exp": [
+    "The brand",
+    [
+     [
+      "Who it is for",
+      "Small businesses and startups in Africa’s top and emerging cities."
+     ],
+     [
+      "What it does",
+      "Lets them pay one another across borders as easily as paying someone down the road."
+     ]
+    ]
+   ],
+   "impact": null,
+   "problem": "Small businesses and startups want to trade with each other across African cities, and paying each other is the hard part.",
+   "goal": "A payments brand that feels trusted across borders and rooted in the continent, starting with Lagos and Cairo.",
+   "impactNote": "",
+   "page": "brand.html",
+   "type": [
+    [
+     "Primary",
+     "Geist"
+    ]
+   ],
+   "brandVer": {
+    "info": "split",
+    "type": "dial",
+    "col": "dial",
+    "mark": "sketch"
+   },
+   "fq": "101.3"
+  },
+  {
+   "slug": "hd-verse",
+   "title": "HD Verse",
+   "kind": "Brand",
+   "tag": "IP marketplace",
+   "role": "Brand designer",
+   "year": "Year",
+   "client": "Hovah Digital",
+   "industry": [
+    "Media",
+    "Marketplace"
+   ],
+   "did": [
+    "Naming story",
+    "Logo design",
+    "Brand identity"
+   ],
+   "headline": "A universe for<br>creative work",
+   "blurb": "A marketplace for licensing and buying intellectual property across film, TV, books, music and art.",
+   "stat": [
+    "",
+    ""
+   ],
+   "cover": "https://framerusercontent.com/images/rlkGxUkKWAnnPlovxKOxWPgzQ.png?scale-down-to=2400",
+   "story": [
+    "An H that is also a spaceship",
+    [
+     "HD comes from the parent company, Hovah Digital; Verse borrows from the metaverse, a creative universe. The logo hides a spaceship inside an H, in the negative space, to suggest how far that universe goes."
+    ]
+   ],
+   "run": [
+    "https://framerusercontent.com/images/rlkGxUkKWAnnPlovxKOxWPgzQ.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/GCEIemxmatZy648xThZjMluqQ.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/owcmndFYCSKfuD7cyBPFj3jYMw.jpg?scale-down-to=2400",
+    {
+     "video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4",
+     "poster": "https://framerusercontent.com/images/UML39gfGM1RTCMsznXk3owMdlQ4.png?scale-down-to=2400"
+    },
+    "https://framerusercontent.com/images/TKN41jsL0q4kswDcAdW8slybTN4.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/20P9Zlz10eNoDi8RpX2qY7FEEQ.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400",
+    "https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400"
+   ],
+   "sections": [
+    {
+     "h": "Intro",
+     "p": [
+      "A marketplace for licensing and buying intellectual property, from film and TV to literature, music and art, with detailed metadata and secure transactions."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/y4WRkRJtg14LsJApkjuofe0gD8.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Logo",
+     "p": [
+      "An H with a spaceship in its negative space: an expansive creative universe."
+     ],
+     "media": [
+      {
+       "video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4",
+       "poster": "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=2400"
+      },
+      "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=4096"
+     ]
+    },
+    {
+     "h": "Colour and type",
+     "p": [
+      "Vibrant purples and deep blues, with secondary colours for range. Bricolage Grotesque for headlines, Epilogue for reading."
+     ],
+     "chips": [
+      "Purple",
+      "Deep blue",
+      "Bricolage Grotesque",
+      "Epilogue"
+     ],
+     "media": [
+      "https://framerusercontent.com/images/Ls028yNjIfsjPek2NkgBKHIoi8.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Personality",
+     "p": [
+      "Bold, creative and full of life, where pop culture meets innovation, with a confident voice that welcomes everyone."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/QAVPF1BfMs3wHmzVtR3h3vSRek.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Mockups",
+     "p": [
+      "The identity on professional and lifestyle pieces."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/xITMbXSfDz88UtaiNaqRZFBxMU.png?scale-down-to=2400",
+      "https://framerusercontent.com/images/vZ005pVH0nbhbnEQ498F7ajpxk.png?scale-down-to=2400"
+     ]
+    }
+   ],
+   "statement": "Bold enough for pop culture, trusted enough for a contract.",
+   "shots": [
+    [
+     "https://framerusercontent.com/images/y4WRkRJtg14LsJApkjuofe0gD8.png?scale-down-to=2400",
+     "The identity",
+     "Brand",
+     "An identity for a marketplace of intellectual property."
+    ],
+    [
+     {
+      "video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4",
+      "poster": "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=2400"
+     },
+     "The logo, in motion",
+     "Brand",
+     "An H with a spaceship hidden in it."
+    ],
+    [
+     "https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400",
+     "In use",
+     "Mockup",
+     "The identity at work."
+    ],
+    [
+     "https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400",
+     "In use",
+     "Mockup",
+     "And on everyday pieces."
+    ],
+    [
+     "https://framerusercontent.com/images/Ls028yNjIfsjPek2NkgBKHIoi8.png?scale-down-to=2400",
+     "Colour and type",
+     "Brand",
+     "Purples and deep blues; Bricolage Grotesque and Epilogue."
+    ]
+   ],
+   "exp": [
+    "The identity",
+    [
+     [
+      "Colour",
+      "Vibrant purples and deep blues, with secondary colours for range."
+     ],
+     [
+      "Type",
+      "Bricolage Grotesque for headlines, Epilogue for reading."
+     ]
+    ]
+   ],
+   "impact": null,
+   "problem": "Licensing film, TV, books, music and art means dealing with scattered owners and a lot of trust.",
+   "goal": "An identity that feels like a creative universe, and still reads as a safe place to trade rights.",
+   "impactNote": "",
+   "page": "brand.html",
+   "type": [
+    [
+     "Headlines",
+     "Bricolage Grotesque"
+    ],
+    [
+     "Body",
+     "Epilogue"
+    ]
+   ],
+   "brandVer": {
+    "info": "split",
+    "type": "dial",
+    "col": "dial",
+    "mark": "sketch"
+   },
+   "fq": "104.6"
+  }
+ ]
+}

@@ -250,8 +250,8 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     ['101.3', 'This portfolio', 'Design engineering', 'A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.', '', '', 'HTML · CSS · JavaScript']
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
-  band.style.height = (CH.length * 70 + 40) + 'vh';
-  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM · ${c[6]}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
+  band.style.height = (CH.length * 56 + 40) + 'vh';
+  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM${c[6] ? ' · ' + c[6] : ''}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
   const chs = [...bcard.children]; let bcur = -1, bsp = 0;
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
   brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);

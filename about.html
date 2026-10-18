@@ -184,10 +184,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
 <main class="wrap">
   <!-- 2 · one statement, lit word by word as you scroll -->
-  <section class="stmt" id="s-stmt"><span class="mono">94.0 · About</span><p id="stmt">I design products from zero to one, and build the tools I need along the way. Five years across product, brand and 3D: Kusnap from its early days to 50,000+ users, design at CHAOSS for the Linux Foundation, and Open Source Community Africa.</p></section>
+  <section class="stmt" id="s-stmt"><span class="mono">94.0 · About</span><p id="stmt">I’m a brand and product designer. I design products from zero to one, and build the tools I need along the way. Five years across fintech, e-commerce and property: Kusnap from its early days to 50,000+ users, brand work for GitHub’s GitSkilled, and design at CHAOSS for the Linux Foundation.</p></section>
 
   <!-- 3 · career band -->
-  <div class="shead" id="s-band"><div><h2>The band so far</h2><p>Scroll to tune through the chapters. Each one is a station.</p></div><span class="mono">Years to fill in</span></div>
+  <div class="shead" id="s-band"><div><h2>The band so far</h2><p>Scroll to tune through the chapters. Each one is a station.</p></div><span class="mono">2020 – Now</span></div>
   <section class="band" id="band"><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
 
   <!-- 4 · mixing desk -->
@@ -220,7 +220,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       <label><span class="mono">Your name</span><input name="n" autocomplete="name" placeholder="Name"></label>
       <label><span class="mono">Email</span><input name="e" type="email" autocomplete="email" placeholder="you@company.com"></label>
       <label><span class="mono">Message</span><textarea name="m" rows="3" placeholder="What are you working on?"></textarea></label>
-      <div class="row"><div class="links"><a href="#" onclick="return false">Email</a><a href="#" onclick="return false">LinkedIn</a><a href="#" onclick="return false">X</a><a href="#" onclick="return false">Behance</a><a href="#" onclick="return false">GitHub</a></div><button class="send" type="submit">Go on air</button></div>
+      <div class="row"><div class="links"><a href="mailto:iamkingsleey@gmail.com">Email</a><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/iamkingsleey" target="_blank" rel="noopener">X</a><a href="https://www.behance.net/iamkingsleey" target="_blank" rel="noopener">Behance</a><a href="https://github.com/iamkingsleey" target="_blank" rel="noopener">GitHub</a></div><button class="send" type="submit">Go on air</button></div>
       <div class="done"><div><span class="mono"><span class="lamp"></span>You're on air</span><b>Thanks, I'll be in touch.</b><p class="mono" style="margin-top:14px">Preview only: nothing was sent</p></div></div>
     </form>
   </section>
@@ -276,18 +276,21 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
-  const CH = [
-    ['88.1', 'Where it started', 'Self-taught', 'Learning design by making things: interfaces first, then brands, then 3D. Code came along when a tool didn’t exist yet.', '', ''],
-    ['91.4', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace. I built its design from the early stage, product and brand, as it grew.', '50,000+', 'users'],
-    ['94.7', 'CHAOSS', 'Design Maintainer · Linux Foundation', 'Design for open source health and community tooling, alongside maintainers around the world.', 'Since 2022', ''],
-    ['98.0', 'Open Source Community Africa', 'Design lead', 'Design for the largest open source festival in Africa: identity, stage, and everything people hold in their hands.', '', ''],
-    ['101.3', 'My own stations', 'Founder', 'Ventures in commerce and payments for African users, from WhatsApp-native shopping to splitting bills with friends.', '', ''],
-    ['104.6', 'Tools I build', 'Design engineer', 'Figma plugins like LineCraft and MeshCraft, and a recorder that turns prototypes into videos. When the tool is missing, I make it.', '2', 'plugins'],
+  const CH = [   // [frequency, where, role, what, stat, stat label, years, second stat, its label]
+    ['88.1', 'Sarge', 'Visual Designer', 'Where it started: visual design for Sarge in Lagos, full time. Interfaces first, then brands, then 3D.', '', '', '2020 – 2021'],
+    ['90.3', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace. I built its design from the early stage, product and brand, as it grew, including the verification system that made it safer to trade.', '50,000+', 'users', '2020 – Now'],
+    ['92.5', 'Haus des Stiftens', 'UX Designer · Germany', 'UX design for Haus des Stiftens in Germany, on a remote contract. Around the same time I went through Digital Product School.', '', '', '2021 – 2022'],
+    ['94.7', 'CHAOSS', 'Design Maintainer · Linux Foundation', 'I lead design at CHAOSS: open source health and community tooling, alongside maintainers around the world.', '', '', '2022 – Now'],
+    ['96.9', 'Open Source Community Africa', 'Design lead', 'Design for OSCAFEST, the largest open source festival in Africa: identity, stage, and everything people hold in their hands.', '', '', ''],
+    ['99.1', 'GitSkilled', 'Brand Designer · GitHub', 'Brand design for GitSkilled, GitHub’s open source skills program for Africans.', '2,500+', 'Africans reached', '2024 – 2025'],
+    ['101.3', 'Bulvds', 'UX Designer', 'Short-lets and rentals in Lagos. I designed the Bulvds Wallet: payments, refunds and commissions in one place.', '', '', '2025'],
+    ['103.5', 'My own stations', 'Founder', 'Ventures in commerce and payments for African users, from WhatsApp-native shopping to splitting bills with friends.', '', '', ''],
+    ['105.7', 'Tools I build', 'Design engineer', 'Figma plugins like LineCraft and MeshCraft, and a recorder that turns prototypes into videos. When the tool is missing, I make it.', '2', 'plugins', ''],
     ['107.9', 'Resources I share', 'Creator', '3D assets I publish for free on Unsplash, used across platforms like Notion, Typeform, Figma, Trello, Medium, Squarespace, Wix and Unfold.', '400K+', 'views', '', '3K+', 'downloads']
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
-  band.style.height = (CH.length * 70 + 40) + 'vh';
-  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM · <span class="todo">Year</span></span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
+  band.style.height = (CH.length * 56 + 40) + 'vh';
+  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM${c[6] ? ' · ' + c[6] : ''}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
   const chs = [...bcard.children]; let bcur = -1, bsp = 0;
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
   brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);

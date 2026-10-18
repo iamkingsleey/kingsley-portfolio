@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
+<script src="tuner.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Case study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Product design (UI/UX), simple versions. One feature, a few large screens on calm panels, short text,
+   credits. Shared by every version: the opening screen is the working prototype (drag the dial), and the
+   section dial at the bottom is clickable. Versions (switch at the top, a CMS setting on the site):
+   Panels · Colour · Tune (pinned, screens crossfade as the needle sweeps) · Story (sticky text, scrolling
+   screens) · Camera (one screen, the view zooms to each detail) · Devices (one screen reshapes phone → tablet → web). */
+@property --z { syntax: "<number>"; inherits: true; initial-value: 1 }
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f4f4f4; --on-ink: #ffffff;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
+  --a1: #2b3bff; --a2: #c6f432; --a3: #f4efe6; --a4: #0e0e10;            /* the sample app's colours */
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  --ease: cubic-bezier(.2,.8,.2,1); --sweep: cubic-bezier(.7,0,.25,1);
+  --pop: cubic-bezier(.34,1.56,.64,1);
+  --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #121212; --on-ink: #000000;
+  --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+html { background: var(--bg) }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden }
+img, video { display: block; max-width: 100% }
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+figure { margin: 0 }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { padding: 0 var(--gut) }
+
+/* station readout + preview theme switch */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 18px; mix-blend-mode: difference; color: #fff }
+.station .back { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: 13px }
+.station .back b { font: 400 12px var(--mono); opacity: .6 }
+.station .fq { font-size: 28px; letter-spacing: -.5px }
+.station .nm { font-size: 13px; font-weight: 500 }
+.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
+
+/* ---------- the phone (device frames keep their rounded corners; pictures elsewhere stay sharp) ---------- */
+.ph { position: relative; width: var(--w, 240px); aspect-ratio: 9 / 19.5; border-radius: calc(var(--w, 240px) * .16); background: #050505; padding: calc(var(--w, 240px) * .035);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 30px 60px -20px rgb(0 0 0 / .55); flex: none }
+html:not([data-theme="dark"]) .ph { box-shadow: 0 0 0 1px rgb(0 0 0 / .1), 0 30px 60px -24px rgb(0 0 0 / .35) }
+.scr { position: relative; width: 100%; height: 100%; border-radius: calc(var(--w, 240px) * .13); overflow: hidden; background: var(--a4); color: #fff; font-family: var(--body); font-size: calc(var(--w, 240px) * .05) }
+.scr::before { content: ""; position: absolute; top: 2.2%; left: 50%; width: 30%; height: 3.2%; margin-left: -15%; border-radius: 99px; background: #000; z-index: 5 }   /* camera island */
+.scr video, .scr > img { width: 100%; height: 100%; object-fit: cover }
+.s-pad { position: absolute; inset: 9% 7% 5%; display: flex; flex-direction: column; gap: 4% }
+.s-t { font-weight: 600; font-size: 1.6em; letter-spacing: -.04em; line-height: 1 }
+.s-sm { font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .6 }
+.s-card { border-radius: .9em; padding: 7%; background: rgb(255 255 255 / .06) }
+.s-row { display: flex; align-items: center; gap: 6%; padding: 4% 0; border-bottom: 1px solid rgb(255 255 255 / .08) }
+.s-av { width: 2.3em; height: 2.3em; border-radius: .5em; flex: none }
+.s-btn { margin-top: auto; border-radius: 99px; padding: 5% 0; text-align: center; font-weight: 600; background: var(--a2); color: var(--a4) }
+.s-tabs { position: absolute; left: 7%; right: 7%; bottom: 3.5%; display: flex; justify-content: space-between; padding: 4% 6%; border-radius: 99px; background: rgb(255 255 255 / .08) }
+.s-tabs i { width: 1.1em; height: 1.1em; border-radius: 4px; background: rgb(255 255 255 / .35) } .s-tabs i.on { background: var(--a2) }
+.s-dial { position: relative; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #1b1b20 0 58%, transparent 59%), conic-gradient(from 200deg, var(--a1), var(--a2), var(--a1)); }
+.s-dial::after { content: ""; position: absolute; left: 50%; top: 8%; width: 3%; height: 22%; margin-left: -1.5%; background: var(--red); border-radius: 2px }
+.s-ruler { height: 2.4em; background: repeating-linear-gradient(90deg, rgb(255 255 255 / .55) 0 1px, transparent 1px 7%); mask: linear-gradient(90deg, transparent, #000 25% 75%, transparent); position: relative }
+.s-ruler::after { content: ""; position: absolute; left: 50%; top: -20%; bottom: -20%; width: 2px; background: var(--red) }
+.s-bars { display: flex; align-items: flex-end; gap: 4%; height: 3em } .s-bars i { flex: 1; border-radius: 2px; background: var(--a2) }
+
+/* ---------- web and tablet devices (Mobile + Web / Web + Tablet versions) ---------- */
+.ph.br, .ph.tb { aspect-ratio: auto; width: var(--w); height: auto }
+.ph.br { padding: 0; border-radius: 10px; background: #1a1a1d }
+.ph.br .bar { position: relative; height: calc(var(--w) * .042); display: flex; align-items: center; gap: calc(var(--w) * .008); padding: 0 2.2% }
+.ph.br .bar i { width: calc(var(--w) * .012); aspect-ratio: 1; border-radius: 50%; background: rgb(255 255 255 / .18) }
+.ph.br .bar span { position: absolute; left: 33%; width: 34%; height: 62%; border-radius: 99px; background: rgb(255 255 255 / .06); font: 500 calc(var(--w) * .014) var(--mono); color: rgb(255 255 255 / .45); display: grid; place-items: center }
+.ph.br .scr { height: auto; aspect-ratio: 16 / 10; border-radius: 0 0 9px 9px; font-size: calc(var(--w) * .019) }
+.ph.tb { padding: calc(var(--w) * .024); border-radius: calc(var(--w) * .045) }
+.ph.tb .scr { height: auto; aspect-ratio: 4 / 3; border-radius: calc(var(--w) * .022); font-size: calc(var(--w) * .023) }
+.ph.br .scr::before, .ph.tb .scr::before { display: none }
+.wv { position: absolute; inset: 0; display: grid; grid-template-columns: 17% 1fr; background: var(--a4); color: #fff }
+.wside { padding: 18% 14%; display: flex; flex-direction: column; gap: 1.1em; background: rgb(255 255 255 / .03); border-right: 1px solid rgb(255 255 255 / .06) }
+.wside b { font-weight: 700; letter-spacing: -.04em; font-size: 1.3em; margin-bottom: .8em }
+.wside span { opacity: .5; font-size: .85em } .wside span.on { opacity: 1; color: var(--a2) }
+.wmain { position: relative; padding: 4.5% 5.5%; display: flex; flex-direction: column; gap: .9em; min-width: 0; overflow: hidden }
+.wgrid { display: grid; gap: .9em }
+.wcard { border-radius: .6em; aspect-ratio: 1 }
+.wv.land { grid-template-columns: 1.1fr .9fr; align-items: center; padding: 0 8%; gap: 6%; background: linear-gradient(120deg, #2B3BFF, #0e0e10 65%) }
+.wv.land > div:first-child { display: flex; flex-direction: column; gap: .9em }
+.wv.white { display: grid; place-items: center; grid-template-columns: 1fr; background: #fff }
+.wv.white video { width: 100% !important; height: 100% !important; object-fit: contain !important }
+.pv { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill) }
+.pv button { height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .3s, color .3s }
+.pv button[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.pv #theme { color: var(--ink) }
+/* flow as a zigzag when the screens are wide */
+.flow.zz { grid-template-columns: 1fr 1fr; gap: 90px clamp(60px, 9vw, 160px); max-width: none }
+.flow.zz .node { margin-top: 0 !important }
+.flow.zz .node:nth-child(even) { translate: 0 160px }
+.ph.br .live, .ph.tb .live { padding: 5% 6%; gap: .5em } .ph.br .live .ld, .ph.tb .live .ld { width: 30%; margin-top: 1% } .ph.br .live .lf { font-size: 2.6em }
+
+
+:root { --panel: #f3f3f3; --max: 1320px }
+html[data-theme="dark"] { --panel: #141414 }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gut) }
+
+/* ---------- opening: the horizontal run (as on the logo page) ----------
+   Frame 1: the title panel with the next column peeking in. Frame 2: the row slides to columns 1–2.
+   Frame 3: on to columns 3–4. Frame 4: the split lines inside the columns slide. Then the page goes vertical. */
+.run { position: relative }
+.run .rpin { position: sticky; top: 0; height: 100vh; overflow: hidden }
+.track { position: absolute; top: 0; left: 0; bottom: 0; display: flex; will-change: transform }
+.intro { flex: none; position: relative; height: 100%; padding: 0 var(--gut) 40px }
+.intro .cat { position: absolute; left: var(--gut); top: 50%; transform: translateY(-50%) }
+.intro .go { position: absolute; right: 48px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 12px }
+.intro .go svg { width: 34px; height: 10px; overflow: visible }
+.intro .go svg path { stroke: var(--ink); fill: none; stroke-width: 1.2 }
+.intro .go .arr { animation: nudge 1.6s var(--ease) infinite }
+@keyframes nudge { 0%, 100% { transform: translateX(0) } 50% { transform: translateX(6px) } }
+.intro .tt { position: absolute; left: var(--gut); right: 40%; bottom: 56px }
+.intro h1 { margin: 0 0 16px; font-size: clamp(48px, 6.4vw, 104px); line-height: .92; letter-spacing: -.055em; max-width: 12ch }
+.intro p { margin: 0; max-width: 44ch; font-size: 16px; line-height: 1.55 }
+.col { flex: none; position: relative; height: 100% }
+.slot { position: absolute; inset: 0; overflow: hidden; background: var(--panel); will-change: clip-path; margin: 0 }
+.slot > video, .slot > .gfx { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform }
+.slot > video { background: #fff }
+.slot .gfx { display: grid; place-items: center; left: -60px; right: -60px; width: auto }   /* wider than the slot, so the sideways pan never shows an edge */
+.slot .lab { position: absolute; top: 0; margin-top: -30px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; color: #fff; mix-blend-mode: difference; pointer-events: none; will-change: transform }
+.split-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; margin-top: -1.5px; background: var(--red); z-index: 4; pointer-events: none; opacity: 0; will-change: transform }
+.split-tag { position: absolute; top: -11px; right: 12px; z-index: 5; padding: 4px 8px; background: var(--red); color: #fff; font: 500 10px var(--mono); letter-spacing: .5px; opacity: 0; pointer-events: none; will-change: transform }
+
+/* panels: sharp, quiet, the screen floats in the middle */
+.pn { position: relative; background: var(--panel); overflow: hidden; display: grid; place-items: center; aspect-ratio: 16 / 9.4; transition: background .6s var(--ease) }
+.pn.tall { aspect-ratio: 4 / 5 }
+.pn > .in { will-change: transform; transition: translate 1.4s var(--pop), opacity .9s var(--ease); translate: 0 90px; opacity: 0 }
+.pn.on > .in { translate: 0 0; opacity: 1 }
+.ph.br { box-shadow: 0 0 0 1px var(--edge), 0 40px 80px -40px rgb(0 0 0 / .45) }
+[data-video] { background: #fff }   /* the clip is recorded on white, so its panel is white in both themes */
+video.raw { width: 100%; height: 100%; object-fit: contain; display: block }
+.cap { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0 0 }
+.cap span:last-child { color: var(--faint) }
+.cap b { color: var(--ink); font-weight: 500 }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+.blk { margin-top: 16px }
+/* colour version: panels take the app's own colours */
+html.colour .pn[data-c="1"] { background: var(--a1) } html.colour .pn[data-c="2"] { background: var(--a2) }
+html.colour .pn[data-c="3"] { background: var(--a3) } html.colour .pn[data-c="4"] { background: #1d1d22 }
+
+/* the working dial (opening screen) */
+.live { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 5% 6%; gap: .5em }
+.live .lf { font: 600 2.8em/1 var(--body); letter-spacing: -.05em; font-variant-numeric: tabular-nums }
+.live .ln { opacity: .7; min-height: 1.3em }
+.live .ld { position: relative; width: 31%; aspect-ratio: 1; margin-top: 1%; border-radius: 50%; touch-action: none; cursor: grab;
+  background: radial-gradient(circle, #1b1b20 0 56%, transparent 57%), conic-gradient(from 0deg, var(--a1), var(--a2), #ff4a1c, var(--a1)) }
+.live .ld:active { cursor: grabbing }
+.live .ld i { position: absolute; left: 50%; top: 50%; width: 3px; height: 46%; margin-left: -1.5px; background: #fff; border-radius: 2px; transform-origin: 50% 0; rotate: var(--a, 180deg) }
+.live .ld::after { content: ""; position: absolute; left: 50%; top: 2%; width: 4px; height: 14%; margin-left: -2px; background: var(--red); border-radius: 2px }
+.live .lh { margin-top: auto; font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .55 }
+.ld.hint { animation: hint 2.4s var(--ease) 1.2s 2 }
+@keyframes hint { 0%, 100% { rotate: 0deg } 30% { rotate: 24deg } 60% { rotate: -8deg } }
+
+/* text */
+.top { padding-top: 96px }
+h1 { margin: 64px 0 0; color: var(--ink); font-weight: 500; font-size: clamp(36px, 5.2vw, 72px); line-height: 1; letter-spacing: -.045em; max-width: 13ch }
+h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em }
+h1 .w > span { display: inline-block; translate: 0 105%; transition: translate 1.1s var(--pop); transition-delay: calc(var(--i) * 60ms + .15s) }
+h1 .w.in > span { translate: 0 0 }
+.sub { margin: 22px 0 0; font-size: 18px; line-height: 1.45; max-width: 46ch }
+.meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin: 40px 0 0; padding-top: 18px; border-top: 1px solid var(--line) }
+.meta b { display: block; margin-top: 8px; color: var(--ink); font-weight: 500; font-size: 14px }
+.meta .ic { display: flex; gap: 8px; margin-top: 8px } .meta .ic img { width: 22px; height: 22px }
+.txt { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 120px 0 }
+.txt h2 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.txt .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px }
+.txt p { margin: 0; font-size: 16px; line-height: 1.6 }
+.txt h3 { margin: 0 0 10px; color: var(--ink); font-size: 15px; font-weight: 500 }
+.rv { opacity: 0; translate: 0 26px; transition: opacity .8s var(--ease), translate 1.1s var(--pop) } .rv.in { opacity: 1; translate: 0 0 }
+
+/* pinned versions share this: a sticky stage the height of the screen, a caption under the panel */
+.pin { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 84px 0 76px }
+.pin .pn { aspect-ratio: auto; flex: 1; min-height: 0 }
+.pcap { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start; padding-top: 16px; min-height: 92px }
+.pcap .mono b { color: var(--ink); font-weight: 500 }
+.pcap h3 { margin: 0; color: var(--ink); font-size: 18px; font-weight: 500; letter-spacing: -.01em }
+.pcap p { margin: 6px 0 0; font-size: 15px; line-height: 1.5; max-width: 52ch }
+.pcap .sw { transition: opacity .35s var(--ease), translate .6s var(--pop) } .pcap .sw.out { opacity: 0; translate: 0 8px }
+
+/* Tune: layers crossfade, a ruler with the red needle under the panel */
+.lay { position: absolute; inset: 0; display: grid; place-items: center; will-change: opacity, transform }
+.truler { height: 46px; margin-top: 12px } .truler canvas { width: 100%; height: 100%; display: block }
+
+/* Story: sticky text with a needle on the left, panels scroll on the right */
+.sty { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 48px; padding: 40px 0 }
+.sst { position: sticky; top: 140px; padding-left: 22px }
+.sst::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--line) }
+.sneedle { position: absolute; left: -1px; top: 0; width: 3px; height: 40px; background: var(--red); transition: translate .9s var(--pop), height .9s var(--pop) }
+.si { padding: 0 0 34px; opacity: .28; transition: opacity .5s var(--ease); cursor: pointer }
+.si.on { opacity: 1 }
+.si h3 { margin: 8px 0 8px; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.si p { margin: 0; font-size: 15px; line-height: 1.55; max-width: 38ch }
+.sr { display: flex; flex-direction: column; gap: 16px }
+.sr .pn { aspect-ratio: 8 / 7 }
+
+/* Camera: one screen, the view moves */
+.cam .pn .cw { will-change: transform; transform-origin: 50% 50% }
+.dots { display: flex; gap: 6px; margin-top: 10px }
+.dots i { width: 22px; height: 3px; background: var(--line); transition: background .4s } .dots i.on { background: var(--red) }
+
+/* Devices: one frame reshapes */
+.mf { position: relative; background: #050505; box-shadow: 0 0 0 1px var(--edge), 0 40px 80px -40px rgb(0 0 0 / .45); overflow: hidden }
+.mf .mbar { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: #1a1a1d; overflow: hidden }
+.mf .mbar i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / .18); flex: none }
+.mf .mscr { position: absolute; overflow: hidden; background: var(--a4) }
+.mf .ml { position: absolute; inset: 0 }
+.mf .ml.p { display: grid; place-items: center } .mf .ml.p .scr { position: relative; width: var(--w); height: calc(var(--w) * 2.04); flex: none; border-radius: 0 }
+.mf .ml.p .scr::before { display: none }
+.mf .ml.w .scr { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; font-size: calc(var(--w) * .019) }
+.mf .ml.w .scr::before { display: none }
+.dlab { display: flex; gap: 22px; margin-top: 10px } .dlab span { transition: color .4s } .dlab span.on { color: var(--ink) }
+
+/* credits + next */
+.cred { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 120px 0 80px; border-bottom: 1px solid var(--line) }
+.cred h2 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
+.cred dl { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 32px }
+.cred dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.cred dd { margin: 8px 0 0; color: var(--ink); font-size: 15px; line-height: 1.5 }
+.next { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 64px 0 160px; text-decoration: none }
+.next .fq { font: 500 12px var(--mono); color: var(--muted) }
+.next b { display: block; margin-top: 10px; color: var(--ink); font-weight: 500; font-size: clamp(28px, 4vw, 52px); letter-spacing: -.04em; line-height: 1 }
+.next i { font-style: normal; display: inline-block; transition: translate .6s var(--pop) } .next:hover i { translate: 10px 0 }
+
+/* version switch + theme, section dial (click a label to tune there) */
+.pv { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill); max-width: calc(100vw - 2 * var(--gut)); overflow-x: auto; scrollbar-width: none }
+.pv::-webkit-scrollbar { display: none }
+.pv button { height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .3s, color .3s }
+.pv button[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.pv #theme { color: var(--ink) }
+/* the section dial runs down the right edge (like the ruler on Designs' All view); content keeps clear of it */
+.sdial { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 30; transition: background-color .4s } .sdial::before { content: ""; position: absolute; inset: -28px 0 0; background: linear-gradient(to top, var(--bg) 62%, transparent); opacity: 0; transition: opacity .4s; pointer-events: none } .sdial.bgd::before { opacity: 1 }
+.sdial canvas { position: relative; width: 100%; height: 100%; cursor: pointer }
+
+
+
+@media (max-width: 899px) {
+  :root { --gut: 18px }
+  .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
+  .pv { top: 74px; left: var(--gut); right: auto }
+  .top { padding-top: 130px }
+  .intro .cat { top: 96px; transform: none } .intro .go { left: var(--gut); right: auto; top: auto; bottom: 24px; transform: none } .intro .tt { right: var(--gut); bottom: 64px }
+  .pn { aspect-ratio: 4 / 3.4 } .pn.tall { aspect-ratio: 4 / 5.4 }
+  .row2 { grid-template-columns: 1fr }
+  .meta { grid-template-columns: 1fr 1fr }
+  .txt, .cred { grid-template-columns: 1fr; padding: 72px 0 } .txt .cols { grid-template-columns: 1fr; gap: 20px }
+  .cred dl { grid-template-columns: 1fr 1fr }
+  .pin { padding: 118px 0 70px } .pcap { grid-template-columns: 1fr; gap: 6px; min-height: 120px } .pcap p { font-size: 14px }
+  .sty { grid-template-columns: 1fr; gap: 0 } .sst { position: sticky; top: 112px; z-index: 5; background: var(--bg); padding: 10px 0 12px 16px }
+  .si { display: none; padding: 0 } .si.on { display: block } .si h3 { font-size: 18px; margin: 4px 0 } .si p { font-size: 14px }
+  .sneedle { display: none } .sr .pn { aspect-ratio: 4 / 4.4 }
+  .next { padding-bottom: 120px }
+}
+@media (prefers-reduced-motion: reduce) { .pn > .in, .rv, h1 .w > span { transition: none; translate: none; opacity: 1 } .ld.hint { animation: none } }
+
+/* ---------- case study additions ---------- */
+.pn { aspect-ratio: 3 / 2 } .pn.tall { aspect-ratio: 4 / 5 }
+.pn > .in.shotw { position: absolute; inset: -4%; display: block }
+.pn img.shot, .pn video.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: var(--panel) }
+/* pinned versions: the panel keeps the picture's shape and fits the screen */
+.pin .pn.fit { flex: none; aspect-ratio: 3 / 2; height: min(calc(100svh - 290px), calc((100vw - 300px) / 1.5)); width: auto; align-self: center }
+.pn .cblk { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 600; letter-spacing: -.05em; font-size: clamp(48px, 7vw, 120px); line-height: 1 }
+.slot > img, .slot > video { position: absolute; top: 0; left: -60px; width: calc(100% + 120px); max-width: none; height: 100%; object-fit: cover; will-change: transform }
+.slot > .cblk { position: absolute; inset: 0 -60px; display: grid; place-items: center; font-weight: 600; letter-spacing: -.05em; font-size: clamp(48px, 6vw, 110px); line-height: 1; will-change: transform }
+.cs-tag { display: inline-flex; align-items: center; gap: 7px; color: var(--ink) }
+.cs-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red) }
+.intro .cat { display: flex; gap: 12px; align-items: center }
+.txt h2 .n { font: 500 11px var(--mono); color: var(--muted); letter-spacing: .6px; margin-right: 10px }
+.txt .one p + p { margin-top: 14px }
+.txt .lead { color: var(--ink); font-size: clamp(19px, 1.7vw, 24px); line-height: 1.4; letter-spacing: -.01em; font-weight: 500; max-width: 40ch }
+.txt dl.list { margin: 22px 0 0 }
+.txt dl.list > div { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 20px; padding: 14px 0; border-top: 1px solid var(--line) }
+.txt dl.list dt { color: var(--ink); font-size: 14px; font-weight: 500 }
+.txt dl.list dd { margin: 0; font-size: 15px; line-height: 1.55 }
+.txt .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px }
+.txt .chip { font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--ink); background: var(--pill); padding: 8px 11px }
+/* impact: the numbers, large */
+.impact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line) }
+.impact > div { padding: 30px 28px 34px 0; border-bottom: 1px solid var(--line) }
+.impact b { display: block; color: var(--ink); font-size: clamp(56px, 6.4vw, 104px); line-height: .9; font-weight: 500; letter-spacing: -.055em; font-variant-numeric: tabular-nums }
+.impact span { display: block; margin-top: 14px; font-size: 15px; line-height: 1.45; max-width: 26ch }
+.todo { color: var(--muted); font-style: italic; font-weight: 400 }
+/* the pictures and videos run nearly edge to edge (56px from each side); the text keeps its column */
+:root { --max: none; --bl: calc(56px - var(--gut)); --br: calc(56px - var(--gut)) }
+@media (max-width: 899px) { :root { --bl: calc(16px - var(--gut)); --br: calc(16px - var(--gut)) } }
+#s-intro > figure, #s-body > figure, #s-body > .row2, #s-body > .blk, #s-body > section.sty, #s-body > section.cam:not(.camonly) .pin > .pn { margin-left: var(--bl); margin-right: var(--br) }
+#s-body > figure .cap, #s-intro > figure .cap, #s-body > .row2 .cap { padding-left: 16px; padding-right: 16px }
+.flw .fwin { margin: 0 var(--br) 0 var(--bl) }
+#hero.vfirst.land { aspect-ratio: auto; width: auto; height: min(calc((100vw - 32px) * .75), calc(100svh - 110px)) }
+figure:has(> .pn.vfirst.land) .cap { max-width: none !important }
+.camonly .pin .pn.fit { width: auto; height: calc(100svh - 120px); aspect-ratio: auto; margin: 0 var(--br) 0 var(--bl); align-self: stretch }
+.pin .pn.fit:not(.camonly *) { height: min(calc(100svh - 270px), calc((100vw - 32px) / 1.5)) }
+.txt.brief { padding-top: 0 }                     /* sits right under the overview, as one block */
+.inote { margin: 22px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); max-width: 60ch }
+.cam .pn { overflow: hidden }
+.camonly .pin .pn.fit { height: min(calc(100svh - 260px), calc((100vw - 400px) / 1.5)) }   /* just the picture, so it can be bigger */ .cam .cw { position: absolute; inset: 0 }
+.cam .cw .camimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+/* flow */
+.flw .pin { padding-left: 0; padding-right: 0 }
+.fwin { position: relative; flex: 1; min-height: 0; overflow: hidden }
+.frow { position: absolute; top: 0; bottom: 0; left: 0; display: flex; gap: 16px; will-change: transform }
+.flw .pin .pn.fcard { flex: none; height: 100%; width: auto; aspect-ratio: 3 / 2; transition: none } .flw .pin .pn.fcard.tall { aspect-ratio: 4 / 5 }
+.fcard > .in.shotw { inset: 0 }
+.fcard .fst { position: absolute; top: 14px; left: 16px }
+/* the opening video */
+.pn.vfirst { aspect-ratio: 4 / 5; width: min(100%, calc((100svh - 150px) * .8)); margin: 0 auto } .pn .vbig { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }   /* the video at its own shape, edge to edge */
+.pn.vfirst.land { aspect-ratio: 4 / 3; width: min(100%, calc((100svh - 150px) * 4 / 3)) }
+figure:has(> .pn.vfirst.land) .cap { max-width: min(100%, calc((100svh - 150px) * 4 / 3)); margin: 0 auto }
+figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 150px) * .8)); margin: 0 auto }
+/* impact numbers count up into place */
+.impact b.count { color: var(--ink) }
+@media (max-width: 899px) { .fcard { width: 78vw } }
+@media (max-width: 899px) { .txt dl.list > div { grid-template-columns: 1fr; gap: 4px } .impact > div { padding-right: 12px } }
+</style>
+</head>
+<body>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610181229" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
+
+<!-- opening: sideways first, then the page continues down -->
+<section class="run" id="run" aria-label="Project opening"><div class="rpin"><div class="track" id="track">
+  <div class="intro" id="intro">
+    <span class="cat mono" id="icat"></span>
+    <span class="go mono">Scroll to explore <svg viewBox="0 0 34 10" aria-hidden="true"><g class="arr"><path d="M0 5h32M28 1l4 4-4 4"/></g></svg></span>
+    <div class="tt"><h1 id="ttl">Making music feel found, not searched</h1><p>One gesture to move between moods. A dial you can feel, a needle that always says where you are.</p></div>
+  </div>
+</div></div></section>
+
+<main class="wrap top">
+  <section id="s-intro">
+    <figure><div class="pn" data-c="1" id="hero"></div>
+      <figcaption class="cap mono"><span><b>01</b> · <span id="hcap"></span></span><span id="hfq"></span></figcaption></figure>
+    <div class="meta rv" id="meta"></div>
+  </section>
+
+  <section class="txt" id="s-over">
+    <h2 class="rv" id="oh">Overview</h2>
+    <div class="cols rv" id="ocols"></div>
+  </section>
+
+  <div id="s-body"></div>
+
+  <section class="cred" id="s-cred">
+    <h2 class="rv">Credits</h2>
+    <dl class="rv" id="cred"></dl>
+  </section>
+  <a class="next" href="#" id="next"><span><span class="fq" id="nfq"></span><b><span id="nnm"></span> <i>→</i></b></span></a>
+</main>
+<div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
+
+<script src="popkit.js"></script>
+<script>
+  // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
+  (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
+    document.addEventListener('click', function (e) {
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+      if (on) Popkit.play('pop');
+    }, true); })();
+</script>
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CASES = [{"slug": "kusnap", "title": "Kusnap", "kind": "Product", "tag": "Marketplace", "role": "Head of Design", "year": "2020 – Now", "client": "Kusnap Africa Limited", "industry": ["E-commerce", "Marketplace"], "did": ["Product design", "User research", "UX strategy", "Prototyping"], "headline": "Making a marketplace<br>people can trust", "blurb": "A peer-to-peer marketplace for buying and selling across Africa, designed from its early stage to more than fifty thousand users.", "stat": ["50,000+", "users"], "cover": "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400", "story": ["A verification system that kept signing up fast", ["Kusnap launched with no verification at all, so anyone could list in seconds. Listings grew quickly, and so did fraud reports and calls from worried buyers and sellers.", "I designed a verification system in two parts: one for individual buyers and sellers, one for business-owned stores. The aim was more trust without making onboarding slower."]], "run": ["https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400", "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400", "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400", {"video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4", "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"}, "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400", "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400", "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400", "https://framerusercontent.com/images/BtD6uLaddiRFiYI6Tlcl5tlvBA.png?scale-down-to=2400"], "sections": [{"h": "Overview", "p": ["Kusnap is an e-commerce platform for buying and selling across Africa. I designed the experience for its active users, with trust and ease of use first."], "media": ["https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400"]}, {"h": "Key feature", "p": ["Verification: identity checks and badges that tell a buyer who they are dealing with before any money moves."], "media": ["https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400"]}, {"h": "Pain points", "p": ["Fast, open listing brought growth and then trust problems. I interviewed buyers and sellers to find where trust broke and what would make them feel safe again."], "media": ["https://framerusercontent.com/images/GhcET0PPsIu9JGObSBX6KoMRDFs.png?scale-down-to=2400"]}, {"h": "UX strategy", "list": [["Problem", "No verification made signing up easy, but fraud reports and trust issues kept rising."], ["Goal", "Strengthen trust in the marketplace while keeping onboarding simple."], ["Approach", "Simple, so verifying is quick. Visible, so trust shows as badges. Scalable, so it grows with the user base."]], "media": ["https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400", "https://framerusercontent.com/images/H7WcabwraavJ4jjDLBtZBr7W50.png?scale-down-to=2400"]}, {"h": "High fidelity", "p": ["Phone verification by one-time code, then identity with a government-issued ID. Secure, without adding friction."], "media": ["https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400", "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400"]}, {"h": "Business shops", "p": ["Responsive screens for verifying business-owned stores, so a shop can show buyers it is the real thing."], "media": [{"video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4", "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"}, "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400", "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400"]}, {"h": "Impact", "stats": [["72%", "fewer fraud complaints in three months"], ["40%", "more successful sales for verified sellers"], ["65%", "of verified sales got positive feedback"], ["50%", "fewer scam-related support calls"]], "media": ["https://framerusercontent.com/images/BtD6uLaddiRFiYI6Tlcl5tlvBA.png?scale-down-to=2400", "https://framerusercontent.com/images/5cgx7cDSzXovP0Dmw3fJT66imo.png?scale-down-to=2400"]}], "statement": "Trust has to be visible before anyone pays.", "shots": [["https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400", "Verification", "Mobile", "Verification for buyers, sellers and shops, built into the flow people already use."], ["https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400", "Verified badges", "Mobile", "A badge tells buyers who they are dealing with before any money moves."], ["https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400", "Phone check", "Mobile", "Step one: a one-time code confirms the phone number."], ["https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400", "ID check", "Mobile", "Step two: a government-issued ID confirms the person."], [{"video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4", "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"}, "Verifying a business shop", "Web", "Business-owned stores get their own check, on the web too."]], "exp": ["The feature", [["Verifying people", "A one-time code for the phone, then a government-issued ID. Verified buyers and sellers get a badge everyone can see."], ["Verifying shops", "Business-owned stores go through their own check, so a shop can show buyers it is the real thing."]]], "impact": {"stats": [["72%", "fewer fraud complaints in three months"], ["40%", "more successful sales for verified sellers"], ["65%", "of verified sales got positive feedback"], ["50%", "fewer scam-related support calls"]]}, "problem": "Anyone could list in seconds, with no checks at all. As the marketplace grew, so did fraud reports and calls from worried buyers and sellers.", "goal": "Make buyers and sellers trust each other, without making signing up any slower.", "impactNote": "Measured over the three months after verification launched. Sales figures compare verified sellers with unverified ones.", "ver": "mix", "page": "case.html", "fq": "88.1"}, {"slug": "bulvds", "title": "Bulvds", "kind": "Product", "tag": "Proptech", "role": "UX Designer", "year": "2025", "client": "Bulvds, Lagos", "industry": ["Proptech", "Short-lets"], "did": ["Product design", "UX strategy", "Wallet design", "Prototyping"], "headline": "One wallet for every<br>part of a booking", "blurb": "Short-lets and rentals made simpler for renters, agents and homeowners. I designed the wallet that holds payments, refunds and commissions.", "stat": ["", ""], "cover": "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400", "story": ["Money you can see, from booking to payout", ["Managers weren’t sure when they’d be paid, renters worried about getting deposits back, and payments often happened off the platform.", "The Bulvds Wallet puts payments, refunds and commissions in one place, with balances that say exactly what is ready, what is coming and what has gone."]], "run": ["https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400", "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400", "https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400", {"video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4", "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"}, "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400", "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400", "https://framerusercontent.com/images/MDiSmbakazviy2RhiYiNIc2wTJ8.png?scale-down-to=2400", "https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400"], "sections": [{"h": "Overview", "p": ["Bulvds simplifies short-let and rental stays for renters, agents and homeowners, with transparency, trust and convenience at every step."], "media": ["https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400"]}, {"h": "Key feature", "p": ["The Bulvds Wallet handles payments, refunds and commissions in one place."], "list": [["Fund it any way", "Card, bank transfer or crypto."], ["Cash out", "Agents and renters withdraw straight to a bank account."], ["Every transaction", "Payments, commissions, refunds and withdrawals in one history."], ["Clear balances", "Total, ready to withdraw, and incoming."]], "media": ["https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400"]}, {"h": "Pain points", "list": [["Payouts", "Managers never knew when they’d be paid."], ["Refunds", "Renters worried about getting deposits back."], ["Trust", "Too little transparency broke it."], ["Payments", "Clunky, and often off the platform."], ["Guests", "International visitors couldn’t pay easily."]], "media": ["https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400"]}, {"h": "UX strategy", "p": ["The goal: clarity, trust and accessibility. Four principles: transparency first, flows without dead ends, payment options that fit local and international guests, and features that build trust."], "media": ["https://framerusercontent.com/images/8x6g6Q3OQvJ32Uzj79Qe4WDD0.png?scale-down-to=2400", "https://framerusercontent.com/images/zqPSR0NdXGgi8hpLR3MhwxF6M.png?scale-down-to=2400"]}, {"h": "High fidelity", "p": ["Wallet home, funding, checkout with wallet pay, pending transactions, withdrawals and the transaction timeline."], "media": [{"video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4", "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"}, "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400", "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400"]}, {"h": "More screens", "p": ["Coupons, property add-ons and rebooking."], "media": ["https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400", "https://framerusercontent.com/images/pCnh0sRjFaGRPSzTnWdKjNiY3DY.png?scale-down-to=2400", "https://framerusercontent.com/images/Rb90O37OWKkoeQYKIwAQ9SLPg.png?scale-down-to=2400"]}, {"h": "Impact", "list": [["Fewer disputes", "Clear balances and timelines settled arguments before they started."], ["Better checkout", "Paying from the wallet removed steps."], ["Confident payouts", "People trusted withdrawals."], ["Loyal agents", "Commissions arrived where agents could see them."]], "media": []}], "statement": "When people can see their money, they stop worrying about it.", "shots": [["https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400", "The wallet", "Mobile", "Payments, refunds and commissions in one wallet."], ["https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400", "Balances", "Mobile", "Total balance, what is ready to withdraw and what is still coming."], ["https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400", "Fund the wallet", "Mobile", "Top up by card, bank transfer or crypto."], ["https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400", "Withdraw", "Mobile", "Cash out to a bank account in a couple of taps."], [{"video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4", "poster": "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400"}, "Booking with the wallet", "Prototype", "Paying for a booking straight from the wallet."]], "exp": ["The feature", [["Money in", "Fund the wallet by card, bank transfer or crypto, so local and international guests can both pay."], ["Money out", "Agents and renters cash out to a bank account. Balances say what is ready, what is coming and what has gone."]]], "impact": {"list": [["Fewer disputes", "Clear balances and timelines settled arguments before they started."], ["Better checkout", "Paying from the wallet removed steps."], ["Confident payouts", "People trusted withdrawals."], ["Loyal agents", "Commissions arrived where agents could see them."]]}, "problem": "Managers didn’t know when they’d be paid, renters worried about getting deposits back, and payments kept drifting off the platform.", "goal": "One place where every payment, refund and commission is visible, for local and international guests alike.", "impactNote": "", "ver": "mix", "page": "case.html", "fq": "91.4"}, {"slug": "sharebuddy", "title": "ShareBuddy", "kind": "Product", "tag": "Fintech", "role": "Founder", "year": "Year", "client": "ShareBuddy", "industry": ["Fintech", "Social"], "did": ["Product", "Brand identity", "Product design", "Go-to-market"], "headline": "Splitting the bill<br>without the awkward bit", "blurb": "Social bill-splitting and group wallets for young Nigerians, so paying friends back takes one tap.", "stat": ["", ""], "cover": {"color": "#E8273A", "word": "ShareBuddy"}, "story": ["A group wallet with a friend in it", ["Splitting rent, trips and dinners in Lagos usually ends with screenshots, reminders and someone left out of pocket.", "ShareBuddy gives a group one wallet, splits the bill and keeps track of who has paid. Buddy, the mascot, does the nudging so friends don’t have to."]], "run": [{"color": "#E8273A", "word": "ShareBuddy"}, {"color": "#111111", "word": "Buddy"}, {"color": "#F4F4F4", "word": "Split it.", "ink": "#E8273A"}, {"color": "#E8273A", "word": "₦"}, {"color": "#111111", "word": "Circles"}, {"color": "#F4F4F4", "word": "Paid.", "ink": "#111111"}, {"color": "#E8273A", "word": "Wallet"}, {"color": "#111111", "word": "Streaks"}], "sections": [{"h": "Overview", "p": ["A social bill-splitting and group wallet app for Nigerians aged 18 to 35, starting in Lagos."], "media": []}, {"h": "The plan", "list": [["Version 1", "Naira wallets for groups, powered by Paystack."], ["Version 2", "Stablecoins as a way to fund the wallet, which stays in naira."]], "media": []}, {"h": "Brand", "p": ["A bright red, #E8273A, and Buddy, a mascot who reminds people to pay so their friends don’t have to."], "media": []}], "statement": "Money between friends should feel like a favour, not a debt.", "todo": true, "shots": [[{"color": "#E8273A", "word": "ShareBuddy"}, "The brand", "Brand", "A bright red brand with a friend in it."], [{"color": "#111111", "word": "Split it."}, "Splitting a bill", "Mobile", "Split a bill between a group in one go."], [{"color": "#F4F4F4", "word": "Buddy", "ink": "#E8273A"}, "Buddy", "Brand", "Buddy does the nudging, so friends don’t have to."], [{"color": "#E8273A", "word": "₦"}, "Group wallet", "Mobile", "One wallet for the whole group, in naira."], [{"color": "#111111", "word": "Paid."}, "Settled up", "Mobile", "Everyone settled, nobody chasing."]], "exp": ["The plan", [["Version 1", "Group wallets in naira, powered by Paystack."], ["Version 2", "Stablecoins as a way to fund the wallet, which stays in naira."]]], "impact": null, "problem": "Splitting rent, trips and dinners between friends ends in screenshots, reminders and someone left out of pocket.", "goal": "A group wallet that splits the bill and keeps track, so nobody has to chase anyone.", "impactNote": "", "ver": "mix", "page": "case.html", "fq": "94.7"}, {"slug": "oghosa", "title": "Oghosa", "kind": "Brand", "tag": "Investment", "role": "Brand designer", "year": "Year", "client": "Oghosa Holdings", "industry": ["Investment", "Management"], "did": ["Brand strategy", "Logo design", "Brand identity"], "headline": "A brand that holds<br>many businesses", "blurb": "Brand identity and strategy for a forward-looking investment and management company.", "stat": ["", ""], "cover": "https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400", "story": ["Protection, drawn as a bag", ["Oghosa Holdings invests in and manages many different businesses. The mark puts those units inside a bag: protected, held together, looked after."]], "run": ["https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400", "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400", "https://framerusercontent.com/images/L7Z51AV2C7wLjOw6cMNYvOdYM6A.png?scale-down-to=2400", "https://framerusercontent.com/images/cpe1idsCmwnKaMHqRL0VIK3a57I.png?scale-down-to=2400", "https://framerusercontent.com/images/8tL75vMng90RocoQDpUd3Kt0A.png?scale-down-to=2400", "https://framerusercontent.com/images/KPkA7Hz7qs4qUnMwDMgVd6UeSDs.png?scale-down-to=2400", "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400", "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400"], "sections": [{"h": "Intro", "p": ["Oghosa Holdings is a forward-looking investment and management company. I worked on its brand strategy and identity."], "media": ["https://framerusercontent.com/images/hH1tBmGuUknZuZQYX8C0XGVTzZE.png?scale-down-to=2400"]}, {"h": "Logo", "p": ["The company’s units sit inside a bag: a symbol of protecting and managing a range of businesses."], "media": ["https://framerusercontent.com/images/Iy8SMFRnxOxzLj1KpFkjpbM0.png?scale-down-to=2400"]}, {"h": "Colour and type", "p": ["Very dark and dark greys, beige, golden sand and coffee brown, with a serif that carries credibility."], "chips": ["Very dark grey", "Dark grey", "Beige", "Golden sand", "Coffee brown"], "media": ["https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400"]}, {"h": "Personality", "p": ["Contemporary and vibrant, with imagery borrowed from pop culture to balance credibility with creativity."], "media": ["https://framerusercontent.com/images/bmcMRR4XGJRAqaZvHbK7g7KIR0s.png?scale-down-to=2400"]}, {"h": "Mockups", "p": ["The identity across professional and lifestyle pieces."], "media": ["https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400", "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400", "https://framerusercontent.com/images/Wp7WvNxzYx9PZB2ANlhjaTFi90w.png?scale-down-to=2400", "https://framerusercontent.com/images/5lyHlMlBcTBRaVekUNMK9Cg1ug.png?scale-down-to=2400"]}], "statement": "Serious about money, never dull about it.", "shots": [["https://framerusercontent.com/images/hH1tBmGuUknZuZQYX8C0XGVTzZE.png?scale-down-to=2400", "The identity", "Brand", "An identity for an investment and management company."], ["https://framerusercontent.com/images/Iy8SMFRnxOxzLj1KpFkjpbM0.png?scale-down-to=2400", "The logo", "Brand", "Business units held inside a bag: protected, together."], ["https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400", "In use", "Mockup", "The identity at work."], ["https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400", "In use", "Mockup", "And in everyday pieces."], ["https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400", "Colour and type", "Brand", "Greys, beige, golden sand and coffee brown, with a serif."]], "exp": ["The identity", [["Colour", "Very dark and dark greys, beige, golden sand and coffee brown."], ["Personality", "A serif for credibility, with pop-culture imagery that keeps it lively."]]], "impact": null, "problem": "A company that invests in and manages many different businesses needed one identity that felt credible without feeling dull.", "goal": "A mark and a system that say protection and care, and still feel lively.", "impactNote": "", "page": "brand.html", "type": [["Primary", "Serif"]], "brandVer": {"info": "split", "type": "dial", "col": "dial", "mark": "sketch"}, "fq": "98.0"}, {"slug": "kauri", "title": "Kauri", "kind": "Brand", "tag": "Fintech", "role": "Brand designer", "year": "Year", "client": "Personal project", "industry": ["Fintech", "Payments"], "did": ["Naming", "Brand identity", "Research"], "headline": "Money that moves<br>between African cities", "blurb": "A payments brand for small businesses and startups trading between African cities, starting with Lagos and Cairo.", "stat": ["", ""], "cover": {"color": "#111111", "word": "Kauri"}, "story": ["Named after the first money", ["Kauri is a respelling of cowrie, the shell that was traded as money across Africa for centuries. Said KOW-ree.", "The brand is for small businesses and startups in Africa’s top and emerging cities that need to pay one another easily, starting with Lagos and Cairo."]], "run": [{"color": "#111111", "word": "Kauri"}, {"color": "#F4F4F4", "word": "KOW-ree", "ink": "#111111"}, {"color": "#F4F4F4", "word": "Lagos", "ink": "#111111"}, {"color": "#111111", "word": "Cairo"}, {"color": "#111111", "word": "→"}, {"color": "#F4F4F4", "word": "Paid.", "ink": "#111111"}, {"color": "#F4F4F4", "word": "SMEs", "ink": "#111111"}, {"color": "#111111", "word": "Cowrie"}], "sections": [{"h": "Intro", "p": ["A side project to stretch my brand and product design: a payments brand that makes it easy for African small businesses and startups to trade with one another across borders."], "media": []}, {"h": "Name", "p": ["Kauri respells cowrie, the shell once traded as money across the continent. A name that carries trade in its history, and still reads as modern."], "media": []}, {"h": "Focus", "list": [["Who", "Small businesses and startups in top and emerging African cities."], ["Where first", "Lagos and Cairo."], ["What", "Paying one another as easily as paying someone down the road."]], "media": []}], "statement": "The oldest money on the continent, for the newest businesses on it.", "todo": true, "shots": [[{"color": "#111111", "word": "Kauri"}, "The name", "Brand", "Kauri: cowrie, the first money traded across Africa."], [{"color": "#F4F4F4", "word": "KOW-ree", "ink": "#111111"}, "Said like cowrie", "Brand", "Said KOW-ree."], [{"color": "#111111", "word": "Lagos"}, "First city", "Brand", "Starting in Lagos."], [{"color": "#F4F4F4", "word": "Cairo", "ink": "#111111"}, "Second city", "Brand", "And Cairo."], [{"color": "#111111", "word": "Lagos → Cairo"}, "Paying across borders", "Brand", "Paying across borders as easily as down the road."]], "exp": ["The brand", [["Who it is for", "Small businesses and startups in Africa’s top and emerging cities."], ["What it does", "Lets them pay one another across borders as easily as paying someone down the road."]]], "impact": null, "problem": "Small businesses and startups want to trade with each other across African cities, and paying each other is the hard part.", "goal": "A payments brand that feels trusted across borders and rooted in the continent, starting with Lagos and Cairo.", "impactNote": "", "page": "brand.html", "type": [["Primary", "Geist"]], "brandVer": {"info": "split", "type": "dial", "col": "dial", "mark": "sketch"}, "fq": "101.3"}, {"slug": "hd-verse", "title": "HD Verse", "kind": "Brand", "tag": "IP marketplace", "role": "Brand designer", "year": "Year", "client": "Hovah Digital", "industry": ["Media", "Marketplace"], "did": ["Naming story", "Logo design", "Brand identity"], "headline": "A universe for<br>creative work", "blurb": "A marketplace for licensing and buying intellectual property across film, TV, books, music and art.", "stat": ["", ""], "cover": "https://framerusercontent.com/images/rlkGxUkKWAnnPlovxKOxWPgzQ.png?scale-down-to=2400", "story": ["An H that is also a spaceship", ["HD comes from the parent company, Hovah Digital; Verse borrows from the metaverse, a creative universe. The logo hides a spaceship inside an H, in the negative space, to suggest how far that universe goes."]], "run": ["https://framerusercontent.com/images/rlkGxUkKWAnnPlovxKOxWPgzQ.png?scale-down-to=2400", "https://framerusercontent.com/images/GCEIemxmatZy648xThZjMluqQ.png?scale-down-to=2400", "https://framerusercontent.com/images/owcmndFYCSKfuD7cyBPFj3jYMw.jpg?scale-down-to=2400", {"video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4", "poster": "https://framerusercontent.com/images/UML39gfGM1RTCMsznXk3owMdlQ4.png?scale-down-to=2400"}, "https://framerusercontent.com/images/TKN41jsL0q4kswDcAdW8slybTN4.png?scale-down-to=2400", "https://framerusercontent.com/images/20P9Zlz10eNoDi8RpX2qY7FEEQ.png?scale-down-to=2400", "https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400", "https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400"], "sections": [{"h": "Intro", "p": ["A marketplace for licensing and buying intellectual property, from film and TV to literature, music and art, with detailed metadata and secure transactions."], "media": ["https://framerusercontent.com/images/y4WRkRJtg14LsJApkjuofe0gD8.png?scale-down-to=2400"]}, {"h": "Logo", "p": ["An H with a spaceship in its negative space: an expansive creative universe."], "media": [{"video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4", "poster": "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=2400"}, "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=4096"]}, {"h": "Colour and type", "p": ["Vibrant purples and deep blues, with secondary colours for range. Bricolage Grotesque for headlines, Epilogue for reading."], "chips": ["Purple", "Deep blue", "Bricolage Grotesque", "Epilogue"], "media": ["https://framerusercontent.com/images/Ls028yNjIfsjPek2NkgBKHIoi8.png?scale-down-to=2400"]}, {"h": "Personality", "p": ["Bold, creative and full of life, where pop culture meets innovation, with a confident voice that welcomes everyone."], "media": ["https://framerusercontent.com/images/QAVPF1BfMs3wHmzVtR3h3vSRek.png?scale-down-to=2400"]}, {"h": "Mockups", "p": ["The identity on professional and lifestyle pieces."], "media": ["https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400", "https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400", "https://framerusercontent.com/images/xITMbXSfDz88UtaiNaqRZFBxMU.png?scale-down-to=2400", "https://framerusercontent.com/images/vZ005pVH0nbhbnEQ498F7ajpxk.png?scale-down-to=2400"]}], "statement": "Bold enough for pop culture, trusted enough for a contract.", "shots": [["https://framerusercontent.com/images/y4WRkRJtg14LsJApkjuofe0gD8.png?scale-down-to=2400", "The identity", "Brand", "An identity for a marketplace of intellectual property."], [{"video": "https://framerusercontent.com/assets/bZSv1gwHemqphEdZapW7WQLWI.mp4", "poster": "https://framerusercontent.com/images/Y2KktH3leo016srEgakCJpg9bY.png?scale-down-to=2400"}, "The logo, in motion", "Brand", "An H with a spaceship hidden in it."], ["https://framerusercontent.com/images/U2O4QbI4DrjGmwt0TnHPRL7HU0.png?scale-down-to=2400", "In use", "Mockup", "The identity at work."], ["https://framerusercontent.com/images/bchYd6bMMTLYm6uzxTMLOG93k.png?scale-down-to=2400", "In use", "Mockup", "And on everyday pieces."], ["https://framerusercontent.com/images/Ls028yNjIfsjPek2NkgBKHIoi8.png?scale-down-to=2400", "Colour and type", "Brand", "Purples and deep blues; Bricolage Grotesque and Epilogue."]], "exp": ["The identity", [["Colour", "Vibrant purples and deep blues, with secondary colours for range."], ["Type", "Bricolage Grotesque for headlines, Epilogue for reading."]]], "impact": null, "problem": "Licensing film, TV, books, music and art means dealing with scattered owners and a lot of trust.", "goal": "An identity that feels like a creative universe, and still reads as a safe place to trade rights.", "impactNote": "", "page": "brand.html", "type": [["Headlines", "Bricolage Grotesque"], ["Body", "Epilogue"]], "brandVer": {"info": "split", "type": "dial", "col": "dial", "mark": "sketch"}, "fq": "104.6"}], TOOL_SRC = {"figma": "assets/figma.svg", "illustrator": "assets/illustrator.svg"};
+  const HP = decodeURIComponent(location.hash.slice(1)).split('/');
+  let CI = CASES.findIndex(c => c.slug === HP[0]); if (CI < 0) CI = 0;
+  const CS = CASES[CI], NX = CASES[(CI + 1) % CASES.length];
+  // product case studies all use one version: Video + Flow + Camera ("ver": "mix" in the CMS)
+  const CV = 'mix';
+  window.KMCASE = { all: CASES, cur: CI, it: CS, next: NX };
+  const VIDEO = '', POSTER = '';
+  const esc = s => String(s).replace(/&(?!#?\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/&lt;br>/g, '<br>');
+  const isBrand = CS.kind === 'Brand';
+  // a picture (url), a video ({video, poster}) or a coloured block ({color, word, ink}) inside a panel or a slot
+  const shot = (m, cls = 'shot') => typeof m === 'string' ? `<img class="${cls}" src="${m}" alt="${esc(CS.title)}" decoding="async">`
+    : m.video ? `<video class="${cls}" src="${m.video}" poster="${m.poster || ''}" muted loop playsinline autoplay preload="metadata"></video>`
+    : `<div class="cblk" style="background:${m.color};color:${m.ink || (/^#f/i.test(m.color) ? '#111' : '#fff')}">${esc(m.word || '')}</div>`;
+  const kindOf = m => typeof m === 'string' ? 'image' : m.video ? 'video' : 'brand';
+
+  const $ = id => document.getElementById(id);
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  document.title = CS.title + ' · Case study';
+  $('sfq').textContent = CS.fq; $('snm').textContent = CS.title;
+  $('icat').textContent = 'Case study · ' + (isBrand ? 'Brand identity' : 'Product design');
+  document.querySelector('.intro .tt p').textContent = CS.blurb;
+  const yr = /^\d/.test(CS.year) ? esc(CS.year) : '<span class="todo">Year</span>';
+  const tools = isBrand ? ['illustrator', 'figma'] : ['figma'];
+  $('meta').innerHTML = `<div><span class="mono">Year</span><b>${yr}</b></div><div><span class="mono">Role</span><b>${esc(CS.role)}</b></div>
+    <div><span class="mono">Industry</span><b>${CS.industry.map(esc).join(', ')}</b></div><div><span class="mono">Tools</span><div class="ic" id="tools"></div></div>`;
+  $('oh').textContent = 'Overview';
+  $('ocols').innerHTML = CS.story[1].map(p => `<p>${esc(p)}</p>`).join('');
+  // the brief, right under the overview: what was wrong, and what it had to do
+  if (CS.problem) $('s-over').insertAdjacentHTML('afterend', `<section class="txt brief" id="s-brief"><h2 class="rv">The brief</h2><div class="cols rv"><div><h3>Problem</h3><p>${esc(CS.problem)}</p></div><div><h3>Goal</h3><p>${esc(CS.goal)}</p></div></div></section>`);
+  $('cred').innerHTML = `<div><dt>Year</dt><dd>${yr}</dd></div><div><dt>Client</dt><dd>${esc(CS.client)}</dd></div>
+    <div><dt>Deliverables</dt><dd>${CS.did.map(esc).join('<br>')}</dd></div><div><dt>Design</dt><dd>Kingsley Mkpandiok · ${esc(CS.role)}</dd></div>`;
+  $('nfq').textContent = 'Next case study · ' + NX.fq + ' · ' + NX.kind; $('nnm').textContent = NX.title; $('next').href = (NX.page && NX.page !== 'case.html' ? NX.page : '') + '#' + NX.slug;
+  const SH = CS.shots, heroM = SH[0][0];
+  document.documentElement.dataset.cv = CV;
+  $('hcap').textContent = SH[0][1]; $('hfq').textContent = SH[0][2];
+  // hold on each screen, then move: progress p (0…n-1) → eased position with a pause at every whole number
+  const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
+  // ---------- stand-in screens for the placeholder app ----------
+  const S = {
+    onboard: () => `<div class="s-pad" style="background:linear-gradient(180deg,#2B3BFF 0,#0e0e10 70%);inset:0;padding:22% 8% 9%"><span class="s-sm">Welcome</span><span class="s-t" style="font-size:2.3em">Turn the<br>dial.</span><span style="opacity:.7;font-size:.9em;line-height:1.4">Pick a mood, we tune the rest.</span><div class="s-dial" style="width:70%;margin:6% auto 0"></div><span class="s-btn">Start listening</span></div>`,
+    home: () => `<div class="s-pad"><span class="s-sm">Good evening</span><span class="s-t">Stations</span>${['#2B3BFF', '#C6F432', '#F4EFE6', '#ff4a1c'].map((c, k) => `<div class="s-row"><i class="s-av" style="background:${c}"></i><span style="flex:1"><b style="display:block;font-weight:600">${['Late night', 'Static', 'Paper', 'Ember'][k]}</b><span class="s-sm">${(88.1 + k * 3.3).toFixed(1)} FM</span></span></div>`).join('')}<div class="s-tabs"><i class="on"></i><i></i><i></i><i></i></div></div>`,
+    tune: () => `<div class="s-pad"><span class="s-sm" style="text-align:center">Now tuned</span><span class="s-t" style="text-align:center;font-size:2.6em">91.4</span><span style="text-align:center;opacity:.7">Static · lo-fi</span><div class="s-dial" style="width:84%;margin:4% auto"></div><div class="s-ruler"></div><div class="s-tabs"><i></i><i class="on"></i><i></i><i></i></div></div>`,
+    play: () => `<div class="s-pad"><div style="aspect-ratio:1;border-radius:1em;background:conic-gradient(from 90deg,#C6F432,#2B3BFF,#C6F432)"></div><span class="s-t" style="margin-top:4%">Night drive</span><span class="s-sm">Static · 91.4 FM</span><div class="s-bars">${[40, 70, 55, 90, 60, 80, 35, 65].map(h => `<i style="height:${h}%"></i>`).join('')}</div><span class="s-btn">Keep this station</span></div>`,
+    library: () => `<div class="s-pad"><span class="s-t">Kept</span><span class="s-sm">12 stations</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:6%">${['#2B3BFF', '#C6F432', '#ff4a1c', '#F4EFE6'].map(c => `<div style="aspect-ratio:1;border-radius:.8em;background:${c}"></div>`).join('')}</div><div class="s-tabs"><i></i><i></i><i class="on"></i><i></i></div></div>`,
+    list: () => `<div class="s-pad" style="background:#16161a;inset:0;padding:14% 7%"><span class="s-t" style="font-size:1.3em">Browse</span>${Array.from({ length: 9 }, (_, k) => `<div class="s-row"><i class="s-av" style="background:rgb(255 255 255 / ${.08 + (k % 3) * .05})"></i><span style="flex:1;height:.6em;border-radius:4px;background:rgb(255 255 255 / .12)"></span></div>`).join('')}</div>`,
+    real: () => `<video src="${VIDEO}" poster="${POSTER}" muted loop playsinline autoplay></video>`
+  };
+  // web versions of the same screens (browser window and tablet)
+  const shell = (on, main) => `<div class="wv"><aside class="wside"><b>tune</b>${['Stations', 'Tune', 'Kept', 'Search'].map((n, k) => `<span class="${k === on ? 'on' : ''}">${n}</span>`).join('')}</aside><main class="wmain">${main}</main></div>`;
+  const CL = ['#2B3BFF', '#C6F432', '#F4EFE6', '#ff4a1c'], NM = ['Late night', 'Static', 'Paper', 'Ember'];
+  const W = {
+    onboard: () => `<div class="wv land"><div><span class="s-sm">Tune for web</span><span class="s-t" style="font-size:3em">Turn the dial.</span><span style="opacity:.7">Pick a mood, we tune the rest.</span><span class="s-btn" style="width:56%;padding:4% 0">Start listening</span></div><div class="s-dial" style="width:82%;justify-self:center"></div></div>`,
+    home: () => shell(0, `<span class="s-sm">Good evening</span><span class="s-t">Stations</span><div class="wgrid" style="grid-template-columns:repeat(4,1fr)">${CL.map((c, k) => `<div><div class="wcard" style="background:${c}"></div><b style="display:block;margin-top:6%;font-weight:600">${NM[k]}</b><span class="s-sm">${(88.1 + k * 3.3).toFixed(1)} FM</span></div>`).join('')}</div>`),
+    tune: () => shell(1, `<div style="display:flex;flex-direction:column;align-items:center;gap:.6em;height:100%"><span class="s-sm">Now tuned</span><span class="s-t" style="font-size:3em">91.4</span><span style="opacity:.7">Static · lo-fi</span><div class="s-dial" style="width:34%;margin:1% 0"></div><div class="s-ruler" style="width:70%"></div></div>`),
+    play: () => shell(1, `<div style="display:grid;grid-template-columns:40% 1fr;gap:6%;align-items:center;height:100%"><div style="aspect-ratio:1;border-radius:1em;background:conic-gradient(from 90deg,#C6F432,#2B3BFF,#C6F432)"></div><div style="display:flex;flex-direction:column;gap:.7em"><span class="s-sm">Static · 91.4 FM</span><span class="s-t" style="font-size:2.4em">Night drive</span><div class="s-bars">${[40, 70, 55, 90, 60, 80, 35, 65, 50, 75].map(h => `<i style="height:${h}%"></i>`).join('')}</div><span class="s-btn" style="width:60%;margin-top:.6em">Keep this station</span></div></div>`),
+    library: () => shell(2, `<span class="s-t">Kept</span><span class="s-sm">12 stations</span><div class="wgrid" style="grid-template-columns:repeat(6,1fr)">${[...CL, ...CL, ...CL].map(c => `<div class="wcard" style="background:${c}"></div>`).join('')}</div>`),
+    list: () => shell(3, `<span class="s-t">Browse</span>${Array.from({ length: 8 }, (_, k) => `<div class="s-row"><i class="s-av" style="background:rgb(255 255 255 / ${.08 + (k % 3) * .05})"></i><span style="flex:1;height:.6em;border-radius:4px;background:rgb(255 255 255 / .12)"></span><span style="width:12%;height:.6em;border-radius:4px;background:rgb(255 255 255 / .08)"></span></div>`).join('')}`),
+    real: () => `<div class="wv white"><video src="${VIDEO}" poster="${POSTER}" muted loop playsinline autoplay></video></div>`
+  };
+  // which version: Mobile, Mobile + Web, Web + Tablet (preview switch; on the site this comes from the CMS)
+
+  // ---------- which version (a CMS setting on the site; a switch here) ----------
+  const VER = [['panels', 'Panels'], ['colour', 'Colour'], ['tune', 'Tune'], ['story', 'Story'], ['camera', 'Camera'], ['devices', 'Devices']];
+  const V = 'panels';   // chosen: Panels. The other versions stay in the code, switched off (set V to try one)
+  document.documentElement.classList.toggle('colour', V === 'colour');
+  const narrow = innerWidth < 900;
+
+  // device markup sized from the box it sits in
+  function devIn(box, t, k, f, inner) {
+    const W0 = box.clientWidth, H0 = box.clientHeight;
+    const w = t === 'phone' ? Math.min(W0 * f, H0 * .8 / 2.17) : Math.min(W0 * (narrow ? .9 : f), (H0 * .82) / .67);
+    return t === 'phone'
+      ? `<div class="ph phone" style="--w:${w.toFixed(1)}px"><div class="scr">${S[k]()}</div></div>`
+      : `<div class="ph br" style="--w:${w.toFixed(1)}px"><div class="bar"><i></i><i></i><i></i><span>tune.fm</span></div><div class="scr">${inner || W[k]()}</div></div>`;
+  }
+  const vid = () => `<video class="raw" src="${VIDEO}" poster="${POSTER}" muted loop playsinline autoplay></video>`;
+
+  // ---------- the body for each version ----------
+  const body = $('s-body');
+  const cap = (n, a, b) => `<figcaption class="cap mono"><span><b>${n}</b> · ${a}</span><span>${b}</span></figcaption>`;
+  const TXT = `<section class="txt"><h2 class="rv">The experience</h2><div class="cols rv">
+      <div><h3>Listening</h3><p>Every station lands with a light tick and a firmer one when it settles, so people stopped looking at the screen to tune. The first song plays straight away, faded in.</p></div>
+      <div><h3>On the web</h3><p>The dial keeps the middle of the screen and the sidebar holds everything else, quiet and narrow. Arrow keys and the scroll wheel move the needle one station at a time.</p></div></div></section>`;
+  // the few screens this feature needs: [kind, device, title, note, frequency]
+  const SHOTS = [
+    ['tune', 'br', 'Tune, on the web', 'The dial keeps the middle of the screen. Everything else waits in a narrow sidebar.', '91.4'],
+    ['play', 'phone', 'Land on a station', 'The needle settles, the song fades in. No list, no decision.', '94.7'],
+    ['real', 'video', 'The ruler, in code', 'The detail that sold it: a ruler that ticks under your thumb, built and tested in code.', '98.0'],
+    ['play', 'br', 'Now playing', 'On a bigger screen the station gets room to breathe. One button to keep it.', '101.3']
+  ];
+  const attrs = (s, fw) => s[1] === 'video' ? 'data-video' : `data-dev="${s[1]}" data-k="${s[0]}" data-f="${s[1] === 'phone' ? .5 : fw}"`;
+  let SECX = 'Screens', tick = () => {}, sizeCam = () => {};
+  if (V === 'panels' || V === 'colour') {
+    body.innerHTML = `<figure><div class="pn" data-video data-c="0"></div>${cap('02', 'The ruler, in code', 'Prototype')}</figure>
+      <div class="row2 blk"><figure><div class="pn tall" data-dev="phone" data-k="tune" data-f=".5" data-c="2"></div>${cap('03', 'Tune', 'Mobile')}</figure>
+      <figure><div class="pn tall" data-dev="phone" data-k="play" data-f=".5" data-c="4"></div>${cap('04', 'Land on a station', 'Mobile')}</figure></div>
+      ${TXT}<figure><div class="pn" data-dev="br" data-k="play" data-f=".74" data-c="3"></div>${cap('05', 'Now playing, on the web', 'Web')}</figure>`;
+  }
+  {
+    const pn = (k, tall) => `<figure><div class="pn${tall ? ' tall' : ''}"><div class="in shotw">${shot(SH[k][0])}</div></div>${cap('0' + (k + 1), esc(SH[k][1]), esc(SH[k][2]))}</figure>`;
+    const E = CS.exp, I = CS.impact;
+    const EXP = `<section class="txt"><h2 class="rv">${esc(E[0])}</h2><div class="cols rv">${E[1].map(([h, p]) => `<div><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join('')}</div></section>`;
+    const INOTE = `<p class="inote">${CS.impactNote ? esc(CS.impactNote) : '<span class="todo">How these were measured, and over what period: to fill in</span>'}</p>`;
+    const IMP = I ? `<section class="txt" id="s-imp"><h2 class="rv">Impact</h2><div class="rv">${I.stats ? `<div class="impact">${I.stats.map(([a, b]) => `<div><b data-n="${esc(a)}">${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>`
+      : `<div class="cols">${I.list.map(([h, p]) => `<div><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join('')}</div>`}${INOTE}</div></section>` : '';
+    const S4 = SH.slice(1, 5), FQ4 = ['88.1', '91.4', '94.7', '98.0'];
+    const pinH = n => `style="height:${n * 90 + 40}vh"`;
+    const CAPBOX = id => `<div class="pcap"><span class="mono sw" id="${id}i"></span><div class="sw" id="${id}x"><h3 id="${id}h"></h3><p id="${id}p"></p></div></div>`;
+    const setCap = (id, n, lab, h, p) => swap([id + 'i', id + 'x'], () => { $(id + 'i').innerHTML = `<b>0${n}</b> · ${lab}`; $(id + 'h').textContent = h; $(id + 'p').textContent = p; });
+    const prog = (sec, n, vh) => { const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * (n - 1); return reduce ? Math.round(p) : held(p); };
+
+    {   // Video + Flow + Camera: the landscape video opens it (see the hero), then the flow, the notes, and the camera picture
+      const ST = [[.5, .5, 1, SH[0][1], SH[0][3]], [.3, .34, 2, E[1][0][0], E[1][0][1]], [.7, .46, 2.1, E[1][1][0], E[1][1][1]], [.5, .72, 1.8, SH[0][1], CS.blurb]];
+      body.innerHTML = `<section class="flw" ${pinH(4)}><div class="pin"><div class="fwin"><div class="frow" id="frow">${S4.map((s, i) => `<div class="pn fcard${i === 1 || i === 2 ? ' tall' : ''}"><div class="in shotw">${shot(s[0])}</div><span class="fst mono">0${i + 1} · ${FQ4[i]}</span></div>`).join('')}</div><i class="fneedle"></i></div>
+        ${CAPBOX('fc')}</div></section>${EXP}
+        <section class="cam camonly" id="camsec" ${pinH(4)}><div class="pin"><div class="pn on fit" id="cpn"><div class="cw" id="cw">${shot(SH[0][0], 'shot camimg')}</div></div></div></section>`;
+      const fsec = body.firstChild, row = $('frow'), cards = [...row.children], csec = $('camsec'), cw = $('cw');
+      let fcur = -1, ccur = -1;
+      tick = (dt, vh) => {
+        const fh = row.clientHeight; cards.forEach(c => { const w = Math.round(fh * (c.classList.contains('tall') ? .8 : 1.5)); if (c.offsetWidth !== w) c.style.width = w + 'px'; });
+        const q = prog(fsec, 4, vh), W = row.parentElement.clientWidth, i0 = Math.min(2, Math.floor(q)), t = q - i0;
+        const mid = k => cards[k].offsetLeft + cards[k].offsetWidth / 2, m = mid(i0) + (mid(i0 + 1) - mid(i0)) * t;
+        row.style.transform = `translate3d(${(W / 2 - m).toFixed(1)}px,0,0)`;
+        cards.forEach((c, i) => { const d = Math.abs(q - i); c.style.opacity = (1 - Math.min(1, d) * .55).toFixed(3); c.style.transform = `scale(${(1 - Math.min(1, d) * .08).toFixed(3)})`; });
+        const fc = Math.round(q);
+        if (fc !== fcur) { if (fcur >= 0) snd('detent'); fcur = fc; setCap('fc', fc + 1, FQ4[fc] + ' FM', S4[fc][1], S4[fc][3]); }
+        const r = prog(csec, 4, vh), j = Math.min(2, Math.floor(r)), u = r - j, A = ST[j], B = ST[j + 1];
+        const sc = A[2] + (B[2] - A[2]) * u, fx = A[0] + (B[0] - A[0]) * u, fy = A[1] + (B[1] - A[1]) * u, bw = cw.offsetWidth, bh = cw.offsetHeight;
+        cw.style.transform = `translate3d(${((.5 - fx) * bw * sc).toFixed(1)}px,${((.5 - fy) * bh * sc).toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
+        const cc = Math.round(r);
+        if (cc !== ccur) { if (ccur >= 0) snd('detent'); ccur = cc; }
+      };
+    }
+    body.insertAdjacentHTML('beforeend', IMP);
+  }
+  if (V === 'tune') tick = buildTune();
+  if (V === 'story') tick = buildStory();
+  if (V === 'camera') tick = buildCamera();
+  if (V === 'devices') tick = buildDevices();
+
+  // ---- Tune: one pinned panel, screens crossfade while the needle sweeps a ruler of frequencies ----
+  function buildTune() {
+    SECX = 'Tune';
+    const N = SHOTS.length;
+    body.innerHTML = `<section class="tn" style="height:${N * 90 + 40}vh"><div class="pin"><div class="pn on" id="tpn">${SHOTS.map((s, i) => `<div class="lay" data-i="${i}" ${attrs(s, .76)}></div>`).join('')}</div>
+      <div class="truler"><canvas id="trc"></canvas></div>
+      <div class="pcap"><span class="mono sw" id="tci"></span><div class="sw" id="tcx"><h3 id="tch"></h3><p id="tcp"></p></div></div></div></section>`;
+    const sec = body.firstChild, lays = [...sec.querySelectorAll('.lay')], cv = $('trc'), cx = cv.getContext('2d');
+    const FQ = SHOTS.map(s => +s[4]);
+    let cur = -1;
+    return (dt, vh) => {
+      const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * (N - 1), q = reduce ? Math.round(p) : held(p);
+      lays.forEach((l, i) => { const d = q - i, o = clamp(1 - Math.abs(d) * 1.6, 0, 1); l.style.opacity = o; l.style.transform = `translate3d(0,${(-d * 60).toFixed(1)}px,0) scale(${(.94 + o * .06).toFixed(3)})`; l.style.visibility = o < .01 ? 'hidden' : ''; });
+      const c = Math.round(q);
+      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; swap(['tci', 'tcx'], () => { $('tci').innerHTML = `<b>0${c + 1}</b> · ${SHOTS[c][4]} FM`; $('tch').textContent = SHOTS[c][2]; $('tcp').textContent = SHOTS[c][3]; }); }
+      // the ruler: one tick per 0.1, the frequency under the needle follows the screens
+      const i0 = Math.floor(q), fr = FQ[i0] + (FQ[Math.min(N - 1, i0 + 1)] - FQ[i0]) * (q - i0);
+      const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+      if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+      const col = ink(), SP = 9, mid = W / 2, base = H - 14;
+      for (let t = Math.floor((fr - mid / SP / 10) * 10) - 1; t <= Math.ceil((fr + mid / SP / 10) * 10) + 1; t++) {
+        const x = mid + (t / 10 - fr) * 10 * SP; if (x < 0 || x > W) continue;
+        const st = FQ.some(f => Math.round(f * 10) === t), major = t % 10 === 0, e = clamp(Math.min(x, W - x) / 80, 0, 1);
+        cx.globalAlpha = (st ? .9 : major ? .45 : .16) * e; cx.strokeStyle = col; cx.lineWidth = st ? 2 : 1;
+        cx.beginPath(); cx.moveTo(x, base); cx.lineTo(x, base - (st ? 20 : major ? 13 : 7)); cx.stroke();
+        if (st) { cx.fillStyle = col; cx.font = '500 9.5px "Geist Mono", monospace'; cx.textAlign = 'center'; cx.fillText((t / 10).toFixed(1), x, base + 12); }
+      }
+      cx.globalAlpha = 1; cx.fillStyle = RED; cx.fillRect(mid - 1.5, base - 30, 3, 32);
+    };
+  }
+  // ---- Story: the text stays, the screens scroll; the needle points at the paragraph for the screen in view ----
+  function buildStory() {
+    SECX = 'Story';
+    const SH = SHOTS.slice(0, 3);
+    body.innerHTML = `<section class="sty"><div><div class="sst"><span class="sneedle" id="sn"></span>${SH.map((s, i) => `<div class="si" data-i="${i}"><span class="mono">0${i + 1} · ${s[4]} FM</span><h3>${s[2]}</h3><p>${s[3]}</p></div>`).join('')}</div></div>
+      <div class="sr">${SH.map((s, i) => `<div class="pn" data-i="${i}" ${attrs(s, .82)}></div>`).join('')}</div></section>`;
+    const items = [...body.querySelectorAll('.si')], pans = [...body.querySelectorAll('.sr .pn')];
+    items.forEach((it, i) => it.onclick = () => go(pans[i], innerHeight / 2 - pans[i].offsetHeight / 2));
+    let cur = -1;
+    return (dt, vh) => {
+      let best = 0, bd = 1e9; pans.forEach((p, i) => { const b = p.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - vh / 2); if (d < bd) { bd = d; best = i; } });
+      if (best !== cur) { if (cur >= 0) snd('detent'); cur = best; items.forEach((it, i) => it.classList.toggle('on', i === cur)); const it = items[cur]; $('sn').style.translate = `0 ${it.offsetTop}px`; $('sn').style.height = Math.max(30, it.offsetHeight - 30) + 'px'; }
+    };
+  }
+  // ---- Camera: one large screen; the view glides to each detail and holds there ----
+  function buildCamera() {
+    SECX = 'Details';
+    // [x, y] of the detail on the browser (0…1), zoom, title, note
+    const ST = [[.5, .5, 1, 'The whole screen', 'One screen carries the feature. Everything below is a closer look at it.'],
+      [.585, .22, 2.4, 'Always know where you are', 'The frequency is the biggest thing on screen and changes as you tune, so the screen itself is the feedback.'],
+      [.585, .52, 2, 'One control, a big target', 'The dial takes the middle of the screen, easy to grab with a mouse or a thumb.'],
+      [.585, .8, 2.6, 'A ruler for precision', 'Under the dial, a ruler for fine moves between neighbouring stations, with the red needle on top.'],
+      [.09, .3, 2.4, 'Navigation steps aside', 'The sidebar holds everything else, quiet and narrow, so the dial never competes.']];
+    const N = ST.length;
+    body.innerHTML = `<section class="cam" style="height:${N * 90 + 40}vh"><div class="pin"><div class="pn on" id="cpn"><div class="cw" id="cw"></div></div>
+      <div class="pcap"><div><span class="mono sw" id="cci"></span><div class="dots">${ST.map(() => '<i></i>').join('')}</div></div><div class="sw" id="ccx"><h3 id="cch"></h3><p id="ccp"></p></div></div></div></section>`;
+    const sec = body.firstChild, cw = $('cw'), dots = [...sec.querySelectorAll('.dots i')];
+    let cur = -1, bw = 0, bh = 0;
+    sizeCam = () => { cw.innerHTML = devIn($('cpn'), 'br', 'tune', .8); const b = cw.firstChild; bw = b.offsetWidth; bh = b.offsetHeight; };
+    return (dt, vh) => {
+      if (!bw) sizeCam();
+      const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * (N - 1), q = reduce ? Math.round(p) : held(p);
+      const i = Math.min(N - 2, Math.floor(q)), t = q - i, A = ST[i], B = ST[i + 1];
+      const s = A[2] + (B[2] - A[2]) * t, fx = A[0] + (B[0] - A[0]) * t, fy = A[1] + (B[1] - A[1]) * t;
+      cw.style.transform = `translate3d(${((.5 - fx) * bw * s).toFixed(1)}px,${((.5 - fy) * bh * s).toFixed(1)}px,0) scale(${s.toFixed(3)})`;
+      const c = Math.round(q);
+      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; dots.forEach((d, k) => d.classList.toggle('on', k === c)); swap(['cci', 'ccx'], () => { $('cci').innerHTML = `<b>0${c + 1}</b> of 0${N}`; $('cch').textContent = ST[c][3]; $('ccp').textContent = ST[c][4]; }); }
+    };
+  }
+  // ---- Devices: one frame reshapes from phone to tablet to browser as you scroll ----
+  function buildDevices() {
+    SECX = 'Devices';
+    const D = [['Mobile', 'Phone', 'One hand, one thumb on the dial. The ruler sits under it for fine moves.'],
+      ['Tablet', 'Tablet', 'More room: the sidebar appears and the dial moves to the middle of the screen.'],
+      ['Web', 'Browser', 'The same screen in a window. Keys and the scroll wheel move the needle too.']];
+    body.innerHTML = `<section class="dv" style="height:${3 * 90 + 40}vh"><div class="pin"><div class="pn on" id="dpn"><div class="mf" id="mf"><div class="mbar" id="mbar"><i></i><i></i><i></i></div><div class="mscr" id="msc">
+      <div class="ml p" id="mlp"><div class="scr">${S.tune()}</div></div><div class="ml w" id="mlw"><div class="scr">${W.tune()}</div></div></div></div></div>
+      <div class="pcap"><div><span class="mono sw" id="dci"></span><div class="dlab mono" id="dlab">${D.map(d => `<span>${d[0]}</span>`).join('')}</div></div><div class="sw" id="dcx"><h3 id="dch"></h3><p id="dcp"></p></div></div></div></section>`;
+    const sec = body.firstChild, labs = [...$('dlab').children];
+    let cur = -1;
+    return (dt, vh) => {
+      const pn = $('dpn'), PW = pn.clientWidth, PH = pn.clientHeight;
+      // the three shapes, sized from the panel: [width, height, corner, bezel, browser bar]
+      const ph = Math.min(PH * .84, PW * .9 * 2.17), pw = ph / 2.17;
+      const th = Math.min(PH * .78, PW * .82 * .75), tw = th / .75;
+      const bwd = Math.min(PW * (narrow ? .94 : .84), PH * .82 / .67), bhh = bwd * .625 + bwd * .042;
+      const G = [[pw, ph, pw * .16, pw * .035, 0], [tw, th, tw * .045, tw * .024, 0], [bwd, bhh, 10, 0, bwd * .042]];
+      const r = sec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - vh), 0, 1) * 2, q = reduce ? Math.round(p) : held(p);
+      const i = Math.min(1, Math.floor(q)), t = q - i, g = G[i].map((v, k) => v + (G[i + 1][k] - v) * t);
+      const [w, h, rad, pad, bar] = g, mf = $('mf'), sc = $('msc');
+      Object.assign(mf.style, { width: w + 'px', height: h + 'px', borderRadius: rad + 'px' });
+      $('mbar').style.height = bar + 'px'; $('mbar').style.opacity = clamp(bar / 10, 0, 1);
+      Object.assign(sc.style, { left: pad + 'px', right: pad + 'px', top: (pad + bar) + 'px', bottom: pad + 'px', borderRadius: Math.max(0, rad - pad * 1.2) + 'px' });
+      const sw = w - pad * 2;
+      $('mlp').style.setProperty('--w', (pw - pw * .07) + 'px'); $('mlp').style.opacity = clamp(1 - q * 2.2, 0, 1);   // the phone layout keeps its own size while it fades
+      $('mlw').style.setProperty('--w', sw + 'px'); $('mlw').style.opacity = clamp(q * 1.6 - .4, 0, 1);
+      const c = Math.round(q);
+      if (c !== cur) { if (cur >= 0) snd('detent'); cur = c; labs.forEach((l, k) => l.classList.toggle('on', k === c)); swap(['dci', 'dcx'], () => { $('dci').innerHTML = `<b>0${c + 1}</b> · ${D[c][1]}`; $('dch').textContent = D[c][0]; $('dcp').textContent = D[c][2]; }); }
+    };
+  }
+  // captions change with a quick fade so the words never just snap
+  function swap(ids, fn) { const els = ids.map($); if (reduce || !els[0].textContent) { fn(); return; } els.forEach(e => e.classList.add('out')); setTimeout(() => { fn(); els.forEach(e => e.classList.remove('out')); }, 180); }
+
+  // ---------- fill every panel with its screen (and resize it with the window) ----------
+  function fill() {
+    document.querySelectorAll('[data-dev], [data-video]').forEach(box => {
+      if (box.hasAttribute('data-video')) { if (!box.querySelector('video')) box.innerHTML = box.classList.contains('lay') ? vid() : `<div class="in" style="width:100%;height:100%">${vid()}</div>`; return; }
+      const html = devIn(box, box.dataset.dev, box.dataset.k, +box.dataset.f);
+      const old = box.querySelector('.ph');
+      if (old) old.style.setProperty('--w', html.match(/--w:([\d.]+)px/)[1] + 'px');
+      else box.innerHTML = box.classList.contains('lay') ? html : `<div class="in">${html}</div>`;
+    });
+    const hero = $('hero');
+    if (!hero.firstChild) {
+      // the opening video: the case study's own landscape video (heroVideo in the CMS), else its first video
+      const vs = (CS.heroVideo ? [{ video: CS.heroVideo, poster: CS.heroPoster || '' }, 'The feature', 'Video'] : SH.find(s => s[0] && s[0].video));
+      if (vs) { hero.classList.add('vfirst'); if (CS.heroVideo) hero.classList.add('land'); hero.innerHTML = `<video class="vbig" src="${vs[0].video}" poster="${vs[0].poster || ''}" muted loop playsinline autoplay></video>`; $('hcap').textContent = vs[1] + ', in motion'; if (vs[2]) $('hfq').textContent = vs[2]; }
+      else hero.innerHTML = `<div class="in shotw">${shot(heroM)}</div>`;
+    }
+    sizeCam();
+  }
+  fill();
+
+  $('tools').innerHTML = tools.map(t => `<img src="${TOOL_SRC[t]}" alt="${t}" title="${t}">`).join('');
+  const ttl = $('ttl'); ttl.textContent = CS.headline.replace(/<br>/g, ' '); ttl.innerHTML = ttl.textContent.split(' ').map((w, k) => `<span class="w"><span style="--i:${k}">${w}</span></span>`).join(' ');
+
+  // arrivals: panels and text rise in with the elastic landing
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add(e.target.classList.contains('pn') ? 'on' : 'in'); }), { rootMargin: '0px 0px -12% 0px' });
+  document.querySelectorAll('.pn, .rv').forEach(el => reduce ? el.classList.add(el.classList.contains('pn') ? 'on' : 'in') : io.observe(el));
+  requestAnimationFrame(() => setTimeout(() => ttl.querySelectorAll('.w').forEach(w => w.classList.add('in')), 120));
+
+  // version switch + theme; one pop for every click
+  function buildPv() {
+    $('pv').innerHTML = `<button type="button" id="theme">${document.documentElement.dataset.theme === 'light' ? 'Dark' : 'Light'}</button>`;
+    $('pv').querySelectorAll('[data-v]').forEach(b => b.onclick = () => { if (b.dataset.v === V) return; history.replaceState(null, '', '#' + b.dataset.v); scrollTo(0, 0); location.reload(); });
+    $('theme').onclick = () => { const d = document.documentElement.dataset.theme === 'light'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; buildPv(); };
+  }
+
+
+  // ---------- smooth scrolling (mouse and trackpad), and a glide used by the section dial ----------
+  const smooth = !reduce && matchMedia('(pointer: fine)').matches;
+  const SS = { cur: scrollY, target: scrollY, mine: false };
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  if (smooth) {
+    addEventListener('wheel', e => { if (e.ctrlKey) return; e.preventDefault(); const raw = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1); SS.target = clamp(SS.target + clamp(raw * .85, -140, 140), 0, maxY()); SS.lastWheel = performance.now(); }, { passive: false });
+    addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
+  }
+  function go(el, off = 90) { const y = clamp((el ? el.getBoundingClientRect().top + scrollY - off : 0), 0, maxY()); if (smooth) SS.target = y; else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); }
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  if (!reduce && matchMedia('(pointer: fine)').matches) addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; } }, { passive: true });
+
+  // ---------- opening run: columns of two stacked screens; scroll moves the row, then the splits slide ----------
+  // [top, bottom] slots: a screen on a coloured panel (phone or browser) or the prototype video. split: [before, after]
+  const SPL = [[.5, .5], [.62, .3], [.3, .72], [.7, .26]], RR = CS.run.slice(0, 8), RCOLS = [];
+  for (let k = 0; k < RR.length; k += 2) RCOLS.push({ split: SPL[RCOLS.length % 4], top: RR[k], bot: RR[k + 1] || RR[0] });
+  const track = $('track'), run = $('run'), introEl = $('intro');
+  const rslot = (m, n) => `<figure class="slot">${shot(m, '').replace(' decoding="async"', '')}<div class="lab mono"><span>${esc(CS.title)}</span><span>${String(n).padStart(2, '0')} · ${kindOf(m)}</span></div></figure>`;
+  track.insertAdjacentHTML('beforeend', RCOLS.map((c, k) => `<div class="col">${rslot(c.top, k * 2 + 1)}${rslot(c.bot, k * 2 + 2)}<i class="split-line"></i><span class="split-tag"></span></div>`).join(''));
+  const colEls = [...track.querySelectorAll('.col')];
+  const STOPS = [0, 1, 2, 3.4], RHOLD = .35;
+  let RW = 0, RH = 0, introW = 0, colW = 0, colH = 0, rsm = 0;
+  function sizeRun() {
+    RW = innerWidth; RH = innerHeight; const mob = RW < 900;
+    introW = Math.round(RW * (mob ? .86 : .83)); colW = Math.round(RW * (mob ? .86 : .415)); colH = RH;
+    introEl.style.width = introW + 'px'; colEls.forEach(c => { c.style.width = colW + 'px'; });
+    run.style.height = (RH + (STOPS[3] + RHOLD) * RH) + 'px';
+    // screens fit the smaller of the two slots they might be shown in
+    track.querySelectorAll('[data-rk="p"]').forEach(el => el.style.setProperty('--w', Math.min(colW * .34, colH * .4 / 2.17) + 'px'));
+    track.querySelectorAll('[data-rk="b"]').forEach(el => el.style.setProperty('--w', Math.min(colW * .76, colH * .4 / .67) + 'px'));
+  }
+  sizeRun(); addEventListener('resize', sizeRun);
+  const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const toFrame = d => { for (let k = 0; k < 3; k++) if (d <= STOPS[k + 1] * RH) return k + Math.max(0, d - STOPS[k] * RH) / ((STOPS[k + 1] - STOPS[k]) * RH); return 3; };
+  function runLayout(dt) {
+    const d = Math.max(0, (smooth ? SS.cur : scrollY) - run.offsetTop), f0 = toFrame(d);
+    rsm = smooth || reduce ? f0 : rsm + (f0 - rsm) * (1 - Math.exp(-dt / 90));
+    const f = rsm, a = clamp(f, 0, 1), b = clamp(f - 1, 0, 1), c = clamp(f - 2, 0, 1);
+    // never slide past the last column: it ends flush with the right edge
+    const x = -Math.min(introW * easeIO(a) + (RW < 900 ? RCOLS.length - 1 : 2) * colW * easeIO(b), introW + RCOLS.length * colW - RW);
+    track.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+    const ec = easeIO(c), glow = Math.sin(Math.PI * c);   // the red line shows only while the split is moving
+    RCOLS.forEach((col, k) => {
+      const sp = col.split[0] + (col.split[1] - col.split[0]) * ec, el = colEls[k], [t, bo, line, tag] = el.children, cut = sp * colH;
+      t.style.clipPath = `inset(0 0 ${(100 - sp * 100).toFixed(2)}% 0)`; bo.style.clipPath = `inset(${(sp * 100).toFixed(2)}% 0 0 0)`;
+      // each screen keeps itself roughly centred in its visible part, and pans a little against the row
+      const cx = x + el.offsetLeft + colW / 2 - RW / 2, px = clamp(-cx * .06, -48, 48).toFixed(1);
+      { const ti = t.firstElementChild; ti.style.height = cut.toFixed(1) + 'px'; ti.style.transform = `translate3d(${px}px,0,0)`; }
+      { const bi = bo.firstElementChild; bi.style.top = cut.toFixed(1) + 'px'; bi.style.height = (colH - cut).toFixed(1) + 'px'; bi.style.transform = `translate3d(${px}px,0,0)`; }
+      t.querySelector('.lab').style.transform = `translate3d(0,${cut.toFixed(1)}px,0)`; bo.querySelector('.lab').style.transform = `translate3d(0,${colH.toFixed(1)}px,0)`;
+      const moves = col.split[0] !== col.split[1];
+      line.style.transform = tag.style.transform = `translate3d(0,${cut.toFixed(1)}px,0)`;
+      line.style.opacity = moves ? glow.toFixed(3) : 0; tag.style.opacity = moves ? Math.min(1, glow * 1.6).toFixed(3) : 0;
+      if (moves) tag.textContent = `${Math.round(sp * 100)} / ${100 - Math.round(sp * 100)}`;
+    });
+  }
+  // when the wheel stops inside the opening, glide to the nearest frame
+  let settle = null, lastNative = 0, touching = false;
+  addEventListener('scroll', () => { if (!smooth) lastNative = performance.now(); }, { passive: true });
+  addEventListener('touchstart', () => { touching = true; settle = null; }, { passive: true });
+  addEventListener('touchend', () => { touching = false; lastNative = performance.now(); }, { passive: true });
+  function runSettle(now) {
+    const y0 = run.offsetTop, nearest = d => { let best = 0; STOPS.forEach((st, k) => { if (Math.abs(d - st * RH) < Math.abs(d - STOPS[best] * RH)) best = k; }); return y0 + STOPS[best] * RH; };
+    if (smooth) { const d = SS.target - y0;
+      if (SS.lastWheel && now - SS.lastWheel > 220 && Math.abs(SS.target - SS.cur) < 60 && d > -2 && d < (STOPS[3] + .15) * RH) { SS.target = nearest(d); SS.lastWheel = 0; } }
+    else if (!reduce) { const d = scrollY - y0;
+      if (!settle && !touching && lastNative && now - lastNative > 160 && d > -2 && d < (STOPS[3] + .15) * RH) { const ty = nearest(d); if (Math.abs(scrollY - ty) > 2) settle = { from: scrollY, to: ty, t0: now }; lastNative = 0; }
+      if (settle) { const t = Math.min(1, (now - settle.t0) / 700); scrollTo(0, settle.from + (settle.to - settle.from) * (1 - Math.pow(1 - t, 4))); lastNative = 0; if (t >= 1) settle = null; } }
+  }
+
+  // ---------- section dial: click a label and the needle sweeps there ----------
+  const SECN = ['Intro', 'Overview', 'Screens', ...(CS.impact ? ['Impact'] : []), 'Credits'];
+  const secs = ['s-over', 's-body', ...(CS.impact ? ['s-imp'] : []), 's-cred'].map($);
+  const pinned = ['tune', 'camera', 'devices'].includes(V);
+  const sd = $('sdial'), sx = sd.getContext('2d');
+  let sp = 0, lastSt = -1;
+  sd.addEventListener('click', e => {
+    const r = sd.getBoundingClientRect(), k = clamp(Math.round(sp + (e.clientX - r.left - r.width / 2) / 150), 0, SECN.length - 1);
+    go(k ? secs[k - 1] : null, k === 2 ? 0 : 90); snd('pop');
+  });
+  let prevT = performance.now();
+  function frame(now) {
+    const dt = Math.min(64, now - prevT); prevT = now; const vh = innerHeight;
+    runSettle(now);
+    if (smooth) { SS.cur += (SS.target - SS.cur) * (1 - Math.exp(-dt / 150)); if (Math.abs(SS.target - SS.cur) < .4) SS.cur = SS.target; if (Math.abs(scrollY - SS.cur) > .5) { SS.mine = true; scrollTo(0, SS.cur); } }
+    const k = 1 - Math.exp(-dt / 160); mx += (tmx - mx) * k; my += (tmy - my) * k;
+    // screens drift a little inside their panels
+    if (!reduce) document.querySelectorAll('.pn > .in').forEach(el => { const b = el.parentElement.getBoundingClientRect(); if (b.bottom < 0 || b.top > vh || el.querySelector('video')) return;
+      el.style.transform = `translate3d(${(-mx * 8).toFixed(1)}px,${(((b.top + b.height / 2 - vh / 2) / vh) * -40 - my * 6).toFixed(1)}px,0)`; });
+    tick(dt, vh);
+    runLayout(dt);
+    // section dial
+    let f = 0; secs.forEach((el, i) => { if (el.getBoundingClientRect().top < vh / 2) f = i + 1; });
+    sp += (f - sp) * (1 - Math.exp(-dt / 110));
+    const st = Math.round(sp); if (st !== lastSt) { if (lastSt >= 0) snd('detent'); lastSt = st; }
+    const dpr = Math.min(2, devicePixelRatio || 1), Wd = sd.clientWidth, Hd = sd.clientHeight;
+    if (sd.width !== Math.round(Wd * dpr)) { sd.width = Math.round(Wd * dpr); sd.height = Math.round(Hd * dpr); }
+    sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, Wd, Hd);
+    const SP = 30, base = Hd - 22, col = ink(), mid = Wd / 2;
+    for (let q = -40; q <= (SECN.length - 1) * 5 + 40; q++) {
+      const x = mid + q * SP - sp * 5 * SP; if (x < -10 || x > Wd + 10) continue;
+      const major = q % 5 === 0 && q >= 0 && q < SECN.length * 5, d = Math.abs(x - mid) / SP;
+      let L = 6 + Math.max(0, 6 - d) * 3; if (major) L = Math.max(L, 16);
+      sx.strokeStyle = col; sx.globalAlpha = (major ? .5 : .16) + Math.max(0, 1 - d / 6) * .35; sx.lineWidth = major ? 2 : 1.2;
+      sx.beginPath(); sx.moveTo(x, base); sx.lineTo(x, base - L); sx.stroke();
+      if (major) { sx.globalAlpha = d < 2.5 ? 1 : .5; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'center'; sx.textBaseline = 'alphabetic'; sx.fillText(SECN[q / 5].toUpperCase(), x, base + 15); }
+    }
+    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(mid - 1.5, base - 34, 3, 36);   // the needle
+    sd.parentElement.classList.toggle('bgd', sp > .5);   // past the opening run, the text slides under a soft fade instead of the ruler
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', fill);
+  addEventListener('hashchange', () => location.reload());   // next case study (or version): same page, new address
+  // Impact: each number counts up and locks in, with a detent, when it scrolls into view
+  document.querySelectorAll('.impact b[data-n]').forEach(b => {
+    const m = b.dataset.n.match(/^([^0-9]*)([0-9][0-9,.]*)(.*)$/); if (!m || reduce) return;
+    const end = parseFloat(m[2].replace(/,/g, '')), dec = (m[2].split('.')[1] || '').length, fmt = v => m[1] + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + m[3];
+    b.textContent = fmt(0);
+    const ob = new IntersectionObserver(es => { if (!es[0].isIntersecting) return; ob.disconnect();
+      const t0 = performance.now(), D = 1400; let lastQ = -1;
+      const step = now => { const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 4), v = end * e; b.textContent = fmt(dec ? +v.toFixed(dec) : Math.round(v));
+        const q = Math.floor(e * 5); if (q !== lastQ) { if (lastQ >= 0) snd('detent'); lastQ = q; }
+        if (t < 1) requestAnimationFrame(step); else b.classList.add('count'); };
+      requestAnimationFrame(step); }, { rootMargin: '0px 0px -20% 0px' });
+    ob.observe(b);
+  });
+  document.querySelectorAll('video').forEach(v => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+  (function () { var K = window.KMCASE, a = document.getElementById('back'), n = document.getElementById('next');
+    a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+      if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
+    n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+      var href = (K.next.page || 'case.html') + '?v=202610181229#' + K.next.slug;
+      if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
+  })();
+</script>
+</body>
+</html>
