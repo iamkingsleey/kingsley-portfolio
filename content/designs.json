@@ -479,6 +479,79 @@
       "bg": "#dbc8c8",
       "dark": false,
       "desc": "Stitched lines bent into an arch above a short note on unfinished ideas."
+    },
+    {
+      "title": "Time:Out, Femicodes",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/time-out-headliner.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/videos/time-out-01.mp4"
+        }
+      ],
+      "bg": "#494142",
+      "dark": true,
+      "desc": "An animated poster for Time:Out Motion at Bricks 414, Brixton, built around a halftone portrait of the headliner.",
+      "tools": "Figma"
+    },
+    {
+      "title": "Time:Out, line-up",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/time-out-line-up.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/videos/time-out-02.mp4"
+        }
+      ],
+      "bg": "#151515",
+      "dark": true,
+      "desc": "The Time:Out Motion line-up poster: bold type, hand-written details and a red rule.",
+      "tools": "Figma"
+    },
+    {
+      "title": "Time:Out, tickets",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/time-out-tickets.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/videos/time-out-03.mp4"
+        }
+      ],
+      "bg": "#b22232",
+      "dark": true,
+      "desc": "A red ticket poster for Time:Out Motion with the venue set in stacked, tilted type.",
+      "tools": "Figma"
+    },
+    {
+      "title": "Time:Out, night",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/time-out-blur.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#731823",
+      "dark": true,
+      "desc": "A motion-blurred red poster for Time:Out Motion: 25 September, 10pm to 4am.",
+      "tools": "Figma"
+    },
+    {
+      "title": "Time:Out, red",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/time-out-red.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#954851",
+      "dark": true,
+      "desc": "The Time:Out Motion line-up set over a red, blurred crowd.",
+      "tools": "Figma"
     }
   ]
 }
