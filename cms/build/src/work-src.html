@@ -275,7 +275,7 @@ body.all .dial, body.all .hint, body.all .px, body.all .count { opacity: 0; poin
 .ov { position: fixed; inset: 0; z-index: 12; overflow-y: auto; padding: 196px max(48px, env(safe-area-inset-right, 0px)) 80px max(48px, env(safe-area-inset-left, 0px)); visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .4s; scrollbar-width: none }
 .ov::-webkit-scrollbar { display: none }
 body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, visibility 0s }
-.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 56px 40px; margin: 0 }   /* spans edge to edge between the station pill and the All button */
+.ov-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 40px; margin: 0 }   /* spans edge to edge between the station pill and the All button */
 .ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
 body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
 .ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
@@ -284,6 +284,21 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 .ov-grid { position: relative; z-index: 1 }
 .ov-t:hover .ov-c b { color: var(--ink) }
 .ov-c { will-change: transform; display: block; margin-top: 12px; font-size: 15px; letter-spacing: -.2px; font-weight: 500; color: var(--ink); line-height: 1.35 }
+/* no captions under the pictures: the title stays for screen readers only; a role match still shows its "Fits" tag on the picture */
+/* the grid: a true masonry. Each piece keeps its own shape and spans as many 1px rows as it is tall (plus the gap),
+   so the columns pack tight, start level and still read left to right. Pieces fly in from the centre once their picture has arrived. */
+.ov-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; grid-auto-rows: 1px; row-gap: 0 !important; column-gap: 22px !important; grid-auto-flow: row dense; align-items: start }
+.ov-t { grid-row-end: span var(--sp, 300); background: none; border: 0; padding: 0; border-radius: 0 }
+.ov-im { aspect-ratio: var(--r, 4 / 5) !important; transition: transform .65s var(--spring), box-shadow .65s var(--spring); box-shadow: 0 12px 31px rgb(0 0 0 / 0) }
+:root { --spring: linear(0, .008, .032 2%, .13 4.4%, .26 6.6%, .681 13%, .891 17.1%, .968, 1.028, 1.073, 1.103 25.2%, 1.114, 1.119, 1.12, 1.115 31.4%, 1.098 34.4%, 1.042 41.6%, 1.017 45.4%, .998 49.5%, .988 53.9%, .986 60.4%, 1.001 80.9% 100%) }
+@media (hover: hover) and (pointer: fine) { .ov-t:hover .ov-im { transform: scale(1.015); box-shadow: 0 12px 31px rgb(0 0 0 / .22) } }
+.ov-t:active .ov-im { transform: scale(.97) }
+.ov-t:not(.ok) .ov-im { opacity: 0 }
+.ov-t.m-in .ov-im { animation: flyin var(--fd, 1.8s) cubic-bezier(.16, 1, .3, 1) var(--fdl, 0s) both }
+@keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(1.5) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
+@media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
+@media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
+.ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
 .ov-c b { font: 500 12px var(--mono); color: var(--muted); margin-right: 4px }
 .ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
 /* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
@@ -483,7 +498,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
   const okDraw = im => !(im && im.dataset && im.dataset.nox);
   // the 1000px copy of a design (made by the build next to each WebP) for places that show it small: the All grid and the tap ripple
-  const mdOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/') : u;
+  const mdOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/')
+    : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '') + (it.cs ? ' cs' : '');
@@ -1611,6 +1627,28 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)
   const ovGrid = ov.querySelector('.ov-grid'), ovOrder = ovTiles.map(o => o.t);
   ovTiles.forEach(o => { const tg = document.createElement('i'); tg.className = 'fit'; o.c.prepend(tg); o.tag = tg; });
+  // ---------- masonry + fly-in ----------
+  const mGap = () => innerWidth < 900 ? 12 : 22;
+  const mSpans = () => ovTiles.forEach(o => { const w = o.t.offsetWidth || 1, r = parseFloat(o.t.style.getPropertyValue('--r')) || .8; o.t.style.setProperty('--sp', Math.round(w / r + mGap())); });
+  let mFlown = false;
+  function mFly() {
+    if (reduce) return;
+    const vis = ovTiles.filter(o => !o.t.hidden).map(o => o.t); if (!vis.length) return;
+    const cols = innerWidth < 900 ? 2 : 4, spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = vis[0].offsetTop, left0 = vis[0].offsetLeft;
+    vis.forEach(t => { if (t.offsetTop - ov.scrollTop > innerHeight * 1.4) return;
+      const c = Math.round((t.offsetLeft - left0) / (t.offsetWidth + mGap())), row = Math.max(0, Math.round((t.offsetTop - top0) / 300));
+      t.style.setProperty('--fx', (spread[c] || 0) + 'px'); t.style.setProperty('--fy', (300 + row * 100) + 'px');
+      t.style.setProperty('--fdl', (.15 + c * .06 + row * .2).toFixed(2) + 's'); t.style.setProperty('--fd', [1.5, 2.1, 1.9, 1.7][(c + row) % 4] + 's');
+      const go = () => { t.classList.remove('m-in'); void t.offsetWidth; t.classList.add('m-in'); };
+      if (t.classList.contains('ok')) go(); else { t.style.setProperty('--fdl', '0s'); t._fly = go; } });
+  }
+  // each piece's real shape comes from its picture (the case-study covers too); a piece shows once its picture is here
+  let mT = 0;
+  ovTiles.forEach(o => { const u = mdOf(still(items[o.i])), i = new Image();
+    i.onload = () => { const r = i.naturalWidth / i.naturalHeight; o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
+    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) o.t.style.setProperty('--r', items[o.i].r); i.src = u; });
+  mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); });
+  addEventListener('resize', () => requestAnimationFrame(mSpans));
   // a role shows only the work that fits it (a recruiter hiring for Brand sees Brand); the chips and the picker bring the rest back
   const ROLE_CHIP = { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
   function applyRole(r, animate) {

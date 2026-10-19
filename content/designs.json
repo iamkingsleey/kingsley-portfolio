@@ -29,6 +29,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Badge, purple",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/badge-purple.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A star badge on a purple stage, with confetti in the air."
+    },
+    {
       "title": "Safe with coins",
       "category": "3d",
       "images": [
@@ -83,6 +96,19 @@
       "bg": "#8e8674",
       "dark": false,
       "desc": "A ribbon of gold coins trailing after a glass cursor: money that moves with a click. Modelled and lit in Blender."
+    },
+    {
+      "title": "Fintech box and paper plane",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/fintech-box.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A gift box opening to a coin and a paper plane, lit soft and grey."
     },
     {
       "title": "Silver coins and glass cursor",
@@ -140,6 +166,19 @@
       "desc": "A badge on an orange background, part of a set of reward objects."
     },
     {
+      "title": "Gold badge, blue",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/gold-badge-blue.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A gold medal with red ribbons on a blue stage."
+    },
+    {
       "title": "Badge in a box",
       "category": "brand",
       "images": [
@@ -190,6 +229,19 @@
       "bg": "#638db5",
       "dark": true,
       "desc": "A debit card surrounded by soft, colourful shapes."
+    },
+    {
+      "title": "Price tag and silver coins",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/price-tag-silver.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A price tag and silver coins in a dark, low-key light."
     },
     {
       "title": "Pink debit card",
@@ -244,6 +296,19 @@
       "desc": "The same swing on dark blue, for a darker brand."
     },
     {
+      "title": "Star badge",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/star-badge.jpg",
+          "ratio": 1.333
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A copper star badge with lilac ribbons on a warm yellow ground."
+    },
+    {
       "title": "Tennis on court",
       "category": "motion",
       "images": [
@@ -296,6 +361,19 @@
       "bg": "#98969b",
       "dark": false,
       "desc": "A set of everyday objects modelled and lit in Blender, made to feel precious."
+    },
+    {
+      "title": "White piggy bank",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/white-piggy-bank.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A white piggy bank with stickers, glowing in a dark blue room."
     },
     {
       "title": "Ruler picker",
