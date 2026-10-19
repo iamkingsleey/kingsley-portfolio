@@ -795,6 +795,20 @@
       "dark": false,
       "desc": "A wallet with coins and a banknote, in isometric line art.",
       "tools": "Illustrator"
+    },
+    {
+      "title": "Collage",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/collage.jpg",
+          "ratio": 1.622
+        }
+      ],
+      "bg": "#d81b6a",
+      "dark": true,
+      "desc": "A collage of the illustration set: the coding laptop, a robot hand, the star award and a gradient sky.",
+      "tools": "Illustrator"
     }
   ]
 }
