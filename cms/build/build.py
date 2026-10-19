@@ -263,9 +263,7 @@ s = rep(s, """  function tuneTo(s, sound) {
   function prefetchDesigns() {
     if (prefetchDesigns.done) return; prefetchDesigns.done = true;
     const add = (href, as) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-    add('designs.html?v=' + BUILD, 'document');
-    const first = ['paper-plane-with-coin.jpg', '3d-tumbler-render.jpg', 'safe-with-coins.jpg', 'pawn-in-an-archway.jpg'];
-    first.forEach(f => add('assets/designs/' + f, 'image'));
+    // (the Designs page itself and its first full pictures are fetched by flow.js; here only the small thumbnails)
     PROJECTS.forEach(p => p.images && p.images[0] && p.images[0].src && add(p.images[0].src.replace('assets/designs/', 'assets/designs/thumbs/'), 'image'));
   }
   const idle = window.requestIdleCallback || (f => setTimeout(f, 1200));

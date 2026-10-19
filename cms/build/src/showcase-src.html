@@ -209,6 +209,8 @@ h1 .w.in > span { translate: 0 0 }
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const PICS = __PICS__;   // { t, src, r } stand-ins: 3D renders and brand pieces
+  // the 1000px copy (made by the build) wherever a piece is shown small; the full picture is kept for the large view
+  const MD = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/') : u;
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
   const snd = n => { if (window.Popkit) Popkit.play(n); };
@@ -229,7 +231,7 @@ h1 .w.in > span { translate: 0 0 }
     page.innerHTML = `
       <header class="head" id="s-ring"><div><h1 id="ttl">Everyday objects, made to feel precious</h1><p class="lede rv">A set of renders, nothing to read. Drag the dial to turn through them, tap one to look closer.</p></div>
         <span class="mono rv">${P.length} pieces · Blender</span></header>
-      <div class="ring" id="ring"><div class="rot" id="rot">${P.map((p, i) => `<div class="card" data-i="${i}"><img src="${p.src}" alt="${p.t}"></div>`).join('')}</div></div>
+      <div class="ring" id="ring"><div class="rot" id="rot">${P.map((p, i) => `<div class="card" data-i="${i}"><img src="${MD(p.src)}" alt="${p.t}"></div>`).join('')}</div></div>
       <div class="rruler"><canvas id="rr"></canvas></div>
       <div class="rcap"><div><span class="mono" id="rcf"></span><h3 id="rct"></h3></div><span class="k"><button type="button" id="rp" aria-label="Previous">‹</button><button type="button" id="rn" aria-label="Next">›</button></span></div>
 
@@ -241,7 +243,7 @@ h1 .w.in > span { translate: 0 0 }
       <div class="clay" id="clay"><img src="${P[2].src}" alt="${P[2].t} in colour"><img class="grey" src="${P[2].src}" alt="${P[2].t} in clay"><span class="ndl"></span><span class="tag l mono">Clay</span><span class="tag r mono">Colour</span></div>
 
       <div class="shead" id="s-wall"><div><h2>Every piece</h2><p>Move across them; tap any one to see it large.</p></div><span class="mono">${PICS.length} renders</span></div>
-      <div class="wall" id="wall">${PICS.map((p, i) => `<figure class="tile" data-i="${i}"><div class="in" style="--r:${p.r}"><img src="${p.src}" alt="${p.t}" loading="lazy"><span class="gl"></span></div><figcaption class="cap mono"><span>${p.t}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
+      <div class="wall" id="wall">${PICS.map((p, i) => `<figure class="tile" data-i="${i}"><div class="in" style="--r:${p.r}"><img src="${MD(p.src)}" alt="${p.t}" loading="lazy"><span class="gl"></span></div><figcaption class="cap mono"><span>${p.t}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
       ${CRED('Personal, ongoing', '3D models<br>Lighting and materials<br>Final renders')}`;
     SECN = ['Dial', 'Play', 'Clay', 'All', 'Credits']; secs = ['s-table', 's-clay', 's-wall', 'cred'];
 
@@ -288,7 +290,7 @@ h1 .w.in > span { translate: 0 0 }
     const table = $('table'), objs = [];
     const OW = narrow ? 104 : 150;
     table.style.setProperty('--ow', OW + 'px');
-    PICS.slice(0, narrow ? 8 : 12).forEach((p, i) => { const el = document.createElement('div'); el.className = 'obj'; el.innerHTML = `<img src="${p.src}" alt="${p.t}">`; table.appendChild(el);
+    PICS.slice(0, narrow ? 8 : 12).forEach((p, i) => { const el = document.createElement('div'); el.className = 'obj'; el.innerHTML = `<img src="${MD(p.src)}" alt="${p.t}">`; table.appendChild(el);
       objs.push({ el, x: 0, y: 0, vx: 0, vy: 0, a: 0, va: 0, hx: 0, hy: 0, held: false, z: i }); });
     const home = () => { const W = table.clientWidth, H = table.clientHeight, cols = Math.max(3, Math.floor(W / (OW * 1.35))), rows = Math.ceil(objs.length / cols);
       objs.forEach((o, i) => { const c = i % cols, r = Math.floor(i / cols); o.hx = (c + .5) * W / cols - OW / 2 + (r % 2 ? OW * .25 : 0); o.hy = (r + .5) * H / rows - OW * .625; }); };
@@ -352,10 +354,10 @@ h1 .w.in > span { translate: 0 0 }
 
       <div class="shead" id="s-col"><div><h2>Colours, pulled from each piece</h2><p>Pick a piece below. Tap a swatch to copy its hex.</p></div><span class="mono">Sampled live</span></div>
       <div class="swrap"><div class="sbig"><img id="sbi" src="${P[0].src}" alt=""></div><div class="sw" id="sw"></div></div>
-      <div class="strip" id="strip">${P.map((p, i) => `<button type="button" data-i="${i}" aria-label="${p.t}"><img src="${p.src}" alt=""></button>`).join('')}</div>
+      <div class="strip" id="strip">${P.map((p, i) => `<button type="button" data-i="${i}" aria-label="${p.t}"><img src="${MD(p.src)}" alt=""></button>`).join('')}</div>
 
       <div class="shead" id="s-sheet"><div><h2>Contact sheet</h2><p>The whole set at a glance. Tap one to see it large.</p></div><span class="mono">${P.length} pieces</span></div>
-      <div class="sheet" id="sheet">${P.map((p, i) => `<figure data-i="${PICS.indexOf(p)}"><div class="im"><img src="${p.src}" alt="${p.t}" loading="lazy"></div><figcaption class="cap mono"><span>${String(i + 1).padStart(2, '0')}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
+      <div class="sheet" id="sheet">${P.map((p, i) => `<figure data-i="${PICS.indexOf(p)}"><div class="im"><img src="${MD(p.src)}" alt="${p.t}" loading="lazy"></div><figcaption class="cap mono"><span>${String(i + 1).padStart(2, '0')}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
       ${CRED('Personal, ongoing', 'Illustrations<br>Colour studies')}`;
     SECN = ['Board', 'Loupe', 'Colour', 'Sheet', 'Credits']; secs = ['s-loupe', 's-col', 's-sheet', 'cred'];
 
@@ -363,7 +365,7 @@ h1 .w.in > span { translate: 0 0 }
     const board = $('board'), prints = [];
     const PW = narrow ? 120 : 200;
     P.slice(0, narrow ? 9 : 14).forEach((p, i) => { const el = document.createElement('div'); el.className = 'print'; el.style.setProperty('--pw', PW * (p.r > 1 ? 1.35 : 1) + 'px'); el.style.setProperty('--r', p.r);
-      el.innerHTML = `<img src="${p.src}" alt="${p.t}"><span>${FQ(i)} · ${p.t}</span>`; board.appendChild(el); prints.push({ el, x: 0, y: 0, a: 0, tx: 0, ty: 0, ta: 0, vx: 0, vy: 0, va: 0, s: 1, ts: 1, vs: 0 }); });
+      el.innerHTML = `<img src="${MD(p.src)}" alt="${p.t}"><span>${FQ(i)} · ${p.t}</span>`; board.appendChild(el); prints.push({ el, x: 0, y: 0, a: 0, tx: 0, ty: 0, ta: 0, vx: 0, vy: 0, va: 0, s: 1, ts: 1, vs: 0 }); });
     const scatter = (first) => { const W = board.clientWidth, H = board.clientHeight;
       prints.forEach((q, i) => { const w = q.el.offsetWidth, h = q.el.offsetHeight; q.tx = 20 + Math.random() * Math.max(10, W - w - 40); q.ty = 20 + Math.random() * Math.max(10, H - h - 40); q.ta = (Math.random() - .5) * 18;
         if (first) { q.x = W / 2 - w / 2; q.y = H + 40; q.a = 0; } q.el.style.zIndex = i; }); };

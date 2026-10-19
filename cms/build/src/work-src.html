@@ -440,6 +440,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const remote = u => /^https?:/i.test(u || '') && !String(u).startsWith(location.origin);
   const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
   const okDraw = im => !(im && im.dataset && im.dataset.nox);
+  // the 1000px copy of a design (made by the build next to each WebP) for places that show it small: the All grid and the tap ripple
+  const mdOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/') : u;
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '') + (it.cs ? ' cs' : '');
@@ -521,12 +523,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const m = Math.min(Math.floor((N - 1) / 2), Math.ceil((innerWidth / 2) / sp));
     return m + Math.floor(Math.random() * (N - 2 * m));
   })();
+  const ROWLESS = true;   // Designs opens on All and the row is retired: its full-size pictures load only if the row is shown
   let p = START, target = START, last = 0, vel = 0, active = -1;
   // load the opening piece and its neighbours at full size straight away (the rest wait for page load),
   // so the centre piece is sharp on first visit instead of showing its small preview
   slots.forEach((sl, i) => {
     const im = sl.querySelector('img[data-src]');
-    if (im && Math.abs(i - START) <= 2) { im.fetchPriority = i === START ? 'high' : 'auto'; im.src = im.dataset.src; im.removeAttribute('data-src'); }
+    if (im && Math.abs(i - START) <= 2 && !ROWLESS) { im.fetchPriority = i === START ? 'high' : 'auto'; im.src = im.dataset.src; im.removeAttribute('data-src'); }
   });
   let hovering = false, hoverAmt = 0, moving = false, settleAt = -1e9, bounce = 0, bounceY = 1;
   const clamp = v => Math.max(0, Math.min(N - 1, v));
@@ -1202,11 +1205,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   }
   items.forEach(it => thumbFor(still(it)));
   function texImg(src) { let im = texCache.get(src); if (!im) { im = xo(new Image(), src); im.src = src; texCache.set(src, im); } return im; }
-  const warm = () => { slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } }); items.forEach(it => texImg(still(it))); };
+  const loadRow = () => slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } });
+  items.forEach(it => texImg(mdOf(still(it))));   // the grid's pictures are small (1000px): fetch them all straight away
+  const warm = () => { if (!ovOpen) loadRow(); };
   if (document.readyState === 'complete') setTimeout(warm, 200); else addEventListener('load', () => setTimeout(warm, 200));          // warm up so the first tap can ripple
   function makeRipple(src, W, H, cx, cy) {
     if (/^https?:/.test(src)) return null;   // pictures from another site can't go into WebGL; no ripple for those
-    const im = texImg(src);
+    const im = texImg(mdOf(src));
     if (reduce || !im.complete || !im.naturalWidth) return null;
     const cv = document.createElement('canvas');
     const gl = cv.getContext('webgl', { premultipliedAlpha: false });
@@ -1515,7 +1520,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // ---------- See everything ----------
   // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
   const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
-  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" style="background-image:url(${it.video ? it.poster : it.src})"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
+  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" style="background-image:url(${mdOf(it.video ? it.poster : it.src)})"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
   document.body.appendChild(ov);
   let ovOpen = false;
   function openOverview() {
@@ -1527,7 +1532,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     setTimeout(() => { const on = ov.querySelector('.ov-t.on'); if (on) on.focus({ preventScroll: true, focusVisible: false }); }, 50);   // keyboard users land here; no ring for mouse users
   }
   function closeOverview(i) {
-    if (!ovOpen) return; ovOpen = false;
+    if (!ovOpen) return; ovOpen = false; loadRow();
     if (i >= 0) { target = p = i; tick(); }
     document.body.classList.remove('all');
     $('allBtn').setAttribute('aria-pressed', 'false');
@@ -1601,16 +1606,18 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       const th = y => Math.max(-1.45, Math.min(1.45, (y - mid) / R));
       const f = y => on ? mid + R * Math.sin(th(y)) : y;                                   // where a line of the grid lands
       const fade = y => on ? Math.max(0, Math.cos(th(y))) ** .6 : 1;
-      for (const o of ovTiles) {
-        if (o.t.hidden) continue;                                   // filtered out
-        const r = o.im.getBoundingClientRect();
+      // measure every tile first, then move captions and draw: mixing the two made the browser redo the page layout once per tile, every frame
+      const live = ovTiles.filter(o => !o.t.hidden);              // (hidden = filtered out)
+      const rects = live.map(o => [o.im.getBoundingClientRect(), o.c.getBoundingClientRect().top]);
+      for (let k = 0; k < live.length; k++) {
+        const o = live[k], r = rects[k][0];
         // caption rides the drum and fades as it turns away (off-screen captions stay put, so the scroll length stays honest)
-        const cr = o.c.getBoundingClientRect(), base = cr.top - o.cy;
+        const base = rects[k][1] - o.cy;
         o.cy = base < -60 || base > vh + 60 ? 0 : f(base) - base;
         o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
         o.c.style.opacity = fade(base).toFixed(3);
         if (r.bottom < -M || r.top > vh + M) continue;
-        const it = items[o.i], full = texImg(still(it)), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
+        const it = items[o.i], full = texImg(mdOf(still(it))), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
         const sw = src.naturalWidth, sh = src.naturalHeight;
         if (sw && okDraw(src)) {
           const ia = sw / sh, ba = r.width / r.height;

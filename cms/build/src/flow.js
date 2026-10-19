@@ -7,6 +7,7 @@
   const ORDER = ['index.html', 'designs.html', 'engineering.html', 'about.html'];
   const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const at = ORDER.indexOf(file); if (at < 0) return;
+  const withV = u => u && window.BUILD ? u + '?v=' + window.BUILD : u;   /* the same address the nav uses, so one cached copy serves both */
   // only between Home and Designs: Home flows down into Designs, and Designs flows back up to Home
   const ALLOW = { 'index.html': [1] }[file] || [];   // only Home → Designs for now (scrolling back up from Designs is off)
   if (!ALLOW.length) return;
@@ -26,7 +27,7 @@
   };
   let gone = false;
   const go = dir => {
-    const to = ORDER[at + dir]; if (!to || !ALLOW.includes(dir) || gone || document.querySelector('.secret:not([hidden]), .tuner')) return; gone = true;
+    const to = withV(ORDER[at + dir]); if (!ORDER[at + dir] || !ALLOW.includes(dir) || gone || document.querySelector('.secret:not([hidden]), .tuner')) return; gone = true;
     try { sessionStorage.setItem('km-flow', JSON.stringify({ d: dir, t: Date.now() })); } catch (_) {}
     if (reduce) { location.href = to; return; }
     if (window.Popkit) try { Popkit.play('detent'); } catch (_) {}
@@ -104,11 +105,11 @@
   addEventListener('pageshow', e => { if (e.persisted) location.reload(); });   // coming back: a fresh page, not the slid-away one
   // get the neighbours ready: the next page is built in the background where the browser allows it, and its pictures are fetched
   const warm = () => {
-    const next = ALLOW.includes(1) ? ORDER[at + 1] : null, prev = ALLOW.includes(-1) ? ORDER[at - 1] : null;
+    const next = ALLOW.includes(1) ? withV(ORDER[at + 1]) : null, prev = ALLOW.includes(-1) ? withV(ORDER[at - 1]) : null;
     // (the page itself is fetched, not pre-built: a page built in the background loses its WebGL grid and its scroll handling)
     try { const sr = document.createElement('script'); sr.type = 'speculationrules'; sr.textContent = JSON.stringify({ prefetch: [next, prev].filter(Boolean).map(u => ({ source: 'list', urls: [u] })) }); document.head.append(sr); } catch (_) {}
     [next, prev].filter(Boolean).forEach(u => fetch(u, { credentials: 'same-origin' }).then(r => r.text()).then(t => {
-      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = s; /* fetched the same way Designs asks for them, so the cached copy works there */ } });
+      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = /^assets\/designs\/[^/]+\.webp$/.test(s) ? s.replace('assets/designs/', 'assets/designs/md/') : s; /* Designs shows the 1000px copies; fetched the same way Designs asks for them, so the cached copy works there */ } });
     }).catch(() => {}));
   };
   (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warm, { timeout: 2500 });

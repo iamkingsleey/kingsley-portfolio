@@ -127,6 +127,36 @@ for _d in _dz:
         _t = _im['src'].replace('assets/designs/', 'assets/designs/thumbs/', 1)   # the trail is small and blurred: the thumbnail is plenty
         _bg.append({'src': _t if _t != _im['src'] and os.path.exists(f'{REPO}/{_t}') else _im['src'], 'ratio': _im.get('ratio', 1)})
 HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
+# ---- pictures: a WebP copy of every JPEG/PNG under assets/ (usually a third smaller, same look), plus a 1000px
+# "md" copy of each design for places that show them small (the Designs grid, the 3D page's cards). The pages then
+# point at the WebP; a picture without one (no Pillow on this machine, say) keeps its original. Copies are only
+# remade when the original changes.
+_WEBP = set()
+try:
+    from PIL import Image as _Im
+    for _dp, _dn, _fn in os.walk(f'{REPO}/assets'):
+        for _n in _fn:
+            if not re.search(r'\.(jpe?g|png)$', _n, re.I): continue
+            _src = os.path.join(_dp, _n); _rel = os.path.relpath(_src, REPO).replace(os.sep, '/')
+            _out = re.sub(r'\.(jpe?g|png)$', '.webp', _src, flags=re.I)
+            try:
+                if not os.path.exists(_out) or os.path.getmtime(_out) < os.path.getmtime(_src):
+                    _im = _Im.open(_src); _alpha = _im.mode in ('RGBA', 'LA', 'P')
+                    _im = _im.convert('RGBA' if _alpha else 'RGB')
+                    if max(_im.size) > 2400: _im.thumbnail((2400, 2400))
+                    _im.save(_out, 'WEBP', quality=82, method=6)
+                if os.path.getsize(_out) < os.path.getsize(_src): _WEBP.add(_rel)
+                if '/thumbs/' not in _rel and _rel.startswith('assets/designs/') and _rel.count('/') == 2:
+                    _md = f'{REPO}/assets/designs/md/' + os.path.basename(_out)
+                    if not os.path.exists(_md) or os.path.getmtime(_md) < os.path.getmtime(_src):
+                        os.makedirs(os.path.dirname(_md), exist_ok=True)
+                        _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((1000, 1000 * 4)); _m.save(_md, 'WEBP', quality=80, method=6)
+            except Exception as _e: print('webp skipped', _rel, _e)
+except ImportError:
+    print('note: Pillow not installed, pictures keep their original format')
+_PIC = re.compile(r'assets/[\w./-]+?\.(?:jpe?g|png)(?=["\'`)\s?#])', re.I)
+def _webpify(html):
+    return _PIC.sub(lambda m: re.sub(r'\.(jpe?g|png)$', '.webp', m.group(0), flags=re.I) if m.group(0) in _WEBP else m.group(0), html)
 import hashlib as _hl
 _vers = {}
 def _ver(n):
@@ -150,6 +180,9 @@ for _p in PAGES:
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
         _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
         if _p == 'index.html': _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
+    _s = _webpify(_s)
+    if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
+        _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
     _s = re.sub(r'src="(nav|protips|home|flow|homebg|tuner|popkit)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     open(_f, 'w', encoding='utf-8').write(_s)
