@@ -627,6 +627,174 @@
       "dark": true,
       "desc": "The Time:Out Motion line-up set over a red, blurred crowd.",
       "tools": "Figma"
+    },
+    {
+      "title": "Card terminal",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/card-terminal.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#6b3fbb",
+      "dark": true,
+      "desc": "A card terminal printing a receipt, with a magnifier and a settings cog, in flat isometric.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Parcel check",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/parcel-check.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#6b3fbb",
+      "dark": true,
+      "desc": "A parcel stamped and checked under a magnifier, in isometric.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Dice",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/dice.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#7aff58",
+      "dark": false,
+      "desc": "Two colourful dice on a bright green ground.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Laptop",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/laptop.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#0151e4",
+      "dark": true,
+      "desc": "An isometric laptop on a blue ground.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "AI assets",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/ai-assets.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "A laptop ringed by a film strip and floating icons: an illustration about AI-made assets.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Parcel search",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/parcel-search.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "An open parcel with a magnifier searching inside it.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Parcel scan",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/parcel-scan.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "A parcel being scanned with a magnifier, drawn in black and white.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Game controller",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/game-controller.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#191919",
+      "dark": true,
+      "desc": "A game controller on a dark ground, in line-art isometric.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Takeaway",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/takeaway.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "A takeaway bag and a cup, in black-and-white isometric.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Notebook",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/notebook.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "A spiral notebook and a pencil, in isometric line art.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Vault",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/vault.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#191919",
+      "dark": true,
+      "desc": "An open vault door with stacked coins inside.",
+      "tools": "Illustrator"
+    },
+    {
+      "title": "Wallet and coins",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/wallet.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#e3ddcf",
+      "dark": false,
+      "desc": "A wallet with coins and a banknote, in isometric line art.",
+      "tools": "Illustrator"
     }
   ]
 }

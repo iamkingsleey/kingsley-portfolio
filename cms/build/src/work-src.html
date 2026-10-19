@@ -1649,6 +1649,38 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) o.t.style.setProperty('--r', items[o.i].r); i.src = u; });
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); });
   addEventListener('resize', () => requestAnimationFrame(mSpans));
+  // ---------- the ripple: moving the pointer drops rings into the grid; each ring travels outward and the pieces
+  // rise and settle as its wave passes, like a stone dropped in water ----------
+  const WAVE = { on: false, amp: 14, speed: 900, wave: 260, width: 230, life: .75, every: 70, max: 6 };
+  if (WAVE.on && !reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const rings = []; let raf = 0, lx = -9999, ly = -9999;
+    const tick = now => {
+      raf = 0; const g = ovGrid.getBoundingClientRect();
+      for (let k = rings.length - 1; k >= 0; k--) if ((now - rings[k].t) / 1000 > WAVE.life * 4) rings.splice(k, 1);
+      ovTiles.forEach(o => {
+        const t = o.t; let dx = 0, dy = 0, lift = 0;
+        if (rings.length && !t.hidden) {
+          const cx = g.left + t.offsetLeft + t.offsetWidth / 2, cy = g.top + t.offsetTop + t.offsetHeight / 2;
+          if (cy > -400 && cy < innerHeight + 400) rings.forEach(r => {
+            const age = (now - r.t) / 1000, ex = cx - r.x, ey = cy - r.y, d = Math.hypot(ex, ey) || 1, off = d - age * WAVE.speed;
+            const h = WAVE.amp * r.k * Math.exp(-age / WAVE.life) * Math.exp(-((off / WAVE.width) ** 2)) * Math.sin(2 * Math.PI * off / WAVE.wave);
+            dx += ex / d * h; dy += ey / d * h; lift += h;
+          });
+        }
+        t.style.translate = rings.length ? `${dx.toFixed(2)}px ${dy.toFixed(2)}px` : '';
+        t.style.scale = rings.length ? (1 + lift * .0022).toFixed(4) : '';
+      });
+      if (rings.length) raf = requestAnimationFrame(tick);
+    };
+    let last = 0;
+    ov.addEventListener('pointermove', e => {
+      const now = performance.now(), moved = Math.hypot(e.clientX - lx, e.clientY - ly);
+      if (now - last < WAVE.every || moved < 24) return;
+      last = now; lx = e.clientX; ly = e.clientY;
+      rings.push({ x: e.clientX, y: e.clientY, t: now, k: Math.min(1, moved / 120) }); if (rings.length > WAVE.max) rings.shift();
+      if (!raf) raf = requestAnimationFrame(tick);
+    }, { passive: true });
+  }
   // a role shows only the work that fits it (a recruiter hiring for Brand sees Brand); the chips and the picker bring the rest back
   const ROLE_CHIP = { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
   function applyRole(r, animate) {
