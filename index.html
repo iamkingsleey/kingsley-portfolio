@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610192032";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610192051";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -246,6 +246,7 @@ h2 { font: 600 32px/1.15 var(--body); color: var(--ink); letter-spacing: -0.96px
 @media (prefers-reduced-motion: reduce) { .tool { transition: none } }
 @media (max-width: 899px) { h1 { font-size: 42px } h2 { font-size: 28px } .bio br { display: none } }
 @media (max-width: 599px) { .pill { font-size: 13px; padding: 6px 10px } }
+@media (max-width: 899px) { .links a { padding: 10px 2px; margin: -10px -2px } .socials a, .mode-bottom .socials a { padding: 9px 13px; font-size: 13.5px } }   /* phones: bigger tap areas, same look */
 
 /* ---------- Inner pages: the dial steps aside for a side menu ----------
    A plain list of pages; the current one is black with a small dash beside it. */
@@ -1889,11 +1890,11 @@ h1.typer { position: relative }
       if (on) Popkit.play('pop');
     }, true); })();
 </script>
-<script src="nav.js?v=bd965032" defer></script>
+<script src="nav.js?v=9d43209a" defer></script>
 <script>window.KM_HOMEBG = [{"src": "assets/designs/thumbs/paper-plane-with-coin.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/3d-tumbler-render.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/badge-purple.webp", "ratio": 1.5}, {"src": "assets/designs/thumbs/safe-with-coins.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/pawn-in-an-archway.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/colorful-award-with-ribbons.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/gold-coins-glassy-mouse.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/fintech-box.webp", "ratio": 1.5}, {"src": "assets/designs/thumbs/silver-coins-glassy-mouse.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/stacked-coins-with-mouse.webp", "ratio": 0.8}, {"src": "assets/uploads/glass-of-wine1.webp", "ratio": 1}, {"src": "assets/designs/thumbs/badge-on-a-orange-background.webp", "ratio": 0.8}];</script>
 <script src="homebg.js?v=14a9878b" defer></script>
 <script src="kit.js?v=c6befc20" defer></script>
-<script src="protips.js?v=6b686bb5" defer></script>
+<script src="protips.js?v=b3a5114d" defer></script>
 <script src="home.js?v=0612d6af" defer></script>
 <script src="flow.js?v=9268d792" defer></script>
 </body>

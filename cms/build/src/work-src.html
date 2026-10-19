@@ -55,27 +55,8 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 /* ---------- Top right: category chips + count ---------- */
 .top { position: fixed; left: 50%; transform: translateX(-50%); top: 106px; z-index: 20; display: flex; align-items: center; gap: 18px }
 .chips { display: flex; gap: 4px } .chips button { white-space: nowrap }
-.rolepick { position: relative; flex: none; margin-left: 10px }
-.rp-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 3px 0 12px; border: 0; border-radius: 999px; background: var(--pill, rgb(127 127 127 / .12)); color: var(--muted); font: 500 12.5px var(--body, inherit); white-space: nowrap; cursor: pointer; transition: background .18s }
-.rp-btn:hover { background: var(--pill-hover, rgb(127 127 127 / .18)) }
-.rp-btn .rp-v { font-weight: 500; color: var(--ink); margin-right: 4px }
-/* the same arrow as "For recruiters": a chevron in a small circle in the page colour; it flips while the menu is open */
-.rp-btn .chev { width: 26px; height: 26px; border-radius: 50%; background: var(--bg); color: var(--ink); display: grid; place-items: center }
-.rp-btn .chev svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
-.rolepick.open .chev svg { transform: rotate(180deg) }
-.rp-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
-.rp-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; min-width: 100%; padding: 6px; border-radius: 16px; display: grid; gap: 2px;
-  background: color-mix(in srgb, var(--bg) 70%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: 0 0 0 1px var(--edge, rgb(127 127 127 / .18)), 0 18px 40px -12px rgb(0 0 0 / .35);
-  opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top right; pointer-events: none; transition: opacity .24s cubic-bezier(.2,.8,.2,1), transform .24s cubic-bezier(.2,.8,.2,1) }
-.rolepick.open .rp-menu { opacity: 1; transform: none; pointer-events: auto; transition-duration: .18s }
-.rp-menu button { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 34px; padding: 0 10px 0 12px; border: 0; border-radius: 10px; background: none; color: var(--text, var(--ink)); font: 500 13px var(--body, inherit); text-align: left; white-space: nowrap; cursor: pointer }
-.rp-menu button:hover, .rp-menu button:focus-visible { background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--ink); outline: none }
-.rp-menu button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0 }
-.rp-menu button[aria-selected="true"] { color: var(--ink) } .rp-menu button[aria-selected="true"] svg { opacity: 1 }
-@media (prefers-reduced-motion: reduce) { .rp-menu, .rp-btn .chev svg { transition: none } }
 :root[data-theme="light"] .ov-t.fits .ov-c .fit { box-shadow: inset 0 0 0 1px rgb(0 0 0 / .14) }   /* the white tag keeps an edge on the light page */   /* the white selection already shows it's active */
-.ov-c .fit { display: none } .ov-t.fits .ov-c .fit { display: inline-block; margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
+.ov-c .fit, .ov-t.fits .ov-c .fit { display: none } .ov-t.fits .ov-c .fit-x { margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
 .chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
 .chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
 .chips button:hover { color: var(--ink) }
@@ -148,10 +129,9 @@ body.open .px { opacity: 0; pointer-events: none }
   .station { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)) }
   .now .fq { font-size: 22px }
   .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between; transform: none }
-  .chips { overflow-x: auto; scrollbar-width: none }
-  .chips button { padding: 6px 9px; font-size: 12px; white-space: nowrap; flex: none }
+  .chips { overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 18px }   /* fades at the edge: more filters this way */
+  .chips button { padding: 10px 11px; font-size: 12.5px; white-space: nowrap; flex: none }   /* taller, for thumbs */
   .chips button sup { display: none }
-  .rolepick { margin-left: 0 } .rp-btn { padding-left: 10px } .rp-btn .rp-l { display: none }
   .hint span { display: none }
   .hint { right: 16px }
   .cap h2 { font-size: 18px }
@@ -227,7 +207,7 @@ body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.no
 .d-next { border-top: 1px solid var(--line) }
 body::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 140px; z-index: 19; pointer-events: none; background: linear-gradient(var(--bg) 62%, transparent); opacity: 0; transition: opacity .3s }
 body.open::before, body.all::before { opacity: 1 }
-@media (max-width: 899px) { body::before { height: 84px } }
+@media (max-width: 899px) { body::before { height: calc(132px + env(safe-area-inset-top, 0px)); background: linear-gradient(var(--bg) 80%, transparent) } .kmn-top { display: none !important } }   /* the fade reaches below the filter row, so pictures never show behind the chips */
 .fly { position: fixed; z-index: 35; overflow: hidden; pointer-events: none; background: var(--tile) }
 .fly img { width: 100%; height: 100%; object-fit: cover; display: block }
 /* Section dial on the project page */
@@ -1621,10 +1601,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const ovFlat = document.createElement('canvas'), oc = ovFlat.getContext('2d');
   const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
   // ---------- role match: "Hiring for" (kit.js keeps the choice). Fitting work moves to the front with a tag; the rest dims but stays. ----------
-  const fits = (it, r) => r === 'Product' ? it.cat === 'Case study' && !/brand\.html|logo\.html|showcase\.html/.test(it.link || it.page || '')
-    : r === 'Brand' ? it.cat === 'Brand' || it.cat === 'Illustration' || it.cat === 'Poster' || /brand\.html|logo\.html/.test(it.link || it.page || '')
-    : r === '3D' ? it.cat === '3D' || /showcase\.html/.test(it.link || it.page || '')
-    : r === 'Motion' ? it.cat === 'Motion' : true;
+  // a role is just its chip: the work shown matches the chip's count exactly
+  const fits = (it, r) => it.cat === { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' }[r];
   let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)
   const ovGrid = ov.querySelector('.ov-grid'), ovOrder = ovTiles.map(o => o.t);
   ovTiles.forEach(o => { const tg = document.createElement('i'); tg.className = 'fit'; o.c.prepend(tg); o.tag = tg; });
@@ -1657,7 +1635,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   //   magnet: pieces near the pointer lean in toward it
   //   lens:   pieces near the pointer swell and push away, like a magnifier gliding over
   //   spot:   a soft spotlight follows the pointer; pieces away from it dim
-  const PFX = (() => { try { return window.KM_FX || localStorage.getItem('km-fx') || 'none'; } catch (_) { return window.KM_FX || 'none'; } })();
+  const PFX = window.KM_FX || 'none';   // parked for now: no pointer effect unless a preview sets KM_FX
   const WAVE = { amp: 14, speed: 900, wave: 260, width: 230, life: .75, every: 70, max: 6 };
   if (PFX !== 'none' && !reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     ov.classList.add('fx-' + PFX);
@@ -1709,31 +1687,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   function applyRole(r, animate) {
     roleNow = r; filt = null;
     chipAll.classList.toggle('on', !r); chipEls.forEach((b, ci) => b.classList.toggle('on', !!r && CATS[ci].name === ROLE_CHIP[r]));
+    { const on = $('chips').querySelector('button.on'), row = $('chips'); if (on && row.scrollWidth > row.clientWidth) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 24); }
     const show = () => { ovTiles.forEach(o => { const ok = !!r && fits(items[o.i], r); o.t.hidden = !!r && !ok; o.t.classList.toggle('fits', ok); o.tag.textContent = ok ? 'Fits ' + r : ''; }); ov.scrollTop = 0; ov.classList.remove('refilt'); };
     if (animate) { ov.classList.add('refilt'); setTimeout(show, 160); } else show();
     if (roleSel) roleSel.value = r;
   }
-  // the picker: a quiet pill at the end of the filter row
-  // the picker: a pill at the end of the filter row; its menu drops just below it on frosted glass, so the work behind blurs instead of blacking out
-  const ROLE_OPTS = ['', 'Product', 'Brand', '3D', 'Motion'], roleName = r => r || 'Any role';
-  const roleWrap = document.createElement('div'); roleWrap.className = 'rolepick';
-  roleWrap.innerHTML = `<button type="button" class="rp-btn" id="rolePick" aria-haspopup="listbox" aria-expanded="false"><span class="rp-l">Hiring for</span><b class="rp-v"></b>
-    <span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6.5 8 10.5 12 6.5"/></svg></span></button>
-    <div class="rp-menu" role="listbox" aria-label="Hiring for" tabindex="-1">${ROLE_OPTS.map(r => `<button type="button" role="option" data-r="${r}">${roleName(r)}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5"/></svg></button>`).join('')}</div>`;
-  $('chips').after(roleWrap);
-  const rpBtn = roleWrap.querySelector('.rp-btn'), rpMenu = roleWrap.querySelector('.rp-menu'), rpOpts = [...rpMenu.children];
-  const roleSel = { set value(r) { roleWrap.querySelector('.rp-v').textContent = roleName(r); rpOpts.forEach(o => o.setAttribute('aria-selected', String(o.dataset.r === r))); roleSel._v = r; }, get value() { return roleSel._v || ''; } };
-  const rpOpen = o => { roleWrap.classList.toggle('open', o); rpBtn.setAttribute('aria-expanded', String(o));
-    if (o) { (rpOpts.find(x => x.dataset.r === roleSel.value) || rpOpts[0]).focus({ preventScroll: true }); } };
-  rpBtn.addEventListener('click', e => { e.stopPropagation(); tap(); rpOpen(!roleWrap.classList.contains('open')); });
-  rpOpts.forEach(o => o.addEventListener('click', e => { e.stopPropagation(); tap(); const r = o.dataset.r; rpOpen(false); rpBtn.focus({ preventScroll: true });
-    if (r === roleSel.value) return; if (window.KM && KM.role) KM.role.set(r); else applyRole(r, true); }));
-  rpMenu.addEventListener('keydown', e => { const k = rpOpts.indexOf(document.activeElement);
-    if (e.key === 'ArrowDown') { e.preventDefault(); rpOpts[(k + 1) % rpOpts.length].focus(); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); rpOpts[(k - 1 + rpOpts.length) % rpOpts.length].focus(); }
-    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); rpOpen(false); rpBtn.focus(); } });
-  document.addEventListener('click', e => { if (!roleWrap.contains(e.target)) rpOpen(false); });
-  roleSel.value = roleNow;
+  // no picker here: the chips are the filter. A role picked in Home's recruiter card arrives as its matching chip.
+  const roleSel = null;
   // shuffle: deal the pieces into a new order (each tap is a new deal); they glide to their new places
   let shufN = 0;
   const shuf = document.createElement('button'); shuf.type = 'button'; shuf.className = 'shuf'; shuf.setAttribute('aria-label', 'Shuffle the designs'); shuf.dataset.nopop = '';   /* only the air sound, no click pop */ shuf.title = 'Shuffle';

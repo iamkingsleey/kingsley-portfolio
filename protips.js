@@ -53,6 +53,7 @@
     .pt-pill { top: auto; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px) }
     .pt-cue { bottom: calc(96px + env(safe-area-inset-bottom, 0px)) }
     .pt-rec { left: 16px; top: auto; bottom: calc(150px + env(safe-area-inset-bottom, 0px)) }
+    .pt-rec.inflow { position: relative; left: auto; bottom: auto; top: auto; margin-top: 16px; z-index: 2 }
     .pt-card { left: 16px; top: auto; bottom: calc(194px + env(safe-area-inset-bottom, 0px)); max-height: calc(100vh - 220px); overflow: auto }
     .pt-q { display: none }
   }`;
@@ -67,8 +68,10 @@
     pill.innerHTML = 'Tune in: pick a station, or <b>scroll ↓</b> for my work'; document.body.append(pill);
     let tt = [];
     hide = () => { pill.classList.remove('on'); tt.forEach(clearTimeout); tt = []; const h = btns.find(b => b.textContent.trim() === 'Home'); if (nd && h) nd.style.left = h.style.left; };
+    // phones: a hint never covers the page; on a short screen where it would sit on the links, it stays out
+    const clash = el => { if (innerWidth >= 900) return false; const r = el.getBoundingClientRect(); return [...document.querySelectorAll('.socials, .pt-rec.inflow, .links')].some(x => { const q = x.getBoundingClientRect(); return q.height && r.top < q.bottom + 8 && r.bottom > q.top - 8 && r.left < q.right && r.right > q.left; }); };
     const show = () => {
-      hide(); pill.classList.add('on'); set('km-tip');
+      hide(); if (clash(pill)) { set('km-tip'); return; } pill.classList.add('on'); set('km-tip');
       if (nd && !reduce) btns.forEach((b, k) => tt.push(setTimeout(() => { nd.style.left = b.style.left; }, 350 + k * 260)));
       if (nd && !reduce) tt.push(setTimeout(() => { const h = btns.find(b => b.textContent.trim() === 'Home'); if (h) nd.style.left = h.style.left; }, 350 + btns.length * 260 + 200));
       tt.push(setTimeout(hide, 4800));
@@ -83,6 +86,7 @@
       cue.innerHTML = 'Scroll for work<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6"/></svg>';
       cue.addEventListener('click', () => { const d = btns.find(b => b.textContent.trim() === 'Designs'); if (d) d.click(); });
       document.body.append(cue);
+      const fitCue = () => { cue.style.visibility = ''; if (clash(cue)) cue.style.visibility = 'hidden'; }; requestAnimationFrame(fitCue); addEventListener('resize', fitCue);
       addEventListener('wheel', () => set('km-scrolled'), { passive: true, once: true });
     }
     // 4 · for recruiters
@@ -97,7 +101,7 @@
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '47 pieces · 7 case studies']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '77 pieces · 7 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#hd-verse', 'HD Verse case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
       '3D':    [['showcase.html#3d-collection', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
@@ -116,6 +120,9 @@
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
     document.body.append(rec, card);
+    /* phones: the button joins the page right under the social links, so it can never sit on top of them on a short screen */
+    const soc = document.querySelector('.socials');
+    if (soc && matchMedia('(max-width: 899px)').matches) { soc.after(rec); rec.classList.add('inflow'); }
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();

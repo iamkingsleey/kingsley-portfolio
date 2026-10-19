@@ -47,7 +47,12 @@
   @media (max-width: 900px) { .kmn-scale { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: calc(100vw - 24px) }
     .kmn-band { top: auto; bottom: 0; height: calc(130px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, color-mix(in srgb, var(--bg, #fff) 60%, transparent) 28%, var(--bg, #fff) 50%);
       -webkit-mask-image: linear-gradient(transparent, #000 48%); mask-image: linear-gradient(transparent, #000 48%) } }
-  @media (max-width: 699px) { .kmn-scale { -webkit-mask-image: none; mask-image: none } .kmn-scale button { font-size: 12.5px; padding: 4px 7px } }`;
+  @media (max-width: 699px) { .kmn-scale { -webkit-mask-image: none; mask-image: none } .kmn-scale button { font-size: 12.5px; padding: 10px 7px; top: 28px } }   /* taller labels: easier to tap, the text stays put */
+  /* phones: the nav lives at the bottom, so a thin frosted strip at the top keeps the page's readout readable as content scrolls under it */
+  .kmn-top { display: none }
+  @media (max-width: 900px) { .kmn-top { display: block; position: fixed; left: 0; right: 0; top: 0; height: calc(var(--kmn-top, 72px) + env(safe-area-inset-top, 0px)); z-index: 15; pointer-events: none;
+    background: linear-gradient(var(--bg, #fff) 45%, color-mix(in srgb, var(--bg, #fff) 55%, transparent) 75%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent) } }`;
   const start = () => {
     const st = document.createElement('style'); st.textContent = css; document.head.append(st);
     document.documentElement.classList.add('kmn');
@@ -75,6 +80,7 @@
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
     S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.append(band, S);
+    if (file !== 'index.html') { const top = document.createElement('div'); top.className = 'kmn-top'; top.setAttribute('aria-hidden', 'true'); document.body.append(top); }
     // a page that opens on a dark hero whatever the theme (About's signal) keeps it clear of the page-colour fade until it scrolls past
     const hero = document.querySelector('.sig');
     if (hero) { const chk = () => band.classList.toggle('off', hero.getBoundingClientRect().bottom > (innerWidth > 900 ? 150 : innerHeight - 130) && innerWidth > 900); addEventListener('scroll', chk, { passive: true }); chk(); }
