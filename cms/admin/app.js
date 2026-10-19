@@ -253,7 +253,8 @@
         { k: 'type', label: 'Type', type: 'select', options: [['dial', 'Dial'], ['ticker', 'Ticker'], ['specimen', 'Specimen']] },
         { k: 'col', label: 'Colour', type: 'select', options: [['dial', 'Dial'], ['swatch', 'Swatches']] },
         { k: 'mark', label: 'Mark', type: 'select', options: [['sketch', 'Sketch → final'], ['still', 'Still']] }] },
-      { k: 'type', label: 'Typefaces', full: true, type: 'list', itemLabel: 'Typeface', def: () => ['Primary', ''], title: t => t[0] + ' · ' + t[1], of: PAIR('Role', 'Font name') },
+      { k: 'typeView', label: 'Type section', type: 'select', full: true, options: [['weights', 'Weights (default)'], ['tester', 'Tester'], ['pairing', 'Pairing']], help: 'How the typefaces are shown on the brand page' },
+      { k: 'type', label: 'Typefaces', full: true, type: 'list', itemLabel: 'Typeface', def: () => ['Primary', ''], title: t => t[0] + ' · ' + t[1], help: 'Primary first, then Secondary', of: PAIR('Role', 'Font name') },
       { k: 'colors', label: 'Brand colours', full: true, help: 'Leave empty to sample colours from the pictures.', type: 'list', itemLabel: 'Colour', def: () => ['', '#000000'], title: c => c[0] + ' ' + c[1], of: { type: 'tuple', fields: [{ label: 'Name' }, { label: 'Hex', type: 'color' }] } } ] }
   ];
   const DESIGN = [

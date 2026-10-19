@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Bricolage+Grotesque:wght@200..800&family=Epilogue:wght@100..900&family=Source+Serif+4:opsz,wght@8..60,200..900&display=swap">
+<style>
+:root { --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --line: #e4e4e4; --panel: #f3f3f3; --pill: #f2f2f2; --edge: rgb(0 0 0 / .08);
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace; --red: #ff4a1c;
+  --gut: max(48px, env(safe-area-inset-left, 0px)); color-scheme: light }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+* { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; transition: background .3s, color .3s }
+h1, h2, h3, p, dl, dd, figure, ul { margin: 0; padding: 0 }
+img, video { display: block; width: 100%; height: auto }
+a { color: inherit }
+button { font: inherit; color: inherit; cursor: pointer }
+.mono { font: 500 11px/1.4 var(--mono); letter-spacing: .7px; text-transform: uppercase; color: var(--muted) }
+/* media: sharp edges, a quiet panel while the picture loads, which then fades in */
+.m { position: relative; background: var(--panel); overflow: hidden }
+.m img, .m video { opacity: 0; transition: opacity .5s }
+.m.ok img, .m.ok video { opacity: 1 }
+.blk { display: grid; place-items: center; aspect-ratio: 4 / 3; font: 600 clamp(32px, 6vw, 88px)/1 var(--body); letter-spacing: -.03em }
+@media (prefers-reduced-motion: reduce) { .m img, .m video { transition: none } }
+
+/* top bar: back to Designs, and the case's frequency */
+.top { display: flex; justify-content: space-between; align-items: center; padding: 24px var(--gut); font-size: 14px }
+.top a { text-decoration: none; color: var(--muted); transition: color .2s } .top a:hover { color: var(--ink) }
+/* next case, at the end of every layout */
+.next { display: block; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; padding: 48px var(--gut) 160px; transition: background .25s }
+.next:hover { background: var(--panel) }
+.next .t { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-top: 10px; font: 600 clamp(40px, 7vw, 104px)/1 var(--body); letter-spacing: -.04em; color: var(--ink) }
+.next .t i { font-style: normal; font-weight: 400; transition: transform .35s cubic-bezier(.2,.8,.2,1) } .next:hover .t i { transform: translateX(10px) }
+
+/* ================= A · Index: a Swiss grid. Numbered sections, the heading holds its place while the section scrolls past ================= */
+.A .hd { padding: 72px var(--gut) 56px }
+.A h1 { font: 600 clamp(56px, 11vw, 176px)/.9 var(--body); letter-spacing: -.055em; color: var(--ink) }
+.A .lede { max-width: 640px; margin-top: 36px; font-size: clamp(19px, 1.7vw, 24px); line-height: 1.4; color: var(--ink) }
+.A .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin: 64px var(--gut) 0; padding-top: 16px; border-top: 1px solid var(--ink) }
+.A .meta dd { margin-top: 6px; color: var(--ink); font-size: 15px; line-height: 1.45 }
+.A .cover { margin: 64px var(--gut) 0 } .A .a-cv { --mh: 80vh }
+.A .sec { display: grid; grid-template-columns: 3fr 9fr; gap: 24px; margin: 0 var(--gut); padding: 40px 0 96px; border-top: 1px solid var(--line) }
+.A .sec:first-of-type { margin-top: 96px }
+.A .sec > header { position: sticky; top: 24px; align-self: start }
+.A .sec .n { font: 500 13px var(--mono); color: var(--muted) }
+.A .sec h2 { margin-top: 6px; font: 600 24px/1.15 var(--body); letter-spacing: -.02em; color: var(--ink) }
+.A .sec .bd { display: grid; gap: 28px }
+.A .sec .bd p { max-width: 640px; font-size: 18px; line-height: 1.55 }
+.A .st { margin: 0 var(--gut); padding: 120px 0; border-top: 1px solid var(--line); font: 600 clamp(36px, 5.4vw, 84px)/1.02 var(--body); letter-spacing: -.04em; color: var(--ink); max-width: 15ch }
+.A .gal { display: grid; grid-template-columns: 1fr 1fr; gap: 24px }
+.A .gal .m:only-child { grid-column: 1 / -1 }
+@media (max-width: 760px) { .A .meta { grid-template-columns: 1fr 1fr } .A .sec { grid-template-columns: 1fr; padding-bottom: 64px } .A .sec > header { position: static } .A .gal { grid-template-columns: 1fr } }
+
+/* ================= B · Spread: magazine pages. Full-bleed cover, text pages and picture pages taking turns ================= */
+.B .cov { position: relative; min-height: 92vh; display: grid; align-content: end; padding: 0 var(--gut) 56px; color: #fff; overflow: hidden }
+.B .cov .m { position: absolute; inset: 0; background: #111 } .B .cov .m img, .B .cov .m video { height: 100%; object-fit: cover }
+.B .cov .m::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgb(0 0 0 / .62)) }
+.B .cov > * { position: relative }
+.B .cov .mono { color: rgb(255 255 255 / .7) }
+.B .cov h1 { margin-top: 18px; font: 600 clamp(48px, 8.4vw, 136px)/.92 var(--body); letter-spacing: -.05em; max-width: 14ch }
+.B .intro { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 120px var(--gut) }
+.B .intro .big { font: 500 clamp(24px, 2.6vw, 38px)/1.25 var(--body); letter-spacing: -.02em; color: var(--ink) }
+.B .intro dl { display: grid; grid-template-columns: auto 1fr; gap: 14px 32px; align-content: start; font-size: 15px }
+.B .intro dt { color: var(--muted) } .B .intro dd { color: var(--ink) }
+.B .pg { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 0 var(--gut) 160px; align-items: start }
+.B .pg .tx { grid-column: 2 / span 4; position: sticky; top: 40px }
+.B .pg .tx h2 { font: 600 clamp(28px, 3vw, 44px)/1.05 var(--body); letter-spacing: -.035em; color: var(--ink); margin: 10px 0 20px }
+.B .pg .tx p { font-size: 17px }
+.B .pg .ms { grid-column: 7 / -1; display: grid; gap: 24px }
+.B .pg.flip .tx { grid-column: 8 / span 4; grid-row: 1 } .B .pg.flip .ms { grid-column: 1 / span 6; grid-row: 1 }
+.B .pg .ms .m:nth-child(2) { width: 72%; justify-self: end }
+.B .bleed { padding: 0 0 160px } .B .bleed .m { width: 100% }
+.B .q { padding: 80px var(--gut) 200px; text-align: center; font: 600 clamp(40px, 7vw, 120px)/.98 var(--body); letter-spacing: -.05em; color: var(--ink) }
+@media (max-width: 760px) { .B .intro { grid-template-columns: 1fr; padding: 72px var(--gut) } .B .pg, .B .pg.flip { display: grid; grid-template-columns: 1fr; padding-bottom: 96px }
+  .B .pg .tx, .B .pg.flip .tx, .B .pg .ms, .B .pg.flip .ms { grid-column: 1; grid-row: auto; position: static } .B .pg .ms .m:nth-child(2) { width: 100% } }
+
+/* ================= C · Split: the story on the left, the work on the right. Each section's words wait beside its pictures ================= */
+.C { display: grid; grid-template-columns: minmax(320px, 38%) 1fr }
+.C .l { padding: 0 48px 0 var(--gut); border-right: 1px solid var(--line) }
+.C .r { padding: 0 var(--gut) 0 48px }
+.C .hd { min-height: 88vh; display: grid; align-content: center; padding: 64px 0 }
+.C h1 { font: 600 clamp(40px, 4.6vw, 72px)/.98 var(--body); letter-spacing: -.045em; color: var(--ink); margin: 14px 0 24px }
+.C .hd p { color: var(--ink); font-size: 18px; line-height: 1.5 }
+.C .hd dl { margin-top: 40px; display: grid; gap: 10px; font-size: 14px } .C .hd dl div { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); padding-top: 10px } .C .hd dt { color: var(--muted) } .C .hd dd { color: var(--ink); text-align: right }
+.C .cv { min-height: 88vh; display: grid; align-content: center; padding: 64px 0 }
+.C .row { display: contents }
+.C .sec { display: grid; grid-template-columns: minmax(320px, 38%) 1fr; grid-column: 1 / -1 }
+.C .sec .t { padding: 64px 48px 120px var(--gut); border-right: 1px solid var(--line); border-top: 1px solid var(--line) }
+.C .sec .t > div { position: sticky; top: 64px }
+.C .sec .t h2 { font: 600 28px/1.1 var(--body); letter-spacing: -.025em; color: var(--ink); margin: 8px 0 16px }
+.C .sec .w { padding: 64px var(--gut) 120px 48px; display: grid; gap: 32px; align-content: start; border-top: 1px solid var(--line) }
+.C .q { grid-column: 1 / -1; padding: 160px var(--gut); border-top: 1px solid var(--line); font: 600 clamp(36px, 5.6vw, 88px)/1 var(--body); letter-spacing: -.045em; color: var(--ink) }
+@media (max-width: 860px) { .C, .C .sec { grid-template-columns: 1fr } .C .l, .C .sec .t { border-right: 0; padding-right: var(--gut) } .C .r, .C .sec .w { padding-left: var(--gut) } .C .hd, .C .cv { min-height: 0; padding: 40px 0 } .C .sec .t > div { position: static } .C .sec .t { padding-bottom: 0 } .C .sec .w { border-top: 0; padding-top: 32px } }
+
+/* ================= D · Essay: one calm column of reading, pictures stepping out wider, notes in the margin ================= */
+.D { --col: 620px }
+.D .w { width: min(var(--col), calc(100% - 2 * var(--gut))); margin: 0 auto; position: relative }
+.D .hd { padding: 96px 0 48px }
+.D h1 { font: 600 clamp(36px, 4.4vw, 60px)/1.04 var(--body); letter-spacing: -.04em; color: var(--ink); margin: 14px 0 22px }
+.D .hd p { font-size: 20px; line-height: 1.5; color: var(--ink) }
+.D .by { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 28px; font-size: 14px; color: var(--muted) } .D .by b { font-weight: 500; color: var(--ink) }
+.D .wide { width: min(1080px, calc(100% - 2 * var(--gut))); margin: 56px auto }
+.D .full { margin: 72px 0 } .D .full .m { width: 100% }
+.D h2 { font: 600 22px/1.2 var(--body); letter-spacing: -.02em; color: var(--ink); margin: 72px 0 14px }
+.D p + p { margin-top: 16px }
+.D .w > p, .D .w dl { font-size: 18px; line-height: 1.65 }
+.D .note { position: absolute; left: calc(100% + 48px); width: 200px; margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--muted) }
+.D .note b { display: block; font-weight: 500; color: var(--ink) }
+.D .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+.D .pq { margin: 72px 0; padding-left: 24px; border-left: 2px solid var(--ink); font: 500 28px/1.25 var(--body); letter-spacing: -.02em; color: var(--ink) }
+.D .end { height: 96px }
+@media (max-width: 1100px) { .D .note { position: static; width: auto; margin: 12px 0 0; padding-left: 12px; border-left: 1px solid var(--line) } }
+@media (max-width: 640px) { .D .pair { grid-template-columns: 1fr } }
+
+/* ================= E · Poster: huge headings, pictures edge to edge, the numbers set as big as the titles ================= */
+.E .hd { padding: 56px var(--gut) 40px }
+.E h1 { font: 700 clamp(64px, 17vw, 300px)/.8 var(--body); letter-spacing: -.07em; color: var(--ink); margin-left: -.04em }
+.E .sub { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 24px; margin-top: 48px; font-size: 15px }
+.E .sub .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; color: var(--ink) }
+.E .sub dd { color: var(--ink); margin-top: 4px }
+.E .edge .m { width: 100% }
+.E .sec { padding: 120px var(--gut) 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: end }
+.E .sec h2 { font: 700 clamp(44px, 8vw, 136px)/.86 var(--body); letter-spacing: -.06em; color: var(--ink) }
+.E .sec .bd { max-width: 460px; justify-self: end; font-size: 17px }
+.E .edge { display: grid; gap: 4px } .E .edge.two { grid-template-columns: 1fr 1fr }
+.E .nums { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line) }
+.E .nums div { padding: 40px var(--gut); border-bottom: 1px solid var(--line) } .E .nums div:nth-child(odd) { border-right: 1px solid var(--line) }
+.E .nums b { display: block; font: 700 clamp(72px, 12vw, 200px)/.86 var(--body); letter-spacing: -.07em; color: var(--ink) }
+.E .nums span { display: block; margin-top: 12px; max-width: 30ch }
+.E .inv { background: var(--ink); color: var(--bg); padding: 160px var(--gut); font: 700 clamp(40px, 7vw, 120px)/.92 var(--body); letter-spacing: -.055em }
+@media (max-width: 760px) { .E .sub { grid-template-columns: 1fr 1fr } .E .sub .lede { grid-column: 1 / -1 } .E .sec { grid-template-columns: 1fr; padding-top: 80px } .E .sec .bd { justify-self: start } .E .edge.two, .E .nums { grid-template-columns: 1fr } .E .nums div:nth-child(odd) { border-right: 0 } }
+
+/* ================= F · Bento: the whole case in one board of tiles first, then each part as its own board ================= */
+.F { padding: 32px var(--gut) 0 }
+.F .grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(120px, auto); gap: 12px }
+.F .t { background: var(--panel); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; min-height: 180px }
+.F .t h2 { font: 600 22px/1.15 var(--body); letter-spacing: -.02em; color: var(--ink) }
+.F .t p { font-size: 15px; line-height: 1.5 }
+.F .ttl { grid-column: span 7; grid-row: span 2; background: var(--ink); color: var(--bg) }
+.F .ttl h1 { font: 600 clamp(40px, 5.6vw, 92px)/.92 var(--body); letter-spacing: -.05em }
+.F .ttl .mono { color: color-mix(in srgb, var(--bg) 55%, transparent) }
+.F .ttl p { font-size: 17px; max-width: 46ch; color: color-mix(in srgb, var(--bg) 80%, transparent) }
+.F .cvr { grid-column: span 5; grid-row: span 3; padding: 0 }
+.F .cvr .m, .F .im .m { height: 100% } .F .cvr .m img, .F .cvr .m video, .F .im .m img, .F .im .m video { height: 100%; object-fit: cover }
+.F .cvr .blk, .F .im .blk { height: 100%; aspect-ratio: auto }
+.F .s3 { grid-column: span 3 } .F .s4 { grid-column: span 4 } .F .s5 { grid-column: span 5 } .F .s6 { grid-column: span 6 } .F .s7 { grid-column: span 7 } .F .s8 { grid-column: span 8 } .F .s12 { grid-column: span 12 }
+.F .im { padding: 0; min-height: 360px }
+.F .big b { font: 700 clamp(48px, 6vw, 96px)/.9 var(--body); letter-spacing: -.06em; color: var(--ink) }
+.F .lbl { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 16px; padding: 88px 0 8px; min-height: 0 }
+.F .lbl h2 { font: 600 clamp(28px, 3vw, 44px)/1 var(--body); letter-spacing: -.035em; color: var(--ink) }
+.F .qt { grid-column: span 12; min-height: 320px; justify-content: center; font: 600 clamp(32px, 4.6vw, 72px)/1 var(--body); letter-spacing: -.045em; color: var(--ink) }
+.F .next { margin: 88px calc(-1 * var(--gut)) 0; width: calc(100% + 2 * var(--gut)) }
+@media (max-width: 860px) { .F .grid { grid-template-columns: 1fr 1fr } .F .grid > * { grid-column: span 2 !important; grid-row: auto !important } .F .t { min-height: 0 } .F .cvr { min-height: 420px } .F .im { min-height: 280px } }
+
+
+/* ================= G · Essay × Poster: poster-sized title and headings over one calm reading column; pictures alternate edge to edge and wide ================= */
+.G { --col: 620px }
+.G .w { width: min(var(--col), calc(100% - 2 * var(--gut))); margin: 0 auto; position: relative }
+.G .hd { padding: 56px var(--gut) 0 }
+.G h1 { font: 700 clamp(64px, 17vw, 300px)/.8 var(--body); letter-spacing: -.07em; color: var(--ink); margin-left: -.04em }
+.G .intro { padding: 56px 0 80px }
+.G .intro .lede { font: 500 clamp(20px, 1.8vw, 26px)/1.4 var(--body); letter-spacing: -.01em; color: var(--ink) }
+.G .by { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 28px; font-size: 14px; color: var(--muted) } .G .by b { font-weight: 500; color: var(--ink) }
+.G .gw { width: min(1080px, calc(100% - 2 * var(--gut))); margin: 0 auto } .G .g-cv { --mh: 76vh }
+.G h2 { padding: 140px var(--gut) 40px; font: 700 clamp(48px, 9vw, 152px)/.86 var(--body); letter-spacing: -.06em; color: var(--ink) }
+.G h2 small { display: block; margin-bottom: 18px; font: 500 12px var(--mono); letter-spacing: .7px; color: var(--muted) }
+.G .bd { padding-bottom: 72px }
+.G .bd > p, .G .bd dl { font-size: 18px; line-height: 1.65 } .G .bd p + p { margin-top: 16px }
+.G .note { position: absolute; left: calc(100% + 48px); top: 4px; width: 200px; font-size: 13px; line-height: 1.5; color: var(--muted) }
+.G .note b { display: block; font-weight: 500; color: var(--ink) }
+.G .nums { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); margin-top: 8px }
+.G .nums div { padding: 40px var(--gut); border-bottom: 1px solid var(--line) } .G .nums div:nth-child(odd) { border-right: 1px solid var(--line) }
+.G .nums b { display: block; font: 700 clamp(72px, 12vw, 200px)/.86 var(--body); letter-spacing: -.07em; color: var(--ink) }
+.G .nums span { display: block; margin-top: 12px; max-width: 30ch }
+.G .inv { margin-top: 140px; background: var(--ink); color: var(--bg); padding: 160px var(--gut); font: 700 clamp(40px, 7vw, 120px)/.92 var(--body); letter-spacing: -.055em }
+.G .sp { height: 140px }
+@media (max-width: 1100px) { .G .note { position: static; width: auto; margin: 20px 0 0; padding-left: 12px; border-left: 1px solid var(--line) } }
+@media (max-width: 760px) { .G h2 { padding-top: 96px } .G .pair, .G .nums { grid-template-columns: 1fr } .G .nums div:nth-child(odd) { border-right: 0 } }
+
+.rows { --gap: 16px; --mh: var(--pmh, 68vh); display: grid; gap: var(--gap); width: 100%; max-width: var(--w, none) }
+.rows .row { display: flex; align-items: flex-start; gap: var(--gap); width: 100%; max-width: calc(var(--mh) * var(--sum) + var(--gap) * (var(--n) - 1)) }
+.rows .row.full { max-width: none }
+.rows .row .m { flex: calc(var(--r) * 100) 1 0; min-width: 0; aspect-ratio: var(--r) }
+.rows .row .m img, .rows .row .m video { width: 100%; height: auto; aspect-ratio: var(--r); object-fit: cover }
+.rows .row .blk { height: 100%; aspect-ratio: auto }
+.rows.c { margin-left: auto; margin-right: auto }
+.rows > .cap2 { margin-top: calc(12px - var(--gap)) }
+@media (max-width: 560px) { .rows { --gap: 8px } }
+@media (max-width: 640px) { :root { --gut: max(20px, env(safe-area-inset-left, 0px)) } }
+
+/* ================= H · Story: a single narrative column. Tags, a big title, the result up front; eyebrow + heading per chapter,
+   pictures a step wider than the text with a caption under each, results as a plain list, credits at the end ================= */
+.H { --tx: 680px; --fr: 1280px }
+.H .tx { width: min(var(--tx), calc(100% - 2 * var(--gut))); margin: 0 auto }
+.H .fr { --gap: 16px; width: min(var(--fr), calc(100% - 2 * var(--gut))); margin: 56px auto 0 }
+@media (max-width: 560px) { .H .fr { --gap: 8px } }
+.H .hd { padding: 72px 0 0 }
+.H .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 24px }
+.H .tags span { padding: 5px 11px; border-radius: 999px; background: var(--pill); font-size: 12.5px; color: var(--text); text-transform: lowercase }
+.H h1 { font: 600 clamp(38px, 5vw, 64px)/1.02 var(--body); letter-spacing: -.045em; color: var(--ink) }
+.H .lede { margin-top: 24px; font-size: 20px; line-height: 1.5; color: var(--text) } .H .lede b { font-weight: 600; color: var(--ink) }
+.H figcaption, .H .cap2 { margin-top: 12px; font: 400 13px/1.5 var(--body); color: var(--muted) }
+.H .cap2 b { font: 500 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; margin-right: 8px; color: var(--muted) }
+.H .ch { padding-top: 120px }
+.H .eb { font: 500 11px var(--mono); letter-spacing: .8px; text-transform: uppercase; color: var(--muted) }
+.H h2 { margin: 12px 0 22px; font: 600 clamp(28px, 3vw, 38px)/1.1 var(--body); letter-spacing: -.035em; color: var(--ink) }
+.H h4 { margin: 32px 0 8px; font: 600 16px/1.3 var(--body); color: var(--ink) }
+.H .tx > p, .H .tx li, .H .tx dl { font-size: 18px; line-height: 1.65 } .H .tx p + p { margin-top: 16px }
+.H .punch { margin-top: 24px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
+.H .lead { display: grid; gap: 14px; margin-top: 8px } .H .lead div { font-size: 18px; line-height: 1.6 } .H .lead b { font-weight: 600; color: var(--ink) }
+.H .role { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px } .H .role span { padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: var(--ink) }
+.H ul.res { list-style: none; display: grid; gap: 0; margin-top: 8px } .H ul.res li { padding: 16px 0; border-top: 1px solid var(--line) } .H ul.res li:last-child { border-bottom: 1px solid var(--line) }
+.H ul.res b { font-weight: 600; color: var(--ink); margin-right: 6px }
+.H .tx .pull { font: 600 clamp(30px, 3.6vw, 48px)/1.08 var(--body); letter-spacing: -.04em; color: var(--ink) }
+.H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
+.H .sp { height: 120px }
+@media (max-width: 640px) { .H .lede { font-size: 18px } .H .ch { padding-top: 88px } .H .cred { grid-template-columns: 1fr 1fr } }
+
+/* the index: a vertical ruler beside the chapters, like the one on About. One long tick per chapter with its name; the red
+   needle slides down the ruler as you read, the chapter you're in turns dark, and the ticks swell around the needle. Click a name to go there. */
+.ix { position: fixed; z-index: 40; left: var(--gut); top: 42%; translate: 0 -50%; width: 260px; opacity: 0; pointer-events: none; transition: opacity .35s }
+.ix.on { opacity: 1; pointer-events: auto }
+.ix .lb { display: block; margin: 0 0 18px 34px; font: 500 14px var(--body); color: var(--muted) }
+.ix .tr { position: relative }
+.ix .tk { position: absolute; left: 0; top: 0; bottom: 0; width: 24px }
+.ix .tk i { position: absolute; left: 0; height: 1px; background: var(--ink); border-radius: 1px }
+.ix .nd { position: absolute; left: -6px; width: 30px; height: 2px; margin-top: -1px; background: var(--red); border-radius: 1px }
+.ix ol { list-style: none; margin: 0; padding: 0 0 0 34px; display: grid }
+.ix li button { display: block; width: 100%; height: 40px; padding: 0; border: 0; background: none; text-align: left; font: 500 17px/40px var(--body); letter-spacing: -.01em; color: var(--muted);
+  opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .25s, opacity .25s }
+.ix li button:hover { color: var(--ink); opacity: 1 }
+.ix li button.on { color: var(--ink); opacity: 1 }
+.ix li button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
+/* the page stays centred on the screen; with the index showing, pictures stop short of it on both sides so the column stays symmetric */
+@media (min-width: 1200px) { .H .tx { width: min(var(--tx), calc(100vw - 2 * 340px)) } }
+.ix.dim { opacity: 0; pointer-events: none }   /* steps aside while a wide picture passes under it */
+@media (max-width: 1199px) { .ix { display: none } }
+@media (prefers-reduced-motion: reduce) { .ix { transition: none } }
+/* lists and stats, shared */
+.ls { display: grid; gap: 0 }
+.ls div { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 16px }
+.ls div:last-child { border-bottom: 1px solid var(--line) }
+.ls dt { color: var(--ink); font-weight: 500 }
+.sts { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 24px }
+.sts b { display: block; font: 600 clamp(40px, 4.4vw, 64px)/1 var(--body); letter-spacing: -.045em; color: var(--ink) }
+.sts span { display: block; margin-top: 8px; font-size: 15px; max-width: 28ch }
+@media (max-width: 520px) { .ls div { grid-template-columns: 1fr; gap: 2px } }
+
+
+/* ======================================================================================================================
+   BRAND layouts. All five sit on one 12-column grid (4 on phones) with the same gutter, so each idea is a different way of
+   playing that grid. "Grid" in the switch shows the columns.
+   ====================================================================================================================== */
+.bz { --g: 24px; --cols: 12; --cw: calc((100vw - 2 * var(--gut) - (var(--cols) - 1) * var(--g)) / var(--cols)) }
+@media (max-width: 760px) { .bz { --g: 12px; --cols: 4 } }
+.bz .gr { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--g); padding: 0 var(--gut) }
+.bz .mono { font: 500 11px/1.4 var(--mono); letter-spacing: .7px; text-transform: uppercase; color: var(--muted) }
+.bz h2 { font: 600 clamp(26px, 2.6vw, 36px)/1.08 var(--body); letter-spacing: -.035em; color: var(--ink) }
+.bz p { font-size: 17px; line-height: 1.6 }
+.bz .m img, .bz .m video { width: 100%; height: 100%; object-fit: cover }
+.bz .fill { position: relative; overflow: hidden; background: var(--panel) } .bz .fill .m { position: absolute; inset: 0 }
+.bz .sw8 { display: flex; height: 100% } .bz .sw8 i { flex: 1 }
+@media (max-width: 760px) { .bz .gr > * { grid-column: 1 / -1 !important; grid-row: auto !important } }
+
+/* the grid overlay */
+.gov { position: fixed; inset: 0; z-index: 45; pointer-events: none; display: none; padding: 0 var(--gut); gap: 24px; grid-template-columns: repeat(12, 1fr) }
+.gov i { background: color-mix(in srgb, var(--ink) 4%, transparent); border-left: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-right: 1px solid color-mix(in srgb, var(--ink) 14%, transparent) }
+html.grid-on .gov { display: grid }
+@media (max-width: 760px) { .gov { gap: 12px; grid-template-columns: repeat(4, 1fr) } .gov i:nth-child(n+5) { display: none } }
+
+/* ---------- I · Guidelines: a brand book. Every part is a numbered spread with its label in columns 1–3 and the work in 4–12 ---------- */
+.I .hd { padding-top: 80px; align-items: end }
+.I .hd h1 { grid-column: 1 / span 9; font: 600 clamp(64px, 12vw, 200px)/.86 var(--bfont, var(--body)); letter-spacing: -.05em; color: var(--ink) }
+.I .hd dl { grid-column: 10 / -1; display: grid; gap: 12px; font-size: 14px; padding-bottom: 12px } .I .hd dd { color: var(--ink) }
+.I .lede { grid-column: 4 / span 6; margin-top: 48px; font: 500 clamp(20px, 1.8vw, 26px)/1.35 var(--body); letter-spacing: -.01em; color: var(--ink) }
+.I .sp { padding-top: 120px; border-top: 1px solid var(--line); margin-top: 120px }
+.I .lab { grid-column: 1 / span 3 } .I .lab h2 { margin-top: 10px }
+.I .wk { grid-column: 4 / -1 }
+.I .tx { grid-column: 4 / span 5; margin-top: 28px }
+.I .logo { aspect-ratio: 16 / 9 }
+.I .sws { display: grid; grid-template-columns: repeat(var(--n), 1fr); height: 420px }
+.I .sws div { display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; font-size: 13px; line-height: 1.4 } .I .sws b { display: block; font-weight: 500 }
+.I .spec { display: grid; grid-template-columns: 1fr 1fr; gap: var(--g) }
+.I .spec .aa { font: 400 clamp(120px, 16vw, 260px)/.9 var(--sf, var(--body)); color: var(--ink); letter-spacing: -.03em }
+.I .spec .abc { font: 400 clamp(22px, 2.2vw, 32px)/1.3 var(--sf, var(--body)); color: var(--ink); word-break: break-all }
+.I .spec .nm { margin-top: 18px }
+.I .pq { grid-column: 4 / -1; font: 600 clamp(36px, 5vw, 80px)/1 var(--bfont, var(--body)); letter-spacing: -.045em; color: var(--ink); max-width: 18ch }
+@media (max-width: 760px) { .I .sws { height: 260px } .I .spec { grid-template-columns: 1fr } .I .sp { margin-top: 80px; padding-top: 72px } }
+
+/* ---------- J · Mosaic: one modular board. The grid's unit is a square column; every tile takes whole units by its shape ---------- */
+.J { padding-top: 32px }
+.J .gr { grid-auto-rows: var(--cw); grid-auto-flow: dense }
+.J .t { background: var(--panel); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; overflow: hidden; min-width: 0 }
+.J .t p { font-size: 15px; line-height: 1.5 }
+.J .ti { grid-column: span 6; grid-row: span 3; background: var(--ink); color: var(--bg) }
+.J .ti h1 { font: 600 clamp(48px, 7vw, 120px)/.88 var(--bfont, var(--body)); letter-spacing: -.05em }
+.J .ti .mono { color: color-mix(in srgb, var(--bg) 55%, transparent) } .J .ti p { color: color-mix(in srgb, var(--bg) 80%, transparent); max-width: 40ch }
+.J .p34 { grid-column: span 3; grid-row: span 4 } .J .p33 { grid-column: span 3; grid-row: span 3 } .J .p64 { grid-column: span 6; grid-row: span 4 } .J .p66 { grid-column: span 6; grid-row: span 6 }
+.J .p32 { grid-column: span 3; grid-row: span 2 } .J .p62 { grid-column: span 6; grid-row: span 2 } .J .p31 { grid-column: span 3; grid-row: span 1 } .J .p12 { grid-column: span 12; grid-row: span 3 }
+.J .im { padding: 0; position: relative } .J .im .m { position: absolute; inset: 0 }
+.J .ty .aa { font: 400 clamp(64px, 8vw, 140px)/.85 var(--sf, var(--body)); color: var(--ink) }
+.J .pal { padding: 0; display: flex } .J .pal i { flex: 1; display: flex; align-items: flex-end; padding: 12px; font: 500 11px var(--mono); font-style: normal; letter-spacing: .4px }
+.J .q { grid-column: span 9; grid-row: span 2; background: none; padding: 0; justify-content: center; font: 600 clamp(28px, 3.6vw, 56px)/1.02 var(--bfont, var(--body)); letter-spacing: -.04em; color: var(--ink) }
+@media (max-width: 760px) { .J .gr { grid-auto-rows: auto } .J .t { min-height: 140px } .J .im { aspect-ratio: var(--r, 1) } .J .ti { min-height: 360px } .J .pal { min-height: 140px } }
+
+/* ---------- K · Specimen: the brand's facts stand still in columns 1–4; the work runs down 6–12 ---------- */
+.K .gr { align-items: start; padding-top: 72px }
+.K .side { grid-column: 1 / span 4; position: sticky; top: 40px }
+.K .side h1 { font: 600 clamp(48px, 5.4vw, 88px)/.9 var(--bfont, var(--body)); letter-spacing: -.05em; color: var(--ink); margin: 14px 0 22px }
+.K .side .lede { color: var(--ink) }
+.K .side dl { margin-top: 32px; display: grid; gap: 0 } .K .side dl div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px } .K .side dd { color: var(--ink); text-align: right }
+.K .dots { display: flex; gap: 6px; margin-top: 18px } .K .dots i { width: 22px; height: 22px; box-shadow: inset 0 0 0 1px var(--edge) }
+.K .main { grid-column: 6 / -1; display: grid; gap: 120px; padding-bottom: 120px }
+.K .main section > p { margin-top: 12px; max-width: 56ch }
+.K .main .rows { margin-top: 28px }
+.K .cap3 { display: flex; gap: 10px; margin-top: 10px; font-size: 13px; color: var(--muted) }
+.K .bars { display: grid; gap: 4px; margin-top: 28px } .K .bars div { height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font-size: 13px }
+.K .tyl { margin-top: 28px; display: grid; gap: 4px } .K .tyl div { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 20px 0; border-top: 1px solid var(--line) }
+.K .tyl b { font: 400 clamp(36px, 4vw, 60px)/1 var(--sf, var(--body)); color: var(--ink); letter-spacing: -.02em }
+.K .kp { margin-top: 40px; display: grid; gap: 12px }
+.K .kps { display: flex; flex-wrap: wrap; gap: 6px }
+.K .kps button { width: 28px; height: 28px; padding: 0; border: 0; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 16%, transparent); transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s }
+.K .kps button:hover { transform: translateY(-2px) }
+.K .kps button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 16%, transparent), 0 0 0 2px var(--bg), 0 0 0 3px var(--ink) }
+html.themed body, html.themed .K { transition: background .45s, color .45s }
+@media (max-width: 760px) { .K .side { position: static } .K .main { gap: 80px } }
+
+/* ---------- L · Contact sheet: everything as equal frames on one tight grid, labelled like a film sheet ---------- */
+.L .hd { padding-top: 72px; padding-bottom: 40px; align-items: end }
+.L .hd h1 { grid-column: 1 / span 6; font: 600 clamp(48px, 6vw, 96px)/.9 var(--bfont, var(--body)); letter-spacing: -.05em; color: var(--ink) }
+.L .hd p { grid-column: 7 / span 4 } .L .hd .mono { grid-column: 11 / -1; text-align: right }
+.L .row { border-top: 1px solid var(--line); padding-top: 18px; padding-bottom: 56px }
+.L .row .lab { grid-column: 1 / span 2 } .L .row .lab b { display: block; margin-top: 6px; font: 600 18px/1.2 var(--body); color: var(--ink) }
+.L .row .lab p { font-size: 14px; margin-top: 8px; color: var(--muted) }
+.L .row .fr { grid-column: 3 / -1; display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--g) }
+.L .fr figure { margin: 0 }
+.L .fr .box { aspect-ratio: 4 / 5; position: relative; overflow: hidden; background: var(--panel) } .L .fr .box .m { position: absolute; inset: 0 }
+.L .fr figcaption { display: flex; justify-content: space-between; margin-top: 8px; font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--muted) }
+.L .fr .w2 { grid-column: span 2 } .L .fr .w2 .box { aspect-ratio: auto; height: calc(100% - 26px) }
+.L .fr .swc { display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; font-size: 12px }
+.L .fr .ty { display: grid; place-items: center; font: 400 64px/1 var(--sf, var(--body)); color: var(--ink) }
+@media (max-width: 760px) { .L .row .fr { grid-template-columns: repeat(2, 1fr) } .L .fr .w2 { grid-column: span 2 } .L .fr .w2 .box { height: auto; aspect-ratio: 4 / 3 } .L .hd .mono { text-align: left } }
+
+/* ---------- M · Broken grid: the work steps across the columns and over the lines, still landing on them ---------- */
+.M { overflow-x: clip }
+.M .hd { padding-top: 64px }
+.M .word { grid-column: 1 / -1; font: 700 clamp(80px, 19vw, 340px)/.78 var(--bfont, var(--body)); letter-spacing: -.07em; color: var(--ink); margin-left: -.05em; white-space: nowrap }
+.M .hd .lede { grid-column: 7 / span 5; margin-top: 40px; font: 500 clamp(19px, 1.6vw, 24px)/1.4 var(--body); color: var(--ink) }
+.M .hd .mono { grid-column: 1 / span 4; margin-top: 46px }
+.M .st { position: relative; margin-top: 120px; align-items: start }
+.M .a { position: relative; z-index: 1 } .M .b { position: relative; z-index: 2 }
+.M .card { background: var(--bg); padding: 28px; box-shadow: 0 0 0 1px var(--line) }
+.M .card p { margin-top: 12px }
+.M .num { font: 700 clamp(64px, 8vw, 132px)/.8 var(--body); letter-spacing: -.06em; color: var(--ink); opacity: .08 }
+.M .pal { display: flex; height: 100% } .M .pal i { flex: 1 }
+.M .q { grid-column: 2 / span 10; margin-top: 160px; font: 700 clamp(40px, 6.4vw, 110px)/.92 var(--bfont, var(--body)); letter-spacing: -.055em; color: var(--ink) }
+.M .ty { font: 400 clamp(90px, 13vw, 220px)/.85 var(--sf, var(--body)); color: var(--ink) }
+@media (max-width: 760px) { .M .word { font-size: 21vw } .M .st { margin-top: 72px } .M .b { margin-top: -32px; margin-left: 24px } }
+
+/* the switch: product / brand */
+.sw .grp { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--pill); margin-right: 6px; flex: none }
+.sw .grp button { height: 30px; padding: 0 12px }
+.sw .grp button[aria-pressed="true"] { background: var(--bg); color: var(--ink); box-shadow: 0 0 0 1px var(--edge) }
+.sw .gbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+
+/* ---------- N · Showcase ---------- */
+.N { --ng: 22px; --ne: max(48px, env(safe-area-inset-left, 0px)) }
+@media (max-width: 899px) { .N { --ng: 12px; --ne: max(16px, env(safe-area-inset-left, 0px)) } }
+.N .nh { padding: 64px var(--ne) 56px }
+.N .nh h1 { margin: 14px 0 0 -.04em; font: 600 clamp(64px, 13vw, 220px)/.84 var(--bfont, var(--body)); letter-spacing: -.055em; color: var(--ink) }
+.N .nhr { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ng); margin-top: 40px; align-items: start }
+.N .nhr .lede { font: 500 clamp(19px, 1.6vw, 24px)/1.4 var(--body); color: var(--ink); max-width: 34ch }
+.N .nhr dl { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px var(--ng); font-size: 14px } .N .nhr dd { margin-top: 4px; color: var(--ink) }
+.N .nf { padding: 0 var(--ne); margin-top: var(--ng) }
+.N .nf .rows { --gap: var(--ng); --mh: 110vh; max-width: none }
+.N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
+@media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.N .nb { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--ng) 48px; padding: 120px var(--ne) 104px; align-items: start }
+@media (min-width: 1200px) { .N .nb { padding-left: calc(var(--ne) + 300px); min-height: 86vh; align-content: center } }   /* the side ruler lives in the empty space on the left; each brief is a breath of white between the pictures, long enough for the ruler to show */   /* the side ruler lives in the empty space on the left */
+.N .nb h2 { margin-top: 10px; font: 600 clamp(26px, 2.6vw, 36px)/1.08 var(--bfont, var(--body)); letter-spacing: -.035em; color: var(--ink) }
+.N .nb .r p { font-size: 17px; line-height: 1.6; max-width: 52ch } .N .nb .r p + p { margin-top: 14px }
+.N .pg { margin-top: 32px; padding: 20px; background: var(--panel); display: grid; gap: 16px; max-width: 520px }
+.N .pg-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 16px } .N .pg-hd b { font: 600 16px var(--body); color: var(--ink) }
+.N .pg-row { display: grid; gap: 8px }
+.N .pg-sw { display: flex; flex-wrap: wrap; gap: 8px }
+.N .pg-sw button { width: 40px; height: 40px; padding: 0; border: 0; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent); transition: transform .2s cubic-bezier(.2,.8,.2,1) }
+.N .pg-sw button:hover { transform: translateY(-2px) }
+.N .pg-sw button[aria-checked="true"] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 2px var(--bg), 0 0 0 4px var(--ink) }
+.N .pg-sw .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0) }
+.N .pg-ac { display: flex; gap: 8px }
+.N .pg-b { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 500 14px var(--body); cursor: pointer }
+.N .pg-b.ghost { background: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line) }
+html.themed body, html.themed .N, html.themed .next { transition: background .45s, color .45s }
+.N .nb .go { margin-top: 18px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
+.N .tsw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 24px }
+.N .tsw button, .N .ttbar button { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s }
+.N .tsw button:hover, .N .ttbar button:hover { color: var(--ink) }
+.N .tsw button[aria-pressed="true"], .N .ttbar button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none }
+/* glyphs */
+.N .tglyph { display: grid; grid-template-columns: 5fr 7fr; gap: var(--ng); padding: 0 var(--ne); align-items: start }
+.N .tgbig { position: sticky; top: 24px; aspect-ratio: 1; background: var(--panel); display: grid; place-items: center; overflow: hidden }
+.N .tgbig .mono { position: absolute; top: 16px; left: 16px; font-family: var(--mono) }
+.N .tgbig b { font-weight: 500; font-size: min(30vw, 62vh); line-height: 1; color: var(--ink) }
+.N .tggrid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line) }
+.N .tggrid button { aspect-ratio: 1; border: 0; background: var(--bg); color: var(--ink); font: inherit; font-size: clamp(20px, 2.4vw, 38px); cursor: pointer; transition: background .15s, color .15s }
+.N .tggrid button:hover, .N .tggrid button.on { background: var(--ink); color: var(--bg) }
+/* scale */
+.N .tscale { padding: 0 var(--ne); border-top: 1px solid var(--line) }
+.N .tsr { display: grid; grid-template-columns: 160px 1fr; gap: var(--ng); align-items: baseline; padding: 28px 0; border-bottom: 1px solid var(--line); color: var(--ink) }
+.N .tsr > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.N .tsr:nth-child(n+5) > span:last-child { white-space: normal; max-width: 64ch; color: var(--text) }
+/* tester */
+.N .ttest { padding: 0 var(--ne); }
+.N .ttbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
+.N .ttw, .N .tts { display: flex; flex-wrap: wrap; gap: 4px } .N .tts { margin-left: auto }
+.N .ttin { min-height: 50vh; padding: 48px 0; color: var(--ink); line-height: .95; letter-spacing: -.04em; outline: none; word-break: break-word; transition: font-size .35s cubic-bezier(.2,.8,.2,1), font-weight .25s }
+.N .ttin:focus { caret-color: var(--ink) }
+.N .tth { display: block; padding-bottom: 24px }
+/* pairing */
+.N .tpair { display: grid; grid-template-columns: 7fr 5fr; gap: var(--ng) 48px; margin: 0 var(--ne); padding: 64px; background: var(--panel); align-items: end }
+.N .tpair h3 { margin-top: 18px; font-size: clamp(40px, 5.4vw, 92px); line-height: .98; letter-spacing: -.04em; color: var(--ink) }
+.N .tpair p { margin-top: 18px; font-size: 18px; line-height: 1.6; color: var(--text); max-width: 46ch } .N .tpair .tpm { font-size: 13px; color: var(--muted) }
+@media (max-width: 899px) { .N .tglyph, .N .tpair { grid-template-columns: 1fr } .N .tgbig { position: static } .N .tggrid { grid-template-columns: repeat(6, minmax(0, 1fr)) } .N .tsr { grid-template-columns: 1fr; gap: 8px } .N .tpair { padding: 28px } .N .ttin { min-height: 36vh } }
+.N .tfaces { display: grid; margin-top: 4px } .N .tfaces div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--line) } .N .tfaces div:last-child { border-bottom: 1px solid var(--line) }
+.N .tfaces dd { color: var(--muted); font-size: 15px } .N .tfaces dd b { font-weight: 500; font-size: 22px; color: var(--ink); letter-spacing: -.01em }
+.N .tsub { position: absolute; left: 50%; bottom: 150px; translate: -50% 0; width: min(760px, calc(100% - 2 * var(--ne))); text-align: center; font-size: clamp(17px, 1.6vw, 22px); line-height: 1.45; color: var(--text) }
+.N .tdl2 { position: absolute; top: 120px; left: var(--ne) }
+.N .tgf { position: absolute; top: 12px; right: 12px; display: flex; gap: 4px }
+.N .tgf button, .N .ttf button { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line) }
+.N .tgf button[aria-pressed="true"], .N .ttf button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none }
+.N .ttf { display: flex; flex-wrap: wrap; gap: 4px }
+.N .cdial { display: block; margin-top: 0 }
+.N .cpin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden }
+.N .cfill { position: absolute; inset: 0 }
+.N .cinfo { position: absolute; left: var(--ne); bottom: 120px; display: grid; gap: 12px; color: inherit }
+.N .cinfo .mono { color: inherit; opacity: .75 }
+.N .cinfo b { font: 500 clamp(64px, 10vw, 168px)/.9 var(--bfont, var(--body)); letter-spacing: -.055em }
+.N .cstations { position: absolute; right: max(var(--ne), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 14px; text-align: right }
+.N .cstations .mono { color: inherit; opacity: .4; transition: opacity .3s } .N .cstations .mono.on { opacity: 1 }
+.N .cruler, .N .truler { position: absolute; left: 0; right: 0; bottom: 36px; height: 46px } .N .cruler canvas, .N .truler canvas { width: 100%; height: 100%; display: block }
+.N .tdial { display: block }
+.N .tpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; place-items: center; overflow: hidden; background: var(--panel) }
+.N .tbig { color: var(--ink); font-size: clamp(80px, 15vw, 260px); line-height: .9; letter-spacing: -.045em; white-space: nowrap }
+.N .tdl { position: absolute; top: 96px; left: var(--ne) }
+.N .tdst { position: absolute; right: max(var(--ne), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 12px; text-align: right }
+.N .tdst .mono { opacity: .4; transition: opacity .3s, color .3s } .N .tdst .mono.on { opacity: 1; color: var(--ink) }
+.N .tticker { padding: 40px 0 0; background: var(--panel); overflow: hidden }
+.N .tkrow { white-space: nowrap; color: var(--ink); font-size: clamp(64px, 10vw, 180px); line-height: 1.05; letter-spacing: -.04em; will-change: transform }
+.N .tkrow.rev { font-size: clamp(24px, 3vw, 44px); color: var(--muted); letter-spacing: -.01em; padding: 10px 0 30px }
+.N .tread { display: flex; justify-content: space-between; gap: 16px; padding: 16px var(--ne); border-top: 1px solid var(--line) }
+@media (max-width: 899px) { .N .nhr, .N .nb { grid-template-columns: 1fr } .N .nb { padding: 72px var(--ne) 56px } .N .cstations, .N .tdst { display: none } .N .tdl { top: 72px } }
+
+#app { transition: opacity .35s } #app.wait { opacity: 0 }
+.top { position: relative; z-index: 31 }   /* above the nav's frosted band, so the way back to Designs stays readable */
+@media (max-width: 900px) { .top .mono { display: none } }
+/* the lab's switch: layout, case, theme */
+.sw { position: fixed; z-index: 50; left: 50%; bottom: max(16px, env(safe-area-inset-bottom, 0px)); translate: -50% 0; display: flex; align-items: center; gap: 2px; padding: 4px;
+  border-radius: 999px; background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 1px var(--edge), 0 16px 40px -16px rgb(0 0 0 / .3); max-width: calc(100vw - 24px); overflow-x: auto; scrollbar-width: none }
+.sw::-webkit-scrollbar { display: none }
+.sw button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: none; font-size: 13px; font-weight: 500; color: var(--muted); transition: background .18s, color .18s; white-space: nowrap }
+.sw button:hover { color: var(--ink) } .sw button[data-l][aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.sw select { flex: none; height: 34px; border: 0; border-radius: 999px; padding: 0 12px; background: var(--pill); color: var(--ink); font: 500 13px var(--body); margin-left: 6px }
+.sw .th { width: 34px; padding: 0; margin-left: 2px; background: var(--pill); color: var(--ink) }
+.sw .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; flex: none }
+.cap { position: fixed; z-index: 50; left: 50%; bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 50px); translate: -50% 0; font: 500 12px var(--body); color: var(--muted);
+  background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); padding: 6px 12px; border-radius: 999px; white-space: nowrap; max-width: calc(100vw - 24px); overflow: hidden; text-overflow: ellipsis; transition: opacity .3s }
+.cap.off { opacity: 0 }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const CASES = __DATA__;
+const LAYOUTS = [
+  ['A', 'Index', 'A Swiss grid: numbered sections, each heading holds its place while its section scrolls past.'],
+  ['B', 'Spread', 'Magazine pages: a full-bleed cover, then text pages and picture pages taking turns.'],
+  ['C', 'Split', 'The story on the left, the work on the right; each section’s words wait beside its pictures.'],
+  ['D', 'Essay', 'One calm reading column; pictures step out wider, notes sit in the margin.'],
+  ['E', 'Poster', 'Huge headings, pictures edge to edge, the numbers set as big as the titles.'],
+  ['G', 'Essay × Poster', 'Poster-sized title and headings over one calm reading column; pictures alternate edge to edge and wide, numbers set huge.'],
+  ['H', 'Story', 'One narrative column: tags, a big title, the result up front; eyebrow and heading per chapter, captioned pictures a step wider than the text, results as a plain list, credits at the end.'],
+  ['F', 'Bento', 'The whole case on one board of tiles first, then each part as its own board.']
+];
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const nl = s => String(s ?? '').replace(/<br\s*\/?>/g, ' ');      // headlines carry <br>; keep them only where a layout wants the break
+const hl = s => esc(s).replace(/&lt;br&gt;/g, '<br>');
+const pad = n => String(n).padStart(2, '0');
+// sound: the ruler's detent tick, as on About. Browsers only allow sound after the first tap or key on the page.
+let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+if (window.Popkit) { Popkit.define('wake', () => {}); const wake = () => { if (soundOn) Popkit.play('wake'); }; addEventListener('pointerdown', wake, { once: true }); addEventListener('keydown', wake, { once: true }); }
+let sndT = 0; const snd = n => { if (!soundOn || !window.Popkit) return; const t = performance.now(); if (n === 'detent' && t - sndT < 38) return; sndT = t; try { Popkit.play(n); } catch (_) {} };
+// one piece of media: a picture, a looping video, or (for cases without pictures yet) a block of colour with a word
+function M(x, cls = '', r) {
+  const st = r ? ` style="--r:${r.toFixed(3)}"` : '';
+  if (!x) return '';
+  if (typeof x === 'string') return `<figure class="m ${cls}"${st}><img src="${esc(x)}" alt="" loading="lazy" decoding="async"></figure>`;
+  if (x.video) return `<figure class="m ${cls}"${st}><video src="${esc(x.video)}" poster="${esc(x.poster || '')}" autoplay muted loop playsinline></video></figure>`;
+  if (x.color) { const dark = !x.ink; return `<figure class="m ok ${cls}" style="background:${esc(x.color)};${r ? `--r:${r.toFixed(3)}` : ''}"><div class="blk" style="color:${esc(x.ink || (/^#(?:f|e)/i.test(x.color) ? '#111' : '#fff'))}">${esc(x.word)}</div></figure>`; }
+  return '';
+}
+// ---------- shape-aware rows: every picture keeps its own shape; pictures in a row share one height, so their tops and
+// bottoms line up and the row runs exactly edge to edge of the column. Landscapes stand alone, portraits and squares pair up,
+// a portrait next to a landscape when that fills the row well. A row is never taller than --mh.
+const RATIO = {};   // filled with each picture's real shape before the page is drawn
+const rOf = x => !x ? 1 : typeof x === 'string' ? (RATIO[x] || 1.5) : x.video ? (RATIO[x.poster] || 16 / 9) : x.color ? 4 / 3 : 1;
+const uniq = list => { const seen = new Set(); return list.filter(m => { const k = JSON.stringify(m); if (seen.has(k)) return false; seen.add(k); return true; }); };
+function rowsOf(list) {
+  list = uniq(list);
+  const rows = []; let cur = [], sum = 0;
+  list.forEach(m => { const r = rOf(m);
+    if (r >= 1.45 && cur.length && sum + r > 2.7) { rows.push(cur); cur = []; sum = 0; }
+    cur.push(m); sum += r;
+    if (sum >= 1.45 || cur.length === 3) { rows.push(cur); cur = []; sum = 0; } });
+  if (cur.length) rows.push(cur);
+  return rows;
+}
+function ROWS(list, cls = '', after = '') {
+  list = uniq(list);
+  // every full row in a group shares one width (the narrowest any of them may take at the height cap), so a landscape and a
+  // pair above or below it line up on both edges; a row that can't fill (a lone portrait) keeps its own width at the left edge
+  const rows = rowsOf(list).map(row => { const sum = row.reduce((a, m) => a + rOf(m), 0); return { row, sum, full: sum >= 1.45 || row.length > 1 }; });
+  const fulls = rows.filter(r => r.full), cap = (r) => `calc(var(--mh) * ${r.sum.toFixed(3)} + var(--gap) * ${r.row.length - 1})`;
+  const w = fulls.length ? (fulls.length === 1 ? cap(fulls[0]) : `min(${fulls.map(cap).join(', ')})`) : (rows[0] ? cap(rows[0]) : 'none');
+  return `<div class="rows ${cls}" style="--w:${w}">` + rows.map(({ row, sum, full }) =>
+    `<div class="row${full ? ' full' : ''}" style="--sum:${sum.toFixed(3)};--n:${row.length}">${row.map(m => M(m, '', rOf(m))).join('')}</div>`).join('') + after + '</div>';
+}
+function body(s) {
+  let h = '';
+  (s.p || []).forEach(p => h += `<p>${esc(p)}</p>`);
+  if (s.list) h += `<dl class="ls">${s.list.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>`;
+  if (s.stats) h += `<div class="sts">${s.stats.map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>`;
+  return h;
+}
+// everything a layout might want, tidied once
+function prep(c) {
+  const meta = [['Role', c.role], ['Year', c.year], ['Client', c.client], ['Work', (c.did || []).join(', ')]].filter(([, v]) => v && v !== 'Year');
+  const secs = (c.sections || []).map(s => ({ ...s, media: (s.media || []).filter(Boolean) }));
+  // cases without pictures in their sections borrow from the run of work, one each
+  const run = (c.run || []).slice(1); let ri = 0;
+  secs.forEach(s => { if (!s.media.length && run[ri]) s.media = [run[ri++]]; });
+  const stats = c.impact && c.impact.stats ? c.impact.stats : null;
+  return { ...c, meta, secs, stats, cover: c.cover, lede: c.blurb };
+}
+const nextOf = c => { const list = CASES.filter(x => x.kind === c.kind), i = list.findIndex(x => x.slug === c.slug); return list[(i + 1) % list.length]; };
+const NEXT = c => { const n = nextOf(c); return `<button class="next" type="button" data-go="${esc(n.slug)}"><span class="mono">Next case · ${esc(n.kind)}</span><span class="t">${esc(n.title)}<i>→</i></span></button>`; };
+const TOP = c => `<div class="top"><a href="designs.html" class="back">← Designs</a><span class="mono">${esc(c.fq || '')}${c.fq ? ' FM · ' : ''}${esc(c.kind)} · ${esc(c.tag)}</span></div>`;
+
+const R = {
+  A(c) {
+    return `${TOP(c)}<main class="A"><header class="hd"><span class="mono">${esc(c.kind)} case study</span><h1>${esc(c.title)}</h1><p class="lede">${esc(c.lede)}</p></header>
+      <dl class="meta">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <div class="cover">${ROWS([c.cover], 'a-cv')}</div>
+      ${c.secs.map((s, i) => `<section class="sec"><header><div class="n">${pad(i + 1)}</div><h2>${esc(s.h)}</h2></header><div class="bd">${body(s)}${s.media.length ? ROWS(s.media) : ''}</div></section>`
+        + (i === 1 && c.statement ? `<p class="st">${esc(c.statement)}</p>` : '')).join('')}
+      ${NEXT(c)}</main>`;
+  },
+  B(c) {
+    const pages = c.secs.map((s, i) => {
+      if (s.media.length === 1 && i % 3 === 2) return `<section class="pg"><div class="tx"><span class="mono">${pad(i + 1)}</span><h2>${esc(s.h)}</h2>${body(s)}</div><div class="ms"></div></section><div class="bleed">${M(s.media[0])}</div>`;
+      return `<section class="pg${i % 2 ? ' flip' : ''}"><div class="tx"><span class="mono">${pad(i + 1)}</span><h2>${esc(s.h)}</h2>${body(s)}</div><div class="ms">${s.media.map(m => M(m)).join('')}</div></section>`;
+    });
+    return `<main class="B"><header class="cov">${M(c.cover)}<span class="mono">${esc(c.title)} · ${esc(c.kind)} · ${esc(c.year !== 'Year' ? c.year : c.tag)}</span><h1>${nl(c.headline)}</h1></header>
+      <section class="intro"><p class="big">${esc(c.lede)}</p><dl>${c.meta.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}${c.problem ? `<dt>Problem</dt><dd>${esc(c.problem)}</dd>` : ''}${c.goal ? `<dt>Goal</dt><dd>${esc(c.goal)}</dd>` : ''}</dl></section>
+      ${pages.slice(0, 2).join('')}${c.statement ? `<p class="q">“${esc(c.statement)}”</p>` : ''}${pages.slice(2).join('')}${NEXT(c)}</main>`;
+  },
+  C(c) {
+    return `<main class="C"><div class="l"><header class="hd"><span class="mono">${esc(c.kind)} · ${esc(c.tag)}</span><h1>${hl(c.headline)}</h1><p>${esc(c.lede)}</p>
+        <dl>${c.meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></header></div>
+      <div class="r"><div class="cv">${M(c.cover)}</div></div>
+      ${c.secs.map((s, i) => `<section class="sec"><div class="t"><div><span class="mono">${pad(i + 1)} / ${pad(c.secs.length)}</span><h2>${esc(s.h)}</h2>${body(s)}</div></div><div class="w">${s.media.map(m => M(m)).join('')}</div></section>`).join('')}
+      ${c.statement ? `<p class="q">${esc(c.statement)}</p>` : ''}<div style="grid-column:1/-1">${NEXT(c)}</div></main>`;
+  },
+  D(c) {
+    const note = (k, v) => `<aside class="note"><b>${k}</b>${esc(v)}</aside>`;
+    let h = `<main class="D"><div class="w hd"><span class="mono">${esc(c.title)} · ${esc(c.kind)} case study</span><h1>${nl(c.headline)}</h1><p>${esc(c.lede)}</p>
+      <div class="by">${c.meta.map(([k, v]) => `<span>${k} <b>${esc(v)}</b></span>`).join('')}</div></div>
+      <div class="wide">${M(c.cover)}</div>`;
+    c.secs.forEach((s, i) => {
+      h += `<div class="w"><h2>${esc(s.h)}</h2>${i === 0 && c.problem ? note('The problem', c.problem) : ''}${i === 1 && c.goal ? note('The goal', c.goal) : ''}${body(s)}</div>`;
+      if (s.media.length === 1) h += i % 2 ? `<div class="wide">${M(s.media[0])}</div>` : `<div class="w" style="margin:40px auto">${M(s.media[0])}</div>`;
+      else if (s.media.length) h += `<div class="wide pair">${s.media.slice(0, 2).map(m => M(m)).join('')}</div>${s.media.slice(2).map(m => `<div class="wide">${M(m)}</div>`).join('')}`;
+      if (i === 2 && c.statement) h += `<div class="w"><p class="pq">${esc(c.statement)}</p></div>`;
+    });
+    return h + `<div class="end"></div>${NEXT(c)}</main>`;
+  },
+  E(c) {
+    let h = `<main class="E"><header class="hd"><h1>${esc(c.title)}</h1><div class="sub"><p class="lede">${esc(c.lede)}</p>${c.meta.slice(0, 3).map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</div></header>
+      <div class="edge">${M(c.cover)}</div>`;
+    c.secs.forEach((s, i) => {
+      if (s.stats) { h += `<section class="sec"><h2>${esc(s.h)}</h2><div class="bd">${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</div></section><div class="nums">${s.stats.map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>`; }
+      else h += `<section class="sec"><h2>${esc(s.h)}</h2><div class="bd">${body(s)}</div></section>`;
+      if (s.media.length) h += `<div class="edge${s.media.length === 2 ? ' two' : ''}">${s.media.map(m => M(m)).join('')}</div>`;
+      if (i === 2 && c.statement) h += `<p class="inv">${esc(c.statement)}</p>`;
+    });
+    return h + `${NEXT(c)}</main>`;
+  },
+  G(c) {
+    const note = (k, v) => `<aside class="note"><b>${k}</b>${esc(v)}</aside>`;
+    let h = `<main class="G"><header class="hd"><span class="mono">${esc(c.kind)} case study · ${esc(c.tag)}</span><h1 style="margin-top:20px">${esc(c.title)}</h1></header>
+      <div class="w intro"><p class="lede">${esc(c.lede)}</p><div class="by">${c.meta.map(([k, v]) => `<span>${k} <b>${esc(v)}</b></span>`).join('')}</div></div>
+      <div class="gw">${ROWS([c.cover], 'c g-cv')}</div>`;
+    let big = 0; const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
+    c.secs.forEach(s => { s.media = s.media.filter(m => !same(m)); });   // the cover isn't shown twice
+    c.secs.forEach((s, i) => {
+      h += `<h2><small>${pad(i + 1)}</small>${esc(s.h)}</h2>`;
+      const notes = (i === 0 && c.problem ? note('The problem', c.problem) : '') + (i === 1 && c.goal ? note('The goal', c.goal) : '');
+      if (s.stats) h += `<div class="w bd">${notes}${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</div><div class="nums">${s.stats.map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div><div class="sp"></div>`;
+      else h += `<div class="w bd">${notes}${body(s)}</div>`;
+      if (s.media.length) h += `<div class="gw">${ROWS(s.media, 'c')}</div>`;
+      if (i === 2 && c.statement) h += `<p class="inv">${esc(c.statement)}</p>`;
+    });
+    return h + `<div class="sp"></div>${NEXT(c)}</main>`;
+  },
+  H(c) {
+    // product case study copy: each section gets the design phase it belongs to (eyebrow) and a plain-spoken chapter title
+    const PH = [[/overview/i, 'Context', 'The product'], [/pain|research|insight/i, 'Research', 'Listening to users'], [/strategy|approach/i, 'Strategy', 'Reframing the problem'],
+      [/key feature|feature|solution/i, 'Solution', 'What we built'], [/high fidelity|hi-?fi/i, 'Design', 'Designing the flow'], [/screens|shops|flow|ui/i, 'Design', null],
+      [/impact|result/i, 'Results', 'The impact'], [/plan|roadmap/i, 'Roadmap', 'The plan'], [/brand/i, 'Brand', 'Giving it a face']];
+    const ph = s => { const m = PH.find(([re]) => re.test(s.h)); return m ? [m[1], m[2] || s.h] : ['Chapter', s.h]; };
+    // and the chapters follow how the work happened: context, research, strategy, the solution, the design, results
+    const ORDER = ['Context', 'Research', 'Strategy', 'Roadmap', 'Solution', 'Brand', 'Design', 'Chapter', 'Results'];
+    c = { ...c, secs: c.secs.map((s, k) => ({ s, k })).sort((a, b) => (ORDER.indexOf(ph(a.s)[0]) - ORDER.indexOf(ph(b.s)[0])) || a.k - b.k).map(x => x.s) };
+    let fig = 0;
+    // the caption sits under the pictures, starting at their left edge (the widest row decides where that is)
+    const cap = (list, b, t) => `<p class="cap2"><b>${b}</b>${t}</p>`;
+    const pics = (list, label) => list.length ? `<div class="fr" style="--pmh:80vh">${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : '';
+    const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
+    const tags = [...(c.industry || []), ...(c.did || []).slice(0, 2)];
+    const st = c.stat && c.stat[0] ? ` <b>${esc(c.stat[0])} ${esc(c.stat[1])}</b>.` : '';
+    let h = `<div class="top"><a href="designs.html" class="back">← Designs</a><span class="mono">Product design case study</span></div><main class="H"><header class="tx hd"><h1>${nl(c.headline)}</h1><p class="lede">${esc(c.lede)}${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
+      <div class="fr" style="--pmh:84vh">${ROWS([c.cover], 'c', cap([c.cover], esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>`;
+    // the backstory: the problem, the goal and my part in it, before any screens
+    h += `<section class="tx ch" data-ix="The brief"><span class="eb">The brief</span><h2>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map(p => `<p>${esc(p)}</p>`).join('')}
+      ${c.problem ? `<h4>The problem</h4><p>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch">${esc(c.goal)}</p>` : ''}
+      <h4>My role</h4><p>${esc(c.role)}${c.client && c.client !== 'Personal project' ? ', ' + esc(c.client) : ''}${c.year && c.year !== 'Year' ? ', ' + esc(c.year) : ''}.</p><div class="role">${(c.did || []).map(d => `<span>${esc(d)}</span>`).join('')}</div></section>`;
+    c.secs.forEach((s, i) => {
+      const media = s.media.filter(m => !same(m));
+      if (s.stats) {
+        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}<ul class="res">${s.stats.map(([a, b]) => `<li><b>${esc(a)}</b>${esc(b)}</li>`).join('')}</ul>${c.impactNote ? `<p class="cap2" style="margin-top:14px">${esc(c.impactNote)}</p>` : ''}</section>${pics(media, s.h)}`;
+        return;
+      }
+      const lead = s.list ? `<div class="lead">${s.list.map(([a, b]) => `<div><b>${esc(a)}.</b> ${esc(b)}</div>`).join('')}</div>` : '';
+      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}${lead}</section>${pics(media, s.h)}`;
+      if (i === 2 && c.statement) h += `<section class="tx ch"><span class="eb">Design principle</span><p class="pull" style="margin-top:12px">${esc(c.statement)}</p></section>`;
+    });
+    if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2><ul class="res">${c.impact.list.map(([a, b]) => `<li><b>${esc(a)}.</b>${esc(b)}</li>`).join('')}</ul></section>`;
+    h += `<section class="tx ch" data-ix="Project details"><span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section><div class="sp"></div>`;
+    return h + `${NEXT(c)}</main>`;
+  },
+  F(c) {
+    const imgs = c.secs.flatMap(s => s.media);
+    let h = `<main class="F"><div class="grid">
+      <div class="t ttl"><span class="mono">${esc(c.kind)} · ${esc(c.tag)}</span><h1>${esc(c.title)}</h1><p>${esc(c.lede)}</p></div>
+      <div class="t cvr">${M(c.cover)}</div>
+      ${c.stat && c.stat[0] ? `<div class="t big s3"><b>${esc(c.stat[0])}</b><span>${esc(c.stat[1])}</span></div><div class="t s4">` : `<div class="t s7">`}<span class="mono">${c.problem ? 'Problem' : 'Role'}</span><p>${esc(c.problem || c.role)}</p></div>
+      ${c.goal ? `<div class="t s4"><span class="mono">Goal</span><p>${esc(c.goal)}</p></div>` : ''}
+      ${c.meta.slice(0, c.goal ? 1 : 2).map(([k, v]) => `<div class="t s4"><span class="mono">${k}</span><p style="color:var(--ink);font-size:17px">${esc(v)}</p></div>`).join('')}
+      ${c.meta.slice(c.goal ? 1 : 2).length ? `<div class="t s4"><span class="mono">${c.meta.slice(c.goal ? 1 : 2).map(([k]) => k).join(' · ')}</span><p>${c.meta.slice(c.goal ? 1 : 2).map(([, v]) => esc(v)).join('<br>')}</p></div>` : ''}`;
+    const spans = [['s7', 's5'], ['s5', 's7'], ['s8', 's4'], ['s4', 's8'], ['s6', 's6']];
+    c.secs.forEach((s, i) => {
+      h += `<div class="t lbl"><span class="mono">${pad(i + 1)}</span><h2>${esc(s.h)}</h2></div>`;
+      const [a, b] = spans[i % spans.length];
+      if (s.stats) { h += s.stats.map(([x, y]) => `<div class="t big s3"><b>${esc(x)}</b><span>${esc(y)}</span></div>`).join(''); h += s.media.map((m, k) => `<div class="t im ${k % 2 ? 's5' : 's7'}">${M(m)}</div>`).join(''); }
+      else if (s.media.length >= 2) { h += `<div class="t s4"><div>${body(s)}</div></div>` + s.media.map((m, k) => `<div class="t im ${s.media.length === 2 ? 's4' : (k ? 's4' : 's8')}">${M(m)}</div>`).join(''); }
+      else h += `<div class="t ${a}"><div>${body(s)}</div></div>${s.media.length ? `<div class="t im ${b}">${M(s.media[0])}</div>` : ''}`;
+      if (i === 1 && c.statement) h += `<div class="t qt">${esc(c.statement)}</div>`;
+    });
+    return h + `</div>${NEXT(c)}</main>`;
+  }
+};
+
+
+// ---------- BRAND: what every brand layout draws from ----------
+const HEX = { 'very dark grey': '#1c1c1c', 'dark grey': '#4b4b4b', 'beige': '#e9dfcb', 'golden sand': '#d8b46c', 'coffee brown': '#6a4a30', 'purple': '#7a3ff0', 'deep blue': '#17286b' };
+const WR = { 'Bricolage Grotesque': [200, 800], 'Epilogue': [100, 900], 'Geist': [100, 900], 'Geist Mono': [100, 900], 'Serif': [200, 900] };   // weight range of each face
+const FONTS = { 'bricolage grotesque': "'Bricolage Grotesque', sans-serif", 'epilogue': "'Epilogue', sans-serif", 'geist': 'Geist, sans-serif', 'geist mono': "'Geist Mono', monospace", 'serif': "'Source Serif 4', Georgia, serif" };   // single quotes: these go inside style attributes
+const ink2 = hex => { const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111' : '#fff'; };
+function brandOf(c) {
+  const by = re => c.secs.find(s => re.test(s.h));
+  const chips = c.secs.flatMap(s => s.chips || []);
+  let pal = (c.colors || []).filter(x => x && /^#[0-9a-f]{6}$/i.test(x[1] || '')).map(([name, hex]) => ({ name: name || hex.toUpperCase(), hex }));
+  if (!pal.length) pal = chips.filter(x => HEX[x.toLowerCase()]).map(x => ({ name: x, hex: HEX[x.toLowerCase()] }));
+  if (!pal.length) { const seen = new Set(); [c.cover, ...(c.run || [])].forEach(x => { if (x && x.color && !seen.has(x.color.toUpperCase())) { seen.add(x.color.toUpperCase()); pal.push({ name: x.color.toUpperCase() === '#111111' ? 'Ink' : 'Paper', hex: x.color }); } }); }
+  // a brand has a primary and a secondary face; where the case names only one, the secondary is a stand-in (Geist, or Geist Mono beside Geist)
+  const raw = (c.type || [['Primary', 'Geist']]).slice(0, 2);
+  if (raw.length < 2) raw.push(['Secondary', raw[0][1].toLowerCase() === 'geist' ? 'Geist Mono' : 'Geist', true]);
+  const type = raw.map(([use, fam, stand], i) => ({ role: i ? 'Secondary' : 'Primary', use: /primary|secondary/i.test(use) ? '' : use, fam, stand: !!stand, css: FONTS[fam.toLowerCase()] || 'Geist, sans-serif', wr: WR[fam] || [400, 400] }));
+  const all = uniq([c.cover, ...c.secs.flatMap(s => s.media), ...(c.run || [])].filter(Boolean));
+  const imgs = all.filter(x => typeof x === 'string' || x.video);
+  const pick = (re, d) => { const s = by(re); return s && s.media.length ? s.media : d; };
+  return { pal, type, all, imgs, intro: by(/intro|overview/i), logo: by(/logo|name/i), colour: by(/colou?r|type/i), pers: by(/personality|focus/i), mock: by(/mockup|in use/i),
+    logoM: pick(/logo|name/i, [c.cover])[0], mockM: pick(/mockup|in use/i, imgs.slice(1, 5)), bfont: type[0].css, sfont: (type[1] || type[0]).css };
+}
+const bstyle = b => `--bfont:var(--body);--sf:${b.sfont}`;   // the page itself is always Geist; only the type specimens show the brand's own fonts
+const P = s => s ? (s.p || []).map(p => `<p>${esc(p)}</p>`).join('') + (s.list ? `<dl class="ls" style="margin-top:16px">${s.list.map(([a, d]) => `<div><dt>${esc(a)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` : '') : '';
+const FIG = (x, cls = '') => `<div class="fill ${cls}" style="--r:${rOf(x).toFixed(3)}">${M(x)}</div>`;
+const metaDL = c => c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('');
+
+Object.assign(R, {
+  // I · Guidelines
+  I(c) { const b = brandOf(c); let n = 0; const lab = (t) => `<div class="lab"><span class="mono">${pad(++n)}</span><h2>${esc(t)}</h2></div>`;
+    let h = `${TOP(c)}<main class="bz I" style="${bstyle(b)}"><header class="gr hd"><h1>${esc(c.title)}</h1><dl>${metaDL(c)}</dl><p class="lede">${esc(c.lede)}</p></header>`;
+    h += `<div class="gr" style="margin-top:72px"><div style="grid-column:1/-1">${ROWS([c.cover], '', '')}</div></div>`;
+    if (c.problem || c.goal) h += `<section class="gr sp">${lab('The brief')}<div class="tx" style="margin-top:0">${c.problem ? `<p>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="punch" style="margin-top:20px;font:500 22px/1.35 var(--body);color:var(--ink)">${esc(c.goal)}</p>` : ''}</div></section>`;
+    h += `<section class="gr sp">${lab(b.logo ? b.logo.h : 'The mark')}<div class="wk">${FIG(b.logoM, 'logo')}</div><div class="tx">${P(b.logo)}</div></section>`;
+    h += `<section class="gr sp">${lab('Colour')}<div class="wk"><div class="sws" style="--n:${b.pal.length}">${b.pal.map(p => `<div style="background:${p.hex};color:${ink2(p.hex)}"><b>${esc(p.name)}</b>${p.hex.toUpperCase()}</div>`).join('')}</div></div><div class="tx">${b.colour ? `<p>${esc((b.colour.p || [])[0] || '')}</p>` : ''}</div></section>`;
+    h += `<section class="gr sp">${lab('Type')}<div class="wk spec">${b.type.map(t => `<div style="--sf:${t.css}"><div class="aa">Aa</div><div class="abc">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</div><div class="nm"><span class="mono">${esc(t.role)}</span><h2 style="margin-top:4px;font-family:${t.css}">${esc(t.fam)}</h2></div></div>`).join('')}</div></section>`;
+    h += `<section class="gr sp">${lab(b.pers ? b.pers.h : 'Voice')}<p class="pq">${esc(c.statement || '')}</p><div class="tx">${P(b.pers)}</div></section>`;
+    if (b.mockM.length) h += `<section class="gr sp">${lab(b.mock ? b.mock.h : 'In use')}<div class="wk">${ROWS(b.mockM)}</div><div class="tx">${P(b.mock)}</div></section>`;
+    return h + `<div style="height:120px"></div>${NEXT(c)}</main>`; },
+
+  // J · Mosaic
+  J(c) { const b = brandOf(c); const sh = x => { const r = rOf(x); return r >= 1.3 ? 'p64' : r <= .9 ? 'p34' : 'p33'; };
+    const im = b.all.filter(x => typeof x === 'string' || x.video || x.color);
+    let t = [`<div class="t ti"><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><h1>${esc(c.title)}</h1><p>${esc(c.lede)}</p></div>`];
+    if (im[0]) t.push(`<div class="t im p66" style="--r:${rOf(im[0])}">${M(im[0])}</div>`);
+    const txt = [b.intro, b.logo, b.colour, b.pers, b.mock].filter(Boolean);
+    t.push(`<div class="t pal p62">${b.pal.map(p => `<i style="background:${p.hex};color:${ink2(p.hex)}">${esc(p.name)}</i>`).join('')}</div>`);
+    t.push(`<div class="t ty p33"><span class="mono">${esc(b.type[0].role)} · ${esc(b.type[0].fam)}</span><div class="aa" style="--sf:${b.type[0].css}">Aa</div></div>`);
+    im.slice(1).forEach((x, i) => { t.push(`<div class="t im ${sh(x)}" style="--r:${rOf(x)}">${M(x)}</div>`); if (txt[i]) t.push(`<div class="t p33"><span class="mono">${pad(i + 1)}</span><div><h2 style="font-size:22px">${esc(txt[i].h)}</h2><p style="margin-top:10px">${esc((txt[i].p || [])[0] || (txt[i].list || [[, '']])[0][1])}</p></div></div>`);
+      if (i === 2 && c.statement) t.push(`<div class="t q">${esc(c.statement)}</div>`); });
+    t.push(`<div class="t p33"><span class="mono">Role</span><p style="color:var(--ink);font-size:17px">${esc(c.role)}<br>${esc(c.client)}</p></div>`);
+    t.push(`<div class="t p33"><span class="mono">Work</span><p style="color:var(--ink);font-size:17px">${(c.did || []).map(esc).join('<br>')}</p></div>`);
+    return `${TOP(c)}<main class="bz J" style="${bstyle(b)}"><div class="gr">${t.join('')}</div><div style="height:120px"></div>${NEXT(c)}</main>`; },
+
+  // K · Specimen
+  K(c) { const b = brandOf(c); let n = 0; const sec = (s, inner) => `<section><span class="mono">${pad(++n)} · ${esc(s.h)}</span>${P(s)}${inner || ''}</section>`;
+    let m = `<div>${ROWS([c.cover])}<div class="cap3"><span class="mono">Fig. 00</span>${esc(c.title)} identity</div></div>`;
+    if (b.intro) m += sec(b.intro);
+    if (b.logo) m += sec(b.logo, `<div style="margin-top:28px">${ROWS([b.logoM])}</div>`);
+    if (b.colour) m += sec(b.colour, `<div class="bars">${b.pal.map(p => `<div style="background:${p.hex};color:${ink2(p.hex)}"><b style="font-weight:500">${esc(p.name)}</b><span class="mono" style="color:inherit;opacity:.7">${p.hex.toUpperCase()}</span></div>`).join('')}</div><div class="tyl">${b.type.map(t => `<div><b style="--sf:${t.css}">${esc(t.fam)}</b><span class="mono">${esc(t.role)}</span></div>`).join('')}</div>`);
+    else m += `<section><span class="mono">${pad(++n)} · Colour and type</span><div class="bars">${b.pal.map(p => `<div style="background:${p.hex};color:${ink2(p.hex)}"><b style="font-weight:500">${esc(p.name)}</b><span class="mono" style="color:inherit;opacity:.7">${p.hex.toUpperCase()}</span></div>`).join('')}</div><div class="tyl">${b.type.map(t => `<div><b style="--sf:${t.css}">${esc(t.fam)}</b><span class="mono">${esc(t.role)}</span></div>`).join('')}</div></section>`;
+    if (b.pers) m += sec(b.pers);
+    if (b.mockM.length) m += `<section><span class="mono">${pad(++n)} · ${esc(b.mock ? b.mock.h : 'In use')}</span>${P(b.mock)}${ROWS(b.mockM)}</section>`;
+    return `${TOP(c)}<main class="bz K" style="${bstyle(b)}"><div class="gr"><aside class="side"><span class="mono">${esc(c.kind)} identity</span><h1>${esc(c.title)}</h1><p class="lede">${esc(c.lede)}</p>
+<dl>${c.meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      ${c.statement ? `<p style="margin-top:28px;font:600 22px/1.25 var(--bfont);letter-spacing:-.02em;color:var(--ink)">${esc(c.statement)}</p>` : ''}
+      <div class="kp" id="kp"><span class="mono">See the page in its colours</span><div class="kps">${playPal(b).map(p => `<button type="button" data-hex="${p.hex}" aria-pressed="false" title="${esc(p.name)}" aria-label="${esc(p.name)} background" style="--c:${p.hex}"></button>`).join('')}</div></div></aside><div class="main">${m}</div></div>${NEXT(c)}</main>`; },
+
+  // L · Contact sheet
+  L(c) { const b = brandOf(c); let k = 0; const code = () => `${c.title.slice(0, 2).toUpperCase()}-${pad(++k)}`;
+    const fr = (inner, cap, cls = '') => `<figure class="${cls}"><div class="box">${inner}</div><figcaption><span>${code()}</span><span>${esc(cap)}</span></figcaption></figure>`;
+    const row = (t, p, frames) => `<section class="gr row"><div class="lab"><span class="mono">${pad(++rn)}</span><b>${esc(t)}</b>${p ? `<p>${esc(p)}</p>` : ''}</div><div class="fr">${frames}</div></section>`;
+    let rn = 0, h = `${TOP(c)}<main class="bz L" style="${bstyle(b)}"><header class="gr hd"><h1>${esc(c.title)}</h1><p>${esc(c.lede)}</p><span class="mono">${b.all.length + b.pal.length + b.type.length} frames</span></header>`;
+    h += row('Identity', c.goal, fr(M(c.cover), 'Cover', 'w2') + b.imgs.slice(1, 4).map(x => fr(M(x), 'Key visual')).join(''));
+    h += row(b.logo ? b.logo.h : 'Mark', b.logo && (b.logo.p || [])[0], fr(M(b.logoM), 'Primary', 'w2') + fr(`<div class="m ok" style="background:var(--ink)"><img src="${esc(typeof b.logoM === 'string' ? b.logoM : '')}" alt="" style="mix-blend-mode:luminosity;opacity:.9"></div>`, 'Mono') + fr(`<div class="ty" style="height:100%;--sf:${b.bfont}">${esc(c.title.slice(0, 1))}</div>`, 'Initial'));
+    h += row('Colour', b.colour && (b.colour.p || [])[0], b.pal.map(p => fr(`<div class="swc" style="height:100%;background:${p.hex};color:${ink2(p.hex)}"><b style="font-weight:500">${esc(p.name)}</b>${p.hex.toUpperCase()}</div>`, 'Swatch')).join(''));
+    h += row('Type', b.type.map(t => t.fam).join(' · '), b.type.map(t => fr(`<div class="ty" style="height:100%;--sf:${t.css}">Aa</div>`, t.role)).join('') + b.type.map(t => fr(`<div class="ty" style="height:100%;--sf:${t.css};font-size:32px;padding:16px;text-align:center">${esc(t.fam)}</div>`, 'Name')).join(''));
+    if (b.mockM.length) h += row(b.mock ? b.mock.h : 'In use', b.mock && (b.mock.p || [])[0], b.mockM.map(x => fr(M(x), 'Mockup')).join('') + (c.statement ? fr(`<div class="ty" style="height:100%;font:600 18px/1.25 var(--bfont);letter-spacing:-.01em;padding:16px;text-align:left;place-items:end start">${esc(c.statement)}</div>`, 'Line') : ''));
+    return h + `${NEXT(c)}</main>`; },
+
+  // M · Broken grid
+  M(c) { const b = brandOf(c); const im = b.imgs.length ? b.imgs : b.all; const g = i => im[i % im.length];
+    let h = `${TOP(c)}<main class="bz M" style="${bstyle(b)}"><header class="gr hd"><div class="word">${esc(c.title)}</div><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><p class="lede">${esc(c.lede)}</p></header>`;
+    // each part: a big picture on one run of columns, a card stepping over its edge on another
+    const parts = [[b.intro || b.logo, 'grid-column:1/span 7', 'grid-column:7/span 5;margin-top:38%'], [b.logo, 'grid-column:5/span 8', 'grid-column:2/span 5;margin-top:-12%;grid-row:2'],
+      [b.colour, 'grid-column:2/span 6', 'grid-column:8/span 4;margin-top:20%'], [b.pers, 'grid-column:6/span 7', 'grid-column:1/span 6;grid-row:2;margin-top:-10%']];
+    parts.forEach(([s, ca, cb], i) => { if (!s) return; const x = s.media[0] || g(i + 1);
+      const pic = i === 2 ? `<div class="a" style="${ca};aspect-ratio:1"><div class="pal">${b.pal.map(p => `<i style="background:${p.hex}"></i>`).join('')}</div></div>` : `<div class="a fill" style="${ca};aspect-ratio:${Math.max(.8, Math.min(1.6, rOf(x))).toFixed(3)}">${M(x)}</div>`;
+      h += `<section class="gr st">${pic}<div class="b card" style="${cb}"><div class="num">${pad(i + 1)}</div><h2 style="margin-top:-18px">${esc(s.h)}</h2>${P(s)}${i === 2 ? `<div class="ty" style="--sf:${b.type[0].css};margin-top:18px">Aa</div><span class="mono">${esc(b.type.map(t => t.fam).join(' · '))}</span>` : ''}</div></section>`; });
+    if (c.statement) h += `<div class="gr"><p class="q">${esc(c.statement)}</p></div>`;
+    if (b.mockM.length) { const ms = b.mockM.slice(0, 4), sp = ['grid-column:1/span 5', 'grid-column:6/span 4;margin-top:22%', 'grid-column:10/span 3;margin-top:8%', 'grid-column:2/span 4;margin-top:-4%'];
+      h += `<section class="gr st" style="margin-top:160px">${ms.map((x, i) => `<div class="fill ${i % 2 ? 'b' : 'a'}" style="${sp[i]};aspect-ratio:${rOf(x).toFixed(3)}">${M(x)}</div>`).join('')}</section>`; }
+    return h + `<div style="height:160px"></div>${NEXT(c)}</main>`; }
+});
+LAYOUTS.push(
+  ['I', 'Guidelines', 'A brand book: every part is a numbered spread, its label in columns 1–3 and the work in 4–12.', 'brand'],
+  ['J', 'Mosaic', 'One modular board: the unit is a square column, and every tile takes whole units by its shape.', 'brand'],
+  ['K', 'Specimen', 'The brand’s facts stand still in columns 1–4 while the work runs down 6–12.', 'brand'],
+  ['L', 'Contact sheet', 'Everything as equal frames on one tight grid, labelled like a film sheet.', 'brand'],
+  ['M', 'Broken grid', 'The work steps across columns and over the lines, but always lands on them.', 'brand']
+);
+
+
+// ---------- N · Showcase: pictures run nearly edge to edge (the Designs page's margins), a short brief between them,
+// and the colour and type sections from the brand page: the screen floods with each colour as a needle tunes to it,
+// and the name steps through its weights as you scroll. The side ruler only shows over the words, never over the work. ----------
+const NT = [];   // per-frame work for the pinned sections
+(function nloop() { let pt = performance.now(); const f = now => { const dt = Math.min(64, now - pt); pt = now; if (L === 'N') NT.forEach(fn => fn(dt)); requestAnimationFrame(f); }; requestAnimationFrame(f); })();
+const nclamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const nprog = (sec, n) => { const r = sec.getBoundingClientRect(), p = nclamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1) * (n - 1), i = Math.floor(p), f = p - i, k = nclamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
+const RED = '#ff4a1c';
+function nruler(cv, q, n, col) {
+  const cx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H); const SP = 12, mid = W / 2;
+  for (let k = -60; k <= (n - 1) * 10 + 60; k++) { const x = mid + (k - q * 10) * SP; if (x < 0 || x > W) continue; const major = k % 10 === 0 && k >= 0 && k <= (n - 1) * 10;
+    cx.globalAlpha = major ? .9 : .28; cx.strokeStyle = col; cx.lineWidth = major ? 2 : 1; cx.beginPath(); cx.moveTo(x, H); cx.lineTo(x, H - (major ? 22 : 9)); cx.stroke(); }
+  cx.globalAlpha = 1; cx.fillStyle = RED; cx.fillRect(mid - 1.5, H - 34, 3, 34);
+}
+// ---------- palette playground: pick a background and a text colour from the brand's palette and the whole page takes them on ----------
+const lumi = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const contrast = (a, b) => { const x = lumi(a), y = lumi(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const playPal = b => { const seen = new Set(), out = []; [...b.pal, { name: 'White', hex: '#ffffff' }, { name: 'Black', hex: '#0b0b0b' }].forEach(p => { const k = p.hex.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(p); } }); return out; };
+const PLAY = b => { const P = playPal(b);
+  const row = (role, lbl) => `<div class="pg-row"><span class="mono">${lbl}</span><div class="pg-sw" role="radiogroup" aria-label="${lbl}">${P.map(p => `<button type="button" role="radio" aria-checked="false" data-role="${role}" data-hex="${p.hex}" title="${esc(p.name)}" style="--c:${p.hex}"><span class="sr">${esc(p.name)}</span></button>`).join('')}</div></div>`;
+  return `<div class="pg" id="pg"><div class="pg-hd"><b>Try the palette</b><span class="mono" id="pgcr"></span></div>${row('bg', 'Background')}${row('ink', 'Text')}
+    <div class="pg-ac"><button type="button" class="pg-b" id="pgsh">Shuffle</button><button type="button" class="pg-b ghost" id="pgrs">Reset</button></div></div>`; };
+const THEME_VARS = ['--bg', '--ink', '--text', '--muted', '--line', '--panel', '--pill', '--edge'];
+function setTheme(bg, ink) {
+  const r = document.documentElement.style;
+  if (!bg) { THEME_VARS.forEach(v => r.removeProperty(v)); document.documentElement.classList.remove('themed'); return; }
+  const mix = p => `color-mix(in srgb, ${ink} ${p}%, ${bg})`;
+  r.setProperty('--bg', bg); r.setProperty('--ink', ink); r.setProperty('--text', mix(80)); r.setProperty('--muted', mix(55));
+  r.setProperty('--line', mix(16)); r.setProperty('--panel', mix(7)); r.setProperty('--pill', mix(10)); r.setProperty('--edge', mix(14));
+  document.documentElement.classList.add('themed');
+}
+// Specimen: one row of swatches; a tap gives the page that background (the text takes the most readable colour of the set), a second tap goes back
+function setupKP() {
+  const kp = document.getElementById('kp'); if (!kp) return;
+  const bs = [...kp.querySelectorAll('button')], hs = bs.map(x => x.dataset.hex); let on = null;
+  bs.forEach(x => x.addEventListener('click', () => { snd('pop'); const h = x.dataset.hex; on = on === h ? null : h;
+    setTheme(on, on ? hs.filter(k => k !== on).sort((p, q) => contrast(on, q) - contrast(on, p))[0] : null);
+    bs.forEach(y => y.setAttribute('aria-pressed', String(y.dataset.hex === on))); }));
+}
+function setupPlay() {
+  setTheme(null); setupKP(); const pg = document.getElementById('pg'); if (!pg) return;
+  const btns = [...pg.querySelectorAll('[data-role]')], cr = document.getElementById('pgcr'); let bg = null, ink = null;
+  const paintP = () => { btns.forEach(x => x.setAttribute('aria-checked', String((x.dataset.role === 'bg' ? bg : ink) === x.dataset.hex)));
+    if (bg && ink) { const k = contrast(bg, ink); cr.textContent = `Contrast ${k.toFixed(1)} · ${k >= 7 ? 'AAA' : k >= 4.5 ? 'AA' : k >= 3 ? 'Large text only' : 'Too low'}`; } else cr.textContent = 'Pick two colours';
+    setTheme(bg && ink ? bg : null, ink); };
+  btns.forEach(x => x.addEventListener('click', () => { snd('pop'); const h = x.dataset.hex;
+    if (x.dataset.role === 'bg') { bg = h; if (!ink || ink === h) ink = [...new Set(btns.map(y => y.dataset.hex))].sort((p, q) => contrast(h, q) - contrast(h, p))[0]; }
+    else { ink = h; if (!bg || bg === h) bg = [...new Set(btns.map(y => y.dataset.hex))].sort((p, q) => contrast(h, q) - contrast(h, p))[0]; }
+    paintP(); }));
+  // shuffle: a random pairing that still reads well (contrast 4.5 or more)
+  document.getElementById('pgsh').addEventListener('click', () => { snd('pop'); const hs = [...new Set(btns.map(y => y.dataset.hex))], pairs = [];
+    hs.forEach(a => hs.forEach(b => { if (a !== b && contrast(a, b) >= 4.5 && !(a === bg && b === ink)) pairs.push([a, b]); }));
+    if (pairs.length) [bg, ink] = pairs[Math.floor(Math.random() * pairs.length)]; paintP(); });
+  document.getElementById('pgrs').addEventListener('click', () => { snd('pop'); bg = ink = null; paintP(); });
+  paintP();
+}
+R.N = function (c) {
+  const b = brandOf(c), used = new Set();
+  const key = m => JSON.stringify(m);
+  // spare pictures (in the brand's run but in no section) fill out a row so a lone portrait never floats in the margin
+  const spare = uniq([...(c.run || []), ...b.imgs]).filter(x => typeof x === 'string' || x.video);
+  const take = list => { list = uniq(list).filter(m => !used.has(key(m))); list.forEach(m => used.add(key(m)));
+    const rows = rowsOf(list), last = rows[rows.length - 1];
+    if (last && last.length === 1 && rOf(last[0]) < 1.45) { const extra = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45); if (extra) { used.add(key(extra)); list.push(extra); } }
+    return list; };
+  const pics = list => { list = take(list); return list.length ? `<div class="nf covers">${ROWS(list, '')}</div>` : ''; };
+  const brief = (s, eyebrow) => s ? `<section class="nb" data-ix="${esc(s.h)}"><div class="l"><span class="mono">${esc(eyebrow)}</span><h2>${esc(s.h)}</h2></div><div class="r">${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}${s.list ? `<dl class="ls">${s.list.map(([a, d]) => `<div><dt>${esc(a)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` : ''}</div></section>` : '';
+  let n = 0; const eb = () => pad(++n);
+  let h = `${TOP(c)}<main class="N" style="${bstyle(b)}">
+    <header class="nh"><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><h1>${esc(c.title)}</h1>
+      <div class="nhr"><p class="lede">${esc(c.lede)}</p><dl>${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div></header>
+    ${pics([c.cover])}`;
+  if (c.problem || c.goal) h += `<section class="nb" data-ix="The brief"><div class="l"><span class="mono">${eb()}</span><h2>The brief</h2></div><div class="r">${c.problem ? `<p>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="go">${esc(c.goal)}</p>` : ''}</div></section>`;
+  if (b.intro && b.intro !== b.logo) h += pics(b.intro.media);
+  if (b.logo) h += brief(b.logo, eb()) + pics(b.logo.media.length ? b.logo.media : [b.logoM]);
+  // colour: the screen floods with each colour in turn
+  if (b.pal.length >= 2) { const P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'];
+    h += `<section class="nb" data-ix="Colour"><div class="l"><span class="mono">${eb()}</span><h2>Colour</h2></div><div class="r"><p>${esc(b.colour ? (b.colour.p || [])[0] || '' : 'The palette, one colour at a time.')}</p></div></section>
+      <section class="cdial covers" id="ncol" style="height:${P.length * 80 + 100}vh"><div class="cpin"><div class="cfill" id="ncfill"></div><div class="cinfo"><span class="mono" id="ncfq"></span><b id="ncnm"></b><span class="mono" id="nchex"></span></div>
+      <div class="cstations">${P.map((p, k) => `<span class="mono">${FQ[k]} · ${esc(p.name)}</span>`).join('')}</div></div></section>`; }
+  // type: the name steps through its weights
+  { const T = b.type[0], fam = T.fam, VAR = { 'Bricolage Grotesque': [200, 800], 'Epilogue': [100, 900], 'Geist': [100, 900], 'Serif': [200, 900] }, [w0, w1] = VAR[fam] || [400, 400];
+    const WS = [[200, 'Extralight'], [300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold'], [800, 'Extrabold']].filter(w => w[0] >= w0 && w[0] <= w1);
+    // the stations follow whichever face has weights to step through (a single-weight serif hands the job to the secondary face)
+    const BW = (b.type[1] || T).wr, WS2 = [[100, 'Thin'], [200, 'Extralight'], [300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold'], [800, 'Extrabold'], [900, 'Black']].filter(w => w[0] >= BW[0] && w[0] <= BW[1] && w[0] >= 200 && w[0] <= 800);
+    const drv2 = WS.length < 2 && WS2.length >= 2, ws = WS.length >= 2 ? WS : drv2 ? WS2 : [[400, 'Regular']];
+    // Weights is the default; Tester and Pairing are the options a case can pick (a "typeView" field in the CMS). The lab's buttons preview them.
+    const TV = [['weights', 'Weights'], ['tester', 'Tester'], ['pairing', 'Pairing']];
+    let tv = window.KM_LAB ? get('cl-ntype', c.typeView || 'weights') : (c.typeView || 'weights'); if (!TV.some(x => x[0] === tv)) tv = 'weights';
+    h += `<section class="nb" data-ix="Type"><div class="l"><span class="mono">${eb()}</span><h2>Type</h2></div><div class="r"><dl class="tfaces">${b.type.map(t => `<div><dt class="mono">${t.role}</dt><dd><b style="font-family:${t.css}">${esc(t.fam)}</b>${t.use ? ` · ${esc(t.use.toLowerCase())}` : ''}${t.stand ? ' · stand-in' : ''}</dd></div>`).join('')}</dl>
+      ${!window.KM_LAB ? '' : `<div class="tsw" role="group" aria-label="Type idea (set per case in the CMS)">${TV.map(([k, n]) => `<button type="button" data-tv="${k}" aria-pressed="${k === tv}">${n}${k === 'weights' ? ' · default' : ''}</button>`).join('')}</div>`}</div></section>`;
+    const B = (b.type[1] || T), word = esc(c.title), line = esc((c.statement || c.lede).replace(/\.$/, ''));
+    if (tv === 'weights') h += `<section class="tdial covers" id="ntyp" data-ws='${JSON.stringify(ws)}' data-fam="${esc(fam)}" data-f2="${esc(B.fam)}" data-w2='${JSON.stringify(B.wr)}' data-drv="${drv2 ? 2 : 1}"  style="height:${ws.length * 60 + 100}vh"><div class="tpin"><span class="mono tdl" id="ntdl"></span><span class="tbig" id="ntdw" style="font-family:${T.css}">${word}</span><span class="tsub" id="ntds" style="font-family:${B.css}">${esc(c.lede)}</span><span class="mono tdl2" id="ntdl2"></span>
+      <div class="tdst">${ws.map(w => `<span class="mono">${w[0]} · ${w[1]}</span>`).join('')}</div><div class="truler"><canvas id="ntdc"></canvas></div></div></section>`;
+    // glyphs: every character on one grid; the one you point at (or tap) fills the big frame
+    else if (tv === 'glyphs') { const G = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&@?!'];
+      h += `<section class="tglyph covers" style="font-family:${T.css}"><div class="tgbig"><span class="mono" id="tgname">${esc(fam)} · A · U+0041</span><div class="tgf">${b.type.map((t, i) => `<button type="button" data-css="${t.css}" data-fam="${esc(t.fam)}" aria-pressed="${!i}">${t.role}</button>`).join('')}</div><b id="tgch">A</b></div>
+        <div class="tggrid" id="tgg">${G.map(g => `<button type="button" data-g="${esc(g)}"${g === 'A' ? ' class="on"' : ''}>${esc(g)}</button>`).join('')}</div></section>`; }
+    // scale: one line set at every size of the system, largest first
+    else if (tv === 'scale') { const SZ = [['Display', 120], ['H1', 72], ['H2', 48], ['H3', 32], ['Body L', 20], ['Body', 16], ['Caption', 13]];
+      h += `<section class="tscale covers">${SZ.map(([n, px], i) => `<div class="tsr"><span class="mono">${n} · ${px}<br>${esc((i < 4 ? T : B).fam)}</span><span style="font-family:${(i < 4 ? T : B).css};font-size:min(${px}px, ${(px / 12).toFixed(2)}vw + ${Math.min(px, 16)}px);font-weight:${i < 4 ? Math.min(w1, 600) : 400};line-height:${i < 4 ? 1 : 1.5};letter-spacing:${i < 4 ? '-.03em' : '0'}">${i < 4 ? line : esc(c.lede)}</span></div>`).join('')}</section>`; }
+    // tester: type anything in the brand's face, pick a weight and a size
+    else if (tv === 'tester') h += `<section class="ttest covers"><div class="ttbar"><div class="ttf">${b.type.map((t, i) => `<button type="button" data-css="${t.css}" aria-pressed="${!i}">${t.role} · ${esc(t.fam)}</button>`).join('')}</div><div class="ttw">${ws.map(w => `<button type="button" data-w="${w[0]}"${w[0] === (ws.find(x => x[0] === 600) || ws[ws.length - 1])[0] ? ' aria-pressed="true"' : ' aria-pressed="false"'}>${w[1]}</button>`).join('')}</div>
+      <div class="tts">${[['S', 6], ['M', 10], ['L', 15]].map(([n, v]) => `<button type="button" data-s="${v}" aria-pressed="${n === 'M'}">${n}</button>`).join('')}</div></div>
+      <div class="ttin" id="ttin" contenteditable="true" spellcheck="false" style="font-family:${T.css};font-weight:${(ws.find(x => x[0] === 600) || ws[ws.length - 1])[0]};font-size:10vw">${word}</div><span class="mono tth">Click the words and type</span></section>`;
+    // pairing: the two faces doing their jobs together, like a page of the brand's own
+    else if (tv === 'pairing') h += `<section class="tpair covers"><div class="tpc"><span class="mono">Primary · ${esc(T.fam)}${T.use ? ' · ' + esc(T.use) : ''}</span><h3 style="font-family:${T.css};font-weight:${Math.min(w1, 700)}">${line}.</h3></div>
+      <div class="tpc"><span class="mono">Secondary · ${esc(B.fam)}${B.use ? ' · ' + esc(B.use) : ''}${B.stand ? ' · stand-in' : ''}</span><p style="font-family:${B.css}">${esc(c.lede)}${b.intro && b.intro.p && !b.intro.p[0].startsWith(c.lede.slice(0, 30)) ? ' ' + esc(b.intro.p[0]) : ''}</p>
+      <p class="tpm" style="font-family:${B.css}">${esc(c.client)} · ${esc(c.role)}</p></div></section>`;
+    if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
+      <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
+  if (b.pers) h += pics(b.pers.media);   // personality and mockups speak through their pictures: no text
+  // the closing four pictures sit as a two-by-two grid of equal frames
+  const mockAll = b.mock ? uniq(b.mock.media).filter(m => !used.has(key(m))) : [];
+  let rest = spare.filter(m => !used.has(key(m)) && !mockAll.some(x => key(x) === key(m)));
+  const need = Math.max(0, 4 - Math.min(4, rest.length)), tail = [...mockAll.slice(Math.max(0, mockAll.length - need)), ...rest].slice(0, 2);   // the closing pair (the last two of the four are off)
+  const mockKeep = mockAll.filter(m => !tail.some(x => key(x) === key(m)));
+  if (b.mock) h += pics(mockKeep);
+  if (tail.length) { tail.forEach(m => used.add(key(m))); h += `<div class="nf covers"><div class="g4">${tail.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div></div>`; }
+  return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
+};
+// wire the pinned sections once the page is drawn
+const nOff = [];
+function setupN() {
+  nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
+  const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
+  const col = $$('ncol');
+  if (col) { const b = brandOf(prep(CASES.find(x => x.slug === C))), P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'];
+    const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), cols = P.map(p => rgb(p.hex)), st = [...col.querySelectorAll('.cstations span')]; let cur = -1;
+    NT.push(() => { const q = nprog(col, P.length), i = Math.min(P.length - 2, Math.floor(q)), t = q - i, cc = cols[i].map((v, k) => v + (cols[i + 1][k] - v) * t);
+      $$('ncfill').style.background = `rgb(${cc.map(Math.round).join(' ')})`; const lum = (cc[0] * 299 + cc[1] * 587 + cc[2] * 114) / 1000; col.style.color = lum > 150 ? '#0e0e10' : '#fff';
+      const k = Math.round(q); if (k !== cur) { if (cur >= 0) snd('detent'); cur = k; $$('ncfq').textContent = FQ[k] + ' FM · ' + pad(k + 1); $$('ncnm').textContent = P[k].name; $$('nchex').textContent = P[k].hex.toUpperCase() + ' · RGB ' + cols[k].join(' '); st.forEach((s, j) => s.classList.toggle('on', j === k)); }
+      });
+    // one scroll = one colour: while the colour screen is up, each wheel notch or trackpad swipe moves to the next (or previous) colour.
+    // A swipe's trailing momentum counts as the same swipe; past the first or last colour, the page scrolls on as normal.
+    const n = P.length, posOf = k => col.getBoundingClientRect().top + scrollY + (col.offsetHeight - innerHeight) * k / (n - 1);
+    let last = 0, busy = false, at = 0;
+    const engaged = () => { const r = col.getBoundingClientRect(); return r.top <= 2 && r.bottom >= innerHeight - 2; };
+    const go = k => { at = k; busy = true; scrollTo({ top: posOf(k), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); clearTimeout(go.t); go.t = setTimeout(() => busy = false, 650); };
+    const onWheel = e => {
+      if (!engaged() || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+      const now = performance.now(), same = now - last < 220; last = now;
+      if (same || busy) { e.preventDefault(); return; }            // still the same swipe, or still moving: hold
+      const k = Math.round(nprog(col, n)), t = k + (e.deltaY > 0 ? 1 : -1);
+      if (t < 0 || t > n - 1) return;                               // the ends let the page carry on
+      e.preventDefault(); go(t);
+    };
+    // phones: one swipe = one colour too
+    let ty0 = null;
+    const onTS = e => { ty0 = engaged() ? e.touches[0].clientY : null; };
+    const onTM = e => { if (ty0 !== null && engaged()) e.preventDefault(); };
+    const onTE = e => { if (ty0 === null) return; const dy = ty0 - e.changedTouches[0].clientY; ty0 = null; if (Math.abs(dy) < 30) return;
+      const k = Math.round(nprog(col, n)), t = k + (dy > 0 ? 1 : -1); if (t < 0 || t > n - 1) { scrollBy({ top: dy > 0 ? innerHeight * .6 : -innerHeight * .6, behavior: 'smooth' }); return; } go(t); };
+    addEventListener('wheel', onWheel, { passive: false }); col.addEventListener('touchstart', onTS, { passive: true }); col.addEventListener('touchmove', onTM, { passive: false }); col.addEventListener('touchend', onTE);
+    nOff.push(() => removeEventListener('wheel', onWheel)); }
+  const ty = $$('ntyp');
+  if (ty) { const WS = JSON.parse(ty.dataset.ws), fam = ty.dataset.fam, st = [...ty.querySelectorAll('.tdst span')]; let cur = -1;
+    NT.push(() => { const q = WS.length > 1 ? nprog(ty, WS.length) : 0, i = Math.min(Math.max(0, WS.length - 2), Math.floor(q)), t = q - i, w = WS.length > 1 ? WS[i][0] + (WS[i + 1][0] - WS[i][0]) * t : WS[0][0];
+      const drv2 = ty.dataset.drv === '2';
+      if (drv2) { $$('ntds').style.fontWeight = Math.round(w); $$('ntdl2').textContent = `Secondary · ${ty.dataset.f2} · ${Math.round(w)}`; }
+      else { $$('ntdw').style.fontWeight = Math.round(w); const W2 = JSON.parse(ty.dataset.w2), f = WS.length > 1 ? q / (WS.length - 1) : 0, w2 = Math.round(Math.max(300, W2[0]) + (Math.min(700, W2[1]) - Math.max(300, W2[0])) * f); $$('ntds').style.fontWeight = W2[0] === W2[1] ? W2[0] : w2; $$('ntdl2').textContent = `Secondary · ${ty.dataset.f2} · ${W2[0] === W2[1] ? W2[0] : w2}`; }
+      const k = Math.round(q); if (k !== cur) { if (cur >= 0) snd('detent'); cur = k; $$('ntdl').textContent = drv2 ? `Primary · ${fam} · Regular 400` : `Primary · ${fam} · ${WS[k][1]} ${WS[k][0]}`; st.forEach((s, j) => s.classList.toggle('on', j === k)); }
+      nruler($$('ntdc'), q, WS.length, inkC()); }); }
+  document.querySelectorAll('.tsw [data-tv]').forEach(x => x.addEventListener('click', () => { if (x.getAttribute('aria-pressed') === 'true') return; snd('pop'); put('cl-ntype', x.dataset.tv); const y = scrollY; paint(true); scrollTo(0, y); }));
+  const tg = $$('tgg');
+  if (tg) { const fam = brandOf(prep(CASES.find(x => x.slug === C))).type[0].fam, pick = x => { tg.querySelectorAll('.on').forEach(o => o.classList.remove('on')); x.classList.add('on'); const g = x.dataset.g;
+      $$('tgch').textContent = g; $$('tgname').textContent = `${tg.closest('.tglyph').dataset.fam || fam} · ${g} · U+${g.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`; };
+    tg.querySelectorAll('button').forEach(x => { x.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pick(x); }); x.addEventListener('click', () => { snd('detent'); pick(x); }); }); }
+  document.querySelectorAll('.tgf button').forEach(x => x.addEventListener('click', () => { snd('pop'); const sec = x.closest('.tglyph'); sec.style.fontFamily = x.dataset.css; sec.dataset.fam = x.dataset.fam;
+    document.querySelectorAll('.tgf button').forEach(y => y.setAttribute('aria-pressed', String(y === x))); const on = document.querySelector('#tgg .on'), g = on ? on.dataset.g : 'A';
+    $$('tgname').textContent = `${x.dataset.fam} · ${g} · U+${g.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`; }));
+  const tin = $$('ttin');
+  document.querySelectorAll('.ttf button').forEach(x => x.addEventListener('click', () => { snd('pop'); if (tin) tin.style.fontFamily = x.dataset.css; document.querySelectorAll('.ttf button').forEach(y => y.setAttribute('aria-pressed', String(y === x))); }));
+  if (tin) { document.querySelectorAll('.ttw button').forEach(x => x.addEventListener('click', () => { snd('pop'); tin.style.fontWeight = x.dataset.w; document.querySelectorAll('.ttw button').forEach(y => y.setAttribute('aria-pressed', String(y === x))); }));
+    document.querySelectorAll('.tts button').forEach(x => x.addEventListener('click', () => { snd('pop'); tin.style.fontSize = x.dataset.s + 'vw'; document.querySelectorAll('.tts button').forEach(y => y.setAttribute('aria-pressed', String(y === x))); })); }
+  const r1 = $$('ntk1'), r2 = $$('ntk2');
+  if (r1) { let x = 0, lastY = scrollY, v = 0;
+    NT.push(dt => { const dy = scrollY - lastY; lastY = scrollY; v += (Math.abs(dy) * .9 - v) * .1; x += (.6 + v) * dt / 16;
+      const w = r1.scrollWidth / 4, w2 = r2.scrollWidth / 3; r1.style.transform = `translate3d(${(-(x % w)).toFixed(1)}px,0,0)`; r2.style.transform = `translate3d(${(-w2 + (x * .6 % w2)).toFixed(1)}px,0,0)`; }); }
+}
+LAYOUTS.splice(LAYOUTS.findIndex(x => x[0] === 'I'), 0, ['N', 'Showcase', 'Pictures nearly edge to edge with a short brief between them; colour floods the screen and the type steps through its weights as you scroll.', 'brand']);
+
+// brand: Showcase and Specimen only for now (Guidelines, Mosaic, Contact sheet and Broken grid are parked)
+for (let i = LAYOUTS.length - 1; i >= 0; i--) if (['I', 'J', 'L', 'M'].includes(LAYOUTS[i][0])) LAYOUTS.splice(i, 1);
+const app = document.getElementById('app');
+const get = (k, d) => { try { return localStorage.getItem(k) || d; } catch (_) { return d; } }, put = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
+// this page draws one kind of case study: Story for product (case.html), Showcase for brand (brand.html)
+const L = window.KM_L, GRP = L === 'N' ? 'brand' : 'product', PAGE = GRP === 'brand' ? 'brand.html' : 'case.html', OTHER = GRP === 'brand' ? 'case.html' : 'brand.html';
+const casesOf = g => CASES.filter(c => (g === 'brand') === (c.kind === 'Brand'));
+const slugNow = () => decodeURIComponent(location.hash.slice(1)).split('/')[0];
+let C = '';
+// ---------- the Story index (a vertical ruler with the chapters) ----------
+let ixOff = null;
+function setupIndex() {
+  if (ixOff) { ixOff(); ixOff = null; }
+  document.querySelectorAll('.ix').forEach(x => x.remove());
+  const secs = [...app.querySelectorAll('[data-ix]')]; if ((L !== 'H' && L !== 'N') || !secs.length) return;
+  const ix = document.createElement('nav'); ix.className = 'ix'; ix.setAttribute('aria-label', 'Contents');
+  ix.innerHTML = `<div class="tr"><div class="tk"></div><i class="nd"></i><ol>${secs.map((s, i) => `<li><button type="button" data-k="${i}">${esc(s.dataset.ix)}</button></li>`).join('')}</ol></div>`;
+  document.body.append(ix);
+  const tk = ix.querySelector('.tk'), nd = ix.querySelector('.nd'), bs = [...ix.querySelectorAll('li button')], ROW = 40, STEP = 8;
+  const n = secs.length, H = n * ROW, ticks = [];
+  for (let y = 4; y <= H - 4; y += STEP) { const e = document.createElement('i'); e.style.top = y + 'px'; tk.append(e); ticks.push({ e, y, major: (y - ROW / 2) % ROW === 0 }); }
+  // chapter k's long tick sits level with its name
+  const major = y => Math.abs(((y - ROW / 2) % ROW + ROW) % ROW) < .5;
+  ticks.forEach(t => t.major = major(t.y));
+  bs.forEach((b, i) => b.addEventListener('click', () => { const y = secs[i].getBoundingClientRect().top + scrollY - 96; scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }));
+  let cur = -1, ny = ROW / 2, target = ROW / 2, raf = 0;
+  const read = () => {
+    const line = innerHeight * .35, tops = secs.map(s => s.getBoundingClientRect().top);
+    let k = 0; for (let i = 0; i < n; i++) if (tops[i] <= line) k = i;
+    // between two chapters the needle travels in step with the reading, so it never jumps
+    const a = tops[k], b = k + 1 < n ? tops[k + 1] : a + 1, f = tops[0] > line ? 0 : Math.max(0, Math.min(1, (line - a) / Math.max(1, b - a)));
+    target = (k + (k + 1 < n ? f : 0)) * ROW + ROW / 2;
+    if (k !== cur) { cur = k; bs.forEach((x, i) => { x.classList.toggle('on', i === k); if (i === k) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); }); }
+    // it steps aside before the footer reaches it, so the two never overlap
+    const nx = app.querySelector('.next'), ir = ix.getBoundingClientRect();
+    ix.classList.toggle('on', scrollY > innerHeight * .5 && (!nx || nx.getBoundingClientRect().top > ir.bottom + 48));
+    const under = [...app.querySelectorAll('.H .rows, .covers')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
+    ix.classList.toggle('dim', under);
+    if (!raf) raf = requestAnimationFrame(draw);
+  };
+  let lastTk = null;
+  const draw = () => { raf = 0; ny += (target - ny) * .2; if (Math.abs(target - ny) < .2) ny = target; else raf = requestAnimationFrame(draw);
+    nd.style.top = ny.toFixed(1) + 'px';
+    const tkI = Math.round((ny - 4) / STEP); if (lastTk !== null && tkI !== lastTk && ix.classList.contains('on') && !ix.classList.contains('dim')) snd('detent'); lastTk = tkI;   // one soft tick for every mark the needle passes
+    ticks.forEach(t => { const d = (t.y - ny) / 34, bump = Math.exp(-d * d);
+      t.e.style.width = ((t.major ? 16 : 7) + bump * 8).toFixed(1) + 'px'; t.e.style.opacity = ((t.major ? .5 : .16) + bump * .4).toFixed(3); }); };
+  addEventListener('scroll', read, { passive: true }); addEventListener('resize', read);
+  ixOff = () => { removeEventListener('scroll', read); removeEventListener('resize', read); cancelAnimationFrame(raf); };
+  read(); ny = target; draw();
+}
+function paint(keep) {
+  const raw = CASES.find(x => x.slug === C), c = prep(raw);
+  document.title = c.title + ' · ' + (GRP === 'brand' ? 'Brand' : 'Product') + ' case study · Kingsley';
+  app.innerHTML = R[L](c);
+  app.querySelectorAll('.m').forEach(f => { const el = f.querySelector('img, video'); if (!el) return;
+    const ok = () => f.classList.add('ok');
+    if (el.tagName === 'IMG') { if (el.complete && el.naturalWidth) ok(); else { el.addEventListener('load', ok); el.addEventListener('error', ok); } }
+    else { if (el.readyState >= 2) ok(); else { el.addEventListener('loadeddata', ok); el.addEventListener('error', ok); } } });
+  // next case: same page, new case (with the tuning transition when it is there)
+  app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
+    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug }); else { location.hash = n.slug; } }));
+  app.querySelectorAll('a.back').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: 100, name: 'Designs', href: 'designs.html' }); else location.href = 'designs.html'; }));
+  if (!keep) scrollTo(0, 0);
+  setupIndex(); setupN(); setupPlay();
+}
+// each picture's real shape, read before drawing, so rows line up the first time (a picture that is slow keeps a wide shape)
+function shapes(c) {
+  const urls = new Set(); const add = x => { if (!x) return; if (typeof x === 'string') urls.add(x); else if (x.video && x.poster) urls.add(x.poster); };
+  [c.cover, ...(c.run || []), ...(c.sections || []).flatMap(s => s.media || [])].forEach(add);
+  return Promise.all([...urls].filter(u => !RATIO[u]).map(u => new Promise(res => { const im = new Image(), t = setTimeout(res, 4000);
+    im.onload = () => { if (im.naturalWidth) RATIO[u] = +(im.naturalWidth / im.naturalHeight).toFixed(3); clearTimeout(t); res(); }; im.onerror = () => { clearTimeout(t); res(); }; im.src = u; })));
+}
+function show() {
+  const h = slugNow(), any = CASES.find(x => x.slug === h);
+  if (any && !casesOf(GRP).includes(any)) { location.replace(OTHER + '#' + h); return; }   // a brand case asked for on the product page, or the other way round
+  C = any ? h : casesOf(GRP)[0].slug;
+  const c = CASES.find(x => x.slug === C);
+  app.classList.add('wait'); shapes(c).then(() => { paint(); app.classList.remove('wait'); });
+}
+addEventListener('hashchange', show);
+show();
+</script>
+</body>
+</html>

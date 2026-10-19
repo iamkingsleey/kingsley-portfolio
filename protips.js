@@ -50,11 +50,10 @@
   .pt-q { position: fixed; z-index: 150; top: calc(48px + env(safe-area-inset-top, 0px)); right: calc(max(64px, env(safe-area-inset-right, 0px)) + 88px); width: 36px; height: 36px; border-radius: 50%; border: 0;
     background: var(--pill, #f2f2f2); color: var(--ink, #111); font: 600 14px Geist, system-ui, sans-serif; cursor: pointer }
   @media (max-width: 899px) {
-    .pt-pill { top: auto; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px) }
-    .pt-cue { bottom: calc(96px + env(safe-area-inset-bottom, 0px)) }
-    .pt-rec { left: 16px; top: auto; bottom: calc(150px + env(safe-area-inset-bottom, 0px)) }
-    .pt-rec.inflow { position: relative; left: auto; bottom: auto; top: auto; margin-top: 16px; z-index: 2 }
-    .pt-card { left: 16px; top: auto; bottom: calc(194px + env(safe-area-inset-bottom, 0px)); max-height: calc(100vh - 220px); overflow: auto }
+    .pt-pill { top: auto; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px) }
+    .pt-cue { bottom: calc(22px + env(safe-area-inset-bottom, 0px)) }
+    .pt-rec { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)); bottom: auto }   /* top left, where the version switch was */
+    .pt-card { left: 16px; top: calc(64px + env(safe-area-inset-top, 0px)); bottom: auto; max-height: calc(100dvh - 88px); overflow: auto }
     .pt-q { display: none }
   }`;
   document.head.append(st);
@@ -69,7 +68,7 @@
     let tt = [];
     hide = () => { pill.classList.remove('on'); tt.forEach(clearTimeout); tt = []; const h = btns.find(b => b.textContent.trim() === 'Home'); if (nd && h) nd.style.left = h.style.left; };
     // phones: a hint never covers the page; on a short screen where it would sit on the links, it stays out
-    const clash = el => { if (innerWidth >= 900) return false; const r = el.getBoundingClientRect(); return [...document.querySelectorAll('.socials, .pt-rec.inflow, .links')].some(x => { const q = x.getBoundingClientRect(); return q.height && r.top < q.bottom + 8 && r.bottom > q.top - 8 && r.left < q.right && r.right > q.left; }); };
+    const clash = el => { if (innerWidth >= 900) return false; const r = el.getBoundingClientRect(); return [...document.querySelectorAll('.socials, .links, .vsw')].some(x => { const q = x.getBoundingClientRect(); return q.height && r.top < q.bottom + 8 && r.bottom > q.top - 8 && r.left < q.right && r.right > q.left; }); };
     const show = () => {
       hide(); if (clash(pill)) { set('km-tip'); return; } pill.classList.add('on'); set('km-tip');
       if (nd && !reduce) btns.forEach((b, k) => tt.push(setTimeout(() => { nd.style.left = b.style.left; }, 350 + k * 260)));
@@ -120,9 +119,6 @@
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
     document.body.append(rec, card);
-    /* phones: the button joins the page right under the social links, so it can never sit on top of them on a short screen */
-    const soc = document.querySelector('.socials');
-    if (soc && matchMedia('(max-width: 899px)').matches) { soc.after(rec); rec.classList.add('inflow'); }
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();

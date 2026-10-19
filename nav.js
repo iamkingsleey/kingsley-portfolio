@@ -52,7 +52,36 @@
   .kmn-top { display: none }
   @media (max-width: 900px) { .kmn-top { display: block; position: fixed; left: 0; right: 0; top: 0; height: calc(var(--kmn-top, 72px) + env(safe-area-inset-top, 0px)); z-index: 15; pointer-events: none;
     background: linear-gradient(var(--bg, #fff) 45%, color-mix(in srgb, var(--bg, #fff) 55%, transparent) 75%, transparent);
-    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent) } }`;
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent) } }
+  /* phones: a menu button at the top right instead of the scale; it opens the stations as a full-screen list */
+  .kmn-mb, .kmn-menu { display: none }
+  @media (max-width: 900px) {
+    .kmn-scale, .kmn-band, #menuBtn, #menu { display: none !important }
+    .kmn-mb { display: grid; place-items: center; position: fixed; z-index: 160; top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%;
+      background: var(--pill, rgb(127 127 127 / .12)); color: var(--ink, #111); cursor: pointer; -webkit-tap-highlight-color: transparent }
+    .kmn-mb i { position: absolute; left: 12px; width: 16px; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .32s cubic-bezier(.65,0,.35,1), opacity .2s, width .32s cubic-bezier(.65,0,.35,1) }
+    .kmn-mb i:nth-child(1) { top: 14.5px } .kmn-mb i:nth-child(2) { top: 19.25px; width: 10px } .kmn-mb i:nth-child(3) { top: 24px }
+    html.kmn-open .kmn-mb i:nth-child(1) { transform: translateY(4.75px) rotate(45deg) }
+    html.kmn-open .kmn-mb i:nth-child(2) { opacity: 0; width: 0 }
+    html.kmn-open .kmn-mb i:nth-child(3) { transform: translateY(-4.75px) rotate(-45deg) }
+    .kmn-menu { display: flex; flex-direction: column; justify-content: flex-end; position: fixed; inset: 0; z-index: 158; background: var(--bg, #fff); color: var(--ink, #111);
+      padding: calc(88px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+      opacity: 0; visibility: hidden; transition: opacity .28s, visibility 0s .28s }
+    html.kmn-open .kmn-menu { opacity: 1; visibility: visible; transition: opacity .22s }
+    html.kmn-open, html.kmn-open body { overflow: hidden }
+    .kmn-menu .lb { font: 500 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888); margin-bottom: 8px }
+    .kmn-menu ul { list-style: none; margin: 0; padding: 0 }
+    .kmn-menu button { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 16px 0 16px 0; border: 0; border-bottom: 1px solid var(--line, rgb(127 127 127 / .16)); background: none;
+      font: 600 34px/1.05 Geist, system-ui, sans-serif; letter-spacing: -1px; color: var(--muted, #999); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      opacity: 0; transform: translateY(14px); transition: color .2s, opacity .3s, transform .45s cubic-bezier(.2,.8,.2,1) }
+    html.kmn-open .kmn-menu button { opacity: 1; transform: none }
+    .kmn-menu button.on { color: var(--ink, #111); padding-left: 16px }
+    .kmn-menu button.on::before { content: ''; position: absolute; left: 0; top: 50%; width: 2px; height: 30px; margin-top: -15px; border-radius: 1px; background: ${RED} }
+    .kmn-menu button:active { color: var(--ink, #111) }
+    .kmn-menu small { font: 400 13px "Geist Mono", ui-monospace, monospace; letter-spacing: 0; color: var(--muted, #888); font-variant-numeric: tabular-nums }
+    html.kmn-open .shuf, html.kmn-open .pt-rec, html.kmn-open .pt-card, html.kmn-open .vsw { visibility: hidden }
+    @media (prefers-reduced-motion: reduce) { .kmn-menu, .kmn-menu button, .kmn-mb i { transition: none } }
+  }`;
   const start = () => {
     const st = document.createElement('style'); st.textContent = css; document.head.append(st);
     document.documentElement.classList.add('kmn');
@@ -80,6 +109,20 @@
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
     S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.append(band, S);
+    // phones: the menu button and its list of stations
+    const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'kmn-mb'; mb.setAttribute('aria-label', 'Open menu'); mb.setAttribute('aria-expanded', 'false'); mb.innerHTML = '<i></i><i></i><i></i>';
+    const M = document.createElement('nav'); M.className = 'kmn-menu'; M.setAttribute('aria-label', 'Stations'); M.id = 'kmnMenu'; mb.setAttribute('aria-controls', 'kmnMenu');
+    M.innerHTML = '<span class="lb">Stations</span><ul>' + STATIONS.map((s, i) => `<li><button type="button" data-i="${i}"${s === cur ? ' class="on" aria-current="page"' : ''}>${s.name}<small>${s.fq.toFixed(1)} FM</small></button></li>`).join('') + '</ul>';
+    const mbs = [...M.querySelectorAll('button')];
+    const menu = o => { document.documentElement.classList.toggle('kmn-open', o); mb.setAttribute('aria-expanded', String(o)); mb.setAttribute('aria-label', o ? 'Close menu' : 'Open menu');
+      mbs.forEach((b, k) => b.style.transitionDelay = o ? (60 + k * 45) + 'ms' : '0ms'); M.inert = !o; };
+    M.inert = true;
+    mb.addEventListener('click', () => { const o = !document.documentElement.classList.contains('kmn-open'); snd(o ? 'open' : 'close'); menu(o); if (o) (mbs.find(b => b.classList.contains('on')) || mbs[0]).focus({ preventScroll: true }); });
+    mbs.forEach(b => b.addEventListener('click', () => { const s = STATIONS[+b.dataset.i]; snd('pop');
+      if (s === cur && !PARENT[file]) { menu(false); return; } leaving = true; go(s); setTimeout(() => menu(false), 600); }));
+    addEventListener('keydown', e => { if (e.key === 'Escape' && document.documentElement.classList.contains('kmn-open')) { menu(false); mb.focus(); } });
+    addEventListener('pageshow', e => { if (e.persisted) menu(false); });
+    document.body.append(M, mb);
     if (file !== 'index.html') { const top = document.createElement('div'); top.className = 'kmn-top'; top.setAttribute('aria-hidden', 'true'); document.body.append(top); }
     // a page that opens on a dark hero whatever the theme (About's signal) keeps it clear of the page-colour fade until it scrolls past
     const hero = document.querySelector('.sig');
@@ -120,6 +163,7 @@
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let last = -1, settle = 0;
     const frame = t => {
+      if (!S.getClientRects().length) { requestAnimationFrame(frame); return; }   // phones: the scale is hidden behind the menu button
       const sr = S.getBoundingClientRect(), nr = nd.getBoundingClientRect(), tr = tk.getBoundingClientRect();
       const n = nr.left + nr.width / 2 - tr.left;                 // the needle, in the ticks' own space
       const moving = Math.abs(n - last) > .2; last = n;

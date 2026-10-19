@@ -256,7 +256,7 @@ canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(10
 .shuf.on { color: var(--ink) }
 .shuf svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
 body.open .shuf { opacity: 0; pointer-events: none }
-@media (max-width: 899px) { .shuf { top: calc(12px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: 40px; height: 40px } }
+@media (max-width: 900px) { .shuf { top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(max(16px, env(safe-area-inset-right, 0px)) + 48px); width: 40px; height: 40px } }   /* left of the menu button */
 .allbtn { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--pill); font-size: 13px; font-weight: 500; color: var(--ink); transition: background .2s, color .2s }
 .allbtn svg { width: 12px; height: 12px; fill: currentColor }
 .allbtn:hover { background: var(--hover) }
@@ -2125,8 +2125,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   if (document.fonts) document.fonts.ready.then(drawStrip);
 })();
 </script>
-<script src="nav.js?v=9d43209a" defer></script>
+<script src="nav.js?v=73bf2373" defer></script>
 <script src="kit.js?v=c6befc20" defer></script>
-<script src="protips.js?v=b3a5114d" defer></script>
+<script src="protips.js?v=ebf00887" defer></script>
 </body>
 </html>

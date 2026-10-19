@@ -23,7 +23,9 @@
   .vsw a { padding: 5px 10px; border-radius: 999px; color: var(--muted, #888); text-decoration: none; transition: color .2s, background .2s }
   .vsw a:hover { color: var(--ink, #111) }
   .vsw a.on { background: var(--bg, #fff); color: var(--ink, #111) }
-  @media (max-width: 899px) { .vsw { left: 16px; bottom: auto; top: calc(20px + env(safe-area-inset-top, 0px)) } }`;
+  @media (max-width: 900px) { .vsw { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); top: auto }   /* phones: bottom left; the menu sits top right */
+    .mode-bottom .theme-btn, .mode-bottom .sound-btn { top: calc(20px + env(safe-area-inset-top, 0px)) !important }
+    .mode-bottom .theme-btn { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 50px) !important } .mode-bottom .sound-btn { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 90px) !important } }`;
   document.head.append(st);
   // version switch, bottom left: this site is v4; v3 is the previous build, kept in iteration-3/
   const vs = document.createElement('nav'); vs.className = 'vsw'; vs.setAttribute('aria-label', 'Site version');

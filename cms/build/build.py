@@ -383,7 +383,7 @@ open(f'{REPO}/project.html', 'w', encoding='utf-8').write(t)
 exec(open(f'{KFM}/tools/build_layouts.py').read())
 exec(open(f'{KFM}/tools/gen_pages.py').read())   # about, engineering and projects, from content/*.json
 exec(open(f'{KFM}/tools/build_about.py').read())
-exec(open(f'{KFM}/tools/build_case.py').read())
+exec(open(f'{KFM}/tools/build_cases2.py').read())   # case.html (Story) and brand.html (Showcase); the older pages' builder is tools/build_case.py
 # ================================================================ shop.html (102.0): packs and templates for sale, from content/shop.json
 # (only once it's switched on in content/site.json, "shop": true; until then no page and no station in the nav)
 _shop_on = bool(json.load(open(f'{REPO}/content/site.json', encoding='utf-8')).get('shop')) and os.path.exists(f'{KFM}/shop-src.html') and os.path.exists(f'{REPO}/content/shop.json')
