@@ -118,12 +118,7 @@
       ],
       "price": 0,
       "images": [
-        "assets/shop/linecraft-cover.jpg",
-        "assets/shop/linecraft-01.jpg",
-        "assets/shop/linecraft-02.jpg",
-        "assets/shop/linecraft-03.jpg",
-        "assets/shop/linecraft-04.jpg",
-        "assets/shop/linecraft-05.jpg"
+        "assets/shop/linecraft-cover.jpg"
       ],
       "color": "#111111",
       "link": "https://www.figma.com/community/plugin/1666142410490475207/linecraft",
