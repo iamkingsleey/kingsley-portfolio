@@ -1637,7 +1637,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const first = reduce ? null : new Map(ovTiles.map(o => [o.t, o.t.getBoundingClientRect()]));
     const deck = [...ovGrid.children];
     for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
-    deck.forEach(t => ovGrid.appendChild(t)); ov.scrollTop = 0;
+    const keep = ov.scrollTop; deck.forEach(t => ovGrid.appendChild(t)); ov.scrollTop = keep;   // the deal happens where you are: no jump to the top
     air();
     if (first) deck.forEach(t => { if (t.hidden) return; const a = first.get(t), z = t.getBoundingClientRect(), dx = a.left - z.left, dy = a.top - z.top;
       if ((dx || dy) && Math.abs(dy) < innerHeight * 2.5) t.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }); });
