@@ -497,7 +497,6 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   function setFilter(name) {
     if (filt === name) return; filt = name;
     chipAll.classList.toggle('on', !name); chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === name));
-    if (window.KM && KM.say) { const n = name ? items.filter(x => x.cat === name).length : items.length; KM.say(name ? chipEls[CATS.findIndex(c => c.name === name)] : chipAll, name ? `${n} ${name} piece${n === 1 ? '' : 's'}` : `All ${n} pieces`); }
     const ovEl = document.getElementById('ov'); if (!ovEl) return;
     ovEl.classList.add('refilt');
     setTimeout(() => {
@@ -1681,7 +1680,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         const base = rects[k][1] - o.cy;
         o.cy = base < -60 || base > vh + 60 ? 0 : f(base) - base;
         o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
-        o.c.style.opacity = fade(base).toFixed(3);
+        const capY = base + o.cy, clearY = (vw < 900 ? 64 : 104) + 40;   // captions that ride up under the filter row fade out there, like the pictures do
+        o.c.style.opacity = (fade(base) * Math.min(1, Math.max(0, (capY - clearY) / 70))).toFixed(3);
         if (r.bottom < -M || r.top > vh + M) continue;
         const it = items[o.i], full = texImg(mdOf(still(it))), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
         const sw = src.naturalWidth, sh = src.naturalHeight;
@@ -1789,6 +1789,20 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     if (pi >= 0) setTimeout(() => { const t = ov.querySelector(`.ov-t[data-i="${pi}"]`); if (!t) return; if (t.hidden) { leaveRole(); }
       t.scrollIntoView({ block: 'center' }); setTimeout(() => openDetail(pi, undefined, undefined, t.querySelector('.ov-im').getBoundingClientRect()), 120); }, 700); }
   // a tile in the All view opens the piece in the small view, or the page the CMS points it to
+  // keyboard: the arrow keys move from piece to piece in any direction (↑ ↓ by row), Enter opens it; ↓ with nothing picked starts at the first piece
+  ov.addEventListener('keydown', e => {
+    const t = e.target.closest && e.target.closest('.ov-t'); if (!t || !/^Arrow/.test(e.key) || e.metaKey || e.ctrlKey || e.altKey) return;
+    const vis = [...ovGrid.children].filter(x => !x.hidden), k = vis.indexOf(t); if (k < 0) return;
+    const top0 = vis[0].offsetTop, cols = Math.max(1, vis.filter(x => x.offsetTop === top0).length);
+    const j = e.key === 'ArrowRight' ? k + 1 : e.key === 'ArrowLeft' ? k - 1 : e.key === 'ArrowDown' ? k + cols : k - cols;
+    e.preventDefault(); if (j < 0 || j >= vis.length) return;
+    tap(); vis[j].focus({ preventScroll: true }); vis[j].scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  });
+  addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown' || e.metaKey || e.ctrlKey || e.altKey || openIdx >= 0 || (document.activeElement && document.activeElement !== document.body)) return;
+    const first = [...ovGrid.children].find(x => !x.hidden); if (!first) return;
+    e.preventDefault(); first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  });
   ov.addEventListener('click', e => {
     const t = e.target.closest('.ov-t'); if (!t) return;
     const i = +t.dataset.i;

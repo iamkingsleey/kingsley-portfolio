@@ -384,5 +384,15 @@ exec(open(f'{KFM}/tools/build_layouts.py').read())
 exec(open(f'{KFM}/tools/gen_pages.py').read())   # about, engineering and projects, from content/*.json
 exec(open(f'{KFM}/tools/build_about.py').read())
 exec(open(f'{KFM}/tools/build_case.py').read())
+# ================================================================ shop.html (102.0): packs and templates for sale, from content/shop.json
+# (only once it's switched on in content/site.json, "shop": true; until then no page and no station in the nav)
+_shop_on = bool(json.load(open(f'{REPO}/content/site.json', encoding='utf-8')).get('shop')) and os.path.exists(f'{KFM}/shop-src.html') and os.path.exists(f'{REPO}/content/shop.json')
+if _shop_on:
+  _sh_src = open(f'{KFM}/shop-src.html', encoding='utf-8').read()
+  _shop = json.load(open(f'{REPO}/content/shop.json', encoding='utf-8'))
+  _sh_src = rep(_sh_src, '<meta charset="utf-8">\n', '<meta charset="utf-8">\n' + THEME_BOOT + TUNER)
+  _sh_src = rep(_sh_src, '__SHOP__', json.dumps(_shop, ensure_ascii=False))
+  _sh_src = rep(_sh_src, '<script>\n(function () {', '<script src="popkit.js"></script>\n' + CLICK + '<script>\n(function () {')
+  open(f'{REPO}/shop.html', 'w', encoding='utf-8').write(_sh_src)
 exec(open(f'{KFM}/tools/post.py').read())   # your text and picture changes, analytics, and the list the CMS edits
 print('ok', len(s), len(d))

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true};</script>
+<script>window.KM_SITE = {"available": true, "shop": false};</script>
 
 <meta charset="utf-8">
 <script>
@@ -102,6 +102,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .bcard .role { margin-top: 14px; color: var(--ink); font-size: 16px }
 .bcard p { margin: 14px 0 0; font-size: 16px; line-height: 1.6; max-width: 52ch }
 .bcard .stats { display: flex; gap: 40px; flex-wrap: wrap }
+.bcard .ext { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; height: 40px; padding: 0 16px; border-radius: 999px; background: var(--pill, rgb(127 127 127 / .12)); color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; transition: background .18s }
+.bcard .ext:hover { background: var(--pill-hover, rgb(127 127 127 / .2)) }
+.bcard .ext i { font-style: normal; transition: transform .3s var(--ease) }
+.bcard .ext:hover i { transform: translate(2px, -2px) }
 .bcard .stat { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line) }
 .bcard .stat b { color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em }
 
@@ -390,10 +394,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191417#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191450#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
-<script src="nav.js?v=a13b3d33" defer></script>
+<script src="nav.js?v=f697093f" defer></script>
 <script src="kit.js?v=2373d5e6" defer></script>
 <script src="protips.js?v=dd09d87a" defer></script>
 </body>

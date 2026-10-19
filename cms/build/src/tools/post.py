@@ -3,7 +3,7 @@
 #  2. applies your edits from content/text.json and content/media.json
 #  3. adds analytics (content/site.json) and the navigation (nav.js) to every page
 import json, re, os, html as _html
-PAGES = ['index.html', 'about.html', 'engineering.html', 'projects.html', 'designs.html', 'case.html', 'brand.html',
+PAGES = ['index.html', 'shop.html', 'about.html', 'engineering.html', 'projects.html', 'designs.html', 'case.html', 'brand.html',
          'logo.html', 'product.html', 'project.html', 'showcase.html']
 def _load(name, d):
     try: return json.load(open(f'{REPO}/content/{name}', encoding='utf-8'))
@@ -109,7 +109,7 @@ _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
 _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
 open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
 _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
-SITEJS = '<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False}) + ';</script>\n'   # settings the pages read (CMS → Settings)
+SITEJS = '<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop'))}) + ';</script>\n'   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
 FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
   'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'

@@ -8,9 +8,10 @@
     { fq: 98.0, name: 'Home', href: 'index.html' },
     { fq: 100.0, name: 'Designs', href: 'designs.html' },
     { fq: 96.0, name: 'Engineering', href: 'engineering.html' },
-    { fq: 94.0, name: 'About', href: 'about.html' }
+    { fq: 94.0, name: 'About', href: 'about.html' },
+    { fq: 102.0, name: 'Shop', href: 'shop.html', gate: 'shop' }   // shown once the shop is switched on (content/site.json "shop": true)
     // { fq: 102.0, name: 'Projects', href: 'projects.html' },   // Projects is off for now: remove the // to bring it back
-  ];
+  ].filter(s => !s.gate || (window.KM_SITE || {})[s.gate]);
   const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   // pages that live under a station: a case study under Projects, a design's own page under Designs
   const PARENT = { 'case.html': 'Designs', 'brand.html': 'Designs',   // case studies sit under Designs while Projects is off
@@ -34,7 +35,7 @@
   .kmn-scale button { position: absolute; top: 34px; transform: translateX(-50%); padding: 4px 10px; border: 0; border-radius: 999px; background: none; color: var(--muted, #888); font: 500 13.5px Geist, system-ui, sans-serif; cursor: pointer; white-space: nowrap; transition: color .25s, background .25s }
   .kmn-scale button:hover, .kmn-scale button.pv { color: var(--ink, #111) }
   .kmn-scale button.on { color: var(--ink, #111) }   /* the red tick above is the only highlight */
-  .kmn-scale button:focus-visible { outline: 2px solid ${RED}; outline-offset: 2px }
+  .kmn-scale button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px }   /* red is kept for the tick */
   @media (max-width: 900px) { .kmn-scale { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: calc(100vw - 24px) } }
   @media (max-width: 699px) { .kmn-scale { -webkit-mask-image: none; mask-image: none } .kmn-scale button { font-size: 12.5px; padding: 4px 7px } }`;
   const start = () => {
@@ -52,7 +53,8 @@
       b.addEventListener('click', () => { snd('pop');   // one pop, right on the click (the page's own click sound is the same pop, so they merge into one)
         if (s !== cur) { leaving = true; place(i); go(s); } else go(s); });
       const look = () => bs.forEach(x => x.classList.toggle('pv', x === b));
-      b.addEventListener('pointerenter', e => { look(); if (e.pointerType === 'mouse') snd('detent'); });   // a tap on a phone is just the pop b.addEventListener('focus', look);
+      b.addEventListener('pointerenter', e => { look(); if (e.pointerType === 'mouse') snd('detent'); });   /* a tap on a phone is just the pop */
+      b.addEventListener('focus', look);
       T.append(b); return b;
     });
     // the scale stays still with every station across it; the red tick goes straight to the one you pick, in one smooth move
@@ -64,6 +66,16 @@
     const nd = document.createElement('i'); nd.className = 'nd';
     S.append(T, nd); document.body.append(S);
     nd.style.transition = 'none'; back(); nd.offsetWidth; nd.style.transition = '';   // on arrival it is already in place
+    // keyboard: ← and → tune to the neighbouring station, exactly like clicking it (the needle moves, then the page changes).
+    // Left alone whenever the arrows mean something else: typing, an open piece, sheet, menu or card, or a control that uses them itself.
+    addEventListener('keydown', e => {
+      if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || leaving) return;
+      const a = document.activeElement;
+      if (a && a !== document.body && !a.closest('.kmn-scale') && (a.matches('input, textarea, select, [contenteditable], [role="slider"], [role="listbox"], [role="option"], [tabindex]:not(button):not(a)') || a.closest('.ov, .rolepick, .pt-card, [role="dialog"]'))) return;
+      if (document.querySelector('body.open, .sheet.open, .lb.on, .pt-card.on, .rolepick.open, .tuner')) return;
+      const j = ci + (e.key === 'ArrowRight' ? 1 : -1); if (j < 0 || j >= STATIONS.length) return;
+      e.preventDefault(); bs[j].click();
+    });
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();
