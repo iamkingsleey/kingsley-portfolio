@@ -40,10 +40,10 @@ for _r in _ch:
 _s = _s[:_i] + '  const CH = [   // [frequency, where, role, what, stat, stat label, years, second stat, its label]\n' + ',\n'.join('    ' + json.dumps(r, ensure_ascii=False) for r in _ch) + '\n  ];' + _s[_j:]
 open(f'{GEN}/about-src.html', 'w', encoding='utf-8').write(_s)
 
-# Engineering: the things I've built
+# Engineering: the things I've built (a tool's link rides at 9 and its button text at 10)
 _en = _rows('engineering')
 make('96.0', 'Engineering', _en['statement'], _en['title'], _en['sub'], _en['tag'],
-     [[t.get(k, '') for k in ['fq', 'name', 'type', 'what', 'stat', 'statLabel', 'tech']] for t in _en['tools'] if not t.get('hidden')], f'{GEN}/engineering-src.html')
+     [[t.get(k, '') for k in ['fq', 'name', 'type', 'what', 'stat', 'statLabel', 'tech']] + ([ '', '', t['link'], t.get('linkLabel') or 'Open'] if t.get('link') else []) for t in _en['tools'] if not t.get('hidden')], f'{GEN}/engineering-src.html')
 
 # Projects: the case studies
 CASES_ = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden')]

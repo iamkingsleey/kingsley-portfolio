@@ -102,6 +102,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .bcard .role { margin-top: 14px; color: var(--ink); font-size: 16px }
 .bcard p { margin: 14px 0 0; font-size: 16px; line-height: 1.6; max-width: 52ch }
 .bcard .stats { display: flex; gap: 40px; flex-wrap: wrap }
+.bcard .ext { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; height: 40px; padding: 0 16px; border-radius: 999px; background: var(--pill, rgb(127 127 127 / .12)); color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; transition: background .18s }
+.bcard .ext:hover { background: var(--pill-hover, rgb(127 127 127 / .2)) }
+.bcard .ext i { font-style: normal; transition: transform .3s var(--ease) }
+.bcard .ext:hover i { transform: translate(2px, -2px) }
 .bcard .stat { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line) }
 .bcard .stat b { color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em }
 
@@ -261,15 +265,15 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
   const CH = [
-    ['88.1', 'LineCraft', 'Figma plugin', 'Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.', '200+', 'users', 'TypeScript · Figma API'],
-    ['91.4', 'MeshCraft', 'Figma plugin', '3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.', '130+', 'users', 'TypeScript · Figma API'],
-    ['94.7', 'Recorder Studio', 'Playwright tool', 'Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.', '', '', 'Node · Playwright'],
+    ['88.1', 'LineCraft', 'Figma plugin', 'Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.', '200+', 'users', 'TypeScript · Figma API', '', '', 'https://www.figma.com/community/plugin/1666142410490475207/linecraft', 'Get it on Figma'],
+    ['91.4', 'MeshCraft', 'Figma plugin', '3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.', '130+', 'users', 'TypeScript · Figma API', '', '', 'https://www.figma.com/community/plugin/1668399347356779904/meshcraft', 'Get it on Figma'],
+    ['94.7', 'Protoreel', 'Playwright tool', 'Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.', '', '', 'Node · Playwright', '', '', 'https://github.com/iamkingsleey/protoreel', 'View on GitHub'],
     ['98.0', 'Popkit', 'Sound in code', 'The UI sounds on this site, made with Web Audio instead of files: a pop on every tap and a detent as the dial turns.', '0', 'audio files', 'JavaScript · Web Audio'],
     ['101.3', 'This portfolio', 'Design engineering', 'A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.', '', '', 'HTML · CSS · JavaScript']
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
   band.style.height = (CH.length * 56 + 40) + 'vh';
-  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM${c[6] ? ' · ' + c[6] : ''}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}</div>`).join('');
+  bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM${c[6] ? ' · ' + c[6] : ''}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}${c[9] ? `<a class="ext" href="${c[9]}" target="_blank" rel="noopener">${c[10] || 'Open'}<i>↗</i></a>` : ''}</div>`).join('');
   const chs = [...bcard.children]; let bcur = -1, bsp = 0;
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
   brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);

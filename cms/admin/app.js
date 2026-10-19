@@ -280,7 +280,7 @@
     { k: 'hidden', label: 'Hide', type: 'bool' } ] };
   const TOOL = { type: 'object', fields: [
     { k: 'name', label: 'Name' }, { k: 'type', label: 'Kind', ph: 'Figma plugin' }, { k: 'fq', label: 'Station', ph: '88.1' }, { k: 'tech', label: 'Made with', ph: 'TypeScript · Figma API' },
-    { k: 'what', label: 'What it does', type: 'textarea' }, { k: 's', type: 'tuple', label: 'Number (optional)', fields: [{ label: 'Number' }, { label: 'Label' }] }, { k: 'hidden', label: 'Hide', type: 'bool' } ] };
+    { k: 'what', label: 'What it does', type: 'textarea' }, { k: 's', type: 'tuple', label: 'Number (optional)', fields: [{ label: 'Number' }, { label: 'Label' }] }, { k: 'link', label: 'Link (optional)', ph: 'https://www.figma.com/community/plugin/…' }, { k: 'linkLabel', label: 'Link button text', ph: 'Get it on Figma' }, { k: 'hidden', label: 'Hide', type: 'bool' } ] };
   const PAGEINTRO = [{ title: 'Page', fields: [{ k: 'statement', label: 'Statement', type: 'textarea', rows: 3 }, { k: 'title', label: 'List heading' }, { k: 'sub', label: 'Under the heading' }, { k: 'tag', label: 'Small tag on the right' }] }];
 
   // stored shapes ↔ friendlier shapes for the forms (put back on save)
