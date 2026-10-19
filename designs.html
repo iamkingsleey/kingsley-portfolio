@@ -1728,6 +1728,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     }
   }
   if (!ogl) ov2d = ovc.getContext('2d');      // no WebGL: show the grid flat
+  const FLAT = true;   // the bulge is off: plain, sharp pictures in a straight grid (set to false to bring the drum back)
+  if (FLAT) { ogl = null; ov2d = null; ovc.style.display = 'none'; ov.classList.add('flat'); }
   // only redraw the grid when something on it changed (scroll, size, filter, theme, a picture arriving), plus a
   // short settle after each change for the tiles' own fade-in; when nothing moves, the page does no work at all
   let ovKey = '', ovSettle = 0;
@@ -1763,7 +1765,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         o.c.style.transform = `translateY(${o.cy.toFixed(1)}px)`;
         const capY = base + o.cy, clearY = (vw < 900 ? 64 : 104) + 40;   // captions that ride up under the filter row fade out there, like the pictures do
         o.c.style.opacity = (fade(base) * Math.min(1, Math.max(0, (capY - clearY) / 70))).toFixed(3);
-        if (r.bottom < -M || r.top > vh + M) continue;
+        if (r.bottom < -M || r.top > vh + M || FLAT) continue;
         const it = items[o.i], full = texImg(mdOf(still(it))), tb = thumbFor(still(it)), src = full.naturalWidth || !tb ? full : tb;
         const sw = src.naturalWidth, sh = src.naturalHeight;
         if (sw && okDraw(src)) {
