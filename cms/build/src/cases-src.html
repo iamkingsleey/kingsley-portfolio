@@ -219,6 +219,15 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .tx .pull { font: 600 clamp(30px, 3.6vw, 48px)/1.08 var(--body); letter-spacing: -.04em; color: var(--ink) }
 .H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
 .H .sp { height: 120px }
+.H .bign { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line) }
+.H .bign > div { padding: 40px 32px 44px 0; border-bottom: 1px solid var(--line) } .H .bign > div:nth-child(even) { padding-left: 32px; border-left: 1px solid var(--line) }
+.H .bign b { display: block; font: 600 clamp(64px, 9vw, 152px)/.86 var(--body); letter-spacing: -.065em; color: var(--ink); font-variant-numeric: tabular-nums }
+.H .bign span { display: block; margin-top: 16px; max-width: 30ch; font-size: 17px; line-height: 1.5; color: var(--text) }
+.H .bign.l b { font-size: clamp(30px, 3.4vw, 52px); line-height: 1.02; letter-spacing: -.04em; margin-top: 12px }
+.H .bign.l i { font-style: normal }
+.H .bign + .cap2 { margin-top: 14px }
+@media (max-width: 640px) { .H .bign { grid-template-columns: 1fr } .H .bign > div, .H .bign > div:nth-child(even) { padding: 28px 0 32px; border-left: 0 } }
+
 @media (max-width: 640px) { .H .lede { font-size: 18px } .H .ch { padding-top: 88px } .H .cred { grid-template-columns: 1fr 1fr } }
 
 /* the index: a vertical ruler beside the chapters, like the one on About. One long tick per chapter with its name; the red
@@ -456,6 +465,27 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 @media (max-width: 899px) { .N .nhr, .N .nb { grid-template-columns: 1fr } .N .nb { padding: 72px var(--ne) 56px } .N .cstations, .N .tdst { display: none } .N .tdl { top: 72px } }
 
 #app { transition: opacity .35s } #app.wait { opacity: 0 }
+.cnav { position: fixed; z-index: 40; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 22px; pointer-events: none }
+.cnav > * { pointer-events: auto }
+.dback { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: var(--pill); color: var(--ink); font: 500 13px var(--body); text-decoration: none; transition: background .2s }
+.dback:hover { background: color-mix(in srgb, var(--ink) 12%, var(--bg)) }
+.dback svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.2,.8,.2,1) }
+.dback:hover svg { transform: translateX(-2px) }
+.cnav .now { display: flex; align-items: baseline; gap: 9px; color: var(--ink) }
+.cnav .fq { font: 500 26px/1 var(--body); letter-spacing: -1px; font-variant-numeric: tabular-nums; min-width: 2.2ch }
+.cnav .nm { font-size: 13px; font-weight: 500; white-space: nowrap }
+.cnav .bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px }
+.cnav .bars i { width: 2.5px; border-radius: 1px; background: var(--ink) } .cnav .bars i:nth-child(1) { height: 4px } .cnav .bars i:nth-child(2) { height: 7px } .cnav .bars i:nth-child(3) { height: 11px }
+/* the frosted band behind it, so the page scrolls cleanly underneath */
+.cnav::before { content: ''; position: fixed; z-index: -1; left: 0; right: 0; top: 0; height: calc(150px + env(safe-area-inset-top, 0px)); pointer-events: none;
+  background: linear-gradient(var(--bg) 62%, transparent); }
+.H .hd { padding-top: 176px !important } .N .nh { padding-top: 176px !important } .K .gr { padding-top: 176px }
+@media (max-width: 900px) {
+  .cnav { left: 16px; top: calc(18px + env(safe-area-inset-top, 0px)); gap: 14px; right: 72px }
+  .cnav .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0 } .cnav .now { min-width: 0 } .cnav .fq { font-size: 22px }
+  .cnav::before { height: calc(84px + env(safe-area-inset-top, 0px)) }
+  .H .hd { padding-top: 104px !important } .N .nh { padding-top: 96px !important } .K .gr { padding-top: 104px } }
+
 .top { position: relative; z-index: 31 }   /* above the nav's frosted band, so the way back to Designs stays readable */
 @media (max-width: 900px) { .top .mono { display: none } }
 /* the lab's switch: layout, case, theme */
@@ -549,7 +579,10 @@ function prep(c) {
 }
 const nextOf = c => { const list = CASES.filter(x => x.kind === c.kind), i = list.findIndex(x => x.slug === c.slug); return list[(i + 1) % list.length]; };
 const NEXT = c => { const n = nextOf(c); return `<button class="next" type="button" data-go="${esc(n.slug)}"><span class="mono">Next case · ${esc(n.kind)}</span><span class="t">${esc(n.title)}<i>→</i></span></button>`; };
-const TOP = c => `<div class="top"><a href="designs.html" class="back">← Designs</a><span class="mono">${esc(c.fq || '')}${c.fq ? ' FM · ' : ''}${esc(c.kind)} · ${esc(c.tag)}</span></div>`;
+// the same header as a piece open on Designs: "All designs" back, the piece's number, its name and the signal bars
+const TOP = c => { const k = CASES.findIndex(x => x.slug === c.slug) + 1;
+  return `<header class="cnav"><a class="dback" href="designs.html" aria-label="Back to all designs"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>All designs</a>
+    <div class="now" aria-label="${esc(c.title)}"><span class="fq">${pad(k)}</span><span class="nm">${esc(c.title)}</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></div></header>`; };
 
 const R = {
   A(c) {
@@ -629,12 +662,23 @@ const R = {
     let fig = 0;
     // the caption sits under the pictures, starting at their left edge (the widest row decides where that is)
     const cap = (list, b, t) => `<p class="cap2"><b>${b}</b>${t}</p>`;
-    const pics = (list, label) => list.length ? `<div class="fr" style="--pmh:80vh">${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : '';
+    // every set of pictures fills the column edge to edge: a picture that would sit alone at part width gets a partner from the case's
+    // other pictures, and is left out if there is none. No picture shows twice.
+    const used = new Set(), key = m => JSON.stringify(m), spare = uniq([...(c.run || []), ...c.secs.flatMap(s => s.media)]);
+    const tidy = list => { list = uniq(list).filter(m => m && !used.has(key(m))); list.forEach(m => used.add(key(m)));
+      const rows = rowsOf(list), last = rows[rows.length - 1];
+      if (last && last.length === 1 && rOf(last[0]) < 1.45) { const ex = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45);
+        if (ex) { used.add(key(ex)); list.push(ex); } else list = list.filter(m => key(m) !== key(last[0])); }
+      return list; };
+    const pics = (list, label) => { list = tidy(list); return list.length ? `<div class="fr" style="--pmh:300vh">${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
+    // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
+    const bigNums = stats => `<div class="fr"><div class="bign">${stats.map(([a, b]) => `<div><b data-n="${esc(a)}">${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2">${esc(c.impactNote)}</p>` : ''}</div>`;
+    const bigList = list => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div></div>`;
     const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
     const tags = [...(c.industry || []), ...(c.did || []).slice(0, 2)];
     const st = c.stat && c.stat[0] ? ` <b>${esc(c.stat[0])} ${esc(c.stat[1])}</b>.` : '';
-    let h = `<div class="top"><a href="designs.html" class="back">← Designs</a><span class="mono">Product design case study</span></div><main class="H"><header class="tx hd"><h1>${nl(c.headline)}</h1><p class="lede">${esc(c.lede)}${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
-      <div class="fr" style="--pmh:84vh">${ROWS([c.cover], 'c', cap([c.cover], esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>`;
+    let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1>${nl(c.headline)}</h1><p class="lede">${esc(c.lede)}${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
+      ${(() => { const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh">${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // the backstory: the problem, the goal and my part in it, before any screens
     h += `<section class="tx ch" data-ix="The brief"><span class="eb">The brief</span><h2>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map(p => `<p>${esc(p)}</p>`).join('')}
       ${c.problem ? `<h4>The problem</h4><p>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch">${esc(c.goal)}</p>` : ''}
@@ -642,14 +686,15 @@ const R = {
     c.secs.forEach((s, i) => {
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
-        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}<ul class="res">${s.stats.map(([a, b]) => `<li><b>${esc(a)}</b>${esc(b)}</li>`).join('')}</ul>${c.impactNote ? `<p class="cap2" style="margin-top:14px">${esc(c.impactNote)}</p>` : ''}</section>${pics(media, s.h)}`;
+        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</section>${bigNums(s.stats)}${pics(media, s.h)}`;
         return;
       }
+      if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · Results</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</section>${bigList(s.list)}${pics(media, s.h)}`; return; }
       const lead = s.list ? `<div class="lead">${s.list.map(([a, b]) => `<div><b>${esc(a)}.</b> ${esc(b)}</div>`).join('')}</div>` : '';
       h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}${lead}</section>${pics(media, s.h)}`;
       if (i === 2 && c.statement) h += `<section class="tx ch"><span class="eb">Design principle</span><p class="pull" style="margin-top:12px">${esc(c.statement)}</p></section>`;
     });
-    if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2><ul class="res">${c.impact.list.map(([a, b]) => `<li><b>${esc(a)}.</b>${esc(b)}</li>`).join('')}</ul></section>`;
+    if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list)}`;
     h += `<section class="tx ch" data-ix="Project details"><span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section><div class="sp"></div>`;
     return h + `${NEXT(c)}</main>`;
   },
@@ -1023,10 +1068,21 @@ function paint(keep) {
   // next case: same page, new case (with the tuning transition when it is there)
   app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
     if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug }); else { location.hash = n.slug; } }));
-  app.querySelectorAll('a.back').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
+  app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
     if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: 100, name: 'Designs', href: 'designs.html' }); else location.href = 'designs.html'; }));
   if (!keep) scrollTo(0, 0);
-  setupIndex(); setupN(); setupPlay();
+  setupIndex(); setupN(); setupPlay(); countUp();
+}
+function countUp() {
+  const els = [...app.querySelectorAll('.bign b[data-n]')]; if (!els.length || !('IntersectionObserver' in window)) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target);
+    const el = e.target, m = el.dataset.n.match(/^([^\d]*)([\d,.]+)(.*)$/); if (!m || reduce) return;
+    const end = parseFloat(m[2].replace(/,/g, '')), dec = (m[2].split('.')[1] || '').length, comma = m[2].includes(','), t0 = performance.now(), D = 1400;
+    const f = now => { const k = Math.min(1, (now - t0) / D), v = end * (1 - Math.pow(1 - k, 3)); let n = v.toFixed(dec); if (comma) n = Number(n).toLocaleString('en-US', { minimumFractionDigits: dec });
+      el.textContent = m[1] + n + m[3]; if (k < 1) requestAnimationFrame(f); else el.textContent = el.dataset.n; };
+    requestAnimationFrame(f); }), { threshold: .4 });
+  els.forEach(el => io.observe(el));
 }
 // each picture's real shape, read before drawing, so rows line up the first time (a picture that is slow keeps a wide shape)
 function shapes(c) {
