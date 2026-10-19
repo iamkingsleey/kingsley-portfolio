@@ -33,12 +33,11 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--gut); padding-right: var(--gut) }
 
-/* chrome: the readout top left, the theme switch top right (the nav is added by nav.js) */
+/* chrome: the readout top left (the nav is added by nav.js; the theme is switched on Home) */
 .station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 12px; color: var(--ink) }
 .station .fq { font-size: 28px; letter-spacing: -.5px; font-variant-numeric: tabular-nums }
 .station .nm { font-size: 13px; font-weight: 500 }
-.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
-@media (max-width: 899px) { .station { top: max(18px, env(safe-area-inset-top, 0px)) } .station .fq { font-size: 22px } .theme { top: max(18px, env(safe-area-inset-top, 0px)) } }
+@media (max-width: 899px) { .station { top: max(18px, env(safe-area-inset-top, 0px)) } .station .fq { font-size: 22px } }
 
 /* ---------- top ---------- */
 .hero { padding-top: 168px; padding-bottom: 40px }
@@ -238,7 +237,6 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 </head>
 <body>
 <div class="station" data-readout><span class="fq">102.0</span><span class="nm">Shop</span></div>
-<button class="theme" type="button" id="theme">Dark</button>
 
 <main class="wrap">
   <section class="hero">
@@ -516,9 +514,6 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
   const h = location.hash.slice(1), hi = P.findIndex(p => p.id === h);
   if (hi >= 0) setTimeout(() => open(shown.indexOf(P[hi]), null), 60);
 
-  // theme switch, as on the other pages
-  const tb = $('theme'), setT = () => { tb.textContent = document.documentElement.dataset.theme === 'dark' ? 'Light' : 'Dark'; };
-  setT(); tb.addEventListener('click', () => { const d = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; try { localStorage.setItem('km-theme', d ? 'dark' : 'light'); } catch (_) {} setT(); snd('pop'); });
 })();
 </script>
 </body>
