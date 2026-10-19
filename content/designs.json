@@ -486,8 +486,7 @@
       "images": [
         {
           "src": "assets/designs/time-out-headliner.jpg",
-          "ratio": 0.8,
-          "video": "assets/designs/videos/time-out-01.mp4"
+          "ratio": 0.8
         }
       ],
       "bg": "#494142",
@@ -501,8 +500,7 @@
       "images": [
         {
           "src": "assets/designs/time-out-line-up.jpg",
-          "ratio": 0.8,
-          "video": "assets/designs/videos/time-out-02.mp4"
+          "ratio": 0.8
         }
       ],
       "bg": "#151515",
@@ -516,8 +514,7 @@
       "images": [
         {
           "src": "assets/designs/time-out-tickets.jpg",
-          "ratio": 0.8,
-          "video": "assets/designs/videos/time-out-03.mp4"
+          "ratio": 0.8
         }
       ],
       "bg": "#b22232",
