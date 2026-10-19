@@ -455,6 +455,45 @@
       "desc": "A character portrait: round glasses, a bow and a bright puffer jacket."
     },
     {
+      "title": "Tennis, from above",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-aerial.jpg",
+          "ratio": 1.333
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Tennis balls and a racket on a blue court, seen from above."
+    },
+    {
+      "title": "Star trophy",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/star-trophy.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A gold star trophy on a white plinth, its shadow thrown on the wall."
+    },
+    {
+      "title": "Vault and piggy bank",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/vault-and-piggy-bank.jpg",
+          "ratio": 1.333
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "An open vault, a blue piggy bank and a debit card sliding out of the floor."
+    },
+    {
       "title": "Stitched, figure of eight",
       "category": "poster",
       "images": [
@@ -905,6 +944,38 @@
       "tools": "Figma",
       "mix": true,
       "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, thank you",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-thank-you.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The thank-you post for OSCAFest’25, with the festival’s sponsors.",
+      "mix": true,
+      "client": "OSCA",
+      "tools": "Figma"
+    },
+    {
+      "title": "OSCAFest’25, my OSCA experience",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-experience.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A “My OSCA experience” post for attendees to share, in the Beyond Borders style.",
+      "mix": true,
+      "client": "OSCA",
+      "tools": "Figma"
     }
   ]
 }

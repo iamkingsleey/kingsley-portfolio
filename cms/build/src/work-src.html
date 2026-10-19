@@ -294,6 +294,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @media (hover: hover) and (pointer: fine) { .ov-t:hover .ov-im { transform: scale(1.015); box-shadow: 0 12px 31px rgb(0 0 0 / .22) } }
 .ov-t:active .ov-im { transform: scale(.97) }
 .ov-t:not(.ok) .ov-im { opacity: 0 }
+.ov.fx-tilt .ov-t { perspective: 900px }
 .ov-t.m-in .ov-im { animation: flyin var(--fd, 1.8s) cubic-bezier(.16, 1, .3, 1) var(--fdl, 0s) both }
 @keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(1.5) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
 @media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
@@ -1649,37 +1650,59 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) o.t.style.setProperty('--r', items[o.i].r); i.src = u; });
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); });
   addEventListener('resize', () => requestAnimationFrame(mSpans));
-  // ---------- the ripple: moving the pointer drops rings into the grid; each ring travels outward and the pieces
-  // rise and settle as its wave passes, like a stone dropped in water ----------
-  const WAVE = { on: false, amp: 14, speed: 900, wave: 260, width: 230, life: .75, every: 70, max: 6 };
-  if (WAVE.on && !reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    const rings = []; let raf = 0, lx = -9999, ly = -9999;
+  // ---------- pointer effects on the grid. One is picked with PFX (or "km-fx" while comparing); 'none' turns them off.
+  //   ripple: moving drops rings that travel outward, pieces rise and settle as each passes
+  //   tilt:   pieces turn in 3D to face the pointer, strongest near it
+  //   depth:  every piece floats at its own depth and drifts against the pointer, like layers of glass
+  //   magnet: pieces near the pointer lean in toward it
+  //   lens:   pieces near the pointer swell and push away, like a magnifier gliding over
+  //   spot:   a soft spotlight follows the pointer; pieces away from it dim
+  const PFX = (() => { try { return window.KM_FX || localStorage.getItem('km-fx') || 'none'; } catch (_) { return window.KM_FX || 'none'; } })();
+  const WAVE = { amp: 14, speed: 900, wave: 260, width: 230, life: .75, every: 70, max: 6 };
+  if (PFX !== 'none' && !reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    ov.classList.add('fx-' + PFX);
+    const st = ovTiles.map((o, k) => ({ x: 0, y: 0, s: 1, rx: 0, ry: 0, b: 1, d: .25 + ((k * 7919) % 100) / 133 }));
+    const rings = []; let raf = 0, mx = -9999, my = -9999, inside = false, lx = -9999, ly = -9999, last = 0, cx0 = innerWidth / 2, cy0 = innerHeight / 2;
     const tick = now => {
-      raf = 0; const g = ovGrid.getBoundingClientRect();
+      raf = 0; const g = ovGrid.getBoundingClientRect(); let moving = false;
       for (let k = rings.length - 1; k >= 0; k--) if ((now - rings[k].t) / 1000 > WAVE.life * 4) rings.splice(k, 1);
-      ovTiles.forEach(o => {
-        const t = o.t; let dx = 0, dy = 0, lift = 0;
-        if (rings.length && !t.hidden) {
-          const cx = g.left + t.offsetLeft + t.offsetWidth / 2, cy = g.top + t.offsetTop + t.offsetHeight / 2;
-          if (cy > -400 && cy < innerHeight + 400) rings.forEach(r => {
-            const age = (now - r.t) / 1000, ex = cx - r.x, ey = cy - r.y, d = Math.hypot(ex, ey) || 1, off = d - age * WAVE.speed;
-            const h = WAVE.amp * r.k * Math.exp(-age / WAVE.life) * Math.exp(-((off / WAVE.width) ** 2)) * Math.sin(2 * Math.PI * off / WAVE.wave);
-            dx += ex / d * h; dy += ey / d * h; lift += h;
-          });
+      ovTiles.forEach((o, k) => {
+        const t = o.t, c = st[k], im = o.im; let tx = 0, ty = 0, ts = 1, rx = 0, ry = 0, tb = 1;
+        const cx = g.left + t.offsetLeft + t.offsetWidth / 2, cy = g.top + t.offsetTop + t.offsetHeight / 2;
+        const near = !t.hidden && cy > -400 && cy < innerHeight + 400;
+        if (near) {
+          const ex = cx - mx, ey = cy - my, d = Math.hypot(ex, ey) || 1;
+          if (PFX === 'ripple') rings.forEach(r => { const age = (now - r.t) / 1000, ax = cx - r.x, ay = cy - r.y, dd = Math.hypot(ax, ay) || 1, off = dd - age * WAVE.speed;
+            const h = WAVE.amp * r.k * Math.exp(-age / WAVE.life) * Math.exp(-((off / WAVE.width) ** 2)) * Math.sin(2 * Math.PI * off / WAVE.wave); tx += ax / dd * h; ty += ay / dd * h; ts += h * .0022; });
+          else if (inside) {
+            const f = Math.exp(-(d * d) / (2 * 360 * 360));
+            if (PFX === 'tilt') { const f2 = Math.exp(-(d * d) / (2 * 520 * 520)); rx = Math.max(-1, Math.min(1, ey / 400)) * 9 * f2; ry = -Math.max(-1, Math.min(1, ex / 400)) * 9 * f2; ts = 1 + f * .02; }
+            else if (PFX === 'depth') { tx = -(mx - cx0) * .045 * c.d; ty = -(my - cy0) * .045 * c.d; }
+            else if (PFX === 'magnet') { tx = -ex / d * f * 26; ty = -ey / d * f * 26; ts = 1 + f * .03; }
+            else if (PFX === 'lens') { tx = ex / d * f * 22; ty = ey / d * f * 22; ts = 1 + f * .045; }
+            else if (PFX === 'spot') { const f3 = Math.exp(-(d * d) / (2 * 420 * 420)); tb = .38 + .62 * f3; ts = 1 + f * .012; }
+          }
         }
-        t.style.translate = rings.length ? `${dx.toFixed(2)}px ${dy.toFixed(2)}px` : '';
-        t.style.scale = rings.length ? (1 + lift * .0022).toFixed(4) : '';
+        const e = PFX === 'depth' ? .06 : PFX === 'spot' ? .1 : .12;
+        c.x += (tx - c.x) * e; c.y += (ty - c.y) * e; c.s += (ts - c.s) * e; c.rx += (rx - c.rx) * e; c.ry += (ry - c.ry) * e; c.b += (tb - c.b) * e;
+        if (Math.abs(tx - c.x) > .05 || Math.abs(ty - c.y) > .05 || Math.abs(ts - c.s) > .0004 || Math.abs(rx - c.rx) > .02 || Math.abs(ry - c.ry) > .02 || Math.abs(tb - c.b) > .002) moving = true;
+        t.style.translate = `${c.x.toFixed(2)}px ${c.y.toFixed(2)}px`; t.style.scale = c.s.toFixed(4);
+        if (PFX === 'tilt') im.style.rotate = `${c.rx.toFixed(3)} ${c.ry.toFixed(3)} 0 ${Math.hypot(c.rx, c.ry).toFixed(2)}deg`;
+        if (PFX === 'spot') im.style.filter = `brightness(${c.b.toFixed(3)})`;
       });
-      if (rings.length) raf = requestAnimationFrame(tick);
+      if (moving || rings.length) raf = requestAnimationFrame(tick);
     };
-    let last = 0;
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     ov.addEventListener('pointermove', e => {
-      const now = performance.now(), moved = Math.hypot(e.clientX - lx, e.clientY - ly);
-      if (now - last < WAVE.every || moved < 24) return;
-      last = now; lx = e.clientX; ly = e.clientY;
-      rings.push({ x: e.clientX, y: e.clientY, t: now, k: Math.min(1, moved / 120) }); if (rings.length > WAVE.max) rings.shift();
-      if (!raf) raf = requestAnimationFrame(tick);
+      mx = e.clientX; my = e.clientY; inside = true;
+      if (PFX === 'ripple') { const now = performance.now(), moved = Math.hypot(mx - lx, my - ly);
+        if (now - last < WAVE.every || moved < 24) return; last = now; lx = mx; ly = my;
+        rings.push({ x: mx, y: my, t: now, k: Math.min(1, moved / 120) }); if (rings.length > WAVE.max) rings.shift(); }
+      kick();
     }, { passive: true });
+    ov.addEventListener('pointerleave', () => { inside = false; kick(); });
+    ov.addEventListener('scroll', kick, { passive: true });
+    addEventListener('resize', () => { cx0 = innerWidth / 2; cy0 = innerHeight / 2; });
   }
   // a role shows only the work that fits it (a recruiter hiring for Brand sees Brand); the chips and the picker bring the rest back
   const ROLE_CHIP = { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
