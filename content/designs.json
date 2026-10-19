@@ -310,6 +310,175 @@
       "bg": "#ffffff",
       "dark": false,
       "desc": "A ruler picker: a value control you drag like a tape measure, with ticks that snap. Built in code."
+    },
+    {
+      "title": "Code on a laptop",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/code-on-a-laptop.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#a53e63",
+      "dark": true,
+      "desc": "A laptop running a payment script, drawn flat with a soft gradient sky behind it."
+    },
+    {
+      "title": "Star on a coin stack",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/star-on-a-coin-stack.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#a53e63",
+      "dark": true,
+      "desc": "A star award on a stack of coins, for streaks, wins and rewards."
+    },
+    {
+      "title": "Study session",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/study-session.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#a53e63",
+      "dark": true,
+      "desc": "Notes, deadlines and a GitHub invite: an illustration about learning to code."
+    },
+    {
+      "title": "Hand with a card",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/hand-with-a-card.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#fcf0c2",
+      "dark": false,
+      "desc": "A hand holding out an orange card, ready to pay."
+    },
+    {
+      "title": "Portrait with glasses",
+      "category": "illustration",
+      "images": [
+        {
+          "src": "assets/designs/portrait-with-glasses.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#781de5",
+      "dark": true,
+      "desc": "A character portrait: round glasses, a bow and a bright puffer jacket."
+    },
+    {
+      "title": "Stitched, figure of eight",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/stitched-eight.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#f4f4f4",
+      "dark": false,
+      "desc": "A single thread looped into a figure of eight, set as a type poster."
+    },
+    {
+      "title": "Reeled",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/reeled.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#d8ddd2",
+      "dark": false,
+      "desc": "A colourful reel with a black line winding through it, and a short line about straight lines learning to spin."
+    },
+    {
+      "title": "Stitched, spiral",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/stitched-spiral.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#f1f1f1",
+      "dark": false,
+      "desc": "Coloured stitches wound into a spiral: one thread, looped thousands of times."
+    },
+    {
+      "title": "Stitched, loop",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/stitched-loop.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#f4f4f4",
+      "dark": false,
+      "desc": "Round and round the same track until the lines read as one closed loop."
+    },
+    {
+      "title": "En passant",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/en-passant.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#c2b7ac",
+      "dark": false,
+      "desc": "A poster for a chess tourney: a pawn and a warped board on warm paper."
+    },
+    {
+      "title": "Web design, 1993",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/web-design-1993.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#c2b6cc",
+      "dark": false,
+      "desc": "A poster about the first web page, with a tangle of coloured lines and mixed-case type."
+    },
+    {
+      "title": "Stitched, dark",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/stitched-dark.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#151314",
+      "dark": true,
+      "desc": "A needle and thread drawing a flower of stitches on a dark dotted ground."
+    },
+    {
+      "title": "Stitched, arch",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/stitched-arch.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#dbc8c8",
+      "dark": false,
+      "desc": "Stitched lines bent into an arch above a short note on unfinished ideas."
     }
   ]
 }

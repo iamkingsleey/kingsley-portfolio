@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shop · Kingsley M.</title>
+<meta name="description" content="3D icon packs, illustration sets and website templates by Kingsley Mkpandiok.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Shop (102.0): the files Kingsley makes for his own work, packed up to sell. A tall title, one statement, filter chips,
+   then the products as cards; a card opens the product on its own sheet (gallery, what's inside, licence, buy).
+   Products come from content/shop.json (the CMS). Same white-and-ink system as the rest of the site. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --pill-hover: #e8e8e8; --panel: #f3f3f3;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --on-ink: #ffffff;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px)); --max: 1320px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --pill-hover: #262626; --panel: #141414;
+  --line: #242424; --edge: rgb(255 255 255 / .1); --on-ink: #0b0b0b; color-scheme: dark }
+@media (max-width: 899px) { :root { --gut: max(16px, env(safe-area-inset-left, 0px)) } }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html { background: var(--bg) }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden }
+img { display: block; max-width: 100% }
+button, a { font: inherit; color: inherit }
+button { background: none; border: 0; padding: 0; cursor: pointer }
+.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--gut); padding-right: var(--gut) }
+
+/* chrome: the readout top left, the theme switch top right (the nav is added by nav.js) */
+.station { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); left: var(--gut); z-index: 40; display: flex; align-items: center; gap: 12px; color: var(--ink) }
+.station .fq { font-size: 28px; letter-spacing: -.5px; font-variant-numeric: tabular-nums }
+.station .nm { font-size: 13px; font-weight: 500 }
+.theme { position: fixed; top: max(28px, env(safe-area-inset-top, 0px)); right: var(--gut); z-index: 40; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12px; font-weight: 500 }
+@media (max-width: 899px) { .station { top: max(18px, env(safe-area-inset-top, 0px)) } .station .fq { font-size: 22px } .theme { top: max(18px, env(safe-area-inset-top, 0px)) } }
+
+/* ---------- top ---------- */
+.hero { padding-top: 168px; padding-bottom: 40px }
+.hero h1 { margin: 0; color: var(--ink); font-size: clamp(72px, 12vw, 184px); line-height: .84; font-weight: 500; letter-spacing: -.065em }
+.hero p { margin: 40px 0 0; max-width: 40ch; font-size: 17px; line-height: 1.55; color: var(--text) }
+.hero .mono { display: block; margin-bottom: 18px }
+@media (max-width: 899px) { .hero { padding-top: 104px } }
+
+.bar { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line) }   /* scrolls with the page */
+@media (max-width: 899px) { .bar { flex-wrap: nowrap } .bar .btn.sm { flex: none } }
+.chips { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none }
+.chips::-webkit-scrollbar { display: none }
+.chips button { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .18s, color .18s }
+.chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
+.chips button:hover { color: var(--ink) }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+.bar .note { font-size: 12.5px; color: var(--muted) }
+@media (max-width: 699px) { .bar .note { display: none } }
+
+/* ---------- products ---------- */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 48px 16px; padding: 32px 0 0 }   /* dense: the wide template card never leaves a hole */
+@media (max-width: 1099px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 599px) { .grid { grid-template-columns: minmax(0, 1fr); gap: 36px } }
+.pc { display: grid; gap: 14px; text-align: left; min-width: 0; cursor: pointer; text-decoration: none; color: inherit }
+.pc.wide { grid-column: span 2 }
+@media (max-width: 599px) { .pc.wide { grid-column: auto } }
+.pc .im { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); outline: 1px solid var(--edge); outline-offset: -1px }
+.pc.wide .im { aspect-ratio: auto; height: 100% ; min-height: 0 }
+.pc .im img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .52s var(--ease), scale .9s var(--ease) }
+.pc.wide .im img, .pc.tpl .im img, .gal.tpl .main img { object-position: top center }
+.pc .im img + img { opacity: 0 }
+.pc:hover .im img:first-of-type { scale: 1.02 }
+.pc.swap .im img + img { opacity: 1 }
+.pc .im .gfx { position: absolute; inset: 0 }
+.tag { position: absolute; left: 12px; top: 12px; z-index: 3; height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10.5px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: 0 0 0 1px rgb(0 0 0 / .06) }
+.dots { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 3; display: flex; justify-content: center; gap: 5px; opacity: 0; transition: opacity .3s }
+.dots i { width: 5px; height: 5px; border-radius: 50%; background: #fff; opacity: .45; box-shadow: 0 0 0 1px rgb(0 0 0 / .08) }
+.dots i.on { opacity: 1 }
+.pc:hover .dots { opacity: 1 }
+.pc .meta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; align-items: baseline }
+.pc h3 { margin: 0; color: var(--ink); font-size: 19px; font-weight: 500; letter-spacing: -.02em }
+.pc .kind { grid-column: 1; font-size: 13.5px; color: var(--muted) }
+.pc .pr { grid-row: 1 / span 2; grid-column: 2; align-self: start; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 500 }
+.pc:focus-visible { outline: none } .pc:focus-visible .im { outline: 2px solid var(--ink); outline-offset: 3px }
+.pc.wide { grid-template-rows: minmax(0, 1fr) auto }
+.empty { padding: 80px 0; text-align: center; color: var(--muted) }
+
+/* drawn covers for products without pictures yet */
+.g-iso { background: var(--c, #2a3bd8); background-image:
+  repeating-linear-gradient(30deg, rgb(255 255 255 / .22) 0 1px, transparent 1px 26px), repeating-linear-gradient(150deg, rgb(255 255 255 / .22) 0 1px, transparent 1px 26px), repeating-linear-gradient(90deg, rgb(255 255 255 / .12) 0 1px, transparent 1px 45px) }
+.g-iso b, .g-plug b { position: absolute; left: 20px; bottom: 18px; color: #fff; font-size: 28px; font-weight: 500; letter-spacing: -.03em }
+.g-plug { background: #111 }
+.g-plug svg { position: absolute; inset: 12% 12% 22%; width: 76%; height: 66%; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linejoin: round; opacity: .9 }
+
+.bar-r { display: flex; align-items: center; gap: 14px }
+.btn.sm { height: 32px; padding: 0 14px; font-size: 13px }
+
+/* ---------- asset request: one question at a time ---------- */
+.req { padding: 200px 0 40px }
+.rq-shell { max-width: 760px; display: grid; gap: 56px }
+.rq-top { display: grid; gap: 20px }
+.rq-prog { margin-top: 12px }
+.rq-top h2 { margin: 0; color: var(--ink); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; font-weight: 500; letter-spacing: -.045em; text-wrap: balance }
+.rq-prog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px }
+.rq-prog i { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; position: relative }
+.rq-prog i::after { content: ""; position: absolute; inset: 0; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease) }
+.rq-prog i.on::after { transform: scaleX(1) }
+.rq { min-width: 0 }
+.st { display: none; gap: 24px } .st.on { display: grid; animation: stin .38s var(--ease) } @keyframes stin { from { opacity: 0; transform: translateY(10px) } }
+.st h3 { margin: 0; color: var(--ink); font-size: 24px; font-weight: 500; letter-spacing: -.025em }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-auto-rows: 1fr; gap: 14px }
+.tiles button { display: grid; align-content: space-between; gap: 20px; padding: 24px 24px 21px; border-radius: 22px; background: var(--panel); text-align: left; transition: background .18s, box-shadow .18s, scale .12s }
+.tiles button:hover { background: var(--pill-hover) } .tiles button:active { scale: .98 }
+.tiles button[aria-pressed="true"] { background: var(--bg); box-shadow: 0 0 0 1.5px var(--ink) }
+.tiles b { color: var(--ink); font-weight: 500 } .tiles b { display: block; line-height: 1.3 } .tiles small { color: var(--muted); font-size: 12.5px; display: block; margin-top: 2px; line-height: 1.3 }
+.tiles svg { margin: -3px 0 0 -3px; width: 28px; height: 28px; fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round }
+.fld { position: relative; display: block; border-radius: 16px; background: var(--panel); transition: background .18s, box-shadow .18s }
+.fld:hover { background: color-mix(in srgb, var(--panel) 70%, var(--pill-hover)) }
+.fld:focus-within, .fld.bad { background: var(--bg); box-shadow: 0 0 0 1.5px var(--ink) }
+.fld > span { position: absolute; left: 16px; top: 10px; font-size: 12px; color: var(--muted); pointer-events: none }
+.fld em { font-style: normal; opacity: .7 }
+.fld input, .fld textarea { display: block; width: 100%; border: 0; background: transparent; outline: none; padding: 30px 16px 12px; font: 16px/1.5 var(--body); color: var(--ink); resize: none; border-radius: 16px }
+.fld textarea { min-height: 120px }
+.fld input::placeholder, .fld textarea::placeholder { color: var(--faint) }
+.fld[hidden], .rq-top[hidden], .rq-done[hidden], .rq[hidden] { display: none }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } @media (max-width: 640px) { .two { grid-template-columns: minmax(0, 1fr) } }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -10px }
+.quick button { height: 32px; padding: 0 13px; border-radius: 999px; background: var(--pill); color: var(--muted); font-size: 13px; font-weight: 500; transition: background .18s, color .18s }
+.quick button:hover { color: var(--ink) } .quick button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+.rq-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line) }
+.rq-nav .btn { height: 48px; padding: 0 22px; font-size: 15px }
+.rq-nav .btn[disabled] { opacity: .35; pointer-events: none }
+.rq-msg { font-size: 13px; color: var(--ink) } .rq-msg:empty { display: none }
+/* the date: a filled field that pops a rounded calendar below it */
+.dp { position: relative; display: block }
+.dp > button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; border-radius: 16px; background: var(--panel); padding: 30px 14px 12px 16px; font-size: 16px; color: var(--ink); position: relative; transition: background .18s, box-shadow .18s }
+.dp > button:hover { background: color-mix(in srgb, var(--panel) 70%, var(--pill-hover)) }
+.dp > button .lb { position: absolute; left: 16px; top: 10px; font-size: 12px; color: var(--muted) }
+.dp > button .lb em { font-style: normal; opacity: .7 }
+.dp > button .dv.ph { color: var(--faint) }
+.dp > button i { width: 30px; height: 30px; margin: -14px 0 -6px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; flex: none }
+.dp > button i svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round }
+.dp.open > button { background: var(--bg); box-shadow: 0 0 0 1.5px var(--ink) }
+.pop { position: absolute; z-index: 40; left: 0; top: calc(100% + 10px); font-size: 15px; line-height: 1.4; color: var(--text);
+  background: color-mix(in srgb, var(--bg) 97%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--edge), 0 30px 70px -22px rgb(0 0 0 / .4); opacity: 0; transform: translateY(-6px) scale(.96); transform-origin: top left; pointer-events: none; transition: opacity .2s var(--ease), transform .28s var(--ease) }
+.up > .pop { top: auto; bottom: calc(100% + 10px); transform: translateY(6px) scale(.96) }
+.open > .pop { opacity: 1; transform: none; pointer-events: auto }
+.cal { width: 320px; max-width: calc(100vw - 32px); padding: 16px; border-radius: 26px }
+@media (max-width: 640px) { .dp .cal { width: 100%; max-width: none } }
+.cal-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px }
+.cal-h b { color: var(--ink); font-weight: 500; font-size: 15px } .cal-h div { display: flex; gap: 4px }
+.cal-h button { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: var(--pill); transition: background .18s }
+.cal-h button:hover { background: var(--pill-hover) } .cal-h button[disabled] { opacity: .3; pointer-events: none }
+.cal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+.cal-w, .cal-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center }
+.cal-w span { font: 500 10.5px var(--mono); color: var(--muted); padding: 6px 0 }
+.cal-d button { aspect-ratio: 1; border-radius: 50%; font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; transition: background .15s, color .15s, scale .12s }
+.cal-d button:hover, .cal-d button:focus-visible { background: var(--pill); outline: none } .cal-d button:active { scale: .92 }
+.cal-d button.out, .cal-d button[disabled] { color: var(--faint) } .cal-d button[disabled] { pointer-events: none }
+.cal-d button.today { box-shadow: inset 0 0 0 1px var(--line) }
+.cal-d button[aria-selected="true"] { background: var(--ink); color: var(--on-ink) }
+.cal-d.slide { animation: calin .26s var(--ease) } @keyframes calin { from { opacity: 0; transform: translateX(var(--dx, 12px)) } }
+.cal-q { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line) }
+.cal-q button { height: 30px; padding: 0 12px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12.5px; font-weight: 500; transition: background .18s }
+.cal-q button:hover { background: var(--pill-hover) }
+.rq-done { padding: 28px; border-radius: 24px; background: var(--panel); display: grid; gap: 14px; justify-items: start }
+.rq-done .tick { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--on-ink); display: grid; place-items: center }
+.rq-done .tick svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
+.rq-done h3 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.rq-done p { margin: 0; font-size: 14.5px; line-height: 1.55; max-width: 48ch } .rq-done b { color: var(--ink); font-weight: 500 }
+.rq-done div { display: flex; gap: 8px; flex-wrap: wrap } .rq-done .btn { background: var(--bg) } .rq-done .btn:hover { background: var(--pill-hover) }
+@media (max-width: 899px) { .req { padding: 136px 0 24px } .rq-shell { gap: 40px } .rq-nav { margin-top: 40px } .tiles { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px } .tiles button { padding: 20px 20px 17px; gap: 16px } }
+@media (prefers-reduced-motion: reduce) { .pop, .st.on, .cal-d.slide, .rq-prog i::after { transition: none !important; animation: none !important } }
+
+/* ---------- licences ---------- */
+.lic { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px 48px; padding: 160px 0 40px; border-bottom: 1px solid var(--line) }
+.lic h2 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.lic .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px }
+.lic h4 { margin: 0 0 8px; color: var(--ink); font-size: 15px; font-weight: 500 }
+.lic p { margin: 0; font-size: 14.5px; line-height: 1.6 }
+@media (max-width: 899px) { .lic { grid-template-columns: minmax(0, 1fr); padding-top: 112px } .lic .cols { grid-template-columns: minmax(0, 1fr) } }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding: 28px 0 calc(140px + env(safe-area-inset-bottom, 0px)); font-size: 14px }
+.foot a { color: var(--ink); text-decoration: none } .foot a:hover { text-decoration: underline }
+
+/* ---------- a product, on its own sheet ---------- */
+.sheet { position: fixed; inset: 0; z-index: 160; background: var(--bg); overflow-y: auto; overscroll-behavior-y: contain; opacity: 0; pointer-events: none; transition: opacity .36s var(--ease) }
+.sheet.open { opacity: 1; pointer-events: auto; transition-duration: .18s }
+.sheet .in { max-width: var(--max); margin: 0 auto; padding: max(28px, env(safe-area-inset-top, 0px)) var(--gut) 120px; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 56px; align-items: start }
+@media (max-width: 899px) { .sheet .in { grid-template-columns: minmax(0, 1fr); padding-bottom: 60px } }
+.sheet .top { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background .18s }
+.btn:hover { background: var(--pill-hover) }
+.btn.pri { height: 48px; padding: 0 22px; background: var(--ink); color: var(--on-ink); font-size: 15px }
+.btn.pri:hover { background: color-mix(in srgb, var(--ink) 86%, var(--bg)) }
+.btn.wide { width: 100% }
+.pn { display: flex; gap: 6px }
+.pn .btn { width: 40px; padding: 0 }
+.gal { display: grid; gap: 10px; min-width: 0; position: sticky; top: 24px }
+@media (max-width: 899px) { .gal { position: static } }
+.gal .main { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); outline: 1px solid var(--edge); outline-offset: -1px }
+.gal.wide .main { aspect-ratio: 16 / 11 }
+.gal .main img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.gal.wide .main img { object-position: top center }
+.gal .main .gfx { position: absolute; inset: 0 }
+.thumbs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none }
+.thumbs button { flex: none; width: 64px; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); opacity: .5; transition: opacity .18s; outline: 1px solid var(--edge); outline-offset: -1px }
+.gal.wide .thumbs button { width: 96px; aspect-ratio: 16 / 11 }
+.thumbs button img { width: 100%; height: 100%; object-fit: cover; object-position: top center }
+.thumbs button[aria-current="true"], .thumbs button:hover { opacity: 1 }
+.info { display: grid; gap: 22px; min-width: 0; padding-top: 4px }
+.info h2 { margin: 6px 0 0; color: var(--ink); font-size: clamp(40px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -.05em }
+.info .bl { margin: 0; font-size: 17px; line-height: 1.6; max-width: 46ch }
+.inside { display: grid; gap: 10px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line) }
+.inside .row { display: flex; justify-content: space-between; gap: 16px; font-size: 14.5px }
+.inside .row span:first-child { color: var(--muted) }
+.inside .row span:last-child { color: var(--ink); text-align: right }
+.fmts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end }
+.fmts i { font-style: normal; height: 26px; padding: 0 10px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--pill); color: var(--ink); font-size: 12.5px }
+.licp { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.licp button { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; text-align: left; background: var(--pill); outline: 1px solid transparent; transition: background .18s, outline-color .18s }
+.licp button b { color: var(--ink); font-weight: 500; font-size: 14.5px; display: flex; justify-content: space-between; gap: 8px }
+.licp button span { font-size: 12.5px; color: var(--muted); line-height: 1.4 }
+.licp button[aria-pressed="true"] { background: var(--bg); outline: 1.5px solid var(--ink) }
+.buy { display: grid; gap: 10px }
+.buy .alt { font-size: 13px; color: var(--muted); text-align: center }
+.buy .alt button { color: var(--ink); text-decoration: underline; text-underline-offset: 3px }
+.keep { position: fixed; z-index: 170; overflow: hidden; pointer-events: none; transform-origin: 0 0; margin: 0 }
+.keep img { width: 100%; height: 100%; object-fit: cover; display: block }
+.sheet .txt > * { transition: opacity .3s var(--ease), translate .45s var(--ease) }
+.sheet:not(.ready) .info > * { opacity: 0; translate: 0 8px }
+.sheet.ready .info > * { opacity: 1; translate: 0 0 }
+.sheet.ready .info > *:nth-child(2) { transition-delay: 40ms } .sheet.ready .info > *:nth-child(3) { transition-delay: 80ms } .sheet.ready .info > *:nth-child(n+4) { transition-delay: 120ms }
+.info > * { transition: opacity .36s var(--ease), translate .52s var(--ease) }
+@media (prefers-reduced-motion: reduce) { .info > *, .pc .im img, .sheet { transition: none !important } }
+</style>
+</head>
+<body>
+<div class="station" data-readout><span class="fq">102.0</span><span class="nm">Shop</span></div>
+<button class="theme" type="button" id="theme">Dark</button>
+
+<main class="wrap">
+  <section class="hero">
+    <div><span class="mono">102.0 FM · Files for sale</span><h1 id="ttl">Shop</h1></div>
+  </section>
+  <div class="bar"><div class="chips" id="chips" role="group" aria-label="Show"></div><div class="bar-r"><a class="btn sm" href="#request" id="toReq">Request an asset</a></div></div>
+  <section class="grid" id="grid" aria-live="polite"></section>
+
+  <section class="req" id="request" aria-labelledby="reqH">
+    <div class="rq-shell">
+      <div class="rq-top"><span class="mono">Asset request · <span id="rqN">Step 1 of 3</span></span><h2 id="reqH">Can't find it? Ask for it.</h2><div class="rq-prog" aria-hidden="true"><i class="on"></i><i></i><i></i></div></div>
+      <form class="rq" id="rq" novalidate>
+        <div class="st on"><h3>What do you need?</h3><div class="tiles" id="rqType" role="group" aria-label="What you need"><button type="button" data-v="3D objects" aria-pressed="true"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3 24 8.5v11L14 25 4 19.5v-11z"/><path d="M4 8.5 14 14l10-5.5M14 14v11"/></svg><span><b>3D objects</b><small>In your brand colours</small></span></button><button type="button" data-v="Icon set" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="2.5"/><rect x="16" y="4" width="8" height="8" rx="2.5"/><rect x="4" y="16" width="8" height="8" rx="2.5"/><rect x="16" y="16" width="8" height="8" rx="2.5"/></svg><span><b>Icon set</b><small>For an app or a site</small></span></button><button type="button" data-v="Illustrations" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 20 14 25l10-5M4 14l10 5 10-5M14 3 4 8l10 5 10-5z"/></svg><span><b>Illustrations</b><small>Scenes or a series</small></span></button><button type="button" data-v="Website template" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="5" width="22" height="18" rx="3"/><path d="M3 10h22M8 15h7M8 19h12"/></svg><span><b>Template</b><small>A website you can edit</small></span></button><button type="button" data-v="Something else" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10"/><path d="M11 11.5a3 3 0 1 1 4.2 2.7c-.8.4-1.2 1-1.2 1.8M14 19.5v.1"/></svg><span><b>Something else</b><small>Tell me, I'll say if I can</small></span></button></div>
+          <label class="fld" id="rqOther" hidden><span>What is it?</span><input id="rqOtherIn" name="other" placeholder="A mascot, a pattern, a 3D logo…" autocomplete="off"></label></div>
+        <div class="st"><h3>Tell me about it</h3><label class="fld"><span>Describe it</span><textarea id="rqWhat" name="what" rows="4" placeholder="What it's for, how many pieces, colours, style"></textarea></label>
+          <label class="fld"><span>Budget <em>(optional)</em></span><input id="rqBudget" name="budget" placeholder="Type an amount, like $500" autocomplete="off"></label>
+          <div class="quick" id="rqBudgetQ" role="group" aria-label="Budget ranges"><button type="button" aria-pressed="false">Under $200</button><button type="button" aria-pressed="false">$200–$800</button><button type="button" aria-pressed="false">$800–$2,000</button><button type="button" aria-pressed="false">$2,000+</button><button type="button" aria-pressed="false">Not sure yet</button></div></div>
+        <div class="st"><h3>Where should I reply?</h3><div class="two"><label class="fld"><span>Your name</span><input id="rqName" name="name" autocomplete="name"></label><label class="fld"><span>Email</span><input id="rqEmail" name="email" type="email" autocomplete="email"></label></div><div class="dp" id="rqWhen"></div></div>
+        <div class="rq-nav"><button type="button" class="btn" id="rqBack" disabled>Back</button><span class="rq-msg" id="rqMsg" role="status" aria-live="polite"></span><button type="submit" class="btn pri" id="rqNext">Next</button></div>
+      </form>
+      <div class="rq-done" id="rqDone" hidden><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7"/></svg></span><h3>Request ready</h3>
+        <p>Your email app should open with the request filled in, ready to send. If it doesn't, copy it and email it to <b>iamkingsleey@gmail.com</b>.</p>
+        <div><button class="btn" type="button" id="rqCopy">Copy request</button><button class="btn" type="button" id="rqNew">Start over</button></div></div>
+    </div>
+  </section>
+
+  <section class="lic">
+    <h2>Licences</h2>
+    <div class="cols">
+      <div><h4>Personal</h4><p>Your own projects, portfolio pieces and anything you don't charge for.</p></div>
+      <div><h4>Commercial</h4><p>Client work, products you sell, ads and apps. One licence covers one company.</p></div>
+      <div><h4>Not allowed</h4><p>Reselling or sharing the files themselves, on their own or in another pack.</p></div>
+    </div>
+  </section>
+  <div class="foot"><span>Need something made for you? <a href="index.html" id="bookLink">Book a call</a></span><span>Questions: <button type="button" class="copy" data-copy="iamkingsleey@gmail.com" style="color:var(--ink)">iamkingsleey@gmail.com</button></span></div>
+</main>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="pTitle">
+  <div class="in">
+    <div class="top"><button class="btn" type="button" id="back">← All products</button><div class="pn"><button class="btn" type="button" id="prev" aria-label="Previous product">‹</button><button class="btn" type="button" id="next" aria-label="Next product">›</button></div></div>
+    <div class="gal" id="gal"><div class="main" id="gMain"></div><div class="thumbs" id="thumbs"></div></div>
+    <div class="info">
+      <span class="mono" id="pKind"></span>
+      <h2 id="pTitle"></h2>
+      <p class="bl" id="pBlurb"></p>
+      <div class="inside" id="pInside"></div>
+      <div class="licp" id="licp" role="group" aria-label="Licence"></div>
+      <div class="buy" id="buy"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SHOP = __SHOP__;
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EMAIL = 'iamkingsleey@gmail.com';
+  const P = SHOP.products.filter(p => !p.hidden);
+  const money = n => n ? '$' + n : 'Free';
+  // pictures of designs come in a lighter 1000px copy for cards (made by the build); the sheet shows the full one
+  const md = u => /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u || '') ? u.replace('assets/designs/', 'assets/designs/md/') : u;
+  const say = (el, t) => window.KM && KM.say && KM.say(el, t);
+  const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
+
+
+  // a drawn cover for a product with no pictures yet
+  const ZIG = '<svg viewBox="0 0 200 120" aria-hidden="true"><polyline points="' + Array.from({ length: 21 }, (_, i) => `${i * 10},${i % 2 ? 30 : 90}`).join(' ') + '"/><polyline points="' + Array.from({ length: 21 }, (_, i) => `${i * 10},${i % 2 ? 50 : 110}`).join(' ') + '" opacity=".5"/></svg>';
+  const SPHERE = '<svg viewBox="0 0 200 200" aria-hidden="true">' + [0, 1, 2, 3, 4, 5].map(i => `<ellipse cx="100" cy="100" rx="${80 * Math.abs(Math.cos(i * Math.PI / 6))}" ry="80"/>`).join('') + [1, 2, 3, 4, 5].map(i => { const y = 100 + 80 * Math.cos(i * Math.PI / 6), r = 80 * Math.sin(i * Math.PI / 6); return `<ellipse cx="100" cy="${y.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * .18).toFixed(1)}"/>`; }).join('') + '</svg>';
+  const cover = p => p.kind === 'Illustration pack' ? `<div class="gfx g-iso" style="--c:${p.color || '#2a3bd8'}"><b>${p.name}</b></div>`
+    : `<div class="gfx g-plug">${p.id === 'meshcraft' ? SPHERE : ZIG}<b>${p.name}</b></div>`;
+  const tagOf = p => p.status === 'free' ? 'Free' : p.status === 'soon' ? 'Coming soon' : '';
+
+  // ---------- filters ----------
+  const KINDS = [['All', () => true], ['3D packs', p => p.kind === '3D pack'], ['Illustrations', p => p.kind === 'Illustration pack'], ['Templates', p => p.kind === 'Website template'], ['Free', p => !p.price]];
+  let kind = 'All';
+  $('chips').innerHTML = KINDS.filter(([, f]) => P.some(f)).map(([k, f]) => `<button type="button" data-k="${k}" aria-pressed="${k === 'All'}">${k}<sup>${P.filter(f).length}</sup></button>`).join('');
+  $('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.k === kind) return; snd('pop'); kind = b.dataset.k;
+    $('chips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); paint(true); });
+
+  // ---------- the grid ----------
+  let shown = [];
+  function paint(animate) {
+    const f = KINDS.find(k => k[0] === kind)[1]; shown = P.filter(f);
+    const g = $('grid');
+    const go = () => {
+      g.innerHTML = shown.length ? shown.map((p, i) => `<a class="pc${p.wide && kind === 'All' ? ' wide' : ''}${p.kind === 'Website template' ? ' tpl' : ''}" href="#${p.id}" data-i="${i}">
+        <div class="im"${p.kind === '3D pack' ? ' data-light' : ''}>${p.images.length ? p.images.slice(0, 2).map((s, j) => `<img src="${md(s)}" alt="${j ? '' : p.name}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">`).join('') : cover(p)}
+          ${tagOf(p) ? `<span class="tag">${tagOf(p)}</span>` : ''}${p.images.length > 1 ? `<span class="dots">${p.images.map((_, j) => `<i${j ? '' : ' class="on"'}></i>`).join('')}</span>` : ''}</div>
+        <div class="meta"><h3>${p.name}</h3><span class="kind">${p.kind} · ${p.count}</span><span class="pr">${p.price ? (p.priceCommercial ? 'from ' : '') + money(p.price) : 'Free'}</span></div></a>`).join('')
+        : '<p class="empty">Nothing here yet.</p>';
+      g.querySelectorAll('.pc').forEach(c => {
+        const p = shown[+c.dataset.i], n = p.images.length;
+        // hovering steps through the pictures; on a phone the first stays
+        let t = 0, k = 0; const im = c.querySelectorAll('img'), dots = c.querySelectorAll('.dots i');
+        if (n > 1) {
+          c.addEventListener('pointerenter', e => { if (e.pointerType !== 'mouse') return; const step = () => { k = (k + 1) % n; if (im[1]) { im[1].src = md(p.images[k]); c.classList.toggle('swap', k !== 0); } dots.forEach((d, j) => d.classList.toggle('on', j === k)); t = setTimeout(step, 1100); }; t = setTimeout(step, 380); });
+          c.addEventListener('pointerleave', () => { clearTimeout(t); k = 0; c.classList.remove('swap'); dots.forEach((d, j) => d.classList.toggle('on', j === 0)); });
+        }
+        c.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); open(+c.dataset.i, c.querySelector('.im')); });
+      });
+      g.style.opacity = '';
+    };
+    if (animate && !reduce) { g.style.transition = 'opacity .16s'; g.style.opacity = 0; setTimeout(go, 160); } else go();
+  }
+  paint(false);
+
+  // ---------- a product on its own sheet ----------
+  const sheet = $('sheet'); let cur = -1, lic = 'personal', pic = 0, fromEl = null;
+  function fill(i) {
+    const p = shown[i]; cur = i; pic = 0;
+    $('pKind').textContent = `${p.kind} · ${p.count}`; $('pTitle').textContent = p.name; $('pBlurb').textContent = p.blurb;
+    $('gal').classList.toggle('wide', !!p.wide); $('gal').classList.toggle('tpl', p.kind === 'Website template');
+    showPic(0);
+    $('thumbs').innerHTML = p.images.length > 1 ? p.images.map((s, j) => `<button type="button" aria-label="Picture ${j + 1}" aria-current="${j === 0}"><img src="${md(s)}" alt=""></button>`).join('') : '';
+    $('pInside').innerHTML = `<div class="row"><span>Inside</span><span>${p.count}</span></div>${p.formats.length ? `<div class="row"><span>Files</span><span class="fmts">${p.formats.map(f => `<i>${f}</i>`).join('')}</span></div>` : ''}${p.link && p.price ? '<div class="row"><span>Sold on</span><span>Gumroad</span></div>' : ''}`;
+    const paid = !!p.price && !!p.priceCommercial;
+    $('licp').hidden = !paid; if (!paid) lic = 'personal';
+    if (paid) { $('licp').innerHTML = `<button type="button" data-l="personal" aria-pressed="${lic === 'personal'}"><b>Personal <em style="font-style:normal">${money(p.price)}</em></b><span>Your own projects</span></button>
+      <button type="button" data-l="commercial" aria-pressed="${lic === 'commercial'}"><b>Commercial <em style="font-style:normal">${money(p.priceCommercial || p.price)}</em></b><span>Client work and products</span></button>`; }
+    paintBuy();
+    $('prev').disabled = $('next').disabled = shown.length < 2;
+    history.replaceState(null, '', '#' + p.id);
+  }
+  function showPic(j) {
+    const p = shown[cur]; pic = j;
+    $('gMain').innerHTML = p.images.length ? `<img src="${p.images[j]}" alt="${p.name}${j ? ', picture ' + (j + 1) : ''}">` : cover(p);
+    $('gMain').toggleAttribute('data-light', p.kind === '3D pack');
+    $('thumbs').querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-current', String(k === j)));
+  }
+  function paintBuy() {
+    const p = shown[cur], price = lic === 'commercial' ? (p.priceCommercial || p.price) : p.price;
+    if (!p.price && p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Get it free on Figma ↗</a>`;
+    else if (p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Buy for ${money(price)} ↗</a><p class="alt">Checkout on Gumroad. The files arrive by email straight away.</p>`;
+    else $('buy').innerHTML = `<a class="btn pri wide" href="mailto:${EMAIL}?subject=${encodeURIComponent('Notify me: ' + p.name)}">Notify me when it's out</a><p class="alt">Coming soon at ${money(price)}. Or email <button type="button" class="copy" data-copy="${EMAIL}">${EMAIL}</button></p>`;
+  }
+  $('thumbs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; snd('pop'); showPic([...$('thumbs').children].indexOf(b)); });
+  $('licp').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; snd('pop'); lic = b.dataset.l;
+    $('licp').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); paintBuy(); });
+
+  // opening keeps the picture: the card's picture grows into the sheet's gallery, and shrinks back on the way out
+  function flip(a, z, src, ms, back) {
+    const k = document.createElement('div'); k.className = 'keep'; k.innerHTML = src ? `<img src="${src}" alt="">` : '';
+    if (!src) k.appendChild(fromEl.querySelector('.gfx').cloneNode(true));
+    Object.assign(k.style, { left: z.left + 'px', top: z.top + 'px', width: z.width + 'px', height: z.height + 'px' }); document.body.appendChild(k);
+    const t = [{ transform: `translate(${a.left - z.left}px, ${a.top - z.top}px) scale(${a.width / z.width}, ${a.height / z.height})` }, { transform: 'none' }];
+    return k.animate(back ? t.reverse() : t, { duration: ms, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }).finished.then(() => k);
+  }
+  async function open(i, el) {
+    fromEl = el; fill(i); snd('pop'); document.documentElement.style.overflow = 'hidden';
+    sheet.scrollTop = 0; sheet.classList.add('open');
+    if (reduce || !el) { sheet.classList.add('ready'); $('back').focus({ preventScroll: true }); return; }
+    const z = $('gMain').getBoundingClientRect(), a = el.getBoundingClientRect(), p = shown[i];
+    $('gMain').style.visibility = 'hidden'; el.style.visibility = 'hidden';
+    const k = await flip(a, z, p.images[0] && md(p.images[0]), 520);
+    $('gMain').style.visibility = ''; k.remove(); el.style.visibility = ''; sheet.classList.add('ready'); $('back').focus({ preventScroll: true });
+  }
+  async function close() {
+    if (!sheet.classList.contains('open')) return; snd('pop');
+    const p = shown[cur], el = $('grid').querySelector(`.pc[data-i="${cur}"] .im`);
+    history.replaceState(null, '', location.pathname + location.search);
+    sheet.classList.remove('ready');
+    if (reduce || !el) { sheet.classList.remove('open'); document.documentElement.style.overflow = ''; return; }
+    el.scrollIntoView({ block: 'nearest' });
+    const z = $('gMain').getBoundingClientRect(), a = el.getBoundingClientRect();
+    fromEl = el; el.style.visibility = 'hidden';
+    const pr = flip(a, z, p.images[pic] && md(p.images[pic]), 360, true);
+    sheet.classList.remove('open'); document.documentElement.style.overflow = '';
+    const k = await pr; el.style.visibility = ''; k.remove(); el.closest('.pc').focus({ preventScroll: true });
+  }
+  const step = d => { if (cur < 0 || shown.length < 2) return; snd('pop'); fill((cur + d + shown.length) % shown.length); sheet.scrollTop = 0; };
+  $('back').addEventListener('click', close); $('prev').addEventListener('click', () => step(-1)); $('next').addEventListener('click', () => step(1));
+  addEventListener('keydown', e => { if (!sheet.classList.contains('open')) return;
+    if (e.key === 'Escape') close(); else if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
+  // phones: swipe left/right between products, down from the top to close
+  let sx = 0, sy = 0, tr = false;
+  sheet.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; tr = true; sx = e.clientX; sy = e.clientY; });
+  sheet.addEventListener('pointerup', e => { if (!tr) return; tr = false; const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1); else if (dy > 100 && Math.abs(dy) > Math.abs(dx) * 1.5 && sheet.scrollTop <= 0) close(); });
+
+  // copy the email, confirmed in place
+  document.addEventListener('click', e => { const b = e.target.closest('.copy'); if (!b) return; e.preventDefault();
+    const done = () => { snd('pop'); say(b, 'Email copied'); };
+    try { navigator.clipboard.writeText(b.dataset.copy).then(done, done); } catch (_) { done(); } });
+
+  // ---------- asset request: three short steps. No server, so it goes out as a filled-in email (and can be copied if no email app opens) ----------
+  const pops = [];
+  const shut = except => pops.forEach(p => p !== except && p.close());
+  document.addEventListener('click', () => shut());
+  addEventListener('resize', () => shut());
+  addEventListener('keydown', e => { if (e.key === 'Escape' && pops.some(p => p.el.classList.contains('open'))) { e.stopPropagation(); pops.forEach(p => p.el.classList.contains('open') && p.close(true)); } }, true);
+  // open below the field; only flip above when there isn't room below and there is above. If neither, open below and scroll it into view.
+  function place(el, pop) {
+    el.classList.remove('up'); pop.style.left = '0px';
+    const r = el.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight, below = innerHeight - (innerWidth < 900 ? 140 : 0) - r.bottom - 10, above = r.top - 10;
+    const up = below < h + 12 && above >= h + 12; el.classList.toggle('up', up);
+    if (!up && below < h + 12) scrollBy({ top: h + 24 - below, behavior: reduce ? 'auto' : 'smooth' });
+    const x = Math.max(16, Math.min(r.left, innerWidth - 16 - w)); pop.style.left = (x - r.left) + 'px';
+    pop.style.transformOrigin = `${r.left - x + 24}px ${up ? 'bottom' : 'top'}`;
+  }
+  const popper = (el, btn, pop, onOpen) => { const o = { el, close(f) { el.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); if (f) btn.focus(); } };
+    btn.addEventListener('click', e => { e.stopPropagation(); if (el.classList.contains('open')) return o.close(); shut(o); snd('pop'); onOpen(); place(el, pop); el.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); onOpen(true); });
+    pop.addEventListener('click', e => e.stopPropagation()); pops.push(o); return o; };
+  // the date
+  const day0 = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })(), plus = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const longD = d => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const CH = r => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${r ? 'M6 3.5 10.5 8 6 12.5' : 'M10 3.5 5.5 8 10 12.5'}"/></svg>`;
+  const dp = $('rqWhen'); let when = null, view = new Date(day0.getFullYear(), day0.getMonth(), 1), foc = day0;
+  dp.innerHTML = `<button type="button" aria-haspopup="dialog" aria-expanded="false"><span class="lb">Needed by <em>(optional)</em></span><span class="dv ph">No rush · pick a date</span><i><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="3"/><path d="M2 6.5h12M5.5 1.8v2.4M10.5 1.8v2.4"/></svg></i></button><div class="pop cal" role="dialog" aria-label="Choose a date">
+    <div class="cal-h"><b></b><div><button type="button" data-m="-1" aria-label="Previous month">${CH(0)}</button><button type="button" data-m="1" aria-label="Next month">${CH(1)}</button></div></div>
+    <div class="cal-w">${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(d => `<span>${d}</span>`).join('')}</div><div class="cal-d" role="grid"></div>
+    <div class="cal-q"><button type="button" data-q="7">In a week</button><button type="button" data-q="14">In 2 weeks</button><button type="button" data-q="30">In a month</button><button type="button" data-q="0">No rush</button></div></div>`;
+  const dBtn = dp.firstChild, dVal = dBtn.querySelector('.dv'), cal = dp.lastChild, days = cal.querySelector('.cal-d');
+  function month(dx) {
+    cal.querySelector('.cal-h b').textContent = view.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    cal.querySelector('[data-m="-1"]').disabled = view.getFullYear() === day0.getFullYear() && view.getMonth() === day0.getMonth();
+    const start = plus(view, -((view.getDay() + 6) % 7));
+    days.innerHTML = Array.from({ length: 42 }, (_, i) => { const d = plus(start, i), t = d.getTime();
+      return `<button type="button" role="gridcell" tabindex="-1" data-t="${t}" class="${d.getMonth() !== view.getMonth() ? 'out' : ''}${t === day0.getTime() ? ' today' : ''}" aria-selected="${!!when && t === when.getTime()}" aria-label="${longD(d)}"${d < day0 ? ' disabled' : ''}>${d.getDate()}</button>`; }).join('');
+    if (dx && !reduce) { days.style.setProperty('--dx', dx > 0 ? '14px' : '-14px'); days.classList.remove('slide'); void days.offsetWidth; days.classList.add('slide'); }
+  }
+  const setWhen = d => { when = d; dVal.textContent = d ? longD(d) : 'No rush · pick a date'; dVal.classList.toggle('ph', !d); };
+  const dpo = popper(dp, dBtn, cal, done => { if (!done) { view = new Date((when || day0).getFullYear(), (when || day0).getMonth(), 1); month(); foc = when || day0; }
+    else requestAnimationFrame(() => { const f = days.querySelector(`[data-t="${foc.getTime()}"]`); f && f.focus({ preventScroll: true }); }); });
+  cal.addEventListener('click', e => { const m = e.target.closest('[data-m]'), d = e.target.closest('[data-t]'), q = e.target.closest('[data-q]');
+    if (m) { view = new Date(view.getFullYear(), view.getMonth() + +m.dataset.m, 1); month(+m.dataset.m); }
+    else if (d || q) { snd('pop'); setWhen(d ? new Date(+d.dataset.t) : +q.dataset.q ? plus(day0, +q.dataset.q) : null); dpo.close(true); } });
+  days.addEventListener('keydown', e => { const n = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]; if (!n) return; e.preventDefault(); e.stopPropagation();
+    let f = plus(foc, n); if (f < day0) f = day0; foc = f;
+    if (f.getMonth() !== view.getMonth() || f.getFullYear() !== view.getFullYear()) { view = new Date(f.getFullYear(), f.getMonth(), 1); month(n); }
+    const b = days.querySelector(`[data-t="${f.getTime()}"]`); b && b.focus(); });
+  // step 1: the kind. "Something else" asks what it is
+  const typeOf = () => $('rqType').querySelector('[aria-pressed="true"]').dataset.v;
+  $('rqType').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; snd('pop');
+    $('rqType').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const o = b.dataset.v === 'Something else'; $('rqOther').hidden = !o; if (o) $('rqOtherIn').focus(); });
+  // step 2: the budget can be typed, or picked from the ranges under it
+  const bq = $('rqBudgetQ');
+  bq.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; snd('pop'); $('rqBudget').value = b.textContent;
+    bq.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
+  $('rqBudget').addEventListener('input', () => bq.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.textContent === $('rqBudget').value))));
+  const budget$ = () => { const v = $('rqBudget').value.trim(); if (!v) return 'Not set yet'; return /^[\d,.\s]+k?$/i.test(v) ? '$' + v.replace(/\s/g, '') : v; };
+  // moving between steps
+  let st = 0;
+  const steps = [...$('rq').querySelectorAll('.st')], bar = [...document.querySelectorAll('.rq-prog i')];
+  const bad = (el, b) => { el.closest('.fld').classList.toggle('bad', b); return b; };
+  const go = (n, focus = true) => { st = n; steps.forEach((x, i) => x.classList.toggle('on', i === st)); bar.forEach((x, i) => x.classList.toggle('on', i <= st));
+    $('rqN').textContent = `Step ${st + 1} of 3`; $('rqBack').disabled = st === 0; $('rqNext').textContent = st === 2 ? 'Send request' : 'Next'; $('rqMsg').textContent = ''; shut();
+    if (focus) { const f = steps[st].querySelector('textarea, input:not([type=hidden])'); if (f && st) f.focus({ preventScroll: true }); }
+    const top = $('request').getBoundingClientRect().top; if (top < 0) $('request').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); };
+  ['rqOtherIn', 'rqWhat', 'rqName', 'rqEmail'].forEach(id => $(id).addEventListener('input', () => { bad($(id), false); $('rqMsg').textContent = ''; }));
+  $('rqBack').addEventListener('click', () => { snd('pop'); go(st - 1); });
+  let reqText = '';
+  $('rq').addEventListener('submit', e => {
+    e.preventDefault();
+    if (st === 0) { if (typeOf() === 'Something else' && bad($('rqOtherIn'), !$('rqOtherIn').value.trim())) { $('rqMsg').textContent = 'Say what you need'; return $('rqOtherIn').focus(); } snd('pop'); return go(1); }
+    if (st === 1) { if (bad($('rqWhat'), $('rqWhat').value.trim().length < 8)) { $('rqMsg').textContent = 'Say a little about it'; return $('rqWhat').focus(); } snd('pop'); return go(2); }
+    const name = $('rqName').value.trim(), mail = $('rqEmail').value.trim();
+    const b1 = bad($('rqName'), !name), b2 = bad($('rqEmail'), !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail));
+    if (b1 || b2) { $('rqMsg').textContent = b1 && b2 ? 'Add your name and email' : b1 ? 'Add your name' : 'Add an email I can reply to'; return (b1 ? $('rqName') : $('rqEmail')).focus(); }
+    const type = typeOf() === 'Something else' ? $('rqOtherIn').value.trim() : typeOf();
+    reqText = `Asset request\n\nName: ${name}\nEmail: ${mail}\nType: ${type}\nBudget: ${budget$()}\nNeeded by: ${when ? longD(when) : 'No rush'}\n\n${$('rqWhat').value.trim()}`;
+    snd('pop');
+    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('Asset request: ' + type + ' from ' + name)}&body=${encodeURIComponent(reqText)}`;
+    $('rq').hidden = true; document.querySelector('.rq-top').hidden = true; $('rqDone').hidden = false;
+  });
+  $('rqCopy').addEventListener('click', () => { const done = () => { snd('pop'); $('rqCopy').textContent = 'Copied ✓'; setTimeout(() => { $('rqCopy').textContent = 'Copy request'; }, 1800); };
+    try { navigator.clipboard.writeText(reqText).then(done, done); } catch (_) { done(); } });
+  $('rqNew').addEventListener('click', () => { $('rq').reset(); setWhen(null); $('rqOther').hidden = true; bq.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    $('rqType').querySelectorAll('button').forEach((x, i) => x.setAttribute('aria-pressed', String(i === 0)));
+    $('rqDone').hidden = true; $('rq').hidden = false; document.querySelector('.rq-top').hidden = false; go(0); $('rqType').firstChild.focus(); });
+  $('toReq').addEventListener('click', e => { e.preventDefault(); $('request').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); setTimeout(() => $('rqType').querySelector('[aria-pressed="true"]').focus({ preventScroll: true }), reduce ? 0 : 600); });
+
+  // a link straight to a product (shop.html#coins-and-cursors) opens it
+  const h = location.hash.slice(1), hi = P.findIndex(p => p.id === h);
+  if (hi >= 0) setTimeout(() => open(shown.indexOf(P[hi]), null), 60);
+
+  // theme switch, as on the other pages
+  const tb = $('theme'), setT = () => { tb.textContent = document.documentElement.dataset.theme === 'dark' ? 'Light' : 'Dark'; };
+  setT(); tb.addEventListener('click', () => { const d = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = d ? 'dark' : 'light'; try { localStorage.setItem('km-theme', d ? 'dark' : 'light'); } catch (_) {} setT(); snd('pop'); });
+})();
+</script>
+</body>
+</html>

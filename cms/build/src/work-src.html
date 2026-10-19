@@ -54,7 +54,7 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 
 /* ---------- Top right: category chips + count ---------- */
 .top { position: fixed; left: 50%; transform: translateX(-50%); top: 106px; z-index: 20; display: flex; align-items: center; gap: 18px }
-.chips { display: flex; gap: 4px }
+.chips { display: flex; gap: 4px } .chips button { white-space: nowrap }
 .rolepick { position: relative; flex: none; margin-left: 10px }
 .rp-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 3px 0 12px; border: 0; border-radius: 999px; background: var(--pill, rgb(127 127 127 / .12)); color: var(--muted); font: 500 12.5px var(--body, inherit); white-space: nowrap; cursor: pointer; transition: background .18s }
 .rp-btn:hover { background: var(--pill-hover, rgb(127 127 127 / .18)) }
@@ -436,6 +436,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   }
   const CATS = [
     { k: '3d', name: '3D', tools: 'Blender' },
+    { k: 'illustration', name: 'Illustration', tools: 'Illustrator' },
+    { k: 'poster', name: 'Poster', tools: 'Figma' },
     { k: 'product', name: 'Case study', tools: 'Figma · Code' },
     { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
     { k: 'motion', name: 'Motion', tools: 'Blender' }
@@ -457,10 +459,21 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // Every piece opens on the project page (project.html#its-name) unless it names a page of its own.
   const PROJECT_PAGE = '';   // design shots open the small view on this page; case studies (page: case.html#…) open their own
   const slugOf = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const items = CATS.flatMap(c => A[c.k].map(x => {
+  // the newer kinds (illustrations, posters) are mixed through the rest instead of sitting in a block of their own:
+  // spread evenly, in a fixed shuffled order so the page looks the same on every visit
+  const MIX = ['Illustration', 'Poster'];
+  const mixIn = list => {
+    const base = list.filter(x => !MIX.includes(x.cat)), extra = list.filter(x => MIX.includes(x.cat));
+    let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = extra.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [extra[i], extra[j]] = [extra[j], extra[i]]; }
+    const n = base.length + extra.length, out = [], step = n / Math.max(1, extra.length); let k = 0;
+    for (let i = 0; i < n; i++) out.push(k < extra.length && Math.floor((k + .5) * step) === i ? extra[k++] : base.shift());
+    return out.concat(base, extra.slice(k));
+  };
+  const items = mixIn(CATS.flatMap(c => A[c.k].map(x => {
     const pj = PROJECTS[x.t] || {};
     return { ...x, featured: !!pj.featured, cat: c.name, tools: pj.tools || x.tools || (x.video ? 'Figma · Code' : c.tools), year: pj.year || x.year || '', client: pj.client || x.client || '', role: pj.role || '', summary: pj.summary || x.desc || '', alt: pj.alt || '', loop: pj.loop || '', page: x.page || pj.page || (PROJECT_PAGE ? PROJECT_PAGE + '#' + slugOf(x.t) : ''), cs: !!x.cs, link: x.link || pj.link || (x.layout ? x.page : '') };
-  }));
+  })));
   const N = items.length;
 
   // ---------- Build ----------
@@ -1077,6 +1090,18 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       p: ['I mapped every state of the control first: idle, hover, drag, snap and settle, so the motion has rules instead of guesses.',
           'Then I built it as a real prototype with timing, easing and sound tuned by hand, so it can be tested on real fingers and handed straight to engineering.'],
       steps: [['Problem', 'Where the default control feels flat.'], ['States', 'Every state and transition mapped.'], ['Prototype', 'Built in code to feel it for real.'], ['Tuning', 'Timing, easing and sound by hand.'], ['Handoff', 'Specs and the working build.']] },
+    'Illustration': { type: 'Illustration', role: 'Illustration, character design, colour',
+      sum: 'A flat illustration with a soft gradient world behind it, drawn to explain an idea at a glance.',
+      state: t => `${t} started as a rough sketch of one moment, then got its colour, light and texture.`,
+      p: ['I sketch the moment first, looking for a pose or an object that tells the story without words.',
+          'Then shapes are cleaned up, colours pulled from the brand and texture added last so it sits well on a screen or in print.'],
+      steps: [['Idea', 'The one moment to show.'], ['Sketch', 'Poses and layout.'], ['Shapes', 'Clean vector forms.'], ['Colour', 'Palette and gradients.'], ['Texture', 'Grain and final details.']] },
+    'Poster': { type: 'Poster', role: 'Graphic design, type, generative art',
+      sum: 'A type poster built around generative line art, set with a short line of copy.',
+      state: t => `${t} started as a single line, repeated until it turned into a shape worth framing.`,
+      p: ['The art is made from one line, repeated and bent until the pattern becomes the subject.',
+          'Type and a short note are set around it so the poster reads at a distance and rewards a closer look.'],
+      steps: [['Line', 'One stroke to start from.'], ['Repeat', 'Loops, offsets and colour.'], ['Shape', 'Where the pattern settles.'], ['Type', 'Title and a short note.'], ['Print', 'Crops for screen and paper.']] },
     'Brand': { type: 'Brand asset', role: 'Brand identity, 3D, illustration',
       sum: 'A brand piece with personality: real-world objects that take the identity off the screen.',
       state: t => `${t} was about giving the brand something to hold, not just something to look at.`,
@@ -1580,7 +1605,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
   // ---------- role match: "Hiring for" (kit.js keeps the choice). Fitting work moves to the front with a tag; the rest dims but stays. ----------
   const fits = (it, r) => r === 'Product' ? it.cat === 'Case study' && !/brand\.html|logo\.html|showcase\.html/.test(it.link || it.page || '')
-    : r === 'Brand' ? it.cat === 'Brand' || /brand\.html|logo\.html/.test(it.link || it.page || '')
+    : r === 'Brand' ? it.cat === 'Brand' || it.cat === 'Illustration' || it.cat === 'Poster' || /brand\.html|logo\.html/.test(it.link || it.page || '')
     : r === '3D' ? it.cat === '3D' || /showcase\.html/.test(it.link || it.page || '')
     : r === 'Motion' ? it.cat === 'Motion' : true;
   let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)

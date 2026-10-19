@@ -259,7 +259,7 @@
   const DESIGN = [
     { title: 'The piece', cols: 2, fields: [
       { k: 'title', label: 'Title' },
-      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Case study']] },
+      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Case study']] },
       { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a case study', type: 'select', options: CASE_SLUGS, help: 'Adds “Read case study” to its page' },
       { k: 'desc', label: 'Project info', type: 'textarea', full: true },
       { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
@@ -371,7 +371,7 @@
     }
     head('Content', 'Designs');
     v.append(el('p', { class: 'lead', text: 'Every piece on the Designs dial, in order within each category. Case studies join the dial automatically.' }));
-    const cats = [['all', 'All'], ['3d', '3D'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Product']];
+    const cats = [['all', 'All'], ['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Product']];
     let cat = vDesigns.cat || 'all';
     const tabs = el('div', { class: 'tabs' }), g = el('div', { class: 'grid' });
     const paint = () => {

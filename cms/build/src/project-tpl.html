@@ -248,8 +248,8 @@ __POPKIT__<script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const A = __ITEMS__, TOOL_SRC = __TOOLS__;   // pieces by category (as on Designs) and the tool icons
-  const CAT = { '3d': '3D', brand: 'Brand', motion: 'Motion', product: 'Product' };
-  const all = []; for (const k of ['3d', 'product', 'brand', 'motion']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
+  const CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product' };
+  const all = []; for (const k of ['3d', 'illustration', 'poster', 'product', 'brand', 'motion']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
   const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const idx = t => all.findIndex(x => x.t === t);
   const pad = i => String(i + 1).padStart(2, '0');
@@ -261,6 +261,16 @@ __POPKIT__<script>
 
   // stand-in copy per category; real projects carry their own
   const COPY = {
+    Poster: { lead: 'One line, repeated until it becomes a picture', did: ['Graphic design', 'Typography', 'Generative art'], tools: ['figma'],
+      p: ['Each poster starts with a single line. Repeated, offset and recoloured, it turns into a pattern, and the pattern becomes the subject.',
+          'Type and a short note are set around it, so the poster reads from across a room and still rewards a closer look.'],
+      statement: 'Repetition is where the shape shows up.',
+      side: ['Process', 'Line, loop, type', 'The art comes first. Type is set last, in the space the pattern leaves.'] },
+    Illustration: { lead: 'An idea you can read at a glance', did: ['Illustration', 'Character design', 'Colour'], tools: ['illustrator', 'figma'],
+      p: ['Each illustration starts as a rough sketch of one moment: a hand, a desk, a reward. If the pose tells the story on its own, the rest follows.',
+          'Shapes are cleaned up into vectors, colour comes from the brand, and a soft gradient world and a little grain make it feel warm rather than flat.'],
+      statement: 'A good drawing explains before it decorates.',
+      side: ['Process', 'Sketch, shape, colour', 'Rough poses come first. Clean shapes, colour and texture are layered on once the moment reads.'] },
     Brand: { lead: 'Giving the brand something to hold', did: ['Brand identity', '3D modelling', 'Art direction', 'Illustration'], tools: ['blender', 'figma'],
       p: ['The brief was simple: take the identity off the screen. I started from the system itself, its colours, marks and tone of voice, and asked where it could live as a physical thing.',
           'Each object was modelled and dressed in the brand’s language, down to the stickers, stitching and texture, so it works as merch, campaign imagery or a hero visual on its own.'],
@@ -280,7 +290,7 @@ __POPKIT__<script>
       p: ['I mapped every state of the control first: idle, hover, drag, snap and settle.', 'Then I built it in code with timing, easing and sound tuned by hand.'],
       statement: 'Feel is a feature.', side: ['States', 'Every state mapped', 'Idle, hover, drag, snap and settle.'] }
   };
-  const TOOL = { blender: 'Blender', figma: 'Figma', photoshop: 'Adobe Photoshop', aftereffects: 'Adobe After Effects', claude: 'Claude' };
+  const TOOL = { illustrator: 'Adobe Illustrator', blender: 'Blender', figma: 'Figma', photoshop: 'Adobe Photoshop', aftereffects: 'Adobe After Effects', claude: 'Claude' };
   // which project: the address says (project.html#card-holder-with-stickers)
   const fromHash = () => { const i = all.findIndex(x => slug(x.t) === decodeURIComponent(location.hash.slice(1))); return i >= 0 ? i : 0; };
   let cur = fromHash();
