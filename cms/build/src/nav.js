@@ -29,6 +29,14 @@
   .kmn-scale { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 150; width: min(480px, calc(100vw - 80px)); height: 66px; overflow: hidden; border-radius: 18px;
     background: color-mix(in srgb, var(--bg, #fff) 82%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); color: var(--ink, #111) }
+  /* the frosted band: the nav's glass runs edge to edge, from the top of the screen down to the nav (on phones, from the nav to the bottom).
+     It sits under the page's own readout and buttons, so they stay sharp on top of it. */
+  /* the page melts into it as on Designs: solid page colour behind the nav, thinning to nothing below it, with the blur fading the same way */
+  .kmn-band { position: fixed; left: 0; right: 0; top: 0; height: 150px; z-index: 30; pointer-events: none; transition: opacity .3s;
+    background: linear-gradient(var(--bg, #fff) 50%, color-mix(in srgb, var(--bg, #fff) 60%, transparent) 72%, transparent);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); -webkit-mask-image: linear-gradient(#000 52%, transparent); mask-image: linear-gradient(#000 52%, transparent) }
+  .kmn-band.off { opacity: 0 }
+  html.kmn .kmn-scale { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none }   /* the band already frosts behind it */
   .kmn-scale .tr { position: absolute; inset: 0 }
   .kmn-scale .tk { position: absolute; top: 6px; height: 12px; background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 12px); opacity: .3 }
   .kmn-scale .nd { position: absolute; left: 50%; top: 2px; width: 2px; height: 30px; margin-left: -1px; background: ${RED}; border-radius: 1px; z-index: 2; transition: left .42s cubic-bezier(.22,1,.36,1) }
@@ -36,7 +44,9 @@
   .kmn-scale button:hover, .kmn-scale button.pv { color: var(--ink, #111) }
   .kmn-scale button.on { color: var(--ink, #111) }   /* the red tick above is the only highlight */
   .kmn-scale button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px }   /* red is kept for the tick */
-  @media (max-width: 900px) { .kmn-scale { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: calc(100vw - 24px) } }
+  @media (max-width: 900px) { .kmn-scale { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: calc(100vw - 24px) }
+    .kmn-band { top: auto; bottom: 0; height: calc(130px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, color-mix(in srgb, var(--bg, #fff) 60%, transparent) 28%, var(--bg, #fff) 50%);
+      -webkit-mask-image: linear-gradient(transparent, #000 48%); mask-image: linear-gradient(transparent, #000 48%) } }
   @media (max-width: 699px) { .kmn-scale { -webkit-mask-image: none; mask-image: none } .kmn-scale button { font-size: 12.5px; padding: 4px 7px } }`;
   const start = () => {
     const st = document.createElement('style'); st.textContent = css; document.head.append(st);
@@ -64,7 +74,10 @@
     addEventListener('resize', back);
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
-    S.append(T, nd); document.body.append(S);
+    S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.append(band, S);
+    // a page that opens on a dark hero whatever the theme (About's signal) keeps it clear of the page-colour fade until it scrolls past
+    const hero = document.querySelector('.sig');
+    if (hero) { const chk = () => band.classList.toggle('off', hero.getBoundingClientRect().bottom > (innerWidth > 900 ? 150 : innerHeight - 130) && innerWidth > 900); addEventListener('scroll', chk, { passive: true }); chk(); }
     nd.style.transition = 'none'; back(); nd.offsetWidth; nd.style.transition = '';   // on arrival it is already in place
     // keyboard: ← and → tune to the neighbouring station, exactly like clicking it (the needle moves, then the page changes).
     // Left alone whenever the arrows mean something else: typing, an open piece, sheet, menu or card, or a control that uses them itself.
