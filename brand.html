@@ -282,7 +282,7 @@ figure { margin: 0 }
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610191818" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">98.0</span><span class="nm" id="snm">Brand</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610191824" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">98.0</span><span class="nm" id="snm">Brand</span></div>
 
 <!-- 1 · horizontal run: three frames, then the page continues vertically -->
 <section class="run" id="run" aria-label="Project opening">
@@ -680,12 +680,12 @@ figure { margin: 0 }
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610191818#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610191824#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>
 <script src="nav.js?v=bd965032" defer></script>
-<script src="kit.js?v=2373d5e6" defer></script>
+<script src="kit.js?v=c6befc20" defer></script>
 <script src="protips.js?v=8e66ebd8" defer></script>
 </body>
 </html>

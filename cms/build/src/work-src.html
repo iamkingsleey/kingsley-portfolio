@@ -1134,7 +1134,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
         <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
-          <div class="d-pic" id="dpic"${it.cat === '3D' && !it.video ? ' data-light' : ''}>${media}</div>
+          <div class="d-pic" id="dpic"${!it.video ? ' data-light' : ''}>${media}</div>
         </div></div>
         <div class="d-info">
           <div class="d-ih"><h1>${it.t}</h1>${it.year ? `<span class="d-yr">${it.year}</span>` : ''}<span class="d-chip">${it.cat}</span></div>
@@ -1162,7 +1162,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
         <div class="d-frame${it.video ? ' white' : ''}" id="dmedia">
-          <div class="d-pic" id="dpic"${it.cat === '3D' && !it.video ? ' data-light' : ''}>${media}</div>
+          <div class="d-pic" id="dpic"${!it.video ? ' data-light' : ''}>${media}</div>
           <i class="notch l" id="nL"></i><i class="notch r" id="nR"></i>
           <div class="d-over" id="dover" style="color:${it.dark ? '#fff' : '#0b0b0b'}"><div class="d-label"><i></i>${pad(i)} · ${it.cat}</div><h1>${it.t}</h1></div>
         </div>
@@ -1716,7 +1716,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       const now = performance.now();
       if (key !== ovKey) { ovKey = key; ovSettle = now + 1400; }
       if (now > ovSettle) { requestAnimationFrame(ovWarp); return; }
-      const dpr = Math.min(1.5, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;   // 1.5x is sharp under the blur-free drum and much lighter than 2x
+      const dpr = Math.min(innerWidth >= 900 ? 2 : 1.5, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;   // full Retina sharpness on laptops and desktops, so the grid is as crisp as the opened piece; phones keep 1.5x to stay smooth
       const on = !reduce && !!ogl, mid = vh / 2, R = vh * DRUM.radius, M = on ? Math.round(vh * DRUM.margin) : 0;
       if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) {
         ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr);
@@ -1749,7 +1749,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
           // each picture is scaled to its tile once and kept, so scrolling only copies small ready-made pictures
           const tw = Math.max(1, Math.round(r.width * dpr)), thh = Math.max(1, Math.round(r.height * dpr)), ck = src.src + '|' + tw + 'x' + thh;
           let pc = tileCache.get(ck);
-          if (!pc) { pc = document.createElement('canvas'); pc.width = tw; pc.height = thh; pc.getContext('2d').drawImage(src, cx0, cy0, cw, ch, 0, 0, tw, thh); tileCache.set(ck, pc); if (tileCache.size > 120) tileCache.delete(tileCache.keys().next().value); }
+          if (!pc) { pc = document.createElement('canvas'); pc.width = tw; pc.height = thh; { const g2 = pc.getContext('2d'); g2.imageSmoothingEnabled = true; g2.imageSmoothingQuality = 'high'; g2.drawImage(src, cx0, cy0, cw, ch, 0, 0, tw, thh); } tileCache.set(ck, pc); if (tileCache.size > 120) tileCache.delete(tileCache.keys().next().value); }
           oc.drawImage(pc, r.left, r.top, r.width, r.height);
         }
         if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline

@@ -324,7 +324,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
     const g = $('grid');
     const go = () => {
       g.innerHTML = shown.length ? shown.map((p, i) => `<a class="pc${p.wide && kind === 'All' ? ' wide' : ''}${p.kind === 'Website template' ? ' tpl' : ''}" href="#${p.id}" data-i="${i}">
-        <div class="im"${p.kind === '3D pack' ? ' data-light' : ''}>${p.images.length ? p.images.slice(0, 2).map((s, j) => `<img src="${md(s)}" alt="${j ? '' : p.name}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">`).join('') : cover(p)}
+        <div class="im"${p.images.length ? ' data-light' : ''}>${p.images.length ? p.images.slice(0, 2).map((s, j) => `<img src="${md(s)}" alt="${j ? '' : p.name}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">`).join('') : cover(p)}
           ${tagOf(p) ? `<span class="tag">${tagOf(p)}</span>` : ''}${p.images.length > 1 ? `<span class="dots">${p.images.map((_, j) => `<i${j ? '' : ' class="on"'}></i>`).join('')}</span>` : ''}</div>
         <div class="meta"><h3>${p.name}</h3><span class="kind">${p.kind} · ${p.count}</span><span class="pr">${p.price ? (p.priceCommercial ? 'from ' : '') + money(p.price) : 'Free'}</span></div></a>`).join('')
         : '<p class="empty">Nothing here yet.</p>';
@@ -364,7 +364,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
   function showPic(j) {
     const p = shown[cur]; pic = j;
     $('gMain').innerHTML = p.images.length ? `<img src="${p.images[j]}" alt="${p.name}${j ? ', picture ' + (j + 1) : ''}">` : cover(p);
-    $('gMain').toggleAttribute('data-light', p.kind === '3D pack');
+    $('gMain').toggleAttribute('data-light', !!p.images.length); if (p.images.length && window.KM && KM.light) KM.light($('gMain'));
     $('thumbs').querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-current', String(k === j)));
   }
   function paintBuy() {

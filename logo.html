@@ -522,7 +522,7 @@ figure { margin: 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610191818';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610191824';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -537,7 +537,7 @@ figure { margin: 0 }
 })();
 </script>
 <script src="nav.js?v=bd965032" defer></script>
-<script src="kit.js?v=2373d5e6" defer></script>
+<script src="kit.js?v=c6befc20" defer></script>
 <script src="protips.js?v=8e66ebd8" defer></script>
 </body>
 </html>

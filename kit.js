@@ -3,7 +3,7 @@
 //  · Every control: a hover (each page's own), a small press, a keyboard focus ring, and a done state that confirms in place.
 //  · KM.say(el, text): a short mono confirmation beside the thing that was used, which fades by itself.
 //  · Blur-up: pictures start as a soft blur of their own thumbnail and sharpen as they arrive (others simply fade in).
-//  · Cursor light: on 3D renders marked [data-light], the pointer becomes the studio lamp.
+//  · Cursor light: on every still picture marked [data-light] (all design pieces and shop pictures), the pointer becomes the studio lamp.
 //  · Keep the picture: opening a case study from Designs carries the picture across and lands it on the new page.
 //  · Role match: KM.role, the "Hiring for" choice a recruiter makes, remembered for this visit and the next.
 // With "reduce motion" on, all of it still works; it just doesn't glide.
@@ -80,16 +80,18 @@
 
   // ---------- cursor light ----------
   function light(el) {
-    if (el.dataset.kmLight) return; el.dataset.kmLight = '1';
-    const g = document.createElement('i'), s = document.createElement('i'); g.className = 'km-glow'; s.className = 'km-shade'; el.append(s, g);
+    if (el.dataset.kmLight) { if (el._kmLamp) el._kmLamp(); return; } el.dataset.kmLight = '1';
+    const g = document.createElement('i'), s = document.createElement('i'); g.className = 'km-glow'; s.className = 'km-shade';
+    const lamp = el._kmLamp = () => { if (!g.isConnected) el.append(s, g); }; lamp();   /* put back if the picture inside was swapped */
     if (reduce) { el.classList.add('km-lit'); return; }                               // a fixed studio light instead of a moving one
     let raf = 0, px = .32, py = .26;
     const paint = () => { raf = 0; el.style.setProperty('--lx', (px * 100).toFixed(1) + '%'); el.style.setProperty('--ly', (py * 100).toFixed(1) + '%'); };
-    const mv = e => { const r = el.getBoundingClientRect(); px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)); el.classList.add('km-lit'); if (!raf) raf = requestAnimationFrame(paint); };
+    const mv = e => { if (!el.hasAttribute('data-light')) return; lamp(); const r = el.getBoundingClientRect(); px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)); el.classList.add('km-lit'); if (!raf) raf = requestAnimationFrame(paint); };
     el.addEventListener('pointermove', mv); el.addEventListener('pointerdown', mv);
     const off = () => el.classList.remove('km-lit'); el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
   }
 
+  KM.light = el => el && light(el);   // for a picture that becomes lit after the page loads
   const watch = () => {
     scan(document.body); document.querySelectorAll('[data-light]').forEach(light);
     new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
