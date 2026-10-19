@@ -390,10 +390,11 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191057#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191417#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=a13b3d33" defer></script>
-<script src="protips.js?v=b87206cf" defer></script>
+<script src="kit.js?v=2373d5e6" defer></script>
+<script src="protips.js?v=dd09d87a" defer></script>
 </body>
 </html>

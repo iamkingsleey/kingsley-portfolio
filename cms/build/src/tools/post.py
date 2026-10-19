@@ -102,7 +102,7 @@ import shutil as _sh
 _sh.copy(f'{KFM}/nav.js', f'{REPO}/nav.js')
 NAV = '<script src="nav.js" defer></script>\n'
 # iteration 4: Home's intro status (home.js), Home ↔ Designs by scrolling (flow.js), tips for getting around (protips.js)
-_sh.copy(f'{KFM}/home.js', f'{REPO}/home.js'); _sh.copy(f'{KFM}/flow.js', f'{REPO}/flow.js')
+_sh.copy(f'{KFM}/kit.js', f'{REPO}/kit.js'); _sh.copy(f'{KFM}/home.js', f'{REPO}/home.js'); _sh.copy(f'{KFM}/flow.js', f'{REPO}/flow.js')
 _cases = json.load(open(f'{REPO}/content/cases.json', encoding='utf-8')).get('cases', [])
 _dsn = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8')).get('projects', []) if not p.get('hidden')]
 _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
@@ -175,6 +175,7 @@ for _p in PAGES:
     if 'src="nav.js' not in _s: _s = _s.replace('</body>', NAV + '</body>', 1)
     if _p == 'index.html' and 'src="homebg.js' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
+    if 'src="kit.js' not in _s: _s = _s.replace('</body>', '<script src="kit.js" defer></script>\n</body>', 1)   # one feel across the site (cms/build/src/kit.js)
     if 'src="protips.js' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
     if _p == 'index.html' and 'src="home.js' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
@@ -184,7 +185,7 @@ for _p in PAGES:
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
-    _s = re.sub(r'src="(nav|protips|home|flow|homebg|tuner|popkit)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
+    _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')

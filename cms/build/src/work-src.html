@@ -55,6 +55,27 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 /* ---------- Top right: category chips + count ---------- */
 .top { position: fixed; left: 50%; transform: translateX(-50%); top: 106px; z-index: 20; display: flex; align-items: center; gap: 18px }
 .chips { display: flex; gap: 4px }
+.rolepick { position: relative; flex: none; margin-left: 10px }
+.rp-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 3px 0 12px; border: 0; border-radius: 999px; background: var(--pill, rgb(127 127 127 / .12)); color: var(--muted); font: 500 12.5px var(--body, inherit); white-space: nowrap; cursor: pointer; transition: background .18s }
+.rp-btn:hover { background: var(--pill-hover, rgb(127 127 127 / .18)) }
+.rp-btn .rp-v { font-weight: 500; color: var(--ink); margin-right: 4px }
+/* the same arrow as "For recruiters": a chevron in a small circle in the page colour; it flips while the menu is open */
+.rp-btn .chev { width: 26px; height: 26px; border-radius: 50%; background: var(--bg); color: var(--ink); display: grid; place-items: center }
+.rp-btn .chev svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
+.rolepick.open .chev svg { transform: rotate(180deg) }
+.rp-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
+.rp-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; min-width: 100%; padding: 6px; border-radius: 16px; display: grid; gap: 2px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--edge, rgb(127 127 127 / .18)), 0 18px 40px -12px rgb(0 0 0 / .35);
+  opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top right; pointer-events: none; transition: opacity .24s cubic-bezier(.2,.8,.2,1), transform .24s cubic-bezier(.2,.8,.2,1) }
+.rolepick.open .rp-menu { opacity: 1; transform: none; pointer-events: auto; transition-duration: .18s }
+.rp-menu button { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 34px; padding: 0 10px 0 12px; border: 0; border-radius: 10px; background: none; color: var(--text, var(--ink)); font: 500 13px var(--body, inherit); text-align: left; white-space: nowrap; cursor: pointer }
+.rp-menu button:hover, .rp-menu button:focus-visible { background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--ink); outline: none }
+.rp-menu button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0 }
+.rp-menu button[aria-selected="true"] { color: var(--ink) } .rp-menu button[aria-selected="true"] svg { opacity: 1 }
+@media (prefers-reduced-motion: reduce) { .rp-menu, .rp-btn .chev svg { transition: none } }
+:root[data-theme="light"] .ov-t.fits .ov-c .fit { box-shadow: inset 0 0 0 1px rgb(0 0 0 / .14) }   /* the white tag keeps an edge on the light page */   /* the white selection already shows it's active */
+.ov-c .fit { display: none } .ov-t.fits .ov-c .fit { display: inline-block; margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
 .chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
 .chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
 .chips button:hover { color: var(--ink) }
@@ -128,8 +149,9 @@ body.open .px { opacity: 0; pointer-events: none }
   .now .fq { font-size: 22px }
   .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between; transform: none }
   .chips { overflow-x: auto; scrollbar-width: none }
-  .chips button { padding: 6px 9px; font-size: 12px }
+  .chips button { padding: 6px 9px; font-size: 12px; white-space: nowrap; flex: none }
   .chips button sup { display: none }
+  .rolepick { margin-left: 0 } .rp-btn { padding-left: 10px } .rp-btn .rp-l { display: none }
   .hint span { display: none }
   .hint { right: 16px }
   .cap h2 { font-size: 18px }
@@ -464,16 +486,18 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // The chips are the Designs page's own nav and filter: All (the default) shows every piece; a category shows only its pieces.
   let filt = null;
   const chipAll = document.createElement('button'); chipAll.type = 'button'; chipAll.className = 'on'; chipAll.innerHTML = `All<sup>${items.length}</sup>`;
-  chipAll.addEventListener('click', () => { tap(); setFilter(null); }); chips.appendChild(chipAll);
+  chipAll.addEventListener('click', () => { tap(); leaveRole(); setFilter(null); }); chips.appendChild(chipAll);
   const chipEls = CATS.map((c, ci) => {
     const b = document.createElement('button'); b.type = 'button';
     b.innerHTML = `${c.name}<sup>${A[c.k].length}</sup>`;
-    b.addEventListener('click', () => { tap(); setFilter(c.name); });
+    b.addEventListener('click', () => { tap(); leaveRole(); setFilter(c.name); });
     chips.appendChild(b); return b;
   });
+  function leaveRole() { if (typeof roleNow === 'undefined' || !roleNow) return; if (window.KM && KM.role) KM.role.set(''); else applyRole('', false); }
   function setFilter(name) {
     if (filt === name) return; filt = name;
     chipAll.classList.toggle('on', !name); chipEls.forEach((b, ci) => b.classList.toggle('on', CATS[ci].name === name));
+    if (window.KM && KM.say) { const n = name ? items.filter(x => x.cat === name).length : items.length; KM.say(name ? chipEls[CATS.findIndex(c => c.name === name)] : chipAll, name ? `${n} ${name} piece${n === 1 ? '' : 's'}` : `All ${n} pieces`); }
     const ovEl = document.getElementById('ov'); if (!ovEl) return;
     ovEl.classList.add('refilt');
     setTimeout(() => {
@@ -1079,7 +1103,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
         <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
-          <div class="d-pic" id="dpic">${media}</div>
+          <div class="d-pic" id="dpic"${it.cat === '3D' && !it.video ? ' data-light' : ''}>${media}</div>
         </div></div>
         <div class="d-info">
           <div class="d-ih"><h1>${it.t}</h1>${it.year ? `<span class="d-yr">${it.year}</span>` : ''}<span class="d-chip">${it.cat}</span></div>
@@ -1107,7 +1131,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
         <div class="d-frame${it.video ? ' white' : ''}" id="dmedia">
-          <div class="d-pic" id="dpic">${media}</div>
+          <div class="d-pic" id="dpic"${it.cat === '3D' && !it.video ? ' data-light' : ''}>${media}</div>
           <i class="notch l" id="nL"></i><i class="notch r" id="nR"></i>
           <div class="d-over" id="dover" style="color:${it.dark ? '#fff' : '#0b0b0b'}"><div class="d-label"><i></i>${pad(i)} · ${it.cat}</div><h1>${it.t}</h1></div>
         </div>
@@ -1270,12 +1294,14 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // still-rippling picture flies into the hero.
   // Pieces with their own page: the picture ripples, a circle of the page colour grows from the tap, then
   // the project page opens (and opens itself from the same point).
-  async function goPage(i, x, y) {
+  async function goPage(i, x, y, fr) {
     busy = true; tap();
-    const from = slots[i].getBoundingClientRect();
+    const from = fr || slots[i].getBoundingClientRect();
     if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
     const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
     const f = flyEl(from, rp && rp.cv, still(items[i]));   // the picture itself ripples from the tap (no ring lines)
+    // keep the picture: it stays sharp above the tuning screen, and the next page lands it on the same picture there (kit.js)
+    if (window.KM && KM.keep && !reduce) { f.style.zIndex = 2147483001; KM.keep(still(items[i]), from); }
     if (window.Tuner) {                                       // then the page blurs and the readout tunes to the piece's station
       try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
       await wait(rp && !reduce ? 260 : 0);
@@ -1295,7 +1321,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   if (PROJECT_PAGE) setTimeout(() => { [PROJECT_PAGE, 'logo.html', 'product.html', 'showcase.html'].forEach(h => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; document.head.appendChild(l); }); }, 1500);
   addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly').forEach(c => c.remove()); busy = false; flyIdx = -1; } });   // back button: nothing left over
   async function openDetail(i, x, y, fr) {      // fr: the box it flies from (a tile in the All view), else the piece on the dial
-    if (items[i] && items[i].link && !busy) return goPage(i, x, y);
+    if (items[i] && items[i].link && !busy) return goPage(i, x, y, fr);
     if (busy || openIdx >= 0) return; busy = true; tap();
     vpEl.classList.remove('show');
     const from = fr || slots[i].getBoundingClientRect();
@@ -1546,6 +1572,46 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   ov.prepend(ovc);
   const ovFlat = document.createElement('canvas'), oc = ovFlat.getContext('2d');
   const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
+  // ---------- role match: "Hiring for" (kit.js keeps the choice). Fitting work moves to the front with a tag; the rest dims but stays. ----------
+  const fits = (it, r) => r === 'Product' ? it.cat === 'Case study' && !/brand\.html|logo\.html|showcase\.html/.test(it.link || it.page || '')
+    : r === 'Brand' ? it.cat === 'Brand' || /brand\.html|logo\.html/.test(it.link || it.page || '')
+    : r === '3D' ? it.cat === '3D' || /showcase\.html/.test(it.link || it.page || '')
+    : r === 'Motion' ? it.cat === 'Motion' : true;
+  let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)
+  const ovGrid = ov.querySelector('.ov-grid'), ovOrder = ovTiles.map(o => o.t);
+  ovTiles.forEach(o => { const tg = document.createElement('i'); tg.className = 'fit'; o.c.prepend(tg); o.tag = tg; });
+  // a role shows only the work that fits it (a recruiter hiring for Brand sees Brand); the chips and the picker bring the rest back
+  const ROLE_CHIP = { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
+  function applyRole(r, animate) {
+    roleNow = r; filt = null;
+    chipAll.classList.toggle('on', !r); chipEls.forEach((b, ci) => b.classList.toggle('on', !!r && CATS[ci].name === ROLE_CHIP[r]));
+    const show = () => { ovTiles.forEach(o => { const ok = !!r && fits(items[o.i], r); o.t.hidden = !!r && !ok; o.t.classList.toggle('fits', ok); o.tag.textContent = ok ? 'Fits ' + r : ''; }); ov.scrollTop = 0; ov.classList.remove('refilt'); };
+    if (animate) { ov.classList.add('refilt'); setTimeout(show, 160); } else show();
+    if (roleSel) roleSel.value = r;
+  }
+  // the picker: a quiet pill at the end of the filter row
+  // the picker: a pill at the end of the filter row; its menu drops just below it on frosted glass, so the work behind blurs instead of blacking out
+  const ROLE_OPTS = ['', 'Product', 'Brand', '3D', 'Motion'], roleName = r => r || 'Any role';
+  const roleWrap = document.createElement('div'); roleWrap.className = 'rolepick';
+  roleWrap.innerHTML = `<button type="button" class="rp-btn" id="rolePick" aria-haspopup="listbox" aria-expanded="false"><span class="rp-l">Hiring for</span><b class="rp-v"></b>
+    <span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6.5 8 10.5 12 6.5"/></svg></span></button>
+    <div class="rp-menu" role="listbox" aria-label="Hiring for" tabindex="-1">${ROLE_OPTS.map(r => `<button type="button" role="option" data-r="${r}">${roleName(r)}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5"/></svg></button>`).join('')}</div>`;
+  $('chips').after(roleWrap);
+  const rpBtn = roleWrap.querySelector('.rp-btn'), rpMenu = roleWrap.querySelector('.rp-menu'), rpOpts = [...rpMenu.children];
+  const roleSel = { set value(r) { roleWrap.querySelector('.rp-v').textContent = roleName(r); rpOpts.forEach(o => o.setAttribute('aria-selected', String(o.dataset.r === r))); roleSel._v = r; }, get value() { return roleSel._v || ''; } };
+  const rpOpen = o => { roleWrap.classList.toggle('open', o); rpBtn.setAttribute('aria-expanded', String(o));
+    if (o) { (rpOpts.find(x => x.dataset.r === roleSel.value) || rpOpts[0]).focus({ preventScroll: true }); } };
+  rpBtn.addEventListener('click', e => { e.stopPropagation(); tap(); rpOpen(!roleWrap.classList.contains('open')); });
+  rpOpts.forEach(o => o.addEventListener('click', e => { e.stopPropagation(); tap(); const r = o.dataset.r; rpOpen(false); rpBtn.focus({ preventScroll: true });
+    if (r === roleSel.value) return; if (window.KM && KM.role) KM.role.set(r); else applyRole(r, true); }));
+  rpMenu.addEventListener('keydown', e => { const k = rpOpts.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); rpOpts[(k + 1) % rpOpts.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); rpOpts[(k - 1 + rpOpts.length) % rpOpts.length].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); rpOpen(false); rpBtn.focus(); } });
+  document.addEventListener('click', e => { if (!roleWrap.contains(e.target)) rpOpen(false); });
+  roleSel.value = roleNow;
+  addEventListener('km-role', e => applyRole(e.detail, true));
+  applyRole(roleNow, false);
   const DRUM = { radius: .62, narrow: .2, fade: .16, margin: .12 };   // radius and margin (share of screen height), how much far rows narrow, fade band
   let ogl = ovc.getContext('webgl', { premultipliedAlpha: true, alpha: true }), oglU = {}, ov2d = null;
   if (ogl) {
@@ -1589,7 +1655,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
       let nLoaded = 0; texCache.forEach(im => { if (im.complete) nLoaded++; });
-      const key = [ov.scrollTop, innerWidth, innerHeight, devicePixelRatio, nLoaded, document.documentElement.dataset.theme, ov.className, document.body.className].join('|');
+      const key = [ov.scrollTop, innerWidth, innerHeight, devicePixelRatio, nLoaded, document.documentElement.dataset.theme, ov.className, document.body.className, roleNow].join('|');
       const now = performance.now();
       if (key !== ovKey) { ovKey = key; ovSettle = now + 1400; }
       if (now > ovSettle) { requestAnimationFrame(ovWarp); return; }
@@ -1719,6 +1785,9 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
   // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
   ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
+  { const m = /^#p-(.+)$/.exec(location.hash); const pi = m ? items.findIndex(x => slugOf(x.t) === m[1]) : -1;
+    if (pi >= 0) setTimeout(() => { const t = ov.querySelector(`.ov-t[data-i="${pi}"]`); if (!t) return; if (t.hidden) { leaveRole(); }
+      t.scrollIntoView({ block: 'center' }); setTimeout(() => openDetail(pi, undefined, undefined, t.querySelector('.ov-im').getBoundingClientRect()), 120); }, 700); }
   // a tile in the All view opens the piece in the small view, or the page the CMS points it to
   ov.addEventListener('click', e => {
     const t = e.target.closest('.ov-t'); if (!t) return;
@@ -1726,6 +1795,12 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const dest = items[i].link || (items[i].cs && items[i].page);   // a case study goes straight to it; "link" points a piece anywhere
     if (dest && window.Tuner) { tap();
       try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
+      // keep the picture: it lifts off its tile and stays sharp above the tuning screen; the case study lands it on the same picture (kit.js)
+      if (window.KM && KM.keep && !reduce) { const r = t.querySelector('.ov-im').getBoundingClientRect(), u = mdOf(still(items[i]));
+        const k = document.createElement('div'); k.className = 'km-keep'; k.innerHTML = `<img alt="" src="${u}">`;
+        Object.assign(k.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: '0px' }); document.body.appendChild(k);
+        k.animate([{ transform: 'none' }, { transform: 'scale(1.03)' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+        KM.keep(u, r); }
       Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest });
       return;
     }

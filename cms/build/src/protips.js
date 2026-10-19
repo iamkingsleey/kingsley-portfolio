@@ -31,13 +31,18 @@
     opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left; pointer-events: none; transition: opacity .2s, transform .3s cubic-bezier(.2,.8,.2,1) }
   .pt-card.on { opacity: 1; transform: none; pointer-events: auto }
   .pt-card .lb { font: 500 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888) }
+  .pt-card .rr { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 12px; font-size: 12.5px; color: var(--muted, #888) }
+  .pt-card .rr span { margin-right: 4px }
+  .pt-card .rr button { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: var(--pill, #f2f2f2); color: var(--muted, #888); font: 500 12px Geist, system-ui, sans-serif; cursor: pointer; transition: background .18s, color .18s }
+  .pt-card .rr button:hover { color: var(--ink, #111) }
+  .pt-card .rr button[aria-pressed="true"] { background: var(--ink, #111); color: var(--bg, #fff) }
   .pt-card .go { margin: 12px 0 16px; display: grid }
   .pt-card .go a { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 12px; padding: 12px 0; border-top: 1px solid var(--line, rgb(0 0 0 / .08)); color: var(--ink, #111); text-decoration: none }
   .pt-card .go a:last-child { border-bottom: 1px solid var(--line, rgb(0 0 0 / .08)) }
   .pt-card .go b { font-weight: 500 }
   .pt-card .go small { grid-column: 1; font-size: 12.5px; color: var(--muted, #888) }
   .pt-card .go i { grid-row: 1 / span 2; grid-column: 2; font-style: normal; color: var(--muted, #888); transition: transform .25s cubic-bezier(.2,.8,.2,1), color .2s }
-  .pt-card .go a:hover i { transform: translateX(3px); color: #ff4a1c }
+  .pt-card .go a:hover i { transform: translateX(3px); color: var(--ink, #111) }
   .pt-card .ac { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
   .pt-card .ac a, .pt-card .ac button { height: 40px; padding: 0 14px; border-radius: 12px; border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--pill, #f2f2f2); color: var(--ink, #111);
     font: 500 13.5px Geist, system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s }
@@ -86,10 +91,25 @@
     const cv = [...document.querySelectorAll('a')].find(a => a.textContent.trim().toLowerCase() === 'resume');
     // the short route through the site: what to open first (nothing the landing page already says)
     card.innerHTML = `<span class="lb">For recruiters · the short route</span>
-      <div class="go"><a href="case.html#kusnap"><b>Kusnap case study</b><small>Product, 0 to 1</small><i>→</i></a>
-        <a href="brand.html#oghosa"><b>Oghosa case study</b><small>Brand identity</small><i>→</i></a>
-        <a href="designs.html"><b>All designs</b><small>__DESIGNS_HINT__</small><i>→</i></a></div>
+      <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r || 'Any'}</button>`).join('')}</div>
+      <div class="go"></div>
       <div class="ac"><a href="${cv ? cv.getAttribute('href') : '#'}" class="cv">Résumé</a><button type="button" class="bk">Book a call</button></div>`;
+    // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
+    // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
+    const ROUTES = {
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '__DESIGNS_HINT__']],
+      Product: [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
+      Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#hd-verse', 'HD Verse case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
+      '3D':    [['showcase.html#3d-collection', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
+      Motion:  [['designs.html#p-tennis-ball-and-rackets', 'Tennis ball and rackets', 'Motion'], ['designs.html#p-red-padlock', 'Red padlock', 'Motion'], ['designs.html', 'All motion work', 'Loops on Designs']]
+    };
+    const rr = card.querySelector('.rr'), go = card.querySelector('.go');
+    const role = r => { rr.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === r)));
+      go.innerHTML = (ROUTES[r] || ROUTES['']).map(([h, t, d]) => `<a href="${h}"><b>${t}</b><small>${d}</small><i>→</i></a>`).join(''); };
+    rr.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation();
+      if (window.KM && KM.role) KM.role.set(b.dataset.r); else role(b.dataset.r); });
+    addEventListener('km-role', e => role(e.detail));
+    role(window.KM && KM.role ? KM.role.get() : '');
     card.querySelector('.bk').addEventListener('click', () => { const b = document.getElementById('bookCall'); if (b) b.click(); });
     const setOpen = o => { card.classList.toggle('on', o); rec.setAttribute('aria-expanded', o); };
     rec.addEventListener('click', e => { e.stopPropagation(); setOpen(!card.classList.contains('on')); });
