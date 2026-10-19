@@ -84,7 +84,8 @@
         "assets/shop/tune-engineering.jpg"
       ],
       "link": "",
-      "status": "soon"
+      "status": "soon",
+      "hidden": true
     },
     {
       "id": "rewards-and-badges",
@@ -105,7 +106,8 @@
         "assets/designs/batch-in-a-box.jpg"
       ],
       "link": "",
-      "status": "soon"
+      "status": "soon",
+      "hidden": true
     },
     {
       "id": "linecraft",
