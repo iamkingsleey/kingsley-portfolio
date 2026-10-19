@@ -345,7 +345,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="projects.html?v=202610191450" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
+<div class="station" data-readout><a class="back" href="projects.html?v=202610191515" id="back"><span aria-hidden="true">‹</span><b>102.0</b> Projects</a><span class="fq" id="sfq">88.1</span><span class="nm" id="snm">Case study</span></div>
 
 <!-- opening: sideways first, then the page continues down -->
 <section class="run" id="run" aria-label="Project opening"><div class="rpin"><div class="track" id="track">
@@ -383,7 +383,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
     document.addEventListener('click', function (e) {
-      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL) || e.target.closest('[data-nopop]')) return;   /* data-nopop: a control with its own sound */
       var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
       if (on) Popkit.play('pop');
     }, true); })();
@@ -809,7 +809,7 @@ figure:has(> .pn.vfirst:not(.land)) .cap { max-width: min(100%, calc((100svh - 1
     a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: 102, name: 'Projects', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); });
     n.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
-      var href = (K.next.page || 'case.html') + '?v=202610191450#' + K.next.slug;
+      var href = (K.next.page || 'case.html') + '?v=202610191515#' + K.next.slug;
       if (window.Tuner) Tuner.go({ from: +K.it.fq, to: +K.next.fq, name: K.next.title, href: href }); else location.href = href; });
   })();
 </script>

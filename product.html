@@ -347,7 +347,7 @@ h1 .w.in > span { translate: 0 0 }
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
     document.addEventListener('click', function (e) {
-      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL) || e.target.closest('[data-nopop]')) return;   /* data-nopop: a control with its own sound */
       var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
       if (on) Popkit.play('pop');
     }, true); })();
@@ -711,7 +711,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610191450';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610191515';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {

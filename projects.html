@@ -234,7 +234,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
     document.addEventListener('click', function (e) {
-      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL) || e.target.closest('[data-nopop]')) return;   /* data-nopop: a control with its own sound */
       var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
       if (on) Popkit.play('pop');
     }, true); })();
@@ -394,7 +394,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191450#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610191515#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=f697093f" defer></script>

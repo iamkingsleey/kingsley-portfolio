@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <script>
-  var BUILD = "202610191450";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202610191515";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -1884,7 +1884,7 @@ h1.typer { position: relative }
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
     document.addEventListener('click', function (e) {
-      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL) || e.target.closest('[data-nopop]')) return;   /* data-nopop: a control with its own sound */
       var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
       if (on) Popkit.play('pop');
     }, true); })();

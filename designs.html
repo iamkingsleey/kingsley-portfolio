@@ -270,6 +270,13 @@ canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(10
 .pagecover { position: fixed; inset: 0; z-index: 90; background: var(--bg); pointer-events: none; clip-path: circle(0px at var(--rx, 50%) var(--ry, 50%)); transition: clip-path .42s cubic-bezier(.55,0,.45,1) }
 .pagecover.on { clip-path: circle(150vmax at var(--rx, 50%) var(--ry, 50%)) }
 /* ---------- See everything ---------- */
+/* shuffle: a round button at the far right of the filter row; grey like "Hiring for" until used, then white */
+.shuf { position: fixed; z-index: 20; right: max(48px, env(safe-area-inset-right, 0px)); top: 101px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--pill); color: var(--muted); transition: color .18s, background .18s }
+.shuf:hover { color: var(--ink) }
+.shuf.on { color: var(--ink) }
+.shuf svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+body.open .shuf { opacity: 0; pointer-events: none }
+@media (max-width: 899px) { .shuf { top: calc(12px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: 40px; height: 40px } }
 .allbtn { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--pill); font-size: 13px; font-weight: 500; color: var(--ink); transition: background .2s, color .2s }
 .allbtn svg { width: 12px; height: 12px; fill: currentColor }
 .allbtn:hover { background: var(--hover) }
@@ -410,7 +417,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
     document.addEventListener('click', function (e) {
-      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL)) return;
+      if (!e.isTrusted || !window.Popkit || !e.target.closest || !e.target.closest(SEL) || e.target.closest('[data-nopop]')) return;   /* data-nopop: a control with its own sound */
       var on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
       if (on) Popkit.play('pop');
     }, true); })();
@@ -1632,6 +1639,32 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); rpOpen(false); rpBtn.focus(); } });
   document.addEventListener('click', e => { if (!roleWrap.contains(e.target)) rpOpen(false); });
   roleSel.value = roleNow;
+  // shuffle: deal the pieces into a new order (each tap is a new deal); they glide to their new places
+  let shufN = 0;
+  const shuf = document.createElement('button'); shuf.type = 'button'; shuf.className = 'shuf'; shuf.setAttribute('aria-label', 'Shuffle the designs'); shuf.dataset.nopop = '';   /* only the air sound, no click pop */ shuf.title = 'Shuffle';
+  shuf.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.2c2 0 3.2 1 4.4 2.8l2.8 4.4C14.6 16 15.8 17 17.8 17H21"/><path d="M3 17h3.2c1.6 0 2.7-.6 3.6-1.7"/><path d="M14.2 8.7C15.1 7.6 16.2 7 17.8 7H21"/><path d="m18 4 3 3-3 3"/><path d="m18 14 3 3-3 3"/></svg>';
+  document.body.appendChild(shuf);
+  // the shuffle's sound: a soft breath of air that sweeps across while the pieces move (made in code, like the site's other sounds)
+  let airBuf = null;
+  function air() {
+    unlockAudio(); let on = soundOn; try { on = on && localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+    if (!on || !ac) return;
+    if (!airBuf) { airBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const d = airBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const t = ac.currentTime + .02, src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    src.buffer = airBuf; f.type = 'bandpass'; f.Q.value = .7; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2600, t + .5);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.07, t + .14); g.gain.exponentialRampToValueAtTime(.0001, t + .5);
+    src.connect(f).connect(g).connect(ac.destination); src.start(t, Math.random() * .4); src.stop(t + .55);
+  }
+  shuf.addEventListener('click', () => {
+    unlockAudio(); shufN++; shuf.classList.add('on'); if (!reduce) shuf.querySelector('svg').animate([{ scale: 1 }, { scale: .78 }, { scale: 1.08 }, { scale: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });   // (shufN tells the drum to redraw while the pieces move)
+    const first = reduce ? null : new Map(ovTiles.map(o => [o.t, o.t.getBoundingClientRect()]));
+    const deck = [...ovGrid.children];
+    for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    deck.forEach(t => ovGrid.appendChild(t)); ov.scrollTop = 0;
+    air();
+    if (first) deck.forEach(t => { if (t.hidden) return; const a = first.get(t), z = t.getBoundingClientRect(), dx = a.left - z.left, dy = a.top - z.top;
+      if ((dx || dy) && Math.abs(dy) < innerHeight * 2.5) t.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }); });
+  });
   addEventListener('km-role', e => applyRole(e.detail, true));
   applyRole(roleNow, false);
   const DRUM = { radius: .62, narrow: .2, fade: .16, margin: .12 };   // radius and margin (share of screen height), how much far rows narrow, fade band
@@ -1677,7 +1710,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
       let nLoaded = 0; texCache.forEach(im => { if (im.complete) nLoaded++; });
-      const key = [ov.scrollTop, innerWidth, innerHeight, devicePixelRatio, nLoaded, document.documentElement.dataset.theme, ov.className, document.body.className, roleNow].join('|');
+      const key = [ov.scrollTop, innerWidth, innerHeight, devicePixelRatio, nLoaded, document.documentElement.dataset.theme, ov.className, document.body.className, roleNow, shufN].join('|');
       const now = performance.now();
       if (key !== ovKey) { ovKey = key; ovSettle = now + 1400; }
       if (now > ovSettle) { requestAnimationFrame(ovWarp); return; }
