@@ -809,6 +809,102 @@
       "dark": true,
       "desc": "A collage of the illustration set: the coding laptop, a robot hand, the star award and a gradient sky.",
       "tools": "Illustrator"
+    },
+    {
+      "title": "OSCAFest’25, keynote speaker",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-keynote.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A keynote speaker announcement for OSCAFest’25, the Beyond Borders edition.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, sold out",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-sold-out.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "An early-bird ticket stub stamped sold out, for OSCAFest’25.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, tell your story",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-story.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A “Tell your OSCAFest story” post in the Beyond Borders style.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, Beyond Borders",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-beyond-borders.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The Beyond Borders theme art for OSCAFest’25 in Lagos.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, call for speakers",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-call-for-speakers.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The call for speakers for Open Source Festival 2025 and KCD Nigeria.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "OSCAFest’25, hallway",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-hallway.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A figure walking toward the Beyond Borders type at the end of a hallway.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
     }
   ]
 }
