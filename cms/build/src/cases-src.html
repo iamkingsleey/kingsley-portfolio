@@ -531,6 +531,7 @@ const KM_EDIT = /[?&]cms=1/.test(location.search);
 const E = (path, br) => KM_EDIT ? ` data-edit="${path}"${br ? ' data-br' : ''}` : '';
 // sound: the ruler's detent tick, as on About. Browsers only allow sound after the first tap or key on the page.
 let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+if (/[?&]cms=1/.test(location.search)) { soundOn = false; const hush = () => { if (window.Popkit) Popkit.mute(true); }; hush(); addEventListener('DOMContentLoaded', hush); addEventListener('load', hush); }   // silent inside the CMS: no ticks, no clicks
 if (window.Popkit) { Popkit.define('wake', () => {}); const wake = () => { if (soundOn) Popkit.play('wake'); }; addEventListener('pointerdown', wake, { once: true }); addEventListener('keydown', wake, { once: true }); }
 let sndT = 0; const snd = n => { if (!soundOn || !window.Popkit) return; const t = performance.now(); if (n === 'detent' && t - sndT < 38) return; sndT = t; try { Popkit.play(n); } catch (_) {} };
 // one piece of media: a picture, a looping video, or (for cases without pictures yet) a block of colour with a word
