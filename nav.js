@@ -60,7 +60,7 @@
     .kmn-mb { display: grid; place-items: center; position: fixed; z-index: 160; top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%;
       background: var(--pill, rgb(127 127 127 / .12)); color: var(--ink, #111); cursor: pointer; -webkit-tap-highlight-color: transparent }
     .kmn-mb i { position: absolute; left: 12px; width: 16px; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .32s cubic-bezier(.65,0,.35,1), opacity .2s, width .32s cubic-bezier(.65,0,.35,1) }
-    .kmn-mb i:nth-child(1) { top: 14.5px } .kmn-mb i:nth-child(2) { top: 19.25px; width: 10px } .kmn-mb i:nth-child(3) { top: 24px }
+    .kmn-mb i:nth-child(1) { top: 14.5px } .kmn-mb i:nth-child(2) { top: 19.25px; width: 10px; left: 18px }   /* the short line sits to the right */ .kmn-mb i:nth-child(3) { top: 24px }
     html.kmn-open .kmn-mb i:nth-child(1) { transform: translateY(4.75px) rotate(45deg) }
     html.kmn-open .kmn-mb i:nth-child(2) { opacity: 0; width: 0 }
     html.kmn-open .kmn-mb i:nth-child(3) { transform: translateY(-4.75px) rotate(-45deg) }

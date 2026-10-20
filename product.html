@@ -711,7 +711,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610201322';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610201455';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -725,7 +725,7 @@ h1 .w.in > span { translate: 0 0 }
   addEventListener('hashchange', function () { location.reload(); });   // next piece with the same layout: same file, new address
 })();
 </script>
-<script src="nav.js?v=73bf2373" defer></script>
+<script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=a9bc7f9e" defer></script>
 <script src="protips.js?v=53e5107b" defer></script>
 </body>
