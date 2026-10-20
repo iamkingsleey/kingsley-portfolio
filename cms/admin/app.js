@@ -217,7 +217,10 @@
   // ---------------------------------------------------------------- schemas
   const mname = p => !p ? 'empty' : typeof p === 'object' ? (p.color ? 'Colour · ' + (p.word || p.color) : 'Video · ' + String(p.video || '').split('/').pop()) : String(p).split('/').pop().split('?')[0];
   const CASE_SLUGS = () => [['', 'None'], ...(C.cases.cases || []).map(c => [c.slug, c.title]),
-    ...((C.designs && C.designs.projects) || []).filter(p => p.caseStudy).map(p => [p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), p.title])];
+    ...((C.designs && C.designs.projects) || []).filter(p => p.caseStudy).map(p => [p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), p.title]),
+    // collections that live only as a shared name on their pieces (e.g. the 3D collection: arrows and a grid on Designs, no page of its own)
+    ...[...new Set(((C.designs && C.designs.projects) || []).map(p => p.case).filter(Boolean))].filter(s => !(C.cases.cases || []).some(c => c.slug === s) && !((C.designs && C.designs.projects) || []).some(p => p.caseStudy && p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === s))
+      .map(s => [s, s.replace(/-/g, ' ').replace(/^./, m => m.toUpperCase()).replace(/^3d/i, '3D')])];
   const PAIR = (a, b) => ({ type: 'tuple', fields: [{ label: a }, { label: b }] });
   const CASE = [
     { title: 'Basics', cols: 2, fields: [

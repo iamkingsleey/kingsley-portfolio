@@ -83,7 +83,7 @@
     var span = Math.abs(o.to - o.from), total = Math.min(520, 260 + span * 70), leg = Math.round(total * LEG);
     var mid = o.from + (o.to - o.from) * LEG;
     document.documentElement.classList.add('tuning');
-    build(o.name); draw(o.from);
+    build(o.name); el.classList.remove('out', 'now'); el.querySelector('.tnm').textContent = o.name || ''; draw(o.from);
     requestAnimationFrame(function () { el.classList.add('on'); });
     count(o.from, mid, leg, easeIn, function () {
       try { sessionStorage.setItem(KEY, JSON.stringify({ v: mid, to: o.to, name: o.name, ms: total - leg, t: Date.now() })); } catch (e) {}
@@ -108,10 +108,10 @@
     var ready = false, counted = false, over = false;
     var finish = function () {
       if (!ready || !counted || over || !el) return; over = true;
-      el.classList.remove('now');
+      var me = el; me.classList.remove('now');
       document.documentElement.classList.add('tuned');   // the page sharpens…
-      requestAnimationFrame(function () { el.classList.add('out'); el.classList.remove('on'); });   // the readout fades where it is
-      setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } }, 200);
+      requestAnimationFrame(function () { me.classList.add('out'); me.classList.remove('on'); });   // the readout fades where it is
+      setTimeout(function () { if (going) return; document.documentElement.classList.remove('tuning', 'tuned'); me.remove(); if (el === me) el = null; }, 200);   // unless a tap already tuned away
     };
     var begin = function () { count(+arr.v, +arr.to, Math.max(140, +arr.ms || 200), easeOut, function () { counted = true; finish(); }); };
     requestAnimationFrame(begin);

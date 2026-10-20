@@ -348,21 +348,6 @@
       "desc": "A bright orange padlock with a rope, from the same security set."
     },
     {
-      "title": "3D collection",
-      "category": "product",
-      "caseStudy": true,
-      "layout": "3d",
-      "images": [
-        {
-          "src": "assets/designs/colorful-award-with-ribbons.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#98969b",
-      "dark": false,
-      "desc": "A set of everyday objects modelled and lit in Blender, made to feel precious."
-    },
-    {
       "title": "White piggy bank",
       "category": "3d",
       "images": [

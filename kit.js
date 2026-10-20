@@ -144,13 +144,19 @@
   const nameHere = () => ((document.querySelector('.cnav .nm, [data-readout] .nm, .station .nm, .now .nm') || {}).textContent || document.title.split(' · ')[0]).trim();
   KM.trail = {
     mark(u = here(), t) { const a = readT(), top = a[a.length - 1];
-      if (t === undefined) t = top && top.u === u && top.t ? top.t : nameHere();   // an automatic mark never renames a place the page already named (e.g. a Designs filter)
+      const back = a.length > 1 && a[a.length - 2].u === u ? a[a.length - 2] : null;
+      if (t === undefined) t = back && back.t ? back.t : top && top.u === u && top.t ? top.t : nameHere();   // an automatic mark never renames a place the page already named (e.g. a Designs filter), even when you come back to it
       const e = { u, t };
       if (a.length > 1 && a[a.length - 2].u === u) { a.pop(); a[a.length - 1] = e; }                      // went back a step
       else if (a.length && fileOf(a[a.length - 1].u) === fileOf(u)) a[a.length - 1] = e;                 // same page, new place on it
       else a.push(e);
       writeT(a); },
-    prev() { const a = readT(), f = fileOf(here()); for (let i = a.length - 1; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i]; else if (i < a.length - 1) break; return null; },   // the page before this one (this page may not be marked yet)
+    // the page before this one, read as if this page were already marked (so it is right from the first moment, and when you have just come back)
+    prev() { const a = readT(), u = here(), f = fileOf(u);
+      if (a.length > 1 && a[a.length - 2].u === u) a.pop();                       // came back a step: the last entry is where we came back from
+      else if (!a.length || fileOf(a[a.length - 1].u) !== f) a.push({ u });      // new here: this page goes on the end
+      for (let i = a.length - 2; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i];
+      return null; },
     // where a back control should go, and what to call it
     back(fallback, fallbackName) { const p = KM.trail.prev(); if (!p) return { href: fallback, name: fallbackName };
       const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#[pf]-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; },

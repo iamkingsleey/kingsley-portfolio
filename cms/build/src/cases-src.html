@@ -1086,7 +1086,7 @@ function paint(keep) {
     const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
   setupIndex(); setupN(); setupPlay(); countUp();
-  if (window.KM && KM.trail) KM.trail.mark();
+  if (window.KM && KM.trail) KM.trail.mark(undefined, c.title);   // this case's own name, whatever the page said a moment before
   if (KM_EDIT) editable(c);
 }
 // ---------- editing in the CMS ----------

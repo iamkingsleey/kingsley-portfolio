@@ -532,7 +532,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   const readHash = () => { const h = decodeURIComponent(location.hash), f = /^#f-([^/]+)/.exec(h), m = /(?:^#|\/)p-([^/]+)$/.exec(h);
     return { f: f ? (CATS.find(c => slugOf(c.name) === f[1]) || {}).name || null : null, p: m ? items.findIndex(x => slugOf(x.t) === m[1]) : -1 }; };
   const stateOf = extra => (window.KM && KM.trail && KM.trail.state) ? KM.trail.state(extra) : Object.assign({}, history.state || {}, extra || {});
-  const markHere = () => { if (window.KM && KM.trail) KM.trail.mark(undefined, openIdx >= 0 ? undefined : catBack(filt)); };
+  const markHere = () => { if (window.KM && KM.trail) KM.trail.mark(undefined, openIdx >= 0 ? items[openIdx].t : catBack(filt)); };
   function setFilter(name, quiet) {
     if (filt === name) return; const was = filt; filt = name;
     document.body.classList.toggle('filt', !!name); if (typeof dbackLabel === 'function') dbackLabel();
@@ -1974,7 +1974,9 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
   // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
   ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
+  addEventListener('pageshow', e => { if (e.persisted) setTimeout(markHere, 0); });   // back from another page: this place keeps its own name
   const H0 = readHash();
+  if (!H0.f && H0.p < 0) setTimeout(markHere, 0);
   if (H0.f) setTimeout(() => setFilter(H0.f, true), 0);   // back to the view you left
   { const pi = H0.p;
     // a piece opened straight from another page (a link on a case study) goes back to that page; one we opened ourselves goes back a step
