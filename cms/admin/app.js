@@ -232,9 +232,9 @@
       { k: 'headline', label: 'Headline', type: 'br', rows: 2, help: 'Press Enter for a line break' }, { k: 'blurb', label: 'Summary', type: 'textarea' },
       { k: 'stat', label: 'Headline number', ...PAIR('Number', 'What it counts') }, { k: 'cover', label: 'Cover picture', type: 'media', rich: true, help: 'Shown on Projects and Designs' } ] },
     { title: 'Story', fields: [
-      { k: 'story', label: 'Overview', type: 'tuple', cols: 1, fields: [{ label: 'Heading' }, { label: 'Paragraphs', type: 'paras', help: 'Leave an empty line between paragraphs' }] },
+      { k: 'story', label: 'The brief', type: 'tuple', cols: 1, fields: [{ label: 'Heading' }, { label: 'Paragraphs', type: 'paras', help: 'Leave an empty line between paragraphs' }] },
       { k: 'problem', label: 'The brief · Problem', type: 'textarea' }, { k: 'goal', label: 'The brief · Goal', type: 'textarea' },
-      { k: 'statement', label: 'Closing statement', type: 'textarea', rows: 2 } ] },
+      { k: 'statement', label: 'Statement', type: 'textarea', rows: 2, help: 'One line set large mid-page (product: the design principle; brand: the scrolling ticker)' } ] },
     { title: 'Sections', help: 'The chapters of the case study, in order. Add, remove, reorder or duplicate them. Each can have text, points, numbers and pictures; leave a part empty to skip it.', fields: [
       { k: 'sections', label: '', type: 'list', itemLabel: 'Section', def: () => ({ h: '', p: [], media: [] }), title: (s, i) => `${i + 1} · ${s.h || 'Untitled section'}`, of: { type: 'object', fields: [
         { k: 'h', label: 'Heading', help: 'e.g. Overview, Pain points, UX strategy, High fidelity, Impact, Logo, Colour and type, Mockups' },
@@ -243,20 +243,20 @@
         { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
         { k: 'chips', label: 'Colour or type names (brand, optional)', type: 'lines', rows: 2, help: 'One per line' },
         { k: 'media', label: 'Pictures and videos', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } }] } } ] },
-    { title: 'Opening run', help: 'The pictures in the moving strip at the top (8 is ideal, tall pictures fit best).', fields: [
+    { title: 'Extra pictures', help: 'Spare pictures the page uses to pair with a picture that would otherwise sit alone, so every row runs edge to edge.', fields: [
       { k: 'run', label: '', type: 'list', itemLabel: 'Picture', def: '', title: (p, i) => `${i + 1} · ${mname(p)}`, of: { type: 'media', rich: true } } ] },
-    { title: 'Screens', help: 'In order: 1 the wide hero, 2 wide, 3 and 4 tall (side by side), 5 wide. Each has a label, where it lives, and a note.', fields: [
+    { title: 'Screens', when: () => false, help: 'In order: 1 the wide hero, 2 wide, 3 and 4 tall (side by side), 5 wide. Each has a label, where it lives, and a note.', fields: [
       { k: 'shots', label: '', type: 'list', itemLabel: 'Screen', def: () => ['', '', '', ''], title: (s, i) => `${i + 1} · ${s[1] || 'Untitled'}`,
         of: { type: 'tuple', cols: 1, fields: [{ label: 'Picture, video or colour block', type: 'media', rich: true }, { label: 'Label' }, { label: 'Where', ph: 'Mobile, Web, Brand…' }, { label: 'Note', type: 'textarea', rows: 2 }] } } ] },
-    { title: 'Product page', when: o => o.kind !== 'Brand', fields: [
+    { title: 'Product page', when: () => false, fields: [
       { k: 'heroVideo', label: 'Opening video', type: 'media', accept: 'video/*', help: 'Landscape works best. Leave empty to open on the first screen.' },
       { k: 'heroPoster', label: 'Video poster (shown while it loads)', type: 'media', accept: 'image/*' },
       { k: 'exp', label: 'Feature notes', type: 'tuple', cols: 1, fields: [{ label: 'Heading' }, { label: 'Notes', type: 'list', itemLabel: 'Note', def: () => ['', ''], title: n => n[0], of: { type: 'tuple', cols: 1, fields: [{ label: 'Title' }, { label: 'Text', type: 'textarea', rows: 2 }] } }] } ] },
-    { title: 'Impact', when: o => o.kind !== 'Brand', help: 'Big numbers that count up, with a note on how they were measured.', fields: [
-      { k: '_imp', label: 'Numbers', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: s => s[0] + ' ' + s[1], of: PAIR('Number', 'What it means') },
+    { title: 'Impact note', when: o => o.kind !== 'Brand', help: 'Put the big numbers in a section (Sections → Big numbers). This note sits under them.', fields: [
+      { k: '_imp', label: 'Numbers', when: () => false, type: 'list', itemLabel: 'Number', def: () => ['', ''], title: s => s[0] + ' ' + s[1], of: PAIR('Number', 'What it means') },
       { k: 'impactNote', label: 'How these were measured', type: 'textarea', rows: 2 } ] },
     { title: 'Brand page', when: o => o.kind === 'Brand', cols: 2, fields: [
-      { k: 'brandVer', label: 'Sections', type: 'object', cols: 2, full: true, fields: [
+      { k: 'brandVer', label: 'Sections', when: () => false, type: 'object', cols: 2, full: true, fields: [
         { k: 'info', label: 'Opening', type: 'select', options: [['split', 'Split'], ['sheet', 'Sheet'], ['read', 'Read along'], ['stations', 'Stations']] },
         { k: 'type', label: 'Type', type: 'select', options: [['dial', 'Dial'], ['ticker', 'Ticker'], ['specimen', 'Specimen']] },
         { k: 'col', label: 'Colour', type: 'select', options: [['dial', 'Dial'], ['swatch', 'Swatches']] },
@@ -269,7 +269,7 @@
     { title: 'The piece', cols: 2, fields: [
       { k: 'title', label: 'Title' },
       { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Case study']] },
-      { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a case study', type: 'select', options: CASE_SLUGS, help: 'Adds “Read case study” to its page' },
+      { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a collection or case study', type: 'select', options: CASE_SLUGS, help: 'A collection (e.g. 3D collection): its pieces share arrows and a grid on Designs. A product or brand case study: adds “Read case study”.' },
       { k: 'desc', label: 'Project info', type: 'textarea', full: true },
       { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
       { k: 'hidden', label: 'Hide this piece from the site', type: 'bool', full: true } ] },
