@@ -443,14 +443,19 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .N .tgf button, .N .ttf button { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line) }
 .N .tgf button[aria-pressed="true"], .N .ttf button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none }
 .N .ttf { display: flex; flex-wrap: wrap; gap: 4px }
-.N .cdial { display: block; margin-top: 0 }
-.N .cpin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden }
+.N .cdial { display: block; position: relative; margin-top: 0; height: min(86vh, 780px); min-height: 500px; overflow: hidden; user-select: none; -webkit-user-select: none }
 .N .cfill { position: absolute; inset: 0 }
-.N .cinfo { position: absolute; left: var(--ne); bottom: 120px; display: grid; gap: 12px; color: inherit }
+.N .chint { position: absolute; right: var(--ne); bottom: 112px; color: inherit; opacity: .6 }
+@media (max-width: 899px) { .N .chint { display: none } }
+.N .crul { position: absolute; left: 0; right: 0; bottom: 22px; height: 84px; touch-action: none; cursor: grab; -webkit-tap-highlight-color: transparent } .N .crul.drag { cursor: grabbing }
+.N .crul canvas { width: 100%; height: 100%; display: block }
+.N .ccopy { justify-self: start; height: 30px; padding: 0 12px; margin-top: 4px; border: 0; border-radius: 999px; font: 500 12px var(--body); color: inherit; background: rgb(255 255 255 / .16); cursor: pointer; transition: background .2s }
+.N .cdial.lt .ccopy { background: rgb(0 0 0 / .08) } .N .ccopy:hover { background: rgb(255 255 255 / .26) } .N .cdial.lt .ccopy:hover { background: rgb(0 0 0 / .14) }
+.N .cinfo { position: absolute; left: var(--ne); bottom: 140px; display: grid; gap: 12px; color: inherit }
 .N .cinfo .mono { color: inherit; opacity: .75 }
 .N .cinfo b { font: 500 clamp(64px, 10vw, 168px)/.9 var(--bfont, var(--body)); letter-spacing: -.055em }
 .N .cstations { position: absolute; right: max(var(--ne), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 14px; text-align: right }
-.N .cstations .mono { color: inherit; opacity: .4; transition: opacity .3s } .N .cstations .mono.on { opacity: 1 }
+.N .cstations .mono { color: inherit; opacity: .4; transition: opacity .3s; background: none; border: 0; padding: 2px 0; cursor: pointer; text-align: right } .N .cstations .mono:hover { opacity: .75 } .N .cstations .mono.on { opacity: 1 }
 .N .cruler, .N .truler { position: absolute; left: 0; right: 0; bottom: 28px; height: 64px; touch-action: none; cursor: grab; user-select: none }   /* drag the scale like a dial */
 .N .cruler.drag, .N .truler.drag { cursor: grabbing } .N .cruler canvas, .N .truler canvas { width: 100%; height: 100%; display: block }
 .N .tdial { display: block }
@@ -912,11 +917,13 @@ R.N = function (c) {
   if (c.problem || c.goal) h += `<section class="nb" data-ix="The brief"><div class="l"><span class="mono">${eb()}</span><h2>The brief</h2></div><div class="r">${c.problem ? `<p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="go"${E('goal')}>${esc(c.goal)}</p>` : ''}</div></section>`;
   if (b.intro && b.intro !== b.logo) h += pics(b.intro.media, b.intro._i);
   if (b.logo) h += brief(b.logo, eb()) + pics(b.logo.media.length ? b.logo.media : [b.logoM], b.logo._i);
-  // colour: the screen floods with each colour in turn
+  // colour: the whole panel takes each colour; drag or tap the ruler (a radio dial) to tune from one to the next
   if (b.pal.length >= 2) { const P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'];
     h += `<section class="nb" data-ix="Colour"><div class="l"><span class="mono">${eb()}</span><h2>Colour</h2></div><div class="r"><p>${esc(b.colour ? (b.colour.p || [])[0] || '' : 'The palette, one colour at a time.')}</p></div></section>
-      <section class="cdial covers" id="ncol" style="height:${P.length * 80 + 100}vh"><div class="cpin"><div class="cfill" id="ncfill"></div><div class="cinfo"><span class="mono" id="ncfq"></span><b id="ncnm"></b><span class="mono" id="nchex"></span></div>
-      <div class="cstations">${P.map((p, k) => `<span class="mono">${FQ[k]} · ${esc(p.name)}</span>`).join('')}</div></div></section>`; }
+      <section class="cdial covers" id="ncol"><div class="cfill" id="ncfill"></div><span class="mono chint">Drag or tap the ruler</span>
+      <div class="cinfo"><span class="mono" id="ncfq"></span><b id="ncnm"></b><span class="mono" id="nchex"></span><button type="button" class="ccopy" id="nccp">Copy HEX</button></div>
+      <div class="cstations">${P.map((p, k) => `<button type="button" class="mono" data-k="${k}">${FQ[k]} · ${esc(p.name)}</button>`).join('')}</div>
+      <div class="crul" id="ncrul" role="slider" tabindex="0" aria-label="Colour" aria-valuemin="1" aria-valuemax="${P.length}"><canvas></canvas></div></section>`; }
   // type: the name steps through its weights
   { const T = b.type[0], fam = T.fam, VAR = { 'Bricolage Grotesque': [200, 800], 'Epilogue': [100, 900], 'Geist': [100, 900], 'Serif': [200, 900] }, [w0, w1] = VAR[fam] || [400, 400];
     const WS = [[200, 'Extralight'], [300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold'], [800, 'Extrabold']].filter(w => w[0] >= w0 && w[0] <= w1);
@@ -975,47 +982,46 @@ function setupN() {
   nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
   const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
   const col = $$('ncol');
-  if (col) { const b = brandOf(prep(CASES.find(x => x.slug === C))), P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'];
-    const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), cols = P.map(p => rgb(p.hex)), st = [...col.querySelectorAll('.cstations span')]; let cur = -1;
-    const fill = $$('ncfill'); let lastQ = -1, lastInk = '';
-    NT.push(() => { const r0 = col.getBoundingClientRect(); if (r0.bottom < -50 || r0.top > innerHeight + 50) return;   // off screen: nothing to do
-      const q = nprog(col, P.length); if (Math.abs(q - lastQ) < .0005) return; lastQ = q;                                      // only when it moved
-      const i = Math.min(P.length - 2, Math.floor(q)), t = q - i, cc = cols[i].map((v, k) => v + (cols[i + 1][k] - v) * t);
-      fill.style.background = `rgb(${cc.map(Math.round).join(' ')})`; const lum = (cc[0] * 299 + cc[1] * 587 + cc[2] * 114) / 1000, ink = lum > 150 ? '#0e0e10' : '#fff'; if (ink !== lastInk) { lastInk = ink; col.style.color = ink; }
-      const k = Math.round(q); if (k !== cur) { if (cur >= 0) snd('detent'); cur = k; $$('ncfq').textContent = FQ[k] + ' FM · ' + pad(k + 1); $$('ncnm').textContent = P[k].name; $$('nchex').textContent = P[k].hex.toUpperCase() + ' · RGB ' + cols[k].join(' '); st.forEach((s, j) => s.classList.toggle('on', j === k)); }
-      });
-    // one scroll = one colour: while the colour screen is up, each wheel notch or trackpad swipe moves to the next (or previous) colour.
-    // A swipe's trailing momentum counts as the same swipe; past the first or last colour, the page scrolls on as normal.
-    const n = P.length, posOf = k => col.getBoundingClientRect().top + scrollY + (col.offsetHeight - innerHeight) * k / (n - 1);
-    let last = 0, busy = false, at = 0, peak = 0, raf = 0, goT = 0;
-    const engaged = () => { const r = col.getBoundingClientRect(); return r.top <= 2 && r.bottom >= innerHeight - 2; };
-    // our own short glide (the browser's smooth scroll varies in length and felt slow): 420ms, quick out, soft landing
-    const go = k => { at = k; busy = true; goT = performance.now(); cancelAnimationFrame(raf);
-      const y0 = scrollY, y1 = posOf(k), D = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420, t0 = performance.now();
-      const step = now => { const f = D ? Math.min(1, (now - t0) / D) : 1, e = 1 - Math.pow(1 - f, 3); scrollTo(0, y0 + (y1 - y0) * e); if (f < 1) raf = requestAnimationFrame(step); else { raf = 0; busy = false; } };
-      raf = requestAnimationFrame(step); };
-    // A new flick moves one colour. A flick's own trailing momentum is held, but a fresh flick on top of it (a sudden rise in
-    // strength, or a change of direction, or a short pause) is read straight away, so quick flicks never feel stuck.
-    let lastDir = 0;
-    const onWheel = e => {
-      if (!engaged() || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-      const now = performance.now(), mag = Math.abs(e.deltaY), dir = Math.sign(e.deltaY), gap = now - last; last = now;
-      const fresh = gap > 140 || dir !== lastDir || (mag > Math.max(14, peak * 1.6) && now - goT > 300); lastDir = dir;   // (a flick still building up is not a new one)
-      peak = fresh ? mag : Math.max(mag, peak * .9);
-      if (!fresh) { e.preventDefault(); return; }                   // this flick's momentum: hold
-      const k = busy ? at : Math.round(nprog(col, n)), t = k + dir;   // a new flick mid-glide carries on to the next colour
-      if (t < 0 || t > n - 1) return;                               // the ends let the page carry on
-      e.preventDefault(); go(t);
+  if (col) { const b = brandOf(prep(CASES.find(x => x.slug === C))), P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'], n = P.length;
+    const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), cols = P.map(p => rgb(p.hex)), st = [...col.querySelectorAll('.cstations button')];
+    const hsl = h => { let [r, g, bb] = rgb(h).map(v => v / 255); const mx = Math.max(r, g, bb), mn = Math.min(r, g, bb), l = (mx + mn) / 2; let H = 0, S = 0;
+      if (mx !== mn) { const d = mx - mn; S = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); H = mx === r ? (g - bb) / d + (g < bb ? 6 : 0) : mx === g ? (bb - r) / d + 2 : (r - g) / d + 4; H *= 60; }
+      return [Math.round(H), Math.round(S * 100), Math.round(l * 100)]; };
+    const fill = $$('ncfill'), rul = $$('ncrul'), cv = rul.querySelector('canvas'), cx = cv.getContext('2d'), SP = innerWidth < 640 ? 96 : 120;
+    let pos = 0, target = 0, vel = 0, drag = null, cur = -1, ink = '', dirty = true, pt = performance.now();
+    const paint = () => {
+      const i = Math.max(0, Math.min(n - 2, Math.floor(pos))), t = nclamp(pos - i, 0, 1), cc = cols[i].map((v, k) => v + (cols[i + 1][k] - v) * t);
+      fill.style.background = `rgb(${cc.map(Math.round).join(' ')})`; const L = (cc[0] * 299 + cc[1] * 587 + cc[2] * 114) / 1000, nk = L > 150 ? '#0e0e10' : '#fff';
+      if (nk !== ink) { ink = nk; col.style.color = ink; col.classList.toggle('lt', L > 150); }
+      const k = nclamp(Math.round(pos), 0, n - 1);
+      if (k !== cur) { cur = k; $$('ncfq').textContent = `${FQ[k]} FM · ${pad(k + 1)} of ${pad(n)}`; $$('ncnm').textContent = P[k].name;
+        $$('nchex').textContent = `${P[k].hex.toUpperCase()} · RGB ${cols[k].join(' ')} · HSL ${hsl(P[k].hex).join(' ')}`; $$('nccp').textContent = 'Copy ' + P[k].hex.toUpperCase();
+        st.forEach((x, j) => x.classList.toggle('on', j === k)); rul.setAttribute('aria-valuenow', k + 1); }
+      // the ruler: a station per colour, nine small ticks between, the red needle fixed in the middle
+      const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
+      if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H); const mid = W / 2;
+      for (let q = -40; q <= (n - 1) * 10 + 40; q++) { const x = mid + (q / 10 - pos) * SP; if (x < 0 || x > W) continue;
+        const major = q % 10 === 0 && q >= 0 && q <= (n - 1) * 10, d = Math.abs(x - mid) / SP, e = Math.min(1, Math.min(x, W - x) / 90);
+        cx.globalAlpha = ((major ? .9 : .3) + Math.max(0, 1 - d) * .2) * e; cx.strokeStyle = ink; cx.lineWidth = major ? 2 : 1;
+        cx.beginPath(); cx.moveTo(x, H - 14); cx.lineTo(x, H - 14 - (major ? 24 : 10)); cx.stroke();
+        if (major) { cx.globalAlpha = (d < .5 ? 1 : .55) * e; cx.fillStyle = ink; cx.font = '500 11px "Geist Mono", monospace'; cx.textAlign = 'center'; cx.fillText(P[q / 10].name, x, H - 54); } }
+      cx.globalAlpha = 1; cx.fillStyle = RED; cx.fillRect(mid - 1.5, H - 44, 3, 38);
     };
-    // phones: one swipe = one colour too
-    let ty0 = null;
-    const onTS = e => { ty0 = engaged() ? e.touches[0].clientY : null; };
-    const onTM = e => { if (ty0 !== null && engaged()) e.preventDefault(); };
-    const onTE = e => { if (ty0 === null) return; const dy = ty0 - e.changedTouches[0].clientY; ty0 = null; if (Math.abs(dy) < 30) return;
-      const k = Math.round(nprog(col, n)), t = k + (dy > 0 ? 1 : -1); if (t < 0 || t > n - 1) { scrollBy({ top: dy > 0 ? innerHeight * .6 : -innerHeight * .6, behavior: 'smooth' }); return; } go(t); };
-    rulerDrag(col.querySelector('.cruler'), col, n);
-    addEventListener('wheel', onWheel, { passive: false }); col.addEventListener('touchstart', onTS, { passive: true }); col.addEventListener('touchmove', onTM, { passive: false }); col.addEventListener('touchend', onTE);
-    nOff.push(() => removeEventListener('wheel', onWheel)); }
+    NT.push(dt => { const r0 = col.getBoundingClientRect(); if (r0.bottom < -50 || r0.top > innerHeight + 50) return;   // off screen: nothing to do
+      if (!drag) { const a = (target - pos) * 150 - vel * 18; vel += a * dt / 1000; pos += vel * dt / 1000; if (Math.abs(target - pos) < .0008 && Math.abs(vel) < .01) { if (pos !== target) dirty = true; pos = target; vel = 0; } else dirty = true; }
+      if (dirty || cv.width !== Math.round(cv.clientWidth * Math.min(2, devicePixelRatio || 1))) { dirty = false; paint(); } });
+    const settle = (k, sound) => { k = nclamp(Math.round(k), 0, n - 1); if (k !== target && sound) snd('detent'); target = k; dirty = true; };
+    rul.addEventListener('pointerdown', e => { if (KM_EDIT || (e.pointerType === 'mouse' && e.button !== 0)) return; drag = { x: e.clientX, p: pos, moved: false, k: Math.round(pos) }; rul.setPointerCapture(e.pointerId); rul.classList.add('drag'); e.preventDefault(); });
+    rul.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; if (!drag.moved) return;
+      pos = nclamp(drag.p - dx / SP, -.3, n - .7); dirty = true; const k = Math.round(pos); if (k !== drag.k) { drag.k = k; if (k >= 0 && k < n) snd('detent'); } });
+    const up = e => { if (!drag) return; const d = drag; drag = null; rul.classList.remove('drag');
+      if (!d.moved) { const r = rul.getBoundingClientRect(); settle(pos + (e.clientX - r.left - r.width / 2) / SP, true); } else { target = nclamp(Math.round(pos), 0, n - 1); dirty = true; } };
+    rul.addEventListener('pointerup', up); rul.addEventListener('pointercancel', up);
+    rul.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); settle(target + 1, true); } if (e.key === 'ArrowLeft') { e.preventDefault(); settle(target - 1, true); } });
+    st.forEach(x => x.addEventListener('click', () => settle(+x.dataset.k, true)));
+    $$('nccp').addEventListener('click', async () => { const h = P[cur].hex.toUpperCase(), btn = $$('nccp'); snd('pop'); try { await navigator.clipboard.writeText(h); btn.textContent = 'Copied'; } catch (_) { btn.textContent = h; } setTimeout(() => { btn.textContent = 'Copy ' + P[cur].hex.toUpperCase(); }, 1400); });
+    paint(); if (document.fonts) document.fonts.ready.then(() => { dirty = true; }); }
   const ty = $$('ntyp');
   if (ty) { const WS = JSON.parse(ty.dataset.ws), fam = ty.dataset.fam, st = [...ty.querySelectorAll('.tdst span')]; let cur = -1;
     rulerDrag(ty.querySelector('.truler'), ty, WS.length);
