@@ -80,7 +80,8 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .band { position: relative }
 .band { --pt: 0px; margin: calc(240px - 50vh) 0 calc(var(--sp) + 30px - 50vh + max(0px, var(--bh, 340px) / 2 + var(--pt) / 2 - 170px) + var(--pad, 0px)) }   /* the pinned card sits mid-screen; pull the neighbours in so the gaps match the rest */
 .bpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: center; padding: 0 }
-.bruler { position: relative; height: 72vh } .bruler canvas { width: 100%; height: 100%; display: block; cursor: pointer }
+.bruler { position: relative; height: 72vh; touch-action: none } .bruler canvas { width: 100%; height: 100%; display: block; cursor: grab }   /* drag it (or tap a station) */
+.bruler.drag canvas, .skscale.drag { cursor: grabbing }
 .bcard { position: relative; min-height: 340px }
 .bcard .ch { position: absolute; inset: 0; opacity: 0; translate: 0 30px; transition: opacity .5s var(--ease), translate .9s var(--pop); pointer-events: none }
 .bcard .ch.on { opacity: 1; translate: 0 0; pointer-events: auto }
@@ -104,7 +105,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .skrow { display: flex; justify-content: space-between; gap: 16px; padding: 18px 0 0 }
 .skw { color: var(--faint); font-size: clamp(22px, 3.2vw, 46px); font-weight: 500; letter-spacing: -.04em; line-height: 1; cursor: pointer; transition: color .45s var(--ease); user-select: none; white-space: nowrap }
 .skw.on { color: var(--ink) }
-.skscale { position: relative; height: 120px; margin-top: 14px }
+.skscale { position: relative; height: 120px; margin-top: 14px; touch-action: none; cursor: grab; user-select: none }   /* drag the needle along the scale */
 .skscale canvas { position: absolute; left: 0; right: 0; top: 0; width: 100%; height: 44px }
 .sktools { position: absolute; top: 56px; left: 0; display: flex; gap: 8px; translate: -50% 0; will-change: transform }
 .sktools img { width: 34px; height: 34px; border-radius: 9px; animation: tup .7s var(--pop) both; animation-delay: calc(var(--k) * 60ms) }
@@ -313,7 +314,14 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // the next section is pulled up under the pinned card; pull it only as far as the tallest chapter allows, so the last one never sits over it
   const bfit = () => band.style.setProperty('--bh', Math.max(...chs.map(el => el.offsetHeight)) + 'px'); bfit(); addEventListener('resize', bfit); if (document.fonts) document.fonts.ready.then(bfit);
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
-  brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);
+  const bruler = brc.parentElement, bY = k => { const br = band.getBoundingClientRect(); return scrollY + br.top + k / (CH.length - 1) * (br.height - innerHeight) * .999; };
+  let bDrag = null, bMoved = false;
+  bruler.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; bDrag = { id: e.pointerId, y: e.clientY, p: bsp }; bMoved = false; bruler.setPointerCapture(e.pointerId); bruler.classList.add('drag'); });
+  bruler.addEventListener('pointermove', e => { if (!bDrag || e.pointerId !== bDrag.id) return; const dy = bDrag.y - e.clientY; if (Math.abs(dy) > 4) bMoved = true; if (!bMoved) return;
+    const p = clamp(bDrag.p + dy / 90, 0, CH.length - 1); if (smooth) { SS.target = bY(p); } else scrollTo(0, bY(p)); });
+  const bUp = () => { if (!bDrag) return; bDrag = null; bruler.classList.remove('drag'); if (bMoved) go(bY(clamp(Math.round(bsp), 0, CH.length - 1))); };
+  bruler.addEventListener('pointerup', bUp); bruler.addEventListener('pointercancel', bUp);
+  brc.addEventListener('click', e => { if (bMoved) { bMoved = false; return; } const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);
     const br = band.getBoundingClientRect(), y = scrollY + br.top + k / (CH.length - 1) * (br.height - innerHeight) * .999; go(y); snd('pop'); });
   ticks.push(dt => {
     const r = band.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1) * (CH.length - 1), q = reduce ? Math.round(p) : held(p);
@@ -365,6 +373,15 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   skws.forEach((w, i) => { w.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pick(i, true); }); w.addEventListener('click', () => pick(i, true));
     w.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(i, true); } }); });
   addEventListener('resize', () => { if (skI >= 0) skT = centre(skI); });
+  // drag: the needle follows your finger along the scale, picking whichever skill it is nearest; let go and it settles on it
+  const skscale = skc.parentElement; let skDrag = null;
+  const along = e => { const b = skc.getBoundingClientRect(); return VERT.matches ? clamp(e.clientY - b.top, 0, b.height) : clamp(e.clientX - b.left, 0, b.width); };
+  const nearest = x => { let k = 0, d = 1e9; skws.forEach((w, i) => { const dd = Math.abs(centre(i) - x); if (dd < d) { d = dd; k = i; } }); return k; };
+  skscale.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; skDrag = { id: e.pointerId }; skscale.setPointerCapture(e.pointerId); skscale.classList.add('drag');
+    const x = along(e); pick(nearest(x), true); skT = x; e.preventDefault(); });
+  skscale.addEventListener('pointermove', e => { if (!skDrag || e.pointerId !== skDrag.id) return; const x = along(e); pick(nearest(x), true); skT = x; });
+  const skUp = e => { if (!skDrag) return; skDrag = null; skscale.classList.remove('drag'); skT = centre(skI); };
+  skscale.addEventListener('pointerup', skUp); skscale.addEventListener('pointercancel', skUp);
   ticks.push(dt => {
     if (!skReady) { if (!skws[0].offsetWidth) return; skReady = true; pick(0, false); skX = skT; }
     const s2 = dt / 1000, a = (skT - skX) * 180 - skV * 18; skV += a * s2; skX += skV * s2;

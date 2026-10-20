@@ -451,7 +451,8 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .N .cinfo b { font: 500 clamp(64px, 10vw, 168px)/.9 var(--bfont, var(--body)); letter-spacing: -.055em }
 .N .cstations { position: absolute; right: max(var(--ne), 128px); top: 50%; translate: 0 -50%; display: grid; gap: 14px; text-align: right }
 .N .cstations .mono { color: inherit; opacity: .4; transition: opacity .3s } .N .cstations .mono.on { opacity: 1 }
-.N .cruler, .N .truler { position: absolute; left: 0; right: 0; bottom: 36px; height: 46px } .N .cruler canvas, .N .truler canvas { width: 100%; height: 100%; display: block }
+.N .cruler, .N .truler { position: absolute; left: 0; right: 0; bottom: 28px; height: 64px; touch-action: none; cursor: grab; user-select: none }   /* drag the scale like a dial */
+.N .cruler.drag, .N .truler.drag { cursor: grabbing } .N .cruler canvas, .N .truler canvas { width: 100%; height: 100%; display: block }
 .N .tdial { display: block }
 .N .tpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; place-items: center; overflow: hidden; background: var(--panel) }
 .N .tbig { color: var(--ink); font-size: clamp(80px, 15vw, 260px); line-height: .9; letter-spacing: -.045em; white-space: nowrap }
@@ -959,6 +960,17 @@ R.N = function (c) {
 };
 // wire the pinned sections once the page is drawn
 const nOff = [];
+// drag a scale like a dial: the section scrolls with your finger (one stop per 120px, the ruler's own spacing), then settles on the nearest stop
+function rulerDrag(el, sec, n) {
+  if (!el || n < 2) return; let d = null, q = 0;
+  const posOf = k => sec.getBoundingClientRect().top + scrollY + (sec.offsetHeight - innerHeight) * k / (n - 1);
+  const raw = () => { const r = sec.getBoundingClientRect(); return nclamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1) * (n - 1); };
+  ['touchstart', 'touchmove', 'touchend'].forEach(t => el.addEventListener(t, e => e.stopPropagation(), { passive: true }));   // not a swipe of the section
+  el.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; d = { id: e.pointerId, x: e.clientX, q: raw() }; q = d.q; el.setPointerCapture(e.pointerId); el.classList.add('drag'); e.preventDefault(); });
+  el.addEventListener('pointermove', e => { if (!d || e.pointerId !== d.id) return; q = nclamp(d.q + (d.x - e.clientX) / 120, 0, n - 1); scrollTo(0, posOf(q)); });
+  const up = () => { if (!d) return; d = null; el.classList.remove('drag'); scrollTo({ top: posOf(Math.round(q)), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
+  el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+}
 function setupN() {
   nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
   const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
@@ -989,10 +1001,12 @@ function setupN() {
     const onTM = e => { if (ty0 !== null && engaged()) e.preventDefault(); };
     const onTE = e => { if (ty0 === null) return; const dy = ty0 - e.changedTouches[0].clientY; ty0 = null; if (Math.abs(dy) < 30) return;
       const k = Math.round(nprog(col, n)), t = k + (dy > 0 ? 1 : -1); if (t < 0 || t > n - 1) { scrollBy({ top: dy > 0 ? innerHeight * .6 : -innerHeight * .6, behavior: 'smooth' }); return; } go(t); };
+    rulerDrag(col.querySelector('.cruler'), col, n);
     addEventListener('wheel', onWheel, { passive: false }); col.addEventListener('touchstart', onTS, { passive: true }); col.addEventListener('touchmove', onTM, { passive: false }); col.addEventListener('touchend', onTE);
     nOff.push(() => removeEventListener('wheel', onWheel)); }
   const ty = $$('ntyp');
   if (ty) { const WS = JSON.parse(ty.dataset.ws), fam = ty.dataset.fam, st = [...ty.querySelectorAll('.tdst span')]; let cur = -1;
+    rulerDrag(ty.querySelector('.truler'), ty, WS.length);
     NT.push(() => { const q = WS.length > 1 ? nprog(ty, WS.length) : 0, i = Math.min(Math.max(0, WS.length - 2), Math.floor(q)), t = q - i, w = WS.length > 1 ? WS[i][0] + (WS[i + 1][0] - WS[i][0]) * t : WS[0][0];
       const drv2 = ty.dataset.drv === '2';
       if (drv2) { $$('ntds').style.fontWeight = Math.round(w); $$('ntdl2').textContent = `Secondary · ${ty.dataset.f2} · ${Math.round(w)}`; }
