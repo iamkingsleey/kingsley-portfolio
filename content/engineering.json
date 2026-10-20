@@ -38,15 +38,6 @@
       "linkLabel": "View on GitHub"
     },
     {
-      "fq": "98.0",
-      "name": "Popkit",
-      "type": "Sound in code",
-      "what": "The UI sounds on this site, made with Web Audio instead of files: a pop on every tap and a detent as the dial turns.",
-      "stat": "0",
-      "statLabel": "audio files",
-      "tech": "JavaScript · Web Audio"
-    },
-    {
       "fq": "101.3",
       "name": "This portfolio",
       "type": "Design engineering",
