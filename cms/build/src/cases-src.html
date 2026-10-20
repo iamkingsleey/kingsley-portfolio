@@ -469,7 +469,9 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .km-cms [data-edit]:hover { outline-color: color-mix(in srgb, var(--ink) 35%, transparent) }
 .km-cms [data-edit]:focus { outline: 2px solid #3d7bff; background: color-mix(in srgb, #3d7bff 8%, transparent) }
 .km-cms .kmn-scale, .km-cms .kmn-band, .km-cms .kmn-mb, .km-cms .kmn-top { display: none !important }
-.km-cms [data-pick] { cursor: pointer } .km-cms [data-pick]:hover { outline: 2px dashed color-mix(in srgb, #3d7bff 70%, transparent); outline-offset: 6px }
+.km-cms figure.m { cursor: pointer } .km-cms figure.m:hover { outline: 2px solid #3d7bff; outline-offset: 2px; z-index: 2 }
+.km-cms .km-add { display: inline-flex; margin-top: 12px; height: 34px; padding: 0 14px; border: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent); border-radius: 999px; background: var(--bg); color: var(--ink); font: 500 13px var(--body); cursor: pointer }
+.km-cms .km-add:hover { border-style: solid }
 .cnav { position: fixed; z-index: 40; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 22px; pointer-events: none }
 .cnav > * { pointer-events: auto }
 .dback { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: var(--pill); color: var(--ink); font: 500 13px var(--body); text-decoration: none; transition: background .2s }
@@ -1102,7 +1104,12 @@ function editable(c) {
     el.addEventListener('input', () => { let v = el.innerText.replace(/ /g, ' '); if (el.hasAttribute('data-br')) v = v.trim().split(/\n+/).join('<br>'); else v = v.replace(/\s*\n\s*/g, ' ');
       parent.postMessage({ type: 'km-cms-edit', slug: c.slug, path: el.dataset.edit, value: v }, '*'); });
   });
-  app.querySelectorAll('[data-pick]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-pick', slug: c.slug, path: el.dataset.pick }, '*'); }, true));
+  // pictures: click one to replace or remove it right here; "+ Add picture" adds one to that section
+  app.querySelectorAll('figure.m').forEach(f => f.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
+    const v = f.querySelector('video'), im = f.querySelector('img'), src = v ? v.getAttribute('src') : im ? im.getAttribute('src') : null;
+    const sec = f.closest('[data-pick]'); parent.postMessage({ type: 'km-cms-media', slug: c.slug, src, video: !!v, section: sec ? sec.dataset.pick : null }, '*'); }, true));
+  app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
+    b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-add', slug: c.slug, section: el.dataset.pick }, '*'); }); el.append(b); });
 }
 if (KM_EDIT) {
   addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-data' || !Array.isArray(d.cases)) return;

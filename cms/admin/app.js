@@ -360,7 +360,7 @@
           if (focusPath) { const m = /^sections\.(\d+)/.exec(focusPath); const grp = [...f.querySelectorAll('.group')].find(g => g.querySelector('h2') && g.querySelector('h2').textContent === 'Sections');
             if (grp && m) { const it = grp.querySelectorAll(':scope .list > .item')[+m[1]]; if (it) { it.classList.remove('closed'); setTimeout(() => it.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); it.classList.add('flash'); setTimeout(() => it.classList.remove('flash'), 1600); } } }
           return; }
-        const note = el('p', { class: 'help', text: 'Click any words on the page and type. Click a set of pictures to change them in the form. Your changes are kept as you go; press Save & rebuild when you are done.' });
+        const note = el('p', { class: 'help', text: 'Click any words on the page and type. Click a picture to replace or remove it, or “+ Add picture” to add one to that section. Changes are kept as you go; press Save & rebuild when you are done.' });
         const fr = el('iframe', { class: 'pageedit', src: pageUrl, title: 'Edit ' + c.title + ' on the page' });
         const send = () => { try { fr.contentWindow.postMessage({ type: 'km-cms-data', cases: clone(C.cases.cases) }, '*'); } catch (_) {} };
         window._kmCmsMsg = e => { if (e.source !== fr.contentWindow) return; const d = e.data || {};
@@ -368,7 +368,36 @@
           if (d.type === 'km-cms-edit' && d.slug === c.slug) { const keys = d.path.split('.'); let o = c;
             for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
-          if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path); };
+          if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path);
+          if ((d.type === 'km-cms-media' || d.type === 'km-cms-add') && d.slug === c.slug) pictureSheet(d); };
+        // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet
+        const same = (m, src) => m && (typeof m === 'string' ? m === src : m.video === src || m.poster === src);
+        const locate = (src, secPath) => {
+          const si = secPath ? +secPath.split('.')[1] : -1, secs = c.sections || [];
+          const inSec = k => { const j = (secs[k] && secs[k].media || []).findIndex(m => same(m, src)); return j >= 0 ? { arr: secs[k].media, j, label: secs[k].h || 'Section ' + (k + 1) } : null; };
+          if (si >= 0) { const r = inSec(si); if (r) return r; }
+          for (let k = 0; k < secs.length; k++) { const r = inSec(k); if (r) return r; }
+          if (same(c.cover, src)) return { obj: c, key: 'cover', label: 'Cover picture' };
+          const j = (c.run || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: c.run, j, label: 'Extra pictures' };
+          return null; };
+        function pictureSheet(d) {
+          let where;
+          if (d.type === 'km-cms-add') { const si = +d.section.split('.')[1], sec = (c.sections || [])[si]; if (!sec) return; sec.media = sec.media || []; where = { arr: sec.media, j: sec.media.length, label: sec.h || 'Section', adding: true }; }
+          else where = locate(d.src, d.section);
+          if (!where) { alert('This picture is filled in by the page from your other pictures. Change it in the Form.'); return; }
+          const get = () => where.obj ? where.obj[where.key] : where.arr[where.j];
+          const put = v => { if (where.obj) where.obj[where.key] = v; else where.arr[where.j] = v; touch('cases'); };
+          const close = () => { m.remove(); if (where.adding && !get()) where.arr.splice(where.j, 1); send(); };
+          const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) close(); } },
+            el('div', { class: 'sheet', style: 'width:min(640px,100%)' },
+              el('header', {}, el('b', { text: (where.adding ? 'Add a picture · ' : 'Picture · ') + where.label }), el('button', { class: 'x', type: 'button', text: '×', onclick: close })),
+              el('div', { class: 'mbody form', style: 'gap:14px' },
+                richMedia(get() || '', v => { put(v); }, { rich: true, _file: 'cases' }),
+                el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' },
+                  !where.obj && !where.adding ? el('button', { class: 'btn danger small', type: 'button', text: 'Remove from page', onclick: () => { if (!confirm('Remove this picture?')) return; where.arr.splice(where.j, 1); touch('cases'); m.remove(); send(); } }) : null,
+                  el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: close })))));
+          document.body.append(m);
+        }
         addEventListener('message', window._kmCmsMsg);
         body.append(note, fr);
       }
