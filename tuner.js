@@ -78,7 +78,8 @@
   // leaving: blur this page, bring the readout to the middle, count part of the way, switch pages
   function go(o) {
     if (going) return; going = true;
-    if (reduce) { location.href = o.href; return; }
+    var leave = function () { if (o.back) history.back(); else if (o.replace) location.replace(o.href); else location.href = o.href; };   // back: step back through the history, so the browser's own back agrees
+    if (reduce) { leave(); return; }
     var span = Math.abs(o.to - o.from), total = Math.min(520, 260 + span * 70), leg = Math.round(total * LEG);
     var mid = o.from + (o.to - o.from) * LEG;
     document.documentElement.classList.add('tuning');
@@ -86,7 +87,14 @@
     requestAnimationFrame(function () { el.classList.add('on'); });
     count(o.from, mid, leg, easeIn, function () {
       try { sessionStorage.setItem(KEY, JSON.stringify({ v: mid, to: o.to, name: o.name, ms: total - leg, t: Date.now() })); } catch (e) {}
-      location.href = o.href;                            // the readout holds at mid while the next page comes in
+      leave();                                           // the readout holds at mid while the next page comes in
+      var u = null; try { u = new URL(o.href, location.href); } catch (e) {}
+      if (!o.back && u && u.pathname === location.pathname && u.search === location.search) {   // same page, new place (the next case): finish here
+        try { sessionStorage.removeItem(KEY); } catch (e) {}
+        count(mid, o.to, Math.max(140, total - leg), easeOut, function () {
+          if (!el) { going = false; return; } document.documentElement.classList.add('tuned'); el.classList.add('out'); el.classList.remove('on');
+          setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } going = false; }, 200); });
+      }
     });
   }
 

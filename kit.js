@@ -153,9 +153,20 @@
     prev() { const a = readT(), f = fileOf(here()); for (let i = a.length - 1; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i]; else if (i < a.length - 1) break; return null; },   // the page before this one (this page may not be marked yet)
     // where a back control should go, and what to call it
     back(fallback, fallbackName) { const p = KM.trail.prev(); if (!p) return { href: fallback, name: fallbackName };
-      const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#[pf]-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; }
+      const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#[pf]-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; },
+    // take the way back: when the page we name is the one right behind us in the browser's history, step back through it
+    // (so the browser's own back button and this one always agree); otherwise go there.
+    go(b, o) { const st = history.state, bk = !!(st && st.kmPrev && st.kmPrev === b.href && history.length > 1);
+      if (window.Tuner) Tuner.go(Object.assign({}, o || {}, { name: b.name, href: b.href, back: bk })); else if (bk) history.back(); else location.href = b.href; },
+    // what this history entry knows: which page sits right behind it. Pages that push their own entries (Designs) keep it with them.
+    state(extra) { return Object.assign({}, history.state || {}, { kmPrev: kmPrev }, extra || {}); }
   };
-  addEventListener('hashchange', () => KM.trail.mark());
+  // which page is right behind this one in the history: the trail's last page, if that is where the browser says we came from
+  let kmPrev = null;
+  try { const st = history.state; if (st && 'kmPrev' in st) kmPrev = st.kmPrev;
+    else { const p = KM.trail.prev(); let rf = ''; try { const r = new URL(document.referrer); if (r.origin === location.origin) rf = r.pathname.split('/').pop() || 'index.html'; } catch (_) {}
+      kmPrev = p && rf && fileOf(p.u) === rf ? p.u : null; history.replaceState(KM.trail.state(), ''); } } catch (_) {}
+  addEventListener('hashchange', () => { try { if (!history.state || !('kmPrev' in history.state)) history.replaceState(KM.trail.state(), ''); } catch (_) {} KM.trail.mark(); });
   addEventListener('pageshow', e => { if (e.persisted) KM.trail.mark(); });
   const go = () => { watch(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();

@@ -10,7 +10,7 @@
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js?v=584c79d8"></script>
+<script src="tuner.js?v=313c3332"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Product case study · Kingsley</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1098,12 +1098,12 @@ function paint(keep) {
     else { if (el.readyState >= 2) ok(); else { el.addEventListener('loadeddata', ok); el.addEventListener('error', ok); } } });
   // next case: same page, new case (with the tuning transition when it is there)
   app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { if (KM_EDIT) return; const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
-    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug }); else { location.hash = n.slug; } }));
+    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug, replace: true }); else location.replace(PAGE + '#' + n.slug); }));   // the next case takes this one's place, so back still leads where you came from
   const backTo = () => (window.KM && KM.trail) ? KM.trail.back('designs.html', 'All designs') : { href: 'designs.html', name: 'All designs' };
   const label = () => { const b = backTo(), a = app.querySelector('a.dback'); if (!a) return; a.href = b.href; a.lastChild.textContent = b.name; a.setAttribute('aria-label', 'Back to ' + b.name); };
   label(); document.addEventListener('km-trail', label, { once: true }); setTimeout(label, 500);
   app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
-    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98, name: b.name, href: b.href }); else location.href = b.href; }));
+    const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
   setupIndex(); setupN(); setupPlay(); countUp();
   if (window.KM && KM.trail) KM.trail.mark();
@@ -1166,7 +1166,7 @@ addEventListener('hashchange', show);
 show();
 </script>
 <script src="nav.js?v=73bf2373" defer></script>
-<script src="kit.js?v=a3e9f248" defer></script>
+<script src="kit.js?v=9ace4fe6" defer></script>
 <script src="protips.js?v=3044366a" defer></script>
 </body>
 </html>
