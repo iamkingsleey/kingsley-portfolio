@@ -143,7 +143,9 @@
   const writeT = a => { try { sessionStorage.setItem(TR, JSON.stringify(a.slice(-30))); } catch (_) {} };
   const nameHere = () => ((document.querySelector('.cnav .nm, [data-readout] .nm, .station .nm, .now .nm') || {}).textContent || document.title.split(' · ')[0]).trim();
   KM.trail = {
-    mark(u = here(), t = nameHere()) { const a = readT(), e = { u, t };
+    mark(u = here(), t) { const a = readT(), top = a[a.length - 1];
+      if (t === undefined) t = top && top.u === u && top.t ? top.t : nameHere();   // an automatic mark never renames a place the page already named (e.g. a Designs filter)
+      const e = { u, t };
       if (a.length > 1 && a[a.length - 2].u === u) { a.pop(); a[a.length - 1] = e; }                      // went back a step
       else if (a.length && fileOf(a[a.length - 1].u) === fileOf(u)) a[a.length - 1] = e;                 // same page, new place on it
       else a.push(e);
