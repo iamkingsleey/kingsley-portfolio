@@ -78,7 +78,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
 /* ---------- 3 · career band ---------- */
 .band { position: relative }
-.band { margin: calc(240px - 50vh) 0 calc(var(--sp) + 30px - 50vh) }   /* the pinned card sits mid-screen; pull the neighbours in so the gaps match the rest */
+.band { --pt: 0px; margin: calc(240px - 50vh) 0 calc(var(--sp) + 30px - 50vh + max(0px, var(--bh, 340px) / 2 + var(--pt) / 2 - 170px) + var(--pad, 0px)) }   /* the pinned card sits mid-screen; pull the neighbours in so the gaps match the rest */
 .bpin { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: center; padding: 0 }
 .bruler { position: relative; height: 72vh } .bruler canvas { width: 100%; height: 100%; display: block; cursor: pointer }
 .bcard { position: relative; min-height: 340px }
@@ -164,16 +164,29 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
 @media (max-width: 899px) {
   :root { --gut: 18px }
-  .wrap { padding: 0 44px 0 var(--gut) }
+  .wrap { padding: 0 var(--gut) }   /* the side dial is retired, so no room kept for it */
   .station { gap: 12px } .station .fq { font-size: 22px } .station .nm { display: none }
   .sdial { width: 38px }
   .sname { font-size: 42px }
   .stmt { grid-template-columns: 1fr } .hc { grid-template-columns: 1fr } .hcol { grid-column: 1 }
-  .bpin { grid-template-columns: 74px minmax(0, 1fr); gap: 16px; padding-top: 80px }
+  .band { --pt: 80px; --pad: 64px }   /* the card drifts a little as you scroll (parallax): room for that too */ .bpin { grid-template-columns: 74px minmax(0, 1fr); gap: 16px; padding-top: var(--pt) }
   .skrow { gap: 8px } .skw { font-size: 17px } .sktools img { width: 28px; height: 28px; border-radius: 7px }
   .how, .air { grid-template-columns: 1fr } .knob { width: 260px }
   .shead { flex-direction: column; align-items: start }
+  .call .row { flex-direction: column; align-items: stretch; gap: 20px } .call .send { width: 100% }   /* Go on air on its own line */
 }
+/* phones: the skills dial stands up. The words stack, the scale runs down beside them, the needle points across at the one picked
+   and its tools sit to the right of it */
+@media (max-width: 640px) {
+  .skills { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; padding-top: 8px }
+  .skrow { flex-direction: column; justify-content: flex-start; gap: 26px; padding: 14px 0 }
+  .skw { font-size: clamp(24px, 7.6vw, 30px) }
+  .skscale { height: auto; margin: 0 }
+  .skscale canvas { width: 44px; height: 100%; right: auto }
+  .sktools { top: 0; left: 54px; gap: 6px; translate: 0 -50% }
+  .sktools img { width: clamp(28px, 8.4vw, 34px); height: clamp(28px, 8.4vw, 34px); border-radius: 8px }
+}
+@media (max-width: 360px) { .skills { column-gap: 10px } .sktools { left: 46px; gap: 5px } .skscale canvas { width: 38px } }   /* the smallest phones: keep the tools inside the margin */
 @media (prefers-reduced-motion: reduce) { .rv { transition: none; translate: none; opacity: 1 } }
 </style>
 </head>
@@ -297,6 +310,8 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   band.style.height = (CH.length * 56 + 40) + 'vh';
   bcard.innerHTML = CH.map(c => `<div class="ch"><span class="fqv">${c[0]} FM${c[6] ? ' · ' + c[6] : ''}</span><h3>${c[1]}</h3><div class="role">${c[2]}</div><p>${c[3]}</p>${c[4] ? `<div class="stats"><div class="stat"><b>${c[4]}</b><span class="mono">${c[5]}</span></div>${c[7] ? `<div class="stat"><b>${c[7]}</b><span class="mono">${c[8]}</span></div>` : ''}</div>` : ''}${c[9] ? `<a class="ext" href="${c[9]}" target="_blank" rel="noopener">${c[10] || 'Open'}<i>↗</i></a>` : ''}</div>`).join('');
   const chs = [...bcard.children]; let bcur = -1, bsp = 0;
+  // the next section is pulled up under the pinned card; pull it only as far as the tallest chapter allows, so the last one never sits over it
+  const bfit = () => band.style.setProperty('--bh', Math.max(...chs.map(el => el.offsetHeight)) + 'px'); bfit(); addEventListener('resize', bfit); if (document.fonts) document.fonts.ready.then(bfit);
   const held = p => { const i = Math.floor(p), f = p - i, k = clamp((f - .3) / .4, 0, 1); return i + k * k * (3 - 2 * k); };
   brc.addEventListener('click', e => { const r = brc.getBoundingClientRect(), d = Math.round((e.clientY - r.top - r.height / 2) / 90), k = clamp(bcur + d, 0, CH.length - 1);
     const br = band.getBoundingClientRect(), y = scrollY + br.top + k / (CH.length - 1) * (br.height - innerHeight) * .999; go(y); snd('pop'); });
@@ -342,7 +357,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   skrow.innerHTML = SKL.map((k, i) => `<span class="skw" data-i="${i}" role="button" tabindex="0">${k[0]}</span>`).join('');
   const skws = [...skrow.children];
   let skI = -1, skX = 0, skV = 0, skT = 0, skReady = false;
-  const centre = i => { const r = skws[i].getBoundingClientRect(), b = skc.getBoundingClientRect(); return r.left + r.width / 2 - b.left; };
+  const VERT = matchMedia('(max-width: 640px)');   // phones: the dial runs down the side of the words
+  const centre = i => { const r = skws[i].getBoundingClientRect(), b = skc.getBoundingClientRect(); return VERT.matches ? r.top + r.height / 2 - b.top : r.left + r.width / 2 - b.left; };
+  VERT.addEventListener('change', () => { if (skI >= 0) { skT = centre(skI); skX = skT; skV = 0; } });
   function pick(i, sound) { if (i === skI) return; skI = i; skT = centre(i); skws.forEach((w, k) => w.classList.toggle('on', k === i));
     skt.innerHTML = SKL[i][1].map((t, k) => `<img src="${TS[t]}" alt="${TN[t]}" title="${TN[t]}" style="--k:${k}">`).join(''); if (sound) snd('detent'); }
   skws.forEach((w, i) => { w.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pick(i, true); }); w.addEventListener('click', () => pick(i, true));
@@ -351,13 +368,13 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   ticks.push(dt => {
     if (!skReady) { if (!skws[0].offsetWidth) return; skReady = true; pick(0, false); skX = skT; }
     const s2 = dt / 1000, a = (skT - skX) * 180 - skV * 18; skV += a * s2; skX += skV * s2;
-    skt.style.transform = `translate3d(${skX.toFixed(1)}px,0,0)`;
+    const V = VERT.matches; skt.style.transform = V ? `translate3d(0,${skX.toFixed(1)}px,0)` : `translate3d(${skX.toFixed(1)}px,0,0)`;
     const dpr = Math.min(2, devicePixelRatio || 1), W = skc.clientWidth, H = skc.clientHeight; if (skc.width !== Math.round(W * dpr)) { skc.width = Math.round(W * dpr); skc.height = Math.round(H * dpr); }
-    skx.setTransform(dpr, 0, 0, dpr, 0, 0); skx.clearRect(0, 0, W, H); const col = ink(), n = Math.round(W / 9);
-    for (let q = 0; q <= n; q++) { const x = q / n * W, d = Math.abs(x - skX) / 60, st = skws.some((w, i) => Math.abs(centre(i) - x) < W / n / 2);
+    skx.setTransform(dpr, 0, 0, dpr, 0, 0); skx.clearRect(0, 0, W, H); const col = ink(), L = V ? H : W, n = Math.round(L / 9);
+    for (let q = 0; q <= n; q++) { const x = q / n * L, d = Math.abs(x - skX) / 60, st = skws.some((w, i) => Math.round(centre(i) / L * n) === q), len = (st ? 16 : 8) + Math.max(0, 1 - d) * 10;
       skx.globalAlpha = (st ? .5 : .14) + Math.max(0, 1 - d) * .4; skx.strokeStyle = col; skx.lineWidth = st ? 1.5 : 1;
-      skx.beginPath(); skx.moveTo(x, 0); skx.lineTo(x, (st ? 16 : 8) + Math.max(0, 1 - d) * 10); skx.stroke(); }
-    skx.globalAlpha = 1; skx.fillStyle = RED; skx.fillRect(skX - 1.5, 0, 3, 40);
+      skx.beginPath(); if (V) { skx.moveTo(0, x); skx.lineTo(len, x); } else { skx.moveTo(x, 0); skx.lineTo(x, len); } skx.stroke(); }
+    skx.globalAlpha = 1; skx.fillStyle = RED; if (V) skx.fillRect(0, skX - 1.5, 40, 3); else skx.fillRect(skX - 1.5, 0, 3, 40);
   });
 
   /* ---------- 5 · how I work: switched off for now (remove this comment to bring it back) ----------
