@@ -235,6 +235,14 @@
       { k: 'story', label: 'Overview', type: 'tuple', cols: 1, fields: [{ label: 'Heading' }, { label: 'Paragraphs', type: 'paras', help: 'Leave an empty line between paragraphs' }] },
       { k: 'problem', label: 'The brief · Problem', type: 'textarea' }, { k: 'goal', label: 'The brief · Goal', type: 'textarea' },
       { k: 'statement', label: 'Closing statement', type: 'textarea', rows: 2 } ] },
+    { title: 'Sections', help: 'The chapters of the case study, in order. Add, remove, reorder or duplicate them. Each can have text, points, numbers and pictures; leave a part empty to skip it.', fields: [
+      { k: 'sections', label: '', type: 'list', itemLabel: 'Section', def: () => ({ h: '', p: [], media: [] }), title: (s, i) => `${i + 1} · ${s.h || 'Untitled section'}`, of: { type: 'object', fields: [
+        { k: 'h', label: 'Heading', help: 'e.g. Overview, Pain points, UX strategy, High fidelity, Impact, Logo, Colour and type, Mockups' },
+        { k: 'p', label: 'Text', type: 'paras', rows: 4, help: 'Leave an empty line between paragraphs' },
+        { k: 'list', label: 'Points (optional)', type: 'list', itemLabel: 'Point', def: () => ['', ''], title: x => x[0] || 'Point', of: PAIR('Title', 'Text') },
+        { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
+        { k: 'chips', label: 'Colour or type names (brand, optional)', type: 'lines', rows: 2, help: 'One per line' },
+        { k: 'media', label: 'Pictures and videos', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } }] } } ] },
     { title: 'Opening run', help: 'The pictures in the moving strip at the top (8 is ideal, tall pictures fit best).', fields: [
       { k: 'run', label: '', type: 'list', itemLabel: 'Picture', def: '', title: (p, i) => `${i + 1} · ${mname(p)}`, of: { type: 'media', rich: true } } ] },
     { title: 'Screens', help: 'In order: 1 the wide hero, 2 wide, 3 and 4 tall (side by side), 5 wide. Each has a label, where it lives, and a note.', fields: [
@@ -298,6 +306,7 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
+      for (const sec of c.sections || []) for (const k of ['list', 'stats', 'chips', 'p']) if (Array.isArray(sec[k]) && !sec[k].length) delete sec[k];   // an empty part is skipped on the page
     }
     if (name === 'designs') for (const p of d.projects) {
       const im = p.images[0]; im.src = p._img; if (p._vid) im.video = p._vid; else delete im.video; if (p._ratio) im.ratio = +p._ratio;
