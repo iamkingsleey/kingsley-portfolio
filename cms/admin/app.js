@@ -274,7 +274,8 @@
       { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
       { k: 'hidden', label: 'Hide this piece from the site', type: 'bool', full: true } ] },
     { title: 'Picture', fields: [ { k: '_img', label: 'Picture', type: 'media', accept: 'image/*', help: 'Its shape and colour are read automatically when you upload.' },
-      { k: '_vid', label: 'Video (optional)', type: 'media', accept: 'video/*', help: 'If set, the video plays and the picture is its poster.' } ] },
+      { k: '_vid', label: 'Video (optional)', type: 'media', accept: 'video/*', help: 'If set, the video plays and the picture is its poster.' },
+      { k: '_more', label: 'More pictures (optional)', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 2} · ${mname(m)}`, help: 'With more than one picture, the piece on Designs gets arrows and a grid of all its pictures under it.', of: { type: 'media', accept: 'image/*' } } ] },
     { title: 'On the dial', cols: 3, fields: [ { k: '_ratio', label: 'Shape (width ÷ height)', type: 'number', help: '0.8 tall · 1.5 wide' }, { k: 'bg', label: 'Background colour', type: 'color' }, { k: 'dark', label: 'Dark picture (light text over it)', type: 'bool' } ] },
     { title: 'Credits', fields: [ { k: 'credits', label: '', type: 'list', itemLabel: 'Credit', def: () => ['', ''], title: c => c.join(' · '), of: PAIR('Role', 'Name') } ] },
     { title: 'Opens', help: 'By default a piece opens its own page on Designs. Point it somewhere else here.', cols: 2, fields: [
@@ -295,7 +296,7 @@
   // stored shapes ↔ friendlier shapes for the forms (put back on save)
   function prep() {
     for (const c of C.cases.cases || []) { if (c.impact === undefined) c.impact = null; c._imp = (c.impact && c.impact.stats) || []; }
-    for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = im.video || ''; p._ratio = im.ratio; }
+    for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = im.video || ''; p._ratio = im.ratio; p._more = p.images.slice(1).map(x => x.src); }
     for (const ch of C.about.chapters || []) { ch.s1 = [ch.stat || '', ch.statLabel || '']; ch.s2 = [ch.stat2 || '', ch.stat2Label || '']; }
     for (const t of C.engineering.tools || []) t.s = [t.stat || '', t.statLabel || ''];
   }
@@ -310,7 +311,8 @@
     }
     if (name === 'designs') for (const p of d.projects) {
       const im = p.images[0]; im.src = p._img; if (p._vid) im.video = p._vid; else delete im.video; if (p._ratio) im.ratio = +p._ratio;
-      delete p._img; delete p._vid; delete p._ratio; for (const k of ['case', 'link', 'layout', 'year', 'caseStudy']) if (!p[k]) delete p[k];
+      { const old = Object.fromEntries(p.images.slice(1).map(x => [x.src, x])); p.images = [p.images[0], ...(p._more || []).filter(Boolean).map(src => old[src] || { src, ratio: .8 })]; }
+      delete p._img; delete p._vid; delete p._ratio; delete p._more; for (const k of ['case', 'link', 'layout', 'year', 'caseStudy']) if (!p[k]) delete p[k];
     }
     if (name === 'about') for (const ch of d.chapters) { [ch.stat, ch.statLabel] = ch.s1; [ch.stat2, ch.stat2Label] = ch.s2; delete ch.s1; delete ch.s2; }
     if (name === 'engineering') for (const t of d.tools) { [t.stat, t.statLabel] = t.s; delete t.s; }

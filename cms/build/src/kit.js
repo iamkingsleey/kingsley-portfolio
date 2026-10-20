@@ -151,7 +151,7 @@
     prev() { const a = readT(), f = fileOf(here()); for (let i = a.length - 1; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i]; else if (i < a.length - 1) break; return null; },   // the page before this one (this page may not be marked yet)
     // where a back control should go, and what to call it
     back(fallback, fallbackName) { const p = KM.trail.prev(); if (!p) return { href: fallback, name: fallbackName };
-      const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#p-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; }
+      const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#[pf]-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; }
   };
   addEventListener('hashchange', () => KM.trail.mark());
   addEventListener('pageshow', e => { if (e.persisted) KM.trail.mark(); });

@@ -313,6 +313,8 @@ for p in pj:
         e['layout'] = lay
         e['page'] = LAYOUT_PAGE[lay] + '#' + slugify(p['title'])
     if p.get('desc'): e['desc'] = p['desc']
+    if len(p['images']) > 1:   # a project with several pictures: they become its own gallery on Designs (arrows + a grid under it)
+        e['gal'] = [{'src': x['src'], 'r': x.get('ratio', 0.8), **({'video': x['video']} if x.get('video') else {})} for x in p['images'] if x.get('src')]
     if p.get('caseStudy'): e['cs'] = True   # optional: shown as a case study (its layout page is the case study)
     for f_ in ('year', 'case', 'credits', 'link', 'tools', 'mix', 'client'):   # optional: year, the case study it belongs to (slug), credits [[role, name]], link (a page to open instead of the small view)
         if p.get(f_): e[f_] = p[f_]

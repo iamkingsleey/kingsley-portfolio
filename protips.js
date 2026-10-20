@@ -103,7 +103,7 @@
       '':      [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '77 pieces · 7 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#hd-verse', 'HD Verse case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
-      '3D':    [['showcase.html#3d-collection', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
+      '3D':    [['designs.html#p-paper-plane-with-coin', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
       Motion:  [['designs.html#p-tennis-ball-and-rackets', 'Tennis ball and rackets', 'Motion'], ['designs.html#p-red-padlock', 'Red padlock', 'Motion'], ['designs.html', 'All motion work', 'Loops on Designs']]
     };
     const rr = card.querySelector('.rr'), go = card.querySelector('.go');
