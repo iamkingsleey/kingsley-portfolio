@@ -1403,7 +1403,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     setTimeout(() => { f.remove(); cov.remove(); busy = false; }, 1500);
   }
   if (PROJECT_PAGE) setTimeout(() => { [PROJECT_PAGE, 'logo.html', 'product.html', 'showcase.html'].forEach(h => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; document.head.appendChild(l); }); }, 1500);
-  addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly').forEach(c => c.remove()); busy = false; flyIdx = -1; } });   // back button: nothing left over
+  addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly, .km-keep').forEach(c => c.remove()); busy = false; flyIdx = -1; leaving = false; } });   // back button: nothing left over
   async function openDetail(i, x, y, fr, quiet) {      // fr: the box it flies from (a tile in the All view), else the piece on the dial; quiet: opened from the address
     if (items[i] && items[i].link && !busy) return goPage(i, x, y, fr);
     if (busy || openIdx >= 0) return; busy = true; tap();

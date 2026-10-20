@@ -173,7 +173,13 @@
     else { const p = KM.trail.prev(); let rf = ''; try { const r = new URL(document.referrer); if (r.origin === location.origin) rf = r.pathname.split('/').pop() || 'index.html'; } catch (_) {}
       kmPrev = p && rf && fileOf(p.u) === rf ? p.u : null; history.replaceState(KM.trail.state(), ''); } } catch (_) {}
   addEventListener('hashchange', () => { try { if (!history.state || !('kmPrev' in history.state)) history.replaceState(KM.trail.state(), ''); } catch (_) {} KM.trail.mark(); });
-  addEventListener('pageshow', e => { if (e.persisted) KM.trail.mark(); });
+  addEventListener('pageshow', e => { if (!e.persisted) return;
+    // back with the browser's back button: the page comes back exactly as it was left, so clear what leaving put on it
+    // (the picture lifted off its tile, page covers, flying copies, blurs)
+    document.querySelectorAll('.km-keep, .pagecover, .fly').forEach(n => n.remove());
+    document.body.classList.remove('leaving'); document.querySelectorAll('.tune-out').forEach(n => n.classList.remove('tune-out'));
+    try { sessionStorage.removeItem('km-keep'); } catch (_) {}
+    KM.trail.mark(); });
   const go = () => { watch(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
