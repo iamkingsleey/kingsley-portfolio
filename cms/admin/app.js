@@ -285,6 +285,7 @@
   ];
   const CHAPTER = { type: 'object', fields: [
     { k: 'where', label: 'Where' }, { k: 'role', label: 'Role' }, { k: 'years', label: 'Years', ph: '2020 – Now' }, { k: 'fq', label: 'Station', ph: '88.1' },
+    { k: 'type', label: 'How', type: 'select', options: [['', '—'], ['Full time', 'Full time'], ['Part time', 'Part time'], ['Contract', 'Contract'], ['Freelance', 'Freelance'], ['Volunteer', 'Volunteer']] }, { k: 'location', label: 'Location', ph: 'Lagos, Nigeria or Remote' },
     { k: 'what', label: 'What I did there', type: 'textarea' },
     { k: 's1', type: 'tuple', label: 'Number (optional)', fields: [{ label: 'Number' }, { label: 'Label' }] },
     { k: 's2', type: 'tuple', label: 'Second number (optional)', fields: [{ label: 'Number' }, { label: 'Label' }] },

@@ -34,7 +34,8 @@ _ab = _rows('about')
 _K = ['fq', 'where', 'role', 'what', 'stat', 'statLabel', 'years', 'stat2', 'stat2Label']
 _s = open(f'{KFM}/about-src.html', encoding='utf-8').read()
 _i = _s.index('  const CH = ['); _j = _s.index('  ];', _i) + 4
-_ch = [[c.get(k, '') for k in _K] for c in _ab['chapters'] if not c.get('hidden')]
+# the role line carries the role, how it was held (contract, full time) and where: "Brand Designer · Contract · Remote"
+_ch = [[(' · '.join(x for x in [c.get('role', ''), c.get('type', ''), c.get('location', '')] if x) if k == 'role' else c.get(k, '')) for k in _K] for c in _ab['chapters'] if not c.get('hidden')]
 for _r in _ch:
     while len(_r) > 7 and not _r[-1] and not _r[-2]: del _r[-2:]   # no second stat
 _s = _s[:_i] + '  const CH = [   // [frequency, where, role, what, stat, stat label, years, second stat, its label]\n' + ',\n'.join('    ' + json.dumps(r, ensure_ascii=False) for r in _ch) + '\n  ];' + _s[_j:]

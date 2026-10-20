@@ -9,7 +9,9 @@
    "statLabel": "",
    "years": "2020 – 2021",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Lagos, Nigeria",
+   "type": "Full time"
   },
   {
    "fq": "90.3",
@@ -20,18 +22,22 @@
    "statLabel": "users",
    "years": "2020 – Now",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Lagos, Nigeria",
+   "type": ""
   },
   {
    "fq": "92.5",
    "where": "Haus des Stiftens",
-   "role": "UX Designer · Germany",
+   "role": "UX Designer",
    "what": "UX design for Haus des Stiftens in Germany, on a remote contract. Around the same time I went through Digital Product School.",
    "stat": "",
    "statLabel": "",
    "years": "2021 – 2022",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Germany · Remote",
+   "type": "Contract"
   },
   {
    "fq": "94.7",
@@ -42,7 +48,9 @@
    "statLabel": "",
    "years": "2022 – Now",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Remote",
+   "type": ""
   },
   {
    "fq": "96.9",
@@ -53,7 +61,9 @@
    "statLabel": "",
    "years": "",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Lagos, Nigeria",
+   "type": ""
   },
   {
    "fq": "99.1",
@@ -64,7 +74,20 @@
    "statLabel": "Africans reached",
    "years": "2024 – 2025",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Remote",
+   "type": "Contract"
+  },
+  {
+   "fq": "100.2",
+   "where": "Open Source Sustainability Lab",
+   "role": "Brand Designer",
+   "location": "United States · Remote",
+   "type": "Contract",
+   "years": "",
+   "what": "Brand design for the Open Source Sustainability Lab in the US, on a contract.",
+   "stat": "",
+   "statLabel": ""
   },
   {
    "fq": "101.3",
@@ -75,7 +98,9 @@
    "statLabel": "",
    "years": "2025",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "location": "Lagos, Nigeria",
+   "type": ""
   },
   {
    "fq": "103.5",
