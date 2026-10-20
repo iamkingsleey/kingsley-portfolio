@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}};</script>
 
 <meta charset="utf-8">
 <script>
@@ -417,11 +417,12 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610201458#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610201532#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=a9bc7f9e" defer></script>
 <script src="protips.js?v=53e5107b" defer></script>
+<script src="feedback.js?v=407a33de" defer></script>
 </body>
 </html>

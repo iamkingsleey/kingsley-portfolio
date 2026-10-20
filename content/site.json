@@ -3,5 +3,10 @@
   "goatcounter": ""
  },
  "available": true,
- "shop": true
+ "shop": true,
+ "feedback": {
+  "on": true,
+  "to": "iamkingsleey@gmail.com",
+  "after": 3
+ }
 }

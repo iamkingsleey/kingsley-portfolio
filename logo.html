@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}};</script>
 
 <meta charset="utf-8">
 <script>
@@ -522,7 +522,7 @@ figure { margin: 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610201458';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610201532';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -539,5 +539,6 @@ figure { margin: 0 }
 <script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=a9bc7f9e" defer></script>
 <script src="protips.js?v=53e5107b" defer></script>
+<script src="feedback.js?v=407a33de" defer></script>
 </body>
 </html>
