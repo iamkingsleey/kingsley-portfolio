@@ -120,7 +120,7 @@
   // step 1: the score
   function step1() {
     card.innerHTML = `<div class="st"><div class="hd"><span class="mo">Quick question · 1 of 2</span>${X}</div>
-      <h3 id="kfb-q">Pick the number that best fits your visit.</h3><p class="sub">1 is frustrating, 5 is effortless.</p>
+      <h3 id="kfb-q">How easy was it to find your way around?</h3><p class="sub">1 is frustrating, 5 is effortless.</p>
       <div class="bd"><div class="ro empty" data-ro><b>–</b><span>Tap a number or drag the dial</span></div>
       <div class="tn" role="slider" tabindex="0" aria-label="Score, 1 to 5" aria-valuemin="1" aria-valuemax="5" aria-valuenow="3"><canvas></canvas></div></div>
       <div class="ft"><button type="button" class="lt" data-later>Not now</button><button type="button" class="go" data-next disabled>Next</button></div></div>`;
