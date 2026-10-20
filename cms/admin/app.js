@@ -238,6 +238,7 @@
     { title: 'Sections', help: 'The chapters of the case study, in order. Add, remove, reorder or duplicate them. Each can have text, points, numbers and pictures; leave a part empty to skip it.', fields: [
       { k: 'sections', label: '', type: 'list', itemLabel: 'Section', def: () => ({ h: '', p: [], media: [] }), title: (s, i) => `${i + 1} · ${s.h || 'Untitled section'}`, of: { type: 'object', fields: [
         { k: 'h', label: 'Heading', help: 'e.g. Overview, Pain points, UX strategy, High fidelity, Impact, Logo, Colour and type, Mockups' },
+        { k: 'title', label: 'Title on the page (product, optional)', help: 'Leave empty for the default, e.g. Pain points shows as “Listening to users”' },
         { k: 'p', label: 'Text', type: 'paras', rows: 4, help: 'Leave an empty line between paragraphs' },
         { k: 'list', label: 'Points (optional)', type: 'list', itemLabel: 'Point', def: () => ['', ''], title: x => x[0] || 'Point', of: PAIR('Title', 'Text') },
         { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
@@ -347,11 +348,36 @@
     const list = C.cases.cases;
     if (sub != null && list[sub]) {
       const c = list[sub]; head('Case studies', c.title || 'New case study');
+      // two ways to edit: right on the page (click any words and type; click pictures to open their section), or the full form
+      let mode = (() => { try { return localStorage.getItem('cms-case-mode') || 'page'; } catch (_) { return 'page'; } })();
+      const body = el('div');
+      const tabs = el('div', { class: 'seg' }, ...[['page', 'On the page'], ['form', 'Form']].map(([k, n]) => el('button', { type: 'button', class: 'seg-b', 'data-k': k, text: n, onclick: () => setMode(k) })));
+      const setMode = (k, focusPath) => { mode = k; try { localStorage.setItem('cms-case-mode', k); } catch (_) {} tabs.querySelectorAll('.seg-b').forEach(b => b.classList.toggle('on', b.dataset.k === k)); paintBody(focusPath); };
+      const pageUrl = `/site/${c.kind === 'Brand' ? 'brand' : 'case'}.html?cms=1#${c.slug}`;
+      function paintBody(focusPath) {
+        body.innerHTML = ''; if (window._kmCmsMsg) removeEventListener('message', window._kmCmsMsg);
+        if (mode === 'form') { const f = form(CASE, c, 'cases'); body.append(f);
+          if (focusPath) { const m = /^sections\.(\d+)/.exec(focusPath); const grp = [...f.querySelectorAll('.group')].find(g => g.querySelector('h2') && g.querySelector('h2').textContent === 'Sections');
+            if (grp && m) { const it = grp.querySelectorAll(':scope .list > .item')[+m[1]]; if (it) { it.classList.remove('closed'); setTimeout(() => it.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); it.classList.add('flash'); setTimeout(() => it.classList.remove('flash'), 1600); } } }
+          return; }
+        const note = el('p', { class: 'help', text: 'Click any words on the page and type. Click a set of pictures to change them in the form. Your changes are kept as you go; press Save & rebuild when you are done.' });
+        const fr = el('iframe', { class: 'pageedit', src: pageUrl, title: 'Edit ' + c.title + ' on the page' });
+        const send = () => { try { fr.contentWindow.postMessage({ type: 'km-cms-data', cases: clone(C.cases.cases) }, '*'); } catch (_) {} };
+        window._kmCmsMsg = e => { if (e.source !== fr.contentWindow) return; const d = e.data || {};
+          if (d.type === 'km-cms-ready') send();
+          if (d.type === 'km-cms-edit' && d.slug === c.slug) { const keys = d.path.split('.'); let o = c;
+            for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
+            const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
+          if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path); };
+        addEventListener('message', window._kmCmsMsg);
+        body.append(note, fr);
+      }
       v.append(el('button', { class: 'back', type: 'button', text: '← All case studies', onclick: () => go('cases') }),
-        el('div', { class: 'headrow' }, el('h2', { text: c.title }), el('div', { class: 'acts' },
+        el('div', { class: 'headrow' }, el('h2', { text: c.title }), el('div', { class: 'acts' }, tabs,
           el('a', { class: 'btn ghost small', href: `/site/${c.kind === 'Brand' ? 'brand' : 'case'}.html#${c.slug}`, target: '_blank', text: 'Preview ↗' }),
           el('button', { class: 'btn danger small', type: 'button', text: 'Delete', onclick: () => { if (confirm('Delete this case study?')) { list.splice(sub, 1); touch('cases'); go('cases'); } } }))),
-        form(CASE, c, 'cases'));
+        body);
+      setMode(mode);
       return;
     }
     head('Content', 'Case studies');

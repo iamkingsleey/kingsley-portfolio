@@ -474,6 +474,11 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 @media (max-width: 899px) { .N .nhr, .N .nb { grid-template-columns: 1fr } .N .nb { padding: 72px var(--ne) 56px } .N .cstations, .N .tdst { display: none } .N .tdl { top: 72px } }
 
 #app { transition: opacity .35s } #app.wait { opacity: 0 }
+.km-cms [data-edit] { outline: 1px dashed transparent; outline-offset: 4px; border-radius: 2px; cursor: text; transition: outline-color .15s, background .15s }
+.km-cms [data-edit]:hover { outline-color: color-mix(in srgb, var(--ink) 35%, transparent) }
+.km-cms [data-edit]:focus { outline: 2px solid #3d7bff; background: color-mix(in srgb, #3d7bff 8%, transparent) }
+.km-cms .kmn-scale, .km-cms .kmn-band, .km-cms .kmn-mb, .km-cms .kmn-top { display: none !important }
+.km-cms [data-pick] { cursor: pointer } .km-cms [data-pick]:hover { outline: 2px dashed color-mix(in srgb, #3d7bff 70%, transparent); outline-offset: 6px }
 .cnav { position: fixed; z-index: 40; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 22px; pointer-events: none }
 .cnav > * { pointer-events: auto }
 .dback { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: var(--pill); color: var(--ink); font: 500 13px var(--body); text-decoration: none; transition: background .2s }
@@ -541,6 +546,9 @@ const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 const nl = s => String(s ?? '').replace(/<br\s*\/?>/g, ' ');      // headlines carry <br>; keep them only where a layout wants the break
 const hl = s => esc(s).replace(/&lt;br&gt;/g, '<br>');
 const pad = n => String(n).padStart(2, '0');
+// editing in the CMS: the page opens as case.html?cms=1 inside the CMS; words marked with E(path) can be typed on directly
+const KM_EDIT = /[?&]cms=1/.test(location.search);
+const E = (path, br) => KM_EDIT ? ` data-edit="${path}"${br ? ' data-br' : ''}` : '';
 // sound: the ruler's detent tick, as on About. Browsers only allow sound after the first tap or key on the page.
 let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
 if (window.Popkit) { Popkit.define('wake', () => {}); const wake = () => { if (soundOn) Popkit.play('wake'); }; addEventListener('pointerdown', wake, { once: true }); addEventListener('keydown', wake, { once: true }); }
@@ -590,7 +598,7 @@ function body(s) {
 // everything a layout might want, tidied once
 function prep(c) {
   const meta = [['Role', c.role], ['Year', c.year], ['Client', c.client], ['Work', (c.did || []).join(', ')]].filter(([, v]) => v && v !== 'Year');
-  const secs = (c.sections || []).map(s => ({ ...s, media: (s.media || []).filter(Boolean) }));
+  const secs = (c.sections || []).map((s, k) => ({ ...s, _i: k, media: (s.media || []).filter(Boolean) }));
   // cases without pictures in their sections borrow from the run of work, one each
   const run = (c.run || []).slice(1); let ri = 0;
   secs.forEach(s => { if (!s.media.length && run[ri]) s.media = [run[ri++]]; });
@@ -675,7 +683,7 @@ const R = {
     const PH = [[/overview/i, 'Context', 'The product'], [/pain|research|insight/i, 'Research', 'Listening to users'], [/strategy|approach/i, 'Strategy', 'Reframing the problem'],
       [/key feature|feature|solution/i, 'Solution', 'What we built'], [/high fidelity|hi-?fi/i, 'Design', 'Designing the flow'], [/screens|shops|flow|ui/i, 'Design', null],
       [/impact|result/i, 'Results', 'The impact'], [/plan|roadmap/i, 'Roadmap', 'The plan'], [/brand/i, 'Brand', 'Giving it a face']];
-    const ph = s => { const m = PH.find(([re]) => re.test(s.h)); return m ? [m[1], m[2] || s.h] : ['Chapter', s.h]; };
+    const ph = s => { const m = PH.find(([re]) => re.test(s.h)); return [m ? m[1] : 'Chapter', s.title || (m && m[2]) || s.h]; };
     // and the chapters follow how the work happened: context, research, strategy, the solution, the design, results
     const ORDER = ['Context', 'Research', 'Strategy', 'Roadmap', 'Solution', 'Brand', 'Design', 'Chapter', 'Results'];
     c = { ...c, secs: c.secs.map((s, k) => ({ s, k })).sort((a, b) => (ORDER.indexOf(ph(a.s)[0]) - ORDER.indexOf(ph(b.s)[0])) || a.k - b.k).map(x => x.s) };
@@ -690,31 +698,31 @@ const R = {
       if (last && last.length === 1 && rOf(last[0]) < 1.45) { const ex = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45);
         if (ex) { used.add(key(ex)); list.push(ex); } else list = list.filter(m => key(m) !== key(last[0])); }
       return list; };
-    const pics = (list, label) => { list = tidy(list); return list.length ? `<div class="fr" style="--pmh:300vh">${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
+    const pics = (list, label, si) => { list = tidy(list); return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
     // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
-    const bigNums = stats => `<div class="fr"><div class="bign">${stats.map(([a, b]) => `<div><b data-n="${esc(a)}">${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2">${esc(c.impactNote)}</p>` : ''}</div>`;
-    const bigList = list => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div></div>`;
+    const bigNums = (stats, si) => `<div class="fr"><div class="bign">${stats.map(([a, b], k) => `<div><b data-n="${esc(a)}"${E(`sections.${si}.stats.${k}.0`)}>${esc(a)}</b><span${E(`sections.${si}.stats.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2"${E('impactNote')}>${esc(c.impactNote)}</p>` : ''}</div>`;
+    const bigList = (list, base) => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b${base ? E(`${base}.${k}.0`) : ''}>${esc(a)}</b><span${base ? E(`${base}.${k}.1`) : ''}>${esc(b)}</span></div>`).join('')}</div></div>`;
     const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
     const tags = [...(c.industry || []), ...(c.did || []).slice(0, 2)];
     const st = c.stat && c.stat[0] ? ` <b>${esc(c.stat[0])} ${esc(c.stat[1])}</b>.` : '';
-    let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1>${nl(c.headline)}</h1><p class="lede">${esc(c.lede)}${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
+    let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
       ${(() => { const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh">${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // the backstory: the problem, the goal and my part in it, before any screens
-    h += `<section class="tx ch" data-ix="The brief"><span class="eb">The brief</span><h2>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map(p => `<p>${esc(p)}</p>`).join('')}
-      ${c.problem ? `<h4>The problem</h4><p>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch">${esc(c.goal)}</p>` : ''}
+    h += `<section class="tx ch" data-ix="The brief"><span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
+      ${c.problem ? `<h4>The problem</h4><p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch"${E('goal')}>${esc(c.goal)}</p>` : ''}
       <h4>My role</h4><p>${esc(c.role)}${c.client && c.client !== 'Personal project' ? ', ' + esc(c.client) : ''}${c.year && c.year !== 'Year' ? ', ' + esc(c.year) : ''}.</p><div class="role">${(c.did || []).map(d => `<span>${esc(d)}</span>`).join('')}</div></section>`;
     c.secs.forEach((s, i) => {
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
-        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</section>${bigNums(s.stats)}${pics(media, s.h)}`;
+        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigNums(s.stats, s._i)}${pics(media, s.h, s._i)}`;
         return;
       }
-      if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · Results</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}</section>${bigList(s.list)}${pics(media, s.h)}`; return; }
-      const lead = s.list ? `<div class="lead">${s.list.map(([a, b]) => `<div><b>${esc(a)}.</b> ${esc(b)}</div>`).join('')}</div>` : '';
-      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2>${esc(ph(s)[1])}</h2>${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}${lead}</section>${pics(media, s.h)}`;
-      if (i === 2 && c.statement) h += `<section class="tx ch"><span class="eb">Design principle</span><p class="pull" style="margin-top:12px">${esc(c.statement)}</p></section>`;
+      if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · Results</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, s.h, s._i)}`; return; }
+      const lead = s.list ? `<div class="lead">${s.list.map(([a, b], k) => `<div><b${E(`sections.${s._i}.list.${k}.0`)}>${esc(a)}</b>. <span${E(`sections.${s._i}.list.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>` : '';
+      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${lead}</section>${pics(media, s.h, s._i)}`;
+      if (i === 2 && c.statement) h += `<section class="tx ch"><span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`;
     });
-    if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list)}`;
+    if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list, 'impact.list')}`;
     h += `<section class="tx ch" data-ix="Project details"><span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section><div class="sp"></div>`;
     return h + `${NEXT(c)}</main>`;
   },
@@ -910,16 +918,16 @@ R.N = function (c) {
     const rows = rowsOf(list), last = rows[rows.length - 1];
     if (last && last.length === 1 && rOf(last[0]) < 1.45) { const extra = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45); if (extra) { used.add(key(extra)); list.push(extra); } }
     return list; };
-  const pics = list => { list = take(list); return list.length ? `<div class="nf covers">${ROWS(list, '')}</div>` : ''; };
-  const brief = (s, eyebrow) => s ? `<section class="nb" data-ix="${esc(s.h)}"><div class="l"><span class="mono">${esc(eyebrow)}</span><h2>${esc(s.h)}</h2></div><div class="r">${(s.p || []).map(p => `<p>${esc(p)}</p>`).join('')}${s.list ? `<dl class="ls">${s.list.map(([a, d]) => `<div><dt>${esc(a)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` : ''}</div></section>` : '';
+  const pics = (list, si) => { list = take(list); return list.length ? `<div class="nf covers"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${ROWS(list, '')}</div>` : ''; };
+  const brief = (s, eyebrow) => s ? `<section class="nb" data-ix="${esc(s.h)}"><div class="l"><span class="mono">${esc(eyebrow)}</span><h2${E(`sections.${s._i}.h`)}>${esc(s.h)}</h2></div><div class="r">${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${s.list ? `<dl class="ls">${s.list.map(([a, d]) => `<div><dt>${esc(a)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` : ''}</div></section>` : '';
   let n = 0; const eb = () => pad(++n);
   let h = `${TOP(c)}<main class="N" style="${bstyle(b)}">
-    <header class="nh"><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><h1>${esc(c.title)}</h1>
-      <div class="nhr"><p class="lede">${esc(c.lede)}</p><dl>${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div></header>
+    <header class="nh"><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><h1${E('title')}>${esc(c.title)}</h1>
+      <div class="nhr"><p class="lede"${E('blurb')}>${esc(c.lede)}</p><dl>${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div></header>
     ${pics([c.cover])}`;
-  if (c.problem || c.goal) h += `<section class="nb" data-ix="The brief"><div class="l"><span class="mono">${eb()}</span><h2>The brief</h2></div><div class="r">${c.problem ? `<p>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="go">${esc(c.goal)}</p>` : ''}</div></section>`;
-  if (b.intro && b.intro !== b.logo) h += pics(b.intro.media);
-  if (b.logo) h += brief(b.logo, eb()) + pics(b.logo.media.length ? b.logo.media : [b.logoM]);
+  if (c.problem || c.goal) h += `<section class="nb" data-ix="The brief"><div class="l"><span class="mono">${eb()}</span><h2>The brief</h2></div><div class="r">${c.problem ? `<p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="go"${E('goal')}>${esc(c.goal)}</p>` : ''}</div></section>`;
+  if (b.intro && b.intro !== b.logo) h += pics(b.intro.media, b.intro._i);
+  if (b.logo) h += brief(b.logo, eb()) + pics(b.logo.media.length ? b.logo.media : [b.logoM], b.logo._i);
   // colour: the screen floods with each colour in turn
   if (b.pal.length >= 2) { const P = b.pal.slice(0, 5), FQ = ['88.1', '91.4', '96.7', '101.3', '104.3'];
     h += `<section class="nb" data-ix="Colour"><div class="l"><span class="mono">${eb()}</span><h2>Colour</h2></div><div class="r"><p>${esc(b.colour ? (b.colour.p || [])[0] || '' : 'The palette, one colour at a time.')}</p></div></section>
@@ -956,13 +964,13 @@ R.N = function (c) {
       <p class="tpm" style="font-family:${B.css}">${esc(c.client)} · ${esc(c.role)}</p></div></section>`;
     if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
       <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
-  if (b.pers) h += pics(b.pers.media);   // personality and mockups speak through their pictures: no text
+  if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
   // the closing four pictures sit as a two-by-two grid of equal frames
   const mockAll = b.mock ? uniq(b.mock.media).filter(m => !used.has(key(m))) : [];
   let rest = spare.filter(m => !used.has(key(m)) && !mockAll.some(x => key(x) === key(m)));
   const need = Math.max(0, 4 - Math.min(4, rest.length)), tail = [...mockAll.slice(Math.max(0, mockAll.length - need)), ...rest].slice(0, 2);   // the closing pair (the last two of the four are off)
   const mockKeep = mockAll.filter(m => !tail.some(x => key(x) === key(m)));
-  if (b.mock) h += pics(mockKeep);
+  if (b.mock) h += pics(mockKeep, b.mock._i);
   if (tail.length) { tail.forEach(m => used.add(key(m))); h += `<div class="nf covers"><div class="g4">${tail.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div></div>`; }
   return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
 };
@@ -1086,19 +1094,43 @@ function paint(keep) {
     if (el.tagName === 'IMG') { if (el.complete && el.naturalWidth) ok(); else { el.addEventListener('load', ok); el.addEventListener('error', ok); } }
     else { if (el.readyState >= 2) ok(); else { el.addEventListener('loadeddata', ok); el.addEventListener('error', ok); } } });
   // next case: same page, new case (with the tuning transition when it is there)
-  app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
+  app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { if (KM_EDIT) return; const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
     if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug }); else { location.hash = n.slug; } }));
   const backTo = () => (window.KM && KM.trail) ? KM.trail.back('designs.html', 'All designs') : { href: 'designs.html', name: 'All designs' };
   const label = () => { const b = backTo(), a = app.querySelector('a.dback'); if (!a) return; a.href = b.href; a.lastChild.textContent = b.name; a.setAttribute('aria-label', 'Back to ' + b.name); };
   label(); document.addEventListener('km-trail', label, { once: true }); setTimeout(label, 500);
-  app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); snd('pop'); const b = backTo();
+  app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
     if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98, name: b.name, href: b.href }); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
   setupIndex(); setupN(); setupPlay(); countUp();
   if (window.KM && KM.trail) KM.trail.mark();
+  if (KM_EDIT) editable(c);
+}
+// ---------- editing in the CMS ----------
+// The CMS loads this page in a frame with ?cms=1 and sends it the case studies as they stand (unsaved changes included).
+// Words marked data-edit can be clicked and typed on; each change goes back to the CMS, which keeps it with the rest.
+// A picture set, when clicked, opens its section in the CMS form.
+function editable(c) {
+  document.documentElement.classList.add('km-cms');
+  app.querySelectorAll('[data-edit]').forEach(el => {
+    el.contentEditable = 'plaintext-only'; if (el.contentEditable !== 'plaintext-only') el.contentEditable = 'true';
+    el.spellcheck = true;
+    el.addEventListener('click', e => e.stopPropagation());
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' && !el.hasAttribute('data-br')) { e.preventDefault(); el.blur(); } });
+    el.addEventListener('paste', e => { e.preventDefault(); document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain')); });
+    el.addEventListener('input', () => { let v = el.innerText.replace(/ /g, ' '); if (el.hasAttribute('data-br')) v = v.trim().split(/\n+/).join('<br>'); else v = v.replace(/\s*\n\s*/g, ' ');
+      parent.postMessage({ type: 'km-cms-edit', slug: c.slug, path: el.dataset.edit, value: v }, '*'); });
+  });
+  app.querySelectorAll('[data-pick]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-pick', slug: c.slug, path: el.dataset.pick }, '*'); }, true));
+}
+if (KM_EDIT) {
+  addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-data' || !Array.isArray(d.cases)) return;
+    CASES.splice(0, CASES.length, ...d.cases.filter(x => !x.hidden)); const y = scrollY; const cs = CASES.find(x => x.slug === C) || CASES.find(x => x.slug === slugNow());
+    if (cs) { C = cs.slug; shapes(cs).then(() => { paint(true); scrollTo(0, y); }); } });
+  parent.postMessage({ type: 'km-cms-ready' }, '*');
 }
 function countUp() {
-  const els = [...app.querySelectorAll('.bign b[data-n]')]; if (!els.length || !('IntersectionObserver' in window)) return;
+  const els = [...app.querySelectorAll('.bign b[data-n]')]; if (KM_EDIT || !els.length || !('IntersectionObserver' in window)) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target);
     const el = e.target, m = el.dataset.n.match(/^([^\d]*)([\d,.]+)(.*)$/); if (!m || reduce) return;
