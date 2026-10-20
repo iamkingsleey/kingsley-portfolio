@@ -9,7 +9,9 @@
   const at = ORDER.indexOf(file); if (at < 0) return;
   const withV = u => u && window.BUILD ? u + '?v=' + window.BUILD : u;   /* the same address the nav uses, so one cached copy serves both */
   // only between Home and Designs: Home flows down into Designs, and Designs flows back up to Home
-  const ALLOW = { 'index.html': [1] }[file] || [];   // only Home → Designs for now (scrolling back up from Designs is off)
+  // Home → Designs everywhere; Designs → Home only on phones and tablets, by pulling down at the top of the grid
+  const TOUCH = matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const ALLOW = { 'index.html': [1], 'designs.html': TOUCH ? [-1] : [] }[file] || [];
   if (!ALLOW.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const home = file === 'index.html';
@@ -55,8 +57,8 @@
   // couple of seconds) goes. One stray scroll at the top of Designs never throws you back.
   let armed = 0, armGesture = -1, gesture = 0, tipEl = null;
   const tip = on => {
-    if (!tipEl) { tipEl = document.createElement('div'); tipEl.innerHTML = 'Once more, <b style="font-weight:500;color:#ff4a1c">scroll ↑</b> to go Home';   /* same words and red as Home's "scroll ↓" tip, so the two directions read as a pair on any device */
-      tipEl.style.cssText = 'position:fixed;z-index:151;left:50%;top:calc(88px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);opacity:0;pointer-events:none;padding:7px 13px;border-radius:999px;background:#fff;color:#111;font:500 13px Geist,system-ui,sans-serif;transition:opacity .2s,transform .35s cubic-bezier(.2,.8,.2,1)';
+    if (!tipEl) { tipEl = document.createElement('div'); tipEl.innerHTML = TOUCH ? 'Pull down <b style="font-weight:500;color:#ff4a1c">once more ↓</b> to go Home' : 'Once more, <b style="font-weight:500;color:#ff4a1c">scroll ↑</b> to go Home';   /* same words and red as Home's "scroll ↓" tip, so the two directions read as a pair on any device */
+      tipEl.style.cssText = 'white-space:nowrap;position:fixed;z-index:151;left:50%;top:calc(88px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);opacity:0;pointer-events:none;padding:7px 13px;border-radius:999px;background:#fff;color:#111;font:500 13px Geist,system-ui,sans-serif;transition:opacity .2s,transform .35s cubic-bezier(.2,.8,.2,1)';
       if (matchMedia('(max-width: 899px)').matches) { tipEl.style.top = 'auto'; tipEl.style.bottom = 'calc(92px + env(safe-area-inset-bottom,0px))'; }
       document.body.append(tipEl); }
     tipEl.style.opacity = on ? 1 : 0; tipEl.style.transform = on ? 'translate(-50%,0)' : 'translate(-50%,-6px)';
@@ -102,7 +104,7 @@
     if (e.target.closest && e.target.closest('input, textarea, button, a')) return;
     if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(1); }
   });
-  addEventListener('pageshow', e => { if (e.persisted) location.reload(); });   // coming back: a fresh page, not the slid-away one
+  addEventListener('pageshow', e => { if (e.persisted && (home || gone)) location.reload(); });   // coming back: a fresh page, not the slid-away one
   // get the neighbours ready: the next page is built in the background where the browser allows it, and its pictures are fetched
   const warm = () => {
     const next = ALLOW.includes(1) ? withV(ORDER[at + 1]) : null, prev = ALLOW.includes(-1) ? withV(ORDER[at - 1]) : null;

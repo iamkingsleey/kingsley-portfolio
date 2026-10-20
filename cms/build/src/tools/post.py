@@ -180,7 +180,7 @@ for _p in PAGES:
     if _p == 'index.html' and 'src="home.js' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
         _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
-        if _p == 'index.html': _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)
+        _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)   # Designs: pull down at the top to go Home (phones only; flow.js decides)
     _s = _webpify(_s)
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
