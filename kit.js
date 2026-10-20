@@ -134,6 +134,27 @@
   // leaving: what Designs calls before it moves to a case study
   KM.keep = (src, r) => { try { sessionStorage.setItem('km-keep', JSON.stringify({ src, x: r.left, y: r.top, w: r.width, h: r.height, t: Date.now() })); } catch (_) {} };
 
-  const go = () => { watch(); arrive(); };
+  // ---------- the way back: the pages this visit has passed through (per tab). A page's own back control returns to the page
+  // you came from (a case study opened from Projects goes back to Projects; one opened from a piece on Designs goes back to that piece);
+  // only when you arrived from nowhere does it fall back to its usual place. Moving within a page (next case, a hash) replaces its entry.
+  const TR = 'km-trail', fileOf = u => u.split('#')[0].split('?')[0] || 'index.html';
+  const here = () => (location.pathname.split('/').pop() || 'index.html') + location.hash;
+  const readT = () => { try { return JSON.parse(sessionStorage.getItem(TR)) || []; } catch (_) { return []; } };
+  const writeT = a => { try { sessionStorage.setItem(TR, JSON.stringify(a.slice(-30))); } catch (_) {} };
+  const nameHere = () => ((document.querySelector('.cnav .nm, [data-readout] .nm, .station .nm, .now .nm') || {}).textContent || document.title.split(' · ')[0]).trim();
+  KM.trail = {
+    mark(u = here(), t = nameHere()) { const a = readT(), e = { u, t };
+      if (a.length > 1 && a[a.length - 2].u === u) { a.pop(); a[a.length - 1] = e; }                      // went back a step
+      else if (a.length && fileOf(a[a.length - 1].u) === fileOf(u)) a[a.length - 1] = e;                 // same page, new place on it
+      else a.push(e);
+      writeT(a); },
+    prev() { const a = readT(), f = fileOf(here()); for (let i = a.length - 1; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i]; else if (i < a.length - 1) break; return null; },   // the page before this one (this page may not be marked yet)
+    // where a back control should go, and what to call it
+    back(fallback, fallbackName) { const p = KM.trail.prev(); if (!p) return { href: fallback, name: fallbackName };
+      const f = fileOf(p.u); return { href: p.u, name: f === 'designs.html' && !/#p-/.test(p.u) ? 'All designs' : f === 'index.html' ? 'Home' : f === 'projects.html' ? 'Projects' : (p.t || fallbackName) }; }
+  };
+  addEventListener('hashchange', () => KM.trail.mark());
+  addEventListener('pageshow', e => { if (e.persisted) KM.trail.mark(); });
+  const go = () => { watch(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

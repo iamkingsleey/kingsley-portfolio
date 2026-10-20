@@ -1168,6 +1168,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
         </div>
       </section>`;
       if (parent) $('dread').addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); tap();
+        try { history.replaceState(null, '', '#p-' + slugOf(it.t)); if (window.KM && KM.trail) KM.trail.mark(); } catch (_) {}   // coming back reopens this piece
         const href = parent.page; if (window.Tuner) Tuner.go({ from: +(100 + (i + 1) / 10).toFixed(1), to: +parent.fq || 102, name: parent.t, href }); else location.href = href; });
       const v0 = $('dmedia').querySelector('video'); if (v0) { v0.muted = true; const pr = v0.play(); if (pr) pr.catch(() => {}); }
       $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage((i + 1) % N) : swapDetail((i + 1) % N); });
@@ -1393,8 +1394,14 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     requestAnimationFrame(() => m.classList.add('in'));
     detail.focus({ preventScroll: true }); busy = false;
   }
-  document.getElementById('dback').addEventListener('click', () => closeDetail());
+  // the back pill: a piece opened from another page (a case study, Projects) goes back to that page; otherwise it closes to the grid
+  let cameFrom = null;
+  const dbackLabel = () => { const el = $('dback'); el.lastChild.textContent = cameFrom ? cameFrom.name : 'All designs'; el.setAttribute('aria-label', 'Back to ' + (cameFrom ? cameFrom.name : 'all designs')); };
+  document.getElementById('dback').addEventListener('click', () => {
+    if (cameFrom) { const b = cameFrom; tap(); if (window.Tuner) Tuner.go({ from: 100, to: 98, name: b.name, href: b.href }); else location.href = b.href; return; }
+    closeDetail(); });
   async function closeDetail() {
+    if (cameFrom) { cameFrom = null; dbackLabel(); }   // once closed to the grid, the pill is the grid's own again
     if (busy || openIdx < 0) return; busy = true;
     const i = openIdx; target = p = i; openIdx = -1;
     const m = $('dmedia'), from = m.getBoundingClientRect();
@@ -1922,6 +1929,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
   ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
   { const m = /^#p-(.+)$/.exec(location.hash); const pi = m ? items.findIndex(x => slugOf(x.t) === m[1]) : -1;
+    if (pi >= 0) { const look = () => { const p = window.KM && KM.trail && KM.trail.prev(); cameFrom = p ? KM.trail.back('designs.html', 'All designs') : null; if (cameFrom && /designs\.html/.test(cameFrom.href)) cameFrom = null; dbackLabel(); };
+      document.addEventListener('km-trail', look, { once: true }); setTimeout(look, 450); }
     if (pi >= 0) setTimeout(() => { const t = ov.querySelector(`.ov-t[data-i="${pi}"]`); if (!t) return; if (t.hidden) { leaveRole(); }
       t.scrollIntoView({ block: 'center' }); setTimeout(() => openDetail(pi, undefined, undefined, t.querySelector('.ov-im').getBoundingClientRect()), 120); }, 700); }
   // a tile in the All view opens the piece in the small view, or the page the CMS points it to
@@ -2126,7 +2135,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 })();
 </script>
 <script src="nav.js?v=73bf2373" defer></script>
-<script src="kit.js?v=c6befc20" defer></script>
+<script src="kit.js?v=da4f7385" defer></script>
 <script src="protips.js?v=ebf00887" defer></script>
 </body>
 </html>
