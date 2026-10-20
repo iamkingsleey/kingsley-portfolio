@@ -1699,22 +1699,27 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
       flown.add(t);
       if (t.classList.contains('ok')) go(); else { t.style.setProperty('--fdl', '0s'); t._fly = go; } });
   }
-  // further down: pieces fly in as they scroll into view, a shorter flight than the arrival, in reading order (left to right, row by row)
+  // as you scroll: every piece flies in each time it comes into view (down or back up), a shorter flight than the arrival,
+  // in reading order. Scrolling down they rise from below; scrolling back up they drop in from above. Once a piece has
+  // left the screen completely it is ready to fly in again.
   function mScrollFly() {
     if (reduce || !('IntersectionObserver' in window)) return;
+    let lastTop = ov.scrollTop, dir = 1;
+    ov.addEventListener('scroll', () => { const t = ov.scrollTop; if (t !== lastTop) dir = t > lastTop ? 1 : -1; lastTop = t; }, { passive: true });
     const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (!e.isIntersecting && flown.has(e.target)) { flown.delete(e.target); e.target.classList.remove('m-in'); } });   // off screen: ready again
       const batch = es.filter(e => e.isIntersecting && !flown.has(e.target) && !e.target.hidden).map(e => e.target)
-        .sort((a, b) => a.offsetTop - b.offsetTop || a.offsetLeft - b.offsetLeft);
+        .sort((a, b) => (a.offsetTop - b.offsetTop) * dir || a.offsetLeft - b.offsetLeft);
       if (!batch.length) return;
       const cols = innerWidth < 900 ? 2 : 4, spread = cols === 4 ? [-120, -40, 40, 120] : [-50, 50], left0 = Math.min(...ovTiles.filter(o => !o.t.hidden).map(o => o.t.offsetLeft));
-      batch.forEach((t, k) => { flown.add(t); io.unobserve(t);
+      batch.forEach((t, k) => { flown.add(t);
         const c = Math.max(0, Math.min(cols - 1, Math.round((t.offsetLeft - left0) / (t.offsetWidth + mGap()))));
-        t.style.setProperty('--fx', (spread[c] || 0) + 'px'); t.style.setProperty('--fy', '220px'); t.style.setProperty('--fs', '1.18');
+        t.style.setProperty('--fx', (spread[c] || 0) + 'px'); t.style.setProperty('--fy', (dir > 0 ? 220 : -220) + 'px'); t.style.setProperty('--fs', '1.18');
         t.style.setProperty('--fdl', Math.min(.4, k * .07).toFixed(2) + 's'); t.style.setProperty('--fd', (1.15 + (c % 2) * .2).toFixed(2) + 's');
         const go = () => { t.classList.remove('m-in'); void t.offsetWidth; t.classList.add('m-in'); };
         if (t.classList.contains('ok')) go(); else { t.style.setProperty('--fdl', '0s'); t._fly = go; } });
-    }, { root: ov, rootMargin: '0px 0px -6% 0px', threshold: .01 });
-    ovTiles.forEach(o => { if (!flown.has(o.t)) io.observe(o.t); });
+    }, { root: ov, rootMargin: '0px', threshold: 0 });
+    ovTiles.forEach(o => io.observe(o.t));
   }
   // each piece's real shape comes from its picture (the case-study covers too); a piece shows once its picture is here
   let mT = 0;
