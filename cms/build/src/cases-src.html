@@ -420,6 +420,12 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .N .nb.tk:not(.in) .l, .N .nb.tk:not(.in) .r p + p, .N .nb.tk:not(.in) .r .go { opacity: 0; translate: 0 10px }
 .N .nb.tk:not(.in) .r p:first-child { letter-spacing: .01em; opacity: 0 }
 .N .nb.tk:not(.in) .l::after { width: 0 }
+/* the product case study: the heading (and a pull quote) tracks in, the label and paragraphs fade up after it */
+.H .tx.tk > * { transition: opacity .9s cubic-bezier(.2,.8,.2,1), translate .9s cubic-bezier(.2,.8,.2,1) }
+.H .tx.tk > h2, .H .tx.tk > .pull { transition: letter-spacing 1.2s cubic-bezier(.2,.8,.2,1), opacity .9s cubic-bezier(.2,.8,.2,1) }
+.H .tx.tk.in > :not(.eb):not(h2):not(.pull) { transition-delay: .3s }
+.H .tx.tk:not(.in) > * { opacity: 0; translate: 0 10px }
+.H .tx.tk:not(.in) > h2, .H .tx.tk:not(.in) > .pull { letter-spacing: .01em; translate: none }
 .N .nb .go { margin-top: 18px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
 .N .tsw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 24px }
 .N .tsw button, .N .ttbar button { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s }
@@ -1105,7 +1111,7 @@ function paint(keep) {
   app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
     const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
-  setupIndex(); setupN(); setupPlay(); countUp();
+  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp();
   if (window.KM && KM.trail) KM.trail.mark(undefined, c.title);   // this case's own name, whatever the page said a moment before
   if (KM_EDIT) editable(c);
 }
@@ -1148,7 +1154,7 @@ function statements() {
 // fades in and a short rule draws after it. Only the words move, and a section resets only once it is well off screen, so nothing flickers.
 function trackIn() {
   if (KM_EDIT || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const secs = [...app.querySelectorAll('.N .nb.stm')]; if (!secs.length) return;
+  const secs = [...app.querySelectorAll('.N .nb.stm, .H .tx.ch')]; if (!secs.length) return;   // brand write-ups, and the product case study's text sections
   secs.forEach(s => s.classList.add('tk'));
   const check = () => { const H = innerHeight; secs.forEach(s => { const r = s.getBoundingClientRect();
     if (r.top < H * .82 && r.bottom > H * .1) s.classList.add('in');
