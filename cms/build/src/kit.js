@@ -41,8 +41,6 @@
   /* keep the picture */
   .km-keep { position: fixed; z-index: 2147483001; margin: 0; overflow: hidden; pointer-events: none; transform-origin: 0 0; border-radius: 6px; box-shadow: 0 24px 60px -20px rgb(0 0 0 / .45) }
   .km-keep img { width: 100%; height: 100%; object-fit: cover; display: block }
-  /* the page opens as a circle from where you tapped (and closes back into it) */
-  .km-circ { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none }
   @media (prefers-reduced-motion: reduce) { img.km-lq { filter: none } :where(button, [role="button"], .btn, .chip):active { scale: none } }`;
   (document.head || root).appendChild(st);
 
@@ -133,35 +131,6 @@
         .onfinish = () => { im.style.visibility = ''; f.remove(); };
     })();
   }
-  // ---------- open out of a picture, close back into it (a shared element transition) ----------
-  // Leaving: the picture lifts off where it sits (and, going back, shrinks into the tile it came from) while a circle of the
-  // next page's colour grows from the tap; the next page then opens as a circle from the same point while the picture
-  // flies into its place there (arrive(), above).
-  const circ = (bg, x, y, from, to, ms) => { const c = document.createElement('div'); c.className = 'km-circ'; c.style.background = bg; document.body.appendChild(c);
-    const t0 = performance.now(), R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 2;
-    const set = q => { const r = (from + (to - from) * q) * R; c.style.clipPath = `circle(${r}px at ${x}px ${y}px)`; };
-    set(0); return new Promise(res => (function f(now) { const k = Math.min(1, (now - t0) / ms), q = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; set(q); if (k < 1) requestAnimationFrame(f); else res(c); })(t0)); };
-  KM.morph = {
-    leave(o) {   // o: { src, rect, to (a box to shrink into first, going back), x, y, href, back, bg }
-      if (reduce) { if (o.back) history.back(); else location.href = o.href; return; }
-      const f = document.createElement('div'); f.className = 'km-keep'; f.innerHTML = `<img alt="" src="${o.src}">`;
-      const r = o.rect; Object.assign(f.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: '0px', boxShadow: 'none' }); document.body.appendChild(f);
-      const end = o.to || r, ms = o.to ? 560 : 420;
-      if (o.to) f.animate([{ left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }, { left: end.left + 'px', top: end.top + 'px', width: end.width + 'px', height: end.height + 'px' }], { duration: ms, easing: 'cubic-bezier(.65,0,.2,1)', fill: 'forwards' });
-      else f.animate([{ transform: 'none' }, { transform: 'scale(1.03)' }], { duration: 520, easing: M.ease, fill: 'forwards' });
-      KM.keep(o.src, end);
-      try { sessionStorage.setItem('km-circ', JSON.stringify({ x: o.x, y: o.y, bg: o.bg, t: Date.now() })); } catch (_) {}
-      circ(o.bg, o.x, o.y, 0, 1, ms).then(() => { if (o.back) history.back(); else location.href = o.href; setTimeout(() => document.querySelectorAll('.km-circ').forEach(n => n.remove()), 1600); });
-    }
-  };
-  // the browser's own page transition, where it has one (see the view-transition rules in Designs and the case pages):
-  // the page that leaves notes what is happening (KM.vt.set); the page that arrives names its side of the picture and sets
-  // where the circle opens from (or closes into)
-  KM.vt = { ok: 'CSSViewTransitionRule' in window && !reduce,
-    set(o) { try { sessionStorage.setItem('km-vt', JSON.stringify(Object.assign({ t: Date.now() }, o))); } catch (_) {} } };
-  // arriving after a morph: the page opens as a circle from the same point
-  function reveal() { let k = null; try { k = JSON.parse(sessionStorage.getItem('km-circ') || 'null'); sessionStorage.removeItem('km-circ'); } catch (_) {}
-    if (!k || Date.now() - k.t > 9000 || reduce) return; circ(k.bg, k.x, k.y, 1, 0, 520).then(c => c.remove()); }
   // leaving: what Designs calls before it moves to a case study
   KM.keep = (src, r) => { try { sessionStorage.setItem('km-keep', JSON.stringify({ src, x: r.left, y: r.top, w: r.width, h: r.height, t: Date.now() })); } catch (_) {} };
 
@@ -209,8 +178,8 @@
     // (the picture lifted off its tile, page covers, flying copies, blurs)
     document.querySelectorAll('.km-keep, .pagecover, .fly, .km-circ').forEach(n => n.remove());
     document.body.classList.remove('leaving'); document.querySelectorAll('.tune-out').forEach(n => n.classList.remove('tune-out'));
-    reveal(); arrive();   // came back by closing a case study into its tile: open back out of it
+    try { sessionStorage.removeItem('km-keep'); } catch (_) {}
     KM.trail.mark(); });
-  const go = () => { watch(); reveal(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
+  const go = () => { watch(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
