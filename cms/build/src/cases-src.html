@@ -388,10 +388,12 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .nf { padding: 0 var(--ne); margin-top: var(--ng) }
 .N .nf .rows { --gap: var(--ng); --mh: 110vh; max-width: none }
 .N .cl { display: grid; gap: var(--ng) }
-.N .clp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }
+.N .clp { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: var(--ng) }
 .N .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } .N .cl .fill.clw { aspect-ratio: 16 / 9 }
 .N .cl .m { position: absolute; inset: 0 } .N .cl .m img, .N .cl .m video { width: 100%; height: 100%; object-fit: cover }
-.N .cl .clt .m img, .N .cl .clt .m video { object-position: 50% 64% }
+.N .cl .clt { --fo: 50% 64% }
+.N .cl .m img, .N .cl .m video { object-position: var(--fo, 50% 50%) }
+.N .cl .fill.own { aspect-ratio: auto } .N .cl .fill.own .m { position: static } .N .cl .fill.own .m img, .N .cl .fill.own .m video { height: auto; display: block }
 .N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
 @media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 .N .nb { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--ng) 48px; padding: 120px var(--ne) 104px; align-items: start }
@@ -987,13 +989,22 @@ R.N = function (c) {
       <p class="tpm" style="font-family:${B.css}">${esc(c.client)} · ${esc(c.role)}</p></div></section>`;
     if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
       <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
-  // a case can set its own pictures after the type ("gallery" in the CMS): exactly those, laid out wide, wide, then a pair
-  // (more in the list repeat the pattern). Nothing else follows them. Oghosa: the collage, the tote, then the cups and the notes.
-  if (Array.isArray(c.gallery) && c.gallery.length) {
-    const G = c.gallery.filter(Boolean), W = (m, x = '') => `<div class="fill clw${x}">${M(m)}</div>`; let g = '';
-    for (let i = 0; i < G.length; i += 4) { const [w1, w2, ...pr] = G.slice(i, i + 4);
-      g += (w1 ? W(w1) : '') + (w2 ? W(w2, ' clt') : '') + (pr.length === 2 ? `<div class="clp">${pr.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : pr.length ? W(pr[0]) : ''); }
-    return h + `<div class="nf covers"${KM_EDIT ? ' data-pick="gallery"' : ''}><div class="cl">${g}</div></div><div style="height:96px"></div>${NEXT(c)}</main>`;
+  // a case can set its own pictures after the type ("Picture sections" in the CMS). Each section is a stack of rows: a row
+  // with one picture runs the full width (16:9, 2:1 or its own shape), two or three sit side by side as squares. When a case
+  // has picture sections, only those show after the type. (An older plain list of pictures reads as wide, wide, pair.)
+  const GAL = (() => { let g = c.gallery; if (!Array.isArray(g) || !g.length) return null;
+    if (typeof g[0] === 'string' || (g[0] && !g[0].rows)) { const L = g.filter(Boolean), rows = [];
+      for (let i = 0; i < L.length; i += 4) { const [a, b2, ...pr] = L.slice(i, i + 4); if (a) rows.push({ pics: [a] }); if (b2) rows.push({ pics: [b2], focus: 'lower' }); if (pr.length) rows.push({ pics: pr }); }
+      g = [{ rows }]; }
+    g = g.map(sec => ({ rows: (sec.rows || []).map(r => ({ ...r, pics: (r.pics || []).filter(Boolean) })).filter(r => r.pics.length) })).filter(sec => sec.rows.length);
+    return g.length ? g : null; })();
+  if (GAL) {
+    const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
+    const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
+      return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
+    GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}"` : ''}><div class="cl">${sec.rows.map(r => r.pics.length === 1 ? box(r.pics[0], r, true)
+      : `<div class="clp" style="--n:${Math.min(3, r.pics.length)}">${r.pics.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`).join('')}</div></div>`; });
+    return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
   }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
   // the closing pictures: a square pair, one wide 16:9 picture across the full width, then another square pair. The most landscape

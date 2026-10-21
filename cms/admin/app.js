@@ -267,7 +267,13 @@
         { k: 'mark', label: 'Mark', type: 'select', options: [['sketch', 'Sketch → final'], ['still', 'Still']] }] },
       { k: 'typeView', label: 'Type section', type: 'select', full: true, options: [['weights', 'Weights (default)'], ['tester', 'Tester'], ['pairing', 'Pairing']], help: 'How the typefaces are shown on the brand page' },
       { k: 'type', label: 'Typefaces', full: true, type: 'list', itemLabel: 'Typeface', def: () => ['Primary', ''], title: t => t[0] + ' · ' + t[1], help: 'Primary first, then Secondary', of: PAIR('Role', 'Font name') },
-      { k: 'colors', label: 'Brand colours', full: true, help: 'Leave empty to sample colours from the pictures.', type: 'list', itemLabel: 'Colour', def: () => ['', '#000000'], title: c => c[0] + ' ' + c[1], of: { type: 'tuple', fields: [{ label: 'Name' }, { label: 'Hex', type: 'color' }] } } ] }
+      { k: 'colors', label: 'Brand colours', full: true, help: 'Leave empty to sample colours from the pictures.', type: 'list', itemLabel: 'Colour', def: () => ['', '#000000'], title: c => c[0] + ' ' + c[1], of: { type: 'tuple', fields: [{ label: 'Name' }, { label: 'Hex', type: 'color' }] } } ] },
+    { title: 'Picture sections', when: o => o.kind === 'Brand', help: 'The pictures after the Type section, in order. Add as many sections as you like; each is a stack of rows. A row with one picture runs the full width; two or three pictures sit side by side as squares. When this has any pictures, only these show after Type (leave it empty to use the section pictures instead).', fields: [
+      { k: 'gallery', label: '', type: 'list', itemLabel: 'Picture section', def: () => ({ rows: [{ pics: [''] }] }), title: (g, i) => `${i + 1} · ${(g.rows || []).map(r => (r.pics || []).length === 1 ? 'Wide' : (r.pics || []).length + ' side by side').join(', ') || 'Empty'}`, of: { type: 'object', fields: [
+        { k: 'rows', label: 'Rows', type: 'list', itemLabel: 'Row', def: () => ({ pics: [''] }), title: (r, i) => `${i + 1} · ${(r.pics || []).length === 1 ? 'One wide picture' : (r.pics || []).length + ' pictures side by side'}`, of: { type: 'object', fields: [
+          { k: 'pics', label: 'Pictures (1 = full width, 2 or 3 = side by side)', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } },
+          { k: 'shape', label: 'Shape of a full-width picture', type: 'select', options: [['16:9', '16:9 (default)'], ['2:1', '2:1'], ['own', 'Its own shape, uncropped']] },
+          { k: 'focus', label: 'Keep in view when cropped', type: 'select', options: [['', 'Middle (default)'], ['top', 'Top'], ['upper', 'Upper'], ['lower', 'Lower'], ['bottom', 'Bottom']] }] } }] } } ] }
   ];
   const DESIGN = [
     { title: 'The piece', cols: 2, fields: [
@@ -312,6 +318,7 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
+      if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).filter(Boolean) }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
       for (const sec of c.sections || []) for (const k of ['list', 'stats', 'chips', 'p']) if (Array.isArray(sec[k]) && !sec[k].length) delete sec[k];   // an empty part is skipped on the page
     }
     if (name === 'designs') for (const p of d.projects) {
@@ -377,7 +384,9 @@
         // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet
         const same = (m, src) => m && (typeof m === 'string' ? m === src : m.video === src || m.poster === src);
         const locate = (src, secPath) => {
-          const si = secPath ? +secPath.split('.')[1] : -1, secs = c.sections || [];
+          if (secPath && secPath.startsWith('gallery.')) { const g = (c.gallery || [])[+secPath.split('.')[1]];   // a picture section after Type
+            for (const [ri, r] of ((g && g.rows) || []).entries()) { const j = (r.pics || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: r.pics, j, label: 'Picture section ' + (+secPath.split('.')[1] + 1) + ' · row ' + (ri + 1) }; } }
+          const si = secPath && secPath.startsWith('sections.') ? +secPath.split('.')[1] : -1, secs = c.sections || [];
           const inSec = k => { const j = (secs[k] && secs[k].media || []).findIndex(m => same(m, src)); return j >= 0 ? { arr: secs[k].media, j, label: secs[k].h || 'Section ' + (k + 1) } : null; };
           if (si >= 0) { const r = inSec(si); if (r) return r; }
           for (let k = 0; k < secs.length; k++) { const r = inSec(k); if (r) return r; }
@@ -386,7 +395,8 @@
           return null; };
         function pictureSheet(d) {
           let where;
-          if (d.type === 'km-cms-add') { const si = +d.section.split('.')[1], sec = (c.sections || [])[si]; if (!sec) return; sec.media = sec.media || []; where = { arr: sec.media, j: sec.media.length, label: sec.h || 'Section', adding: true }; }
+          if (d.type === 'km-cms-add' && String(d.section).startsWith('gallery.')) { const g = (c.gallery || [])[+d.section.split('.')[1]]; if (!g) return; const row = { pics: [] }; g.rows.push(row); where = { arr: row.pics, j: 0, label: 'Picture section ' + (+d.section.split('.')[1] + 1) + ' · new wide row', adding: true }; }
+          else if (d.type === 'km-cms-add') { const si = +d.section.split('.')[1], sec = (c.sections || [])[si]; if (!sec) return; sec.media = sec.media || []; where = { arr: sec.media, j: sec.media.length, label: sec.h || 'Section', adding: true }; }
           else where = locate(d.src, d.section);
           if (!where) { alert('This picture is filled in by the page from your other pictures. Change it in the Form.'); return; }
           const get = () => where.obj ? where.obj[where.key] : where.arr[where.j];
