@@ -391,6 +391,7 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .clp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }
 .N .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } .N .cl .fill.clw { aspect-ratio: 16 / 9 }
 .N .cl .m { position: absolute; inset: 0 } .N .cl .m img, .N .cl .m video { width: 100%; height: 100%; object-fit: cover }
+.N .cl .clt .m img, .N .cl .clt .m video { object-position: 50% 64% }
 .N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
 @media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 .N .nb { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--ng) 48px; padding: 120px var(--ne) 104px; align-items: start }
@@ -1001,8 +1002,11 @@ R.N = function (c) {
   if (b.mock) h += pics(mockKeep, b.mock._i);
   if (cl.length) { cl.forEach(m => used.add(key(m)));
     const oth = cl.slice(2), wi = oth.length ? oth.reduce((bi, m, i) => rOf(m) > rOf(oth[bi]) ? i : bi, 0) : -1;
-    const wide = wi >= 0 ? oth[wi] : null;
-    if (wide) h += `<div class="nf covers"><div class="cl"><div class="fill clw">${M(wide)}</div></div></div>`; }
+    // wide, wide, pair: the most landscape of the others across the full width, then the first closing picture
+    // (Oghosa's tote) across the full width, cropped to keep the middle, then the other two side by side
+    const wide = wi >= 0 ? oth[wi] : null, last = oth.filter((_, i) => i !== wi).slice(0, 2);
+    const W = (m, x = '') => `<div class="fill clw${x}">${M(m)}</div>`;
+    h += `<div class="nf covers"><div class="cl">${wide ? W(wide) : ''}${W(first[0], ' clt')}${last.length === 2 ? `<div class="clp">${last.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : ''}</div></div>`; }
   return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
 };
 // wire the pinned sections once the page is drawn
