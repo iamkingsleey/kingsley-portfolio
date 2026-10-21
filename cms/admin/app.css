@@ -181,3 +181,7 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 .ibmsg { white-space: pre-wrap; color: var(--ink); font-size: 15px; line-height: 1.6; max-width: 66ch }
 .ibf { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--line) } .ibf dd { margin: 0; color: var(--ink) }
 @media (max-width: 900px) { .ib { grid-template-columns: 1fr } .ibl { border-right: 0; border-bottom: 1px solid var(--line); max-height: 44vh } }
+
+/* picture effect: hotspot points */
+.hsl { display: grid; gap: 6px } .hsr { display: grid; grid-template-columns: 18px 64px 64px minmax(0, 1fr) minmax(0, 1.4fr) 34px; gap: 6px; align-items: center }
+.hsr input { min-width: 0 } @media (max-width: 640px) { .hsr { grid-template-columns: 18px 56px 56px minmax(0, 1fr) 34px } .hsr input:nth-of-type(4) { grid-column: 2 / -2 } }

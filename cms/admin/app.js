@@ -264,6 +264,7 @@
       { k: 'tag', label: 'Tag', help: 'Shown after the type, e.g. Marketplace' }, { k: 'role', label: 'My role' },
       { k: 'year', label: 'Year', ph: '2024 or 2020 – Now' }, { k: 'client', label: 'Client' },
       { k: 'industry', label: 'Industry', type: 'lines', rows: 2, help: 'One per line' }, { k: 'did', label: 'What I did', type: 'lines', rows: 3, help: 'One per line' },
+      { k: 'fxDefault', label: 'Effect on every picture', type: 'select', full: true, options: [['', 'None (plain)'], ['beforeafter', 'Before and after'], ['swap', 'Hover to swap'], ['lens', 'Zoom lens'], ['zoom', 'Click to zoom'], ['pan', 'Drag to look around'], ['hotspots', 'Hotspots'], ['camera', 'Camera'], ['tilt', 'Tilt'], ['kenburns', 'Ken Burns'], ['spotlight', 'Spotlight'], ['reveal', 'Reveal on scroll'], ['parallax', 'Parallax']], help: 'Each picture can still have its own: click it on the page view → Effect. “None” keeps the pictures plain.' },
       { k: 'hidden', label: 'Hide this case study from the site', type: 'bool', full: true } ] },
     { title: 'Opening', fields: [
       { k: 'headline', label: 'Headline', type: 'br', rows: 2, help: 'Press Enter for a line break' }, { k: 'blurb', label: 'Summary', type: 'textarea' },
@@ -354,6 +355,7 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
+      if (!c.fxDefault) delete c.fxDefault; if (c.fx) { for (const k in c.fx) if (!c.fx[k] || !c.fx[k].k) delete c.fx[k]; if (!Object.keys(c.fx).length) delete c.fx; }
       const tidyRows = R => (R || []).map(r => { const o = { pics: (r.pics || []).map(x => x || '') }; if (r.fit === 'auto') { o.fit = 'auto'; o.pics = o.pics.filter(Boolean); } for (const k of ['split', 'shape', 'focus']) if (r[k] && !(k === 'shape' && r[k] === '16:9')) o[k] = r[k]; if (Array.isArray(r.w) && r.w.length === o.pics.length) { o.w = r.w; if (r.ar) o.ar = r.ar; } return o; }).filter(r => r.pics.length);
       for (const sec of c.sections || []) if (Array.isArray(sec.rows)) { sec.rows = tidyRows(sec.rows); if (!sec.rows.length) delete sec.rows; else sec.media = [...new Set(sec.rows.flatMap(r => r.pics.filter(Boolean)).map(m => JSON.stringify(m)))].map(m => JSON.parse(m)); }
       if (Array.isArray(c.coverRows)) { c.coverRows = tidyRows(c.coverRows); if (!c.coverRows.length) delete c.coverRows; else { const f = c.coverRows.flatMap(r => r.pics).find(Boolean); if (f) c.cover = f; } }
@@ -478,6 +480,33 @@
           if (same(c.cover, src)) return { obj: c, key: 'cover', label: 'Cover picture' };
           const j = (c.run || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: c.run, j, label: 'Extra pictures' };
           return null; };
+        // a picture's effect, kept by the picture: c.fx[picture] = { k, second, points }. "Same as the case" uses the case's default.
+        const FXL = [['', 'Same as the case' ], ['none', 'None (plain)'], ['beforeafter', 'Before and after', 'Compare'], ['swap', 'Hover to swap', 'Compare'], ['lens', 'Zoom lens', 'Look closer'], ['zoom', 'Click to zoom', 'Look closer'], ['pan', 'Drag to look around', 'Look closer'], ['hotspots', 'Hotspots', 'Look closer'],
+          ['camera', 'Camera', 'Motion'], ['tilt', 'Tilt', 'Motion'], ['kenburns', 'Ken Burns', 'Motion'], ['spotlight', 'Spotlight', 'Motion'], ['reveal', 'Reveal on scroll', 'Motion'], ['parallax', 'Parallax', 'Motion']];
+        const FXH = { beforeafter: 'Drag across to compare with a second picture (leave it empty to compare with the same picture in black and white).', swap: 'Point at it (tap on a phone) to show a second picture.', lens: 'A round magnifier follows the pointer.', zoom: 'Click a spot to zoom in right there; click again to zoom out.',
+          pan: 'The picture is bigger than its frame: drag to look around.', hotspots: 'Numbered points that open a note. Add them below.', camera: 'A viewfinder that focuses as it comes into view; a click takes the shot.', tilt: 'Leans toward the pointer in 3D.',
+          kenburns: 'A slow drift and zoom.', spotlight: 'Dimmed except a circle of light that follows the pointer.', reveal: 'Wipes in each time it scrolls into view.', parallax: 'Moves a little slower than the page as you scroll.' };
+        const msrc = m => typeof m === 'string' ? m : m && (m.video || m.poster) || '';
+        function fxPanel(getSrc) {
+          const box = el('div', { class: 'f' }), paint = () => { box.innerHTML = ''; const src = getSrc(); if (!src) return; c.fx = c.fx || {}; const cur = c.fx[src] || {};
+            const sel = el('select', { onchange: e => { const k = e.target.value; if (!k) delete c.fx[src]; else c.fx[src] = Object.assign({}, cur, { k }); if (!Object.keys(c.fx).length) delete c.fx; touch('cases'); send(); paint(); } });
+            let og = null, g0 = null; FXL.forEach(([k, n, g]) => { if (g !== g0) { g0 = g; og = g ? el('optgroup', { label: g }) : null; if (og) sel.append(og); } (og || sel).append(el('option', { value: k, selected: (cur.k || '') === k }, k === '' && c.fxDefault ? 'Same as the case (' + (FXL.find(x => x[0] === c.fxDefault) || [, c.fxDefault])[1] + ')' : n)); });
+            box.append(el('label', { text: 'Effect' }), sel);
+            const k = cur.k || ''; if (FXH[k]) box.append(el('div', { class: 'help', text: FXH[k] }));
+            const upd = patch => { c.fx[src] = Object.assign({}, c.fx[src] || { k }, patch); touch('cases'); send(); };
+            if (k === 'beforeafter' || k === 'swap') box.append(el('div', { class: 'f', style: 'margin-top:10px' }, el('label', { text: k === 'swap' ? 'Picture on hover' : 'Before picture' }), mediaField(cur.second || '', v => upd({ second: v || undefined }), { accept: 'image/*' })));
+            if (k === 'hotspots') { const pts = (cur.points || []).slice(), list = el('div', { class: 'hsl' });
+              const save = () => upd({ points: pts.filter(p => p.t) });
+              const row = (p, i) => el('div', { class: 'hsr' }, el('b', { class: 'mono', text: String(i + 1) }),
+                el('input', { type: 'number', min: 0, max: 100, value: p.x ?? 50, title: 'From the left, %', oninput: e => { p.x = +e.target.value; save(); } }),
+                el('input', { type: 'number', min: 0, max: 100, value: p.y ?? 50, title: 'From the top, %', oninput: e => { p.y = +e.target.value; save(); } }),
+                el('input', { type: 'text', value: p.t || '', placeholder: 'Title', oninput: e => { p.t = e.target.value; save(); } }),
+                el('input', { type: 'text', value: p.d || '', placeholder: 'Note', oninput: e => { p.d = e.target.value; save(); } }),
+                el('button', { class: 'btn ghost small', type: 'button', text: '✕', title: 'Remove this point', onclick: () => { pts.splice(i, 1); save(); paint(); } }));
+              pts.forEach((p, i) => list.append(row(p, i)));
+              box.append(el('div', { class: 'help', style: 'margin-top:10px', text: 'Each point: across and down (0 to 100%), a title, and a note.' }), list,
+                el('button', { class: 'btn ghost small', type: 'button', style: 'justify-self:start', text: '+ Add point', onclick: () => { pts.push({ x: 50, y: 50, t: 'Point ' + (pts.length + 1), d: '' }); save(); paint(); } })); }
+          }; paint(); return box; }
         function pictureSheet(d) {
           const B = block(d.section); let where, spot = null;
           // a picture in a block with rows (or one that gets rows when you pick a grid): it lives at a row and a spot
@@ -497,18 +526,21 @@
           if (!where) { alert('This picture is filled in by the page from your other pictures. Change it in the Form.'); return; }
           const viaRows = () => where.rows || (B && inRows() && findSpot(inRows(), cur));
           const get = () => { if (viaRows()) { const p = getSpot(), R = inRows(); return p && R ? R[p[0]].pics[p[1]] : d.src; } return where.obj ? where.obj[where.key] : where.arr[where.j]; };
-          const put = v => { if (viaRows()) { const p = getSpot(true); if (!p) return; const R = inRows(); R[p[0]].pics[p[1]] = v; cur.src = typeof v === 'string' ? v : v && (v.video || v.poster); if (d.section === 'cover' && p[0] === 0 && p[1] === 0) c.cover = v; }
+          const put = v => { { const o = msrc(get()), n = msrc(v); if (c.fx && o && n && o !== n && c.fx[o]) { c.fx[n] = c.fx[o]; delete c.fx[o]; } }
+            if (viaRows()) { const p = getSpot(true); if (!p) return; const R = inRows(); R[p[0]].pics[p[1]] = v; cur.src = typeof v === 'string' ? v : v && (v.video || v.poster); if (d.section === 'cover' && p[0] === 0 && p[1] === 0) c.cover = v; }
             else if (where.obj) where.obj[where.key] = v; else where.arr[where.j] = v; touch('cases'); send(); };
           const close = () => { m.remove(); if (where.newRow && !get()) { const R = inRows(), p = getSpot(); if (R && p) R.splice(p[0], 1); } if (where.adding && !get()) where.arr.splice(where.j, 1); send(); };
           const removeIt = () => { if (!confirm('Remove this picture?')) return;
             if (viaRows()) { const R = rowsOfBlock(B, d.groups), p = getSpot(true); if (p) { const r = R[p[0]]; if (r.fit === 'auto') { r.pics.splice(p[1], 1); if (!r.pics.length) R.splice(p[0], 1); } else r.pics[p[1]] = ''; } }
             else where.arr.splice(where.j, 1);
             touch('cases'); m.remove(); send(); };
+          let fxBox = fxPanel(() => msrc(get()));
           const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) close(); } },
             el('div', { class: 'sheet', style: 'width:min(680px,100%)' },
               el('header', {}, el('b', { text: (where.slot || where.adding ? 'Add a picture · ' : 'Picture · ') + where.label }), el('button', { class: 'x', type: 'button', text: '×', onclick: close })),
               el('div', { class: 'mbody form', style: 'gap:14px' },
-                richMedia(get() || '', v => { put(v); }, { rich: true, _file: 'cases' }),
+                richMedia(get() || '', v => { put(v); fxBox.replaceWith(fxBox = fxPanel(() => msrc(get()))); }, { rich: true, _file: 'cases' }),
+                fxBox,
                 B ? rowPanel(d, getSpot) : null,
                 el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' },
                   !where.obj && !where.adding && !where.slot ? el('button', { class: 'btn danger small', type: 'button', text: 'Remove from page', onclick: removeIt }) : null,
@@ -646,7 +678,9 @@
   async function vInbox(v) {
     head('Overview', 'Inbox');
     const body = el('div', {}, el('div', { class: 'mono', text: 'Checking for messages…' })); v.append(body);
-    let r; try { r = await api('/api/inbox'); } catch (e) { body.innerHTML = ''; body.append(el('div', { class: 'err', text: e.message })); return; }
+    let r; try { r = await api('/api/inbox'); } catch (e) { body.innerHTML = '';
+      if (/not found/i.test(e.message)) body.append(el('div', { class: 'empty' }, el('h2', { text: 'Restart the CMS to use the inbox' }), el('div', { text: 'The CMS was already running when the inbox was added. Close the “Start CMS” window (or press Control-C in it), open “Start CMS.command” again, then come back here.' })));
+      else body.append(el('div', { class: 'err', text: e.message })); return; }
     body.innerHTML = '';
     if (!r.configured) { body.append(el('div', { class: 'empty' }, el('h2', { text: 'Set up your inbox' }),
       el('div', { text: (r.hasUrl ? 'Add the inbox key' : 'Add the inbox address') + ' in Settings → Inbox. The one-time Cloudflare setup is in cms/inbox/README.md (about ten minutes, free).' }),
