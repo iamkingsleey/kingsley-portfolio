@@ -963,13 +963,28 @@ R.N = function (c) {
     const rows = rowsOf(list), last = rows[rows.length - 1];
     if (last && last.length === 1 && rOf(last[0]) < 1.45) { const extra = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45); if (extra) { used.add(key(extra)); list.push(extra); } }
     return list; };
-  const pics = (list, si) => { list = take(list); return list.length ? `<div class="nf covers"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${ROWS(list, '')}</div>` : ''; };
+  // grids: a row of one picture runs the full width (16:9, 2:1 or its own shape); two or three sit side by side, even or
+  // asymmetric (one height, the gaps off centre). A section can pick a layout in the CMS (its "grid": a pattern of rows that
+  // repeats until its pictures run out); without one it keeps the shape-aware rows.
+  const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
+  const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
+  const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
+    return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
+  const rowH = (P, r) => P.length === 1 ? box(P[0], r, true)
+    : ASY[P.length] && ASY[P.length][r.split] ? `<div class="clp asy" style="--cols:${ASY[P.length][r.split]}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
+    : `<div class="clp" style="--n:${Math.min(3, P.length)}">${P.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`;
+  const gridH = (list, G) => { let o = '', i = 0, k = 0; while (i < list.length) { const r = G[k++ % G.length] || {}, nn = Math.max(1, Math.min(3, +r.n || 1)); o += rowH(list.slice(i, i + nn), r); i += nn; } return `<div class="cl">${o}</div>`; };
+  const gridOf = g => Array.isArray(g) && g.length ? g : null;
+  const pics = (list, si, pick, G) => { G = gridOf(G !== undefined ? G : si !== undefined ? ((c.sections || [])[si] || {}).grid : null);
+    list = G ? uniq(list).filter(m => !used.has(key(m))) : take(list); if (G) list.forEach(m => used.add(key(m)));
+    pick = pick || (si !== undefined ? `sections.${si}` : '');
+    return list.length ? `<div class="nf covers"${KM_EDIT && pick ? ` data-pick="${pick}"` : ''}>${G ? gridH(list, G) : ROWS(list, '')}</div>` : ''; };
   const brief = (s, eyebrow) => s ? `<section class="nb" data-ix="${esc(s.h)}"><div class="l"><span class="mono">${esc(eyebrow)}</span><h2${E(`sections.${s._i}.h`)}>${esc(s.h)}</h2></div><div class="r">${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${s.list ? `<dl class="ls">${s.list.map(([a, d]) => `<div><dt>${esc(a)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl>` : ''}</div></section>` : '';
   let n = 0; const eb = () => pad(++n);
   let h = `${TOP(c)}<main class="N" style="${bstyle(b)}">
     <header class="nh"><span class="mono">${esc(c.kind)} identity · ${esc(c.tag)}</span><h1${E('title')}>${esc(c.title)}</h1>
       <div class="nhr"><p class="lede"${E('blurb')}>${esc(c.lede)}</p><dl>${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div></header>
-    ${pics([c.cover])}`;
+    ${pics([c.cover, ...(c.coverMore || []).filter(Boolean)], undefined, 'cover', c.coverGrid || null)}`;
   if (c.problem || c.goal) h += `<section class="nb" data-ix="The brief"><div class="l"><span class="mono">${eb()}</span><h2>The brief</h2></div><div class="r">${c.problem ? `<p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<p class="go"${E('goal')}>${esc(c.goal)}</p>` : ''}</div></section>`;
   if (b.intro && b.intro !== b.logo) h += pics(b.intro.media, b.intro._i);
   if (b.logo) h += brief(b.logo, eb()) + pics(b.logo.media.length ? b.logo.media : [b.logoM], b.logo._i);
@@ -1020,14 +1035,7 @@ R.N = function (c) {
     g = g.map(sec => ({ rows: (sec.rows || []).map(r => ({ ...r, pics: (r.pics || []).filter(Boolean) })).filter(r => r.pics.length) })).filter(sec => sec.rows.length);
     return g.length ? g : null; })();
   if (GAL) {
-    const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
-    const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
-    const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
-      return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
-    GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}"` : ''}><div class="cl">${sec.rows.map(r => r.pics.length === 1 ? box(r.pics[0], r, true)
-      : ASY[r.pics.length] && ASY[r.pics.length][r.split]   // asymmetric: one height; two pictures split 60/40 or 40/60, three 60/20/20, 20/60/20 or 20/20/60
-        ? `<div class="clp asy" style="--cols:${ASY[r.pics.length][r.split]}">${r.pics.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
-        : `<div class="clp" style="--n:${Math.min(3, r.pics.length)}">${r.pics.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`).join('')}</div></div>`; });
+    GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}"` : ''}><div class="cl">${sec.rows.map(r => rowH(r.pics, r)).join('')}</div></div>`; });
     return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
   }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text

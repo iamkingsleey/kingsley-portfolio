@@ -55,6 +55,12 @@
       wrap.append(el('div', { class: 'color' }, pk, tx));
     } else if (t === 'media') {
       wrap.append(d.rich ? richMedia(get(), v => set(v), { ...d, _file: file }) : mediaField(get(), v => set(v), d));
+    } else if (t === 'layout') {   // a section's grid: tap one; Auto keeps the shape-aware rows
+      const box = el('div', { class: 'lyt' });
+      const paint = () => { const cur = get() && get().length ? (LAYOUTS.find(L => L[2] && sig(L[2]) === sig(get())) || ['custom'])[0] : 'auto'; box.innerHTML = '';
+        LAYOUTS.forEach(([k, name, G]) => box.append(el('button', { type: 'button', class: 'lyt-b' + (k === cur ? ' on' : ''), 'aria-pressed': String(k === cur),
+          onclick: () => { if (G) set(clone(G)); else { delete obj[d.k]; touch(file); wrap.classList.add('changed'); } paint(); } }, mini(G), el('span', { text: name })))); };
+      paint(); wrap.append(box);
     } else if (t === 'tuple') {   // a fixed-length array shown side by side, e.g. [value, label]
       if (!Array.isArray(get())) obj[d.k] = d.fields.map(f => f.blank ?? '');
       const arr = get();
@@ -91,6 +97,26 @@
     };
     paint(); return f;
   }
+  // small thumbnails in a list item's header: the pictures it holds (itself, or the ones inside it), so you can tell them apart closed
+  const isPic = v => typeof v === 'string' && (/\.(png|jpe?g|webp|gif|avif|svg|mp4|webm|mov)(\?|$)/i.test(v) || /framerusercontent\.com\/images\//.test(v));
+  function picsIn(v, out = [], depth = 0) {
+    if (out.length >= 4 || depth > 4 || v == null) return out;
+    if (isPic(v)) out.push(v);
+    else if (Array.isArray(v)) v.forEach(x => picsIn(x, out, depth + 1));
+    else if (typeof v === 'object') { if (v.color) out.push(v); else if (v.poster || v.video) out.push(v.poster || v.video); else Object.values(v).forEach(x => picsIn(x, out, depth + 1)); }
+    return out.slice(0, 4); }
+  function thumbs(v) {
+    const P = picsIn(v), box = el('span', { class: 'thumbs' }); if (!P.length) return box;
+    P.forEach(p => { if (typeof p === 'object') { const t = el('span', { class: 'th', text: (p.word || '').slice(0, 2) }); t.style.background = p.color; t.style.color = p.ink || '#fff'; box.append(t); }
+      else box.append(isVid(p) ? el('video', { class: 'th', src: src(p), muted: true, playsinline: true, preload: 'metadata' }) : el('img', { class: 'th', src: src(p), alt: '', loading: 'lazy' })); });
+    return box; }
+  // the grids a section can use (shared by the picture sheet and the Form)
+  const LAYOUTS = [['auto', 'Auto', null], ['wide', 'Full width', [{ n: 1 }]], ['pairs', 'Pairs', [{ n: 2 }]], ['p64', 'Pairs 60/40', [{ n: 2, split: 'left' }]], ['p46', 'Pairs 40/60', [{ n: 2, split: 'right' }]],
+    ['threes', 'Threes', [{ n: 3 }]], ['t622', '60/20/20', [{ n: 3, split: 'left' }]], ['t262', '20/60/20', [{ n: 3, split: 'middle' }]], ['t226', '20/20/60', [{ n: 3, split: 'right' }]],
+    ['wp', 'Wide, then a pair', [{ n: 1 }, { n: 2 }]], ['wwp', 'Wide, wide, pair', [{ n: 1 }, { n: 1 }, { n: 2 }]], ['wp64', 'Wide, then 60/40', [{ n: 1 }, { n: 2, split: 'left' }]], ['wwp64', 'Wide, wide, 60/40', [{ n: 1 }, { n: 1 }, { n: 2, split: 'left' }]]];
+  const COLS = { '': n => Array(n).fill(1), left: n => n === 2 ? [3, 2] : [3, 1, 1], right: n => n === 2 ? [2, 3] : [1, 1, 3], middle: () => [1, 3, 1] };
+  const mini = G => el('span', { class: 'lyt-mini' }, ...(G || [{ n: 1 }, { n: 2 }]).map(r => el('span', { class: 'lyt-row' + (G ? '' : ' auto') }, ...(COLS[r.split || ''] || COLS[''])(r.n).map(w => el('i', { style: `flex:${w}` })))));
+  const sig = G => JSON.stringify((G || []).map(r => [r.n || 1, r.split || '']));
   function listField(arr, d, file, changed) {
     const box = el('div', { class: 'list' });
     const title = (it, i) => (d.title ? d.title(it, i) : '') || `${d.itemLabel || 'Item'} ${i + 1}`;
@@ -101,7 +127,7 @@
         const holder = { v: it };
         const item = el('div', { class: 'item' + (d.open ? '' : ' closed') },
           el('header', { onclick: e => { if (!e.target.closest('.ib')) item.classList.toggle('closed'); } },
-            el('span', { class: 'chev', text: '▾' }), el('b', { text: title(it, i) }),
+            el('span', { class: 'chev', text: '▾' }), thumbs(it), el('b', { text: title(it, i) }),
             el('span', { class: 'ib' },
               el('button', { type: 'button', title: 'Move up', text: '↑', onclick: () => { if (i) { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; changed(); paint(); } } }),
               el('button', { type: 'button', title: 'Move down', text: '↓', onclick: () => { if (i < arr.length - 1) { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; changed(); paint(); } } }),
@@ -109,8 +135,9 @@
               el('button', { type: 'button', title: 'Remove', text: '✕', onclick: () => { if (confirm('Remove "' + title(it, i) + '"?')) { arr.splice(i, 1); changed(); paint(); } } }))),
           body);
         const of = d.of;
-        if (of.type === 'object') of.fields.forEach(f => body.append(field(f, it, file, () => { item.querySelector('b').textContent = title(it, i); changed(); })));
-        else body.append(field({ ...of, k: i, label: '' }, arr, file, () => { item.querySelector('b').textContent = title(arr[i], i); changed(); }));
+        const reThumb = v => { const o = item.querySelector(':scope > header > .thumbs'); if (o) o.replaceWith(thumbs(v)); };
+        if (of.type === 'object') of.fields.forEach(f => body.append(field(f, it, file, () => { item.querySelector('b').textContent = title(it, i); reThumb(it); changed(); })));
+        else body.append(field({ ...of, k: i, label: '' }, arr, file, () => { item.querySelector('b').textContent = title(arr[i], i); reThumb(arr[i]); changed(); }));
         box.append(item);
       });
       box.append(el('button', { class: 'btn ghost small addrow', type: 'button', text: '+ Add ' + (d.itemLabel || 'item').toLowerCase(), onclick: () => { arr.push(typeof d.def === 'function' ? d.def() : clone(d.def ?? '')); changed(); paint(); box.querySelectorAll('.item')[arr.length - 1].classList.remove('closed'); } }));
@@ -246,7 +273,8 @@
         { k: 'list', label: 'Points (optional)', type: 'list', itemLabel: 'Point', def: () => ['', ''], title: x => x[0] || 'Point', of: PAIR('Title', 'Text') },
         { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
         { k: 'chips', label: 'Colour or type names (brand, optional)', type: 'lines', rows: 2, help: 'One per line' },
-        { k: 'media', label: 'Pictures and videos', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } }] } } ] },
+        { k: 'media', label: 'Pictures and videos', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } },
+        { k: 'grid', label: 'Layout of these pictures', type: 'layout', help: 'The pattern repeats until the pictures run out. Auto keeps each picture’s own shape.' }] } } ] },
     { title: 'Extra pictures', help: 'Spare pictures the page uses to pair with a picture that would otherwise sit alone, so every row runs edge to edge.', fields: [
       { k: 'run', label: '', type: 'list', itemLabel: 'Picture', def: '', title: (p, i) => `${i + 1} · ${mname(p)}`, of: { type: 'media', rich: true } } ] },
     { title: 'Screens', when: () => false, help: 'In order: 1 the wide hero, 2 wide, 3 and 4 tall (side by side), 5 wide. Each has a label, where it lives, and a note.', fields: [
@@ -319,6 +347,9 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
+      if (Array.isArray(c.coverMore)) { c.coverMore = c.coverMore.filter(Boolean); if (!c.coverMore.length) delete c.coverMore; }
+      if (Array.isArray(c.coverGrid) && !c.coverGrid.length) delete c.coverGrid;
+      for (const sec of c.sections || []) if (Array.isArray(sec.grid) && !sec.grid.length) delete sec.grid;
       if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).filter(Boolean) }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; if (r.split) o.split = r.split; return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
       for (const sec of c.sections || []) for (const k of ['list', 'stats', 'chips', 'p']) if (Array.isArray(sec[k]) && !sec[k].length) delete sec[k];   // an empty part is skipped on the page
     }
@@ -392,11 +423,35 @@
           if (si >= 0) { const r = inSec(si); if (r) return r; }
           for (let k = 0; k < secs.length; k++) { const r = inSec(k); if (r) return r; }
           if (same(c.cover, src)) return { obj: c, key: 'cover', label: 'Cover picture' };
+          { const j = (c.coverMore || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: c.coverMore, j, label: 'Cover · picture ' + (j + 2) }; }
           const j = (c.run || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: c.run, j, label: 'Extra pictures' };
           return null; };
+        // the layout of the section a picture sits in: every grid the CMS has, picked with one tap (the page redraws as you pick)
+        function layoutPanel(path) {
+          if (!path) return null;
+          let block;
+          if (path === 'cover') block = { label: 'the cover', get: () => c.coverGrid, set: G => { if (G) c.coverGrid = G; else delete c.coverGrid; }, n: () => 1 + (c.coverMore || []).filter(Boolean).length, auto: true };
+          else if (path.startsWith('sections.')) { const sec = (c.sections || [])[+path.split('.')[1]]; if (!sec) return null;
+            block = { label: sec.h || 'this section', get: () => sec.grid, set: G => { if (G) sec.grid = G; else delete sec.grid; }, n: () => (sec.media || []).filter(Boolean).length, auto: true }; }
+          else if (path.startsWith('gallery.')) { const g = (c.gallery || [])[+path.split('.')[1]]; if (!g) return null;
+            block = { label: 'this picture section', get: () => { const R = g.rows || []; return R.map(r => ({ n: (r.pics || []).length, split: r.split })); },
+              set: G => { const keep = (g.rows || []).map(r => ({ shape: r.shape, focus: r.focus })), P = (g.rows || []).flatMap(r => r.pics || []).filter(Boolean); g.rows = []; let i = 0, k = 0;
+                while (i < P.length) { const r = G[k % G.length], o = { pics: P.slice(i, i + r.n) }, kp = keep[k] || {}; if (r.split) o.split = r.split; if (o.pics.length === 1) { if (kp.shape) o.shape = kp.shape; if (kp.focus) o.focus = kp.focus; } g.rows.push(o); i += r.n; k++; } },
+              n: () => (g.rows || []).reduce((a, r) => a + (r.pics || []).length, 0), auto: false }; }
+          else return null;
+          const now = () => { const G = block.get(); if (!G || !G.length) return 'auto'; const f = LAYOUTS.find(L => L[2] && (sig(L[2]) === sig(G) || (block.auto === false && sig(Array.from({ length: Math.ceil(G.length / L[2].length) }, () => L[2]).flat().slice(0, G.length)) === sig(G)))); return f ? f[0] : 'custom'; };
+          const box = el('div', { class: 'lyt' }), note = el('div', { class: 'help' });
+          const paint = () => { const cur = now(); box.innerHTML = '';
+            LAYOUTS.filter(L => block.auto || L[2]).forEach(([k, name, G]) => box.append(el('button', { type: 'button', class: 'lyt-b' + (k === cur ? ' on' : ''), 'aria-pressed': String(k === cur), title: name,
+              onclick: () => { block.set(G ? clone(G) : null); touch('cases'); send(); paint(); } }, mini(G), el('span', { text: name }))));
+            note.textContent = (cur === 'custom' ? 'This section has its own rows (set in the Form). ' : '') + `The pattern repeats until the ${block.n()} picture${block.n() === 1 ? '' : 's'} in ${block.label} run out. Use “+ Add picture” on the page for more.` + (block.auto ? ' Auto keeps each picture’s own shape.' : ''); };
+          paint();
+          return el('div', { class: 'f' }, el('label', { text: 'Layout of ' + block.label }), box, note);
+        }
         function pictureSheet(d) {
           let where;
           if (d.type === 'km-cms-add' && String(d.section).startsWith('gallery.')) { const g = (c.gallery || [])[+d.section.split('.')[1]]; if (!g) return; const row = { pics: [] }; g.rows.push(row); where = { arr: row.pics, j: 0, label: 'Picture section ' + (+d.section.split('.')[1] + 1) + ' · new wide row', adding: true }; }
+          else if (d.type === 'km-cms-add' && d.section === 'cover') { c.coverMore = c.coverMore || []; where = { arr: c.coverMore, j: c.coverMore.length, label: 'Cover', adding: true }; }
           else if (d.type === 'km-cms-add') { const si = +d.section.split('.')[1], sec = (c.sections || [])[si]; if (!sec) return; sec.media = sec.media || []; where = { arr: sec.media, j: sec.media.length, label: sec.h || 'Section', adding: true }; }
           else where = locate(d.src, d.section);
           if (!where) { alert('This picture is filled in by the page from your other pictures. Change it in the Form.'); return; }
@@ -408,6 +463,7 @@
               el('header', {}, el('b', { text: (where.adding ? 'Add a picture · ' : 'Picture · ') + where.label }), el('button', { class: 'x', type: 'button', text: '×', onclick: close })),
               el('div', { class: 'mbody form', style: 'gap:14px' },
                 richMedia(get() || '', v => { put(v); }, { rich: true, _file: 'cases' }),
+                layoutPanel(d.section),
                 el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' },
                   !where.obj && !where.adding ? el('button', { class: 'btn danger small', type: 'button', text: 'Remove from page', onclick: () => { if (!confirm('Remove this picture?')) return; where.arr.splice(where.j, 1); touch('cases'); m.remove(); send(); } }) : null,
                   el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: close })))));
