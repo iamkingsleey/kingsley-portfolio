@@ -987,6 +987,14 @@ R.N = function (c) {
       <p class="tpm" style="font-family:${B.css}">${esc(c.client)} · ${esc(c.role)}</p></div></section>`;
     if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
       <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
+  // a case can set its own pictures after the type ("gallery" in the CMS): exactly those, laid out wide, wide, then a pair
+  // (more in the list repeat the pattern). Nothing else follows them. Oghosa: the collage, the tote, then the cups and the notes.
+  if (Array.isArray(c.gallery) && c.gallery.length) {
+    const G = c.gallery.filter(Boolean), W = (m, x = '') => `<div class="fill clw${x}">${M(m)}</div>`; let g = '';
+    for (let i = 0; i < G.length; i += 4) { const [w1, w2, ...pr] = G.slice(i, i + 4);
+      g += (w1 ? W(w1) : '') + (w2 ? W(w2, ' clt') : '') + (pr.length === 2 ? `<div class="clp">${pr.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : pr.length ? W(pr[0]) : ''); }
+    return h + `<div class="nf covers"${KM_EDIT ? ' data-pick="gallery"' : ''}><div class="cl">${g}</div></div><div style="height:96px"></div>${NEXT(c)}</main>`;
+  }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
   // the closing pictures: a square pair, one wide 16:9 picture across the full width, then another square pair. The most landscape
   // of the three after the first pair takes the wide spot. With fewer pictures it keeps what it can: a pair, or a pair and a wide one.
