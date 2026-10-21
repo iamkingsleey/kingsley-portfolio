@@ -414,12 +414,15 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .pg-b { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 500 14px var(--body); cursor: pointer }
 .N .pg-b.ghost { background: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line) }
 html.themed body, html.themed .N, html.themed .next { transition: background .45s, color .45s }
-.N .nb.wd { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 24px }
-.N .nb.wd .l { grid-column: 1 / -1 }
-.N .nb.wd h2 { margin-top: 14px; font-size: clamp(56px, 10.5vw, 176px); line-height: .88; letter-spacing: -.055em; font-weight: 300; text-wrap: balance }
-.N .nb.wd .r { grid-column: 2 }
-.N .wdr { margin-top: 22px; display: grid; gap: 10px } .N .wdr canvas { width: 100%; height: 32px; display: block } .N .wdl { color: var(--muted) }
-@media (max-width: 899px) { .N .nb.wd { grid-template-columns: 1fr } .N .nb.wd .r { grid-column: 1 } .N .nb.wd h2 { font-size: clamp(48px, 15vw, 88px) } }
+.N .nb.bn { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; gap: 0 clamp(24px, 4vw, 72px); align-items: end; align-content: center }
+.N .nb.bn .l { align-self: end }
+.N .nb.bn .bno { grid-row: 1 / span 2; font: 200 clamp(120px, 19vw, 300px)/.78 var(--body); letter-spacing: -.07em; color: var(--ink); font-variant-numeric: tabular-nums; margin-left: -.04em }
+.N .nb.bn .bno i { font-style: normal; color: var(--red) }
+.N .nb.bn .l, .N .nb.bn .r { grid-column: 2; max-width: 46ch }
+.N .nb.bn .l .mono { display: none }                       /* the big number says it */
+.N .nb.bn h2 { margin-top: 0; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -.035em }
+.N .nb.bn .r { margin-top: 16px; padding-bottom: clamp(4px, 1vw, 14px) }
+@media (max-width: 899px) { .N .nb.bn { grid-template-columns: 1fr; grid-template-rows: none } .N .nb.bn .bno { grid-row: auto; font-size: clamp(110px, 34vw, 180px); margin-bottom: 20px } .N .nb.bn .l, .N .nb.bn .r { grid-column: 1 } }
 .N .nb .go { margin-top: 18px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
 .N .tsw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 24px }
 .N .tsw button, .N .ttbar button { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s }
@@ -1014,7 +1017,7 @@ function rulerDrag(el, sec, n) {
 }
 function setupN() {
   nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
-  weightDial();
+  bigNumbers();
   const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
   const col = $$('ncol');
   if (col) { const st = [...col.querySelectorAll('.cst')]; let cur = 0;
@@ -1153,30 +1156,11 @@ if (KM_EDIT) {
 // brand pages: pictures fly in as they scroll into view, every time (down: they rise from below; back up: they drop from above),
 // in reading order across a row. Pictures already on screen when the page is drawn stay put (the arrival lands the first one).
 const flyOff = [];
-// the text sections: each heading is set large, and its weight turns from thin to bold as it rises through the screen,
-// with a small ruler under it that tunes along (Geist, 100 to 900). Visitors who ask for less motion get it bold, still.
-function weightDial() {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const secs = [...app.querySelectorAll('.N .nb')]; if (!secs.length) return;
-  const WS = [100, 200, 300, 400, 500, 600, 700, 800, 900], RED2 = '#ff4a1c';
-  const items = secs.map(sec => { sec.classList.add('wd'); const l = sec.querySelector('.l'), h = l && l.querySelector('h2'); if (!h) return null;
-    const box = document.createElement('div'); box.className = 'wdr'; box.setAttribute('aria-hidden', 'true'); box.innerHTML = '<canvas></canvas><span class="mono wdl"></span>'; h.after(box);
-    return { sec, h, cv: box.querySelector('canvas'), lab: box.querySelector('.wdl'), w: -1 }; }).filter(Boolean);
-  const ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0e0e10';
-  const draw = (it, q, w) => {
-    it.h.style.fontWeight = w; it.h.style.fontVariationSettings = `"wght" ${w}`; it.lab.textContent = `Geist · ${w}`;
-    const cv = it.cv, cx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
-    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-    cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H); const c = ink();
-    for (let k = 0; k <= 80; k++) { const x = Math.min(W - 1, k / 80 * W), major = k % 10 === 0; cx.globalAlpha = major ? .7 : .25; cx.strokeStyle = c; cx.lineWidth = major ? 1.5 : 1;
-      cx.beginPath(); cx.moveTo(x, H); cx.lineTo(x, H - (major ? 14 : 7)); cx.stroke();
-      if (major && k < 80) { cx.globalAlpha = .5; cx.fillStyle = c; cx.font = '500 10px "Geist Mono", monospace'; cx.fillText(String(WS[k / 10]), x + 4, 10); } }
-    cx.globalAlpha = 1; cx.fillStyle = RED2; cx.fillRect(Math.max(0, Math.min(W - 3, q * W - 1.5)), 0, 3, H);
-  };
-  NT.push(() => { const H = innerHeight; items.forEach(it => { const r = it.h.getBoundingClientRect(); if (r.bottom < -100 || r.top > H + 100) return;
-    const q = reduce ? 1 : nclamp((H * .92 - r.top) / (H * .62), 0, 1), w = Math.round(100 + q * 800); if (w === it.w && it.cv.width) return; it.w = w; draw(it, q, w); }); });
-  const onR = () => items.forEach(it => { it.w = -1; it.cv.width = 0; }); addEventListener('resize', onR); nOff.push(() => removeEventListener('resize', onR));
-  if (document.fonts) document.fonts.ready.then(onR);
+// the text sections: the section number set huge and thin, with a red dot, and the heading and copy sitting on its baseline
+function bigNumbers() {
+  app.querySelectorAll('.N .nb').forEach(sec => { if (sec.querySelector('.bno')) return; const n = sec.querySelector('.l .mono'); if (!n) return;
+    const d = document.createElement('div'); d.className = 'bno'; d.setAttribute('aria-hidden', 'true'); d.innerHTML = `${esc(n.textContent.trim())}<i>.</i>`;
+    sec.prepend(d); sec.classList.add('bn'); });
 }
 function flyIn() {
   flyOff.splice(0).forEach(f => f());
