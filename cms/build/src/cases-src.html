@@ -1207,6 +1207,18 @@ function paint(keep) {
   const label = () => { const b = backTo(), a = app.querySelector('a.dback'); if (!a) return; a.href = b.href; a.lastChild.textContent = b.name; a.setAttribute('aria-label', 'Back to ' + b.name); };
   label(); document.addEventListener('km-trail', label, { once: true }); setTimeout(label, 500);
   app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
+    // opened out of a picture on Designs: close back into it. The cover (or whichever picture is on screen) shrinks into the
+    // tile it came from while a circle of the Designs page closes in on it.
+    { let fr = null; try { fr = JSON.parse(sessionStorage.getItem('km-from') || 'null'); } catch (_) {}
+      const st = history.state, bk = !!(st && st.kmPrev && st.kmPrev === b.href && history.length > 1);
+      if (fr && /designs\.html/.test(b.href) && (fr.page || '').split('#')[1] === c.slug && window.KM && KM.morph) {
+        const base = u => String(u || '').split(/[?#]/)[0].split('/').pop().replace(/\.(webp|jpe?g|png)$/i, '');
+        const vis = im => { const r = im.getBoundingClientRect(); return r.width > 60 && r.bottom > 40 && r.top < innerHeight - 40; };
+        const ims = [...app.querySelectorAll('figure.m img')], im = ims.find(x => base(x.currentSrc || x.src) === base(fr.src) && vis(x)) || ims.find(vis);
+        const r = im ? im.getBoundingClientRect() : { left: innerWidth * .2, top: innerHeight * .2, width: innerWidth * .6, height: innerHeight * .6 };
+        if (im) im.style.visibility = 'hidden';
+        KM.morph.leave({ src: im ? (im.currentSrc || im.src) : fr.src, rect: r, to: { left: fr.x, top: fr.y, width: fr.w, height: fr.h }, x: fr.x + fr.w / 2, y: fr.y + fr.h / 2, back: bk, href: b.href, bg: fr.bg || '#0b0b0b' });
+        return; } }
     const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
   setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp();

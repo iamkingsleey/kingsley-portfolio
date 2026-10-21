@@ -243,7 +243,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.jpg';
+  const HEAD = 'assets/headshot.webp';
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -400,7 +400,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
         if (window.Tuner) Tuner.go({ from: 96, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
   </script>
   <script src="nav.js?v=e73dc949" defer></script>
-<script src="kit.js?v=a9bc7f9e" defer></script>
+<script src="kit.js?v=accd2daf" defer></script>
 <script src="protips.js?v=9d9b4541" defer></script>
 <script src="feedback.js?v=2e3b8a1c" defer></script>
 </body>

@@ -2033,6 +2033,13 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const t = e.target.closest('.ov-t'); if (!t) return;
     const i = +t.dataset.i;
     const dest = items[i].link || (items[i].cs && items[i].page);   // a case study goes straight to it; "link" points a piece anywhere
+    if (dest && items[i].cs && window.KM && KM.morph) { tap();   // a case study opens out of its picture (and closes back into it)
+      const r = t.querySelector('.ov-im').getBoundingClientRect(), u = mdOf(still(items[i]));
+      try { sessionStorage.setItem('km-return', items[i].t); sessionStorage.setItem('km-from', JSON.stringify({ page: dest, src: u, x: r.left, y: r.top, w: r.width, h: r.height, cx: e.clientX, cy: e.clientY, bg: getComputedStyle(document.body).backgroundColor, t: Date.now() })); } catch (_) {}
+      let th = ''; try { th = localStorage.getItem('km-theme') || ''; } catch (_) {}
+      KM.morph.leave({ src: u, rect: r, x: e.clientX, y: e.clientY, href: dest, bg: th === 'dark' ? '#0b0b0b' : '#ffffff' });
+      return;
+    }
     if (dest && window.Tuner) { tap();
       try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
       // keep the picture: it lifts off its tile and stays sharp above the tuning screen; the case study lands it on the same picture (kit.js)
