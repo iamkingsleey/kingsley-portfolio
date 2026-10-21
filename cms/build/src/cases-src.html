@@ -412,6 +412,14 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .N .nb.stm .r p:first-child.long { max-width: 26ch; font-size: clamp(26px, 3.6vw, 52px); line-height: 1.1 }   /* a long statement steps down a size */
 .N .nb.stm .r p:first-child .q { color: var(--muted) }
 .N .nb.stm .r p + p, .N .nb.stm .r .go { max-width: 52ch; margin-top: 22px }
+.N .nb.stm .l::after { content: ""; flex: 0 0 auto; width: 40px; height: 1px; background: var(--muted); align-self: center; margin-left: 4px }
+.N .nb.tk .l, .N .nb.tk .r p + p, .N .nb.tk .r .go { transition: opacity .9s cubic-bezier(.2,.8,.2,1), translate .9s cubic-bezier(.2,.8,.2,1) }
+.N .nb.tk .r p:first-child { transition: letter-spacing 1.2s cubic-bezier(.2,.8,.2,1), opacity .9s cubic-bezier(.2,.8,.2,1) }
+.N .nb.tk .l::after { transition: width 1s cubic-bezier(.2,.8,.2,1) .1s }
+.N .nb.tk.in .r p + p, .N .nb.tk.in .r .go { transition-delay: .35s }
+.N .nb.tk:not(.in) .l, .N .nb.tk:not(.in) .r p + p, .N .nb.tk:not(.in) .r .go { opacity: 0; translate: 0 10px }
+.N .nb.tk:not(.in) .r p:first-child { letter-spacing: .01em; opacity: 0 }
+.N .nb.tk:not(.in) .l::after { width: 0 }
 .N .nb .go { margin-top: 18px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
 .N .tsw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 24px }
 .N .tsw button, .N .ttbar button { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s }
@@ -993,7 +1001,7 @@ function rulerDrag(el, sec, n) {
 }
 function setupN() {
   nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
-  statements();
+  statements(); trackIn();
   const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
   const col = $$('ncol');
   if (col) { const st = [...col.querySelectorAll('.cst')]; let cur = 0;
@@ -1135,6 +1143,19 @@ function statements() {
   app.querySelectorAll('.N .nb').forEach(sec => { if (sec.classList.contains('stm')) return; sec.classList.add('stm');
     const p = sec.querySelector('.r p'); if (!p) return; if (p.textContent.length > 110) p.classList.add('long'); if (KM_EDIT || p.children.length) return;
     const t = p.textContent, k = t.indexOf(': '); if (k > 0 && k < t.length - 3) p.innerHTML = `${esc(t.slice(0, k + 1))} <span class="q">${esc(t.slice(k + 2))}</span>`; });
+}
+// the statements arrive as you scroll, every time: the letters start a touch apart and draw together as they fade in; the label
+// fades in and a short rule draws after it. Only the words move, and a section resets only once it is well off screen, so nothing flickers.
+function trackIn() {
+  if (KM_EDIT || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const secs = [...app.querySelectorAll('.N .nb.stm')]; if (!secs.length) return;
+  secs.forEach(s => s.classList.add('tk'));
+  const check = () => { const H = innerHeight; secs.forEach(s => { const r = s.getBoundingClientRect();
+    if (r.top < H * .82 && r.bottom > H * .1) s.classList.add('in');
+    else if (r.top > H * 1.05 || r.bottom < -H * .05) s.classList.remove('in'); }); };
+  const onS = () => requestAnimationFrame(check); addEventListener('scroll', onS, { passive: true }); addEventListener('resize', onS);
+  nOff.push(() => { removeEventListener('scroll', onS); removeEventListener('resize', onS); });
+  requestAnimationFrame(() => requestAnimationFrame(check));
 }
 function countUp() {
   const els = [...app.querySelectorAll('.bign b[data-n]')]; if (KM_EDIT || !els.length || !('IntersectionObserver' in window)) return;
