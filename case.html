@@ -396,6 +396,10 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .nhr dl { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px var(--ng); font-size: 14px } .N .nhr dd { margin-top: 4px; color: var(--ink) }
 .N .nf { padding: 0 var(--ne); margin-top: var(--ng) }
 .N .nf .rows { --gap: var(--ng); --mh: 110vh; max-width: none }
+.N .cl { display: grid; gap: var(--ng) }
+.N .clp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }
+.N .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } .N .cl .fill.clw { aspect-ratio: 16 / 9 }
+.N .cl .m { position: absolute; inset: 0 } .N .cl .m img, .N .cl .m video { width: 100%; height: 100%; object-fit: cover }
 .N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
 @media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 .N .nb { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--ng) 48px; padding: 120px var(--ne) 104px; align-items: start }
@@ -1003,13 +1007,23 @@ R.N = function (c) {
     if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
       <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
-  // the closing four pictures sit as a two-by-two grid of equal frames
+  // the closing pictures: a square pair, one wide 16:9 picture across the full width, then another square pair. The most landscape
+  // of the three after the first pair takes the wide spot. With fewer pictures it keeps what it can: a pair, or a pair and a wide one.
   const mockAll = b.mock ? uniq(b.mock.media).filter(m => !used.has(key(m))) : [];
-  let rest = spare.filter(m => !used.has(key(m)) && !mockAll.some(x => key(x) === key(m)));
-  const need = Math.max(0, 4 - Math.min(4, rest.length)), tail = [...mockAll.slice(Math.max(0, mockAll.length - need)), ...rest].slice(0, 2);   // the closing pair (the last two of the four are off)
-  const mockKeep = mockAll.filter(m => !tail.some(x => key(x) === key(m)));
+  const rest = spare.filter(m => !used.has(key(m)) && !mockAll.some(x => key(x) === key(m)));
+  // the opening pair is the one that closed the page before (on Oghosa, the tote and the sticker); the other three come from the
+  // spare pictures next, then the last of the mockups
+  const need = Math.max(0, 4 - Math.min(4, rest.length)), first = [...mockAll.slice(Math.max(0, mockAll.length - need)), ...rest].slice(0, 2);
+  const isF = m => first.some(x => key(x) === key(m));
+  const others = [...rest.filter(m => !isF(m)), ...mockAll.filter(m => !isF(m)).reverse()].slice(0, 3);
+  const cl = first.length === 2 ? [...first, ...(others.length >= 3 ? others : others.length >= 1 ? others.slice(0, 1) : [])] : [];
+  const mockKeep = mockAll.filter(m => !cl.some(x => key(x) === key(m)));
   if (b.mock) h += pics(mockKeep, b.mock._i);
-  if (tail.length) { tail.forEach(m => used.add(key(m))); h += `<div class="nf covers"><div class="g4">${tail.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div></div>`; }
+  if (cl.length) { cl.forEach(m => used.add(key(m)));
+    const oth = cl.slice(2), wi = oth.length ? oth.reduce((bi, m, i) => rOf(m) > rOf(oth[bi]) ? i : bi, 0) : -1;
+    const wide = wi >= 0 ? oth[wi] : null, last = oth.filter((_, i) => i !== wi).slice(0, 2);
+    const pair = list => list.length === 2 ? `<div class="clp">${list.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : '';
+    h += `<div class="nf covers"><div class="cl">${pair(first)}${wide ? `<div class="fill clw">${M(wide)}</div>` : ''}${pair(last)}</div></div>`; }
   return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
 };
 // wire the pinned sections once the page is drawn
