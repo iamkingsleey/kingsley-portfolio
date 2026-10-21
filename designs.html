@@ -1707,7 +1707,12 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   ovTiles.forEach(o => { const tg = document.createElement('i'); tg.className = 'fit'; o.c.prepend(tg); o.tag = tg; });
   // ---------- masonry + fly-in ----------
   const mGap = () => innerWidth < 900 ? 12 : 22;
-  const mSpans = () => ovTiles.forEach(o => { const w = o.t.offsetWidth || 1, r = parseFloat(o.t.style.getPropertyValue('--r')) || .8; o.t.style.setProperty('--sp', Math.round(w / r + mGap())); });
+  // every piece is sized from the column width, not its own: a piece hidden by a filter has no width, and sizing it from
+  // that cut its slot to a sliver, so pieces piled on top of each other when they came back
+  const mSpans = () => { const cols = innerWidth < 900 ? 2 : 4, gw = ovGrid.clientWidth; if (!gw) return;
+    const w = (gw - mGap() * (cols - 1)) / cols;
+    ovTiles.forEach(o => { const r = parseFloat(o.t.style.getPropertyValue('--r')) || .8; o.t.style.setProperty('--sp', Math.round(w / r + mGap())); }); };
+  if ('ResizeObserver' in window) new ResizeObserver(() => mSpans()).observe(ovGrid);
   let mFlown = false;
   const flown = new WeakSet();   // each piece flies in once: the first screenful on arrival, the rest as you scroll to them
   function mFly() {
@@ -1811,7 +1816,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     roleNow = r; filt = null;
     chipAll.classList.toggle('on', !r); chipEls.forEach((b, ci) => b.classList.toggle('on', !!r && CATS[ci].name === ROLE_CHIP[r]));
     { const on = $('chips').querySelector('button.on'), row = $('chips'); if (on && row.scrollWidth > row.clientWidth) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 24); }
-    const show = () => { ovTiles.forEach(o => { const ok = !!r && fits(items[o.i], r); o.t.hidden = !!r && !ok; o.t.classList.toggle('fits', ok); o.tag.textContent = ok ? 'Fits ' + r : ''; }); ov.scrollTop = 0; ov.classList.remove('refilt'); };
+    const show = () => { ovTiles.forEach(o => { const ok = !!r && fits(items[o.i], r); o.t.hidden = !!r && !ok; o.t.classList.toggle('fits', ok); o.tag.textContent = ok ? 'Fits ' + r : ''; }); mSpans(); ov.scrollTop = 0; ov.classList.remove('refilt'); };
     if (animate) { ov.classList.add('refilt'); setTimeout(show, 160); } else show();
     if (roleSel) roleSel.value = r;
   }
