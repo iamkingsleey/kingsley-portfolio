@@ -807,16 +807,28 @@
       },
       {
        "pics": [
-        "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400"
+        "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400",
+        "assets/uploads/card-02.jpg"
        ],
-       "focus": "lower"
+       "focus": "lower",
+       "split": "left",
+       "w": [
+        38.63,
+        61.37
+       ],
+       "ar": "1011 / 505"
       },
       {
        "pics": [
-        "https://framerusercontent.com/images/8tL75vMng90RocoQDpUd3Kt0A.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/KPkA7Hz7qs4qUnMwDMgVd6UeSDs.png?scale-down-to=2400"
+        "assets/uploads/7.jpg",
+        "assets/uploads/4.jpg"
        ],
-       "split": "left"
+       "split": "left",
+       "w": [
+        68.63,
+        31.37
+       ],
+       "ar": "1011 / 505"
       }
      ]
     }
