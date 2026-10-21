@@ -405,15 +405,13 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .pg-b { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 500 14px var(--body); cursor: pointer }
 .N .pg-b.ghost { background: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line) }
 html.themed body, html.themed .N, html.themed .next { transition: background .45s, color .45s }
-.N .nb.bn { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; gap: 0 clamp(24px, 4vw, 72px); align-items: end; align-content: center }
-.N .nb.bn .l { align-self: end }
-.N .nb.bn .bno { grid-row: 1 / span 2; font: 200 clamp(120px, 19vw, 300px)/.78 var(--body); letter-spacing: -.07em; color: var(--ink); font-variant-numeric: tabular-nums; margin-left: -.04em }
-.N .nb.bn .bno i { font-style: normal; color: var(--red) }
-.N .nb.bn .l, .N .nb.bn .r { grid-column: 2; max-width: 46ch }
-.N .nb.bn .l .mono { display: none }                       /* the big number says it */
-.N .nb.bn h2 { margin-top: 0; font-size: clamp(30px, 3.4vw, 50px); line-height: 1; letter-spacing: -.035em }
-.N .nb.bn .r { margin-top: 16px; padding-bottom: clamp(4px, 1vw, 14px) }
-@media (max-width: 899px) { .N .nb.bn { grid-template-columns: 1fr; grid-template-rows: none } .N .nb.bn .bno { grid-row: auto; font-size: clamp(110px, 34vw, 180px); margin-bottom: 20px } .N .nb.bn .l, .N .nb.bn .r { grid-column: 1 } }
+.N .nb.stm { grid-template-columns: minmax(0, 1fr); row-gap: 26px; align-content: center }
+.N .nb.stm .l { display: flex; align-items: baseline; gap: 14px }
+.N .nb.stm h2 { margin-top: 0; font-size: 15px; line-height: 1.3; letter-spacing: -.01em; font-weight: 500 }
+.N .nb.stm .r p:first-child { max-width: 22ch; color: var(--ink); font-size: clamp(30px, 4.6vw, 68px); line-height: 1.06; letter-spacing: -.04em; font-weight: 500; text-wrap: balance }
+.N .nb.stm .r p:first-child.long { max-width: 26ch; font-size: clamp(26px, 3.6vw, 52px); line-height: 1.1 }   /* a long statement steps down a size */
+.N .nb.stm .r p:first-child .q { color: var(--muted) }
+.N .nb.stm .r p + p, .N .nb.stm .r .go { max-width: 52ch; margin-top: 22px }
 .N .nb .go { margin-top: 18px; font: 500 22px/1.35 var(--body); letter-spacing: -.015em; color: var(--ink) }
 .N .tsw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 24px }
 .N .tsw button, .N .ttbar button { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 13px var(--body); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s }
@@ -997,7 +995,7 @@ function rulerDrag(el, sec, n) {
 }
 function setupN() {
   nOff.splice(0).forEach(f => f()); NT.length = 0; if (L !== 'N') return;
-  bigNumbers();
+  statements();
   const $$ = id => document.getElementById(id), inkC = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000';
   const col = $$('ncol');
   if (col) { const st = [...col.querySelectorAll('.cst')]; let cur = 0;
@@ -1136,11 +1134,12 @@ if (KM_EDIT) {
 // brand pages: pictures fly in as they scroll into view, every time (down: they rise from below; back up: they drop from above),
 // in reading order across a row. Pictures already on screen when the page is drawn stay put (the arrival lands the first one).
 const flyOff = [];
-// the text sections: the section number set huge and thin, with a red dot, and the heading and copy sitting on its baseline
-function bigNumbers() {
-  app.querySelectorAll('.N .nb').forEach(sec => { if (sec.querySelector('.bno')) return; const n = sec.querySelector('.l .mono'); if (!n) return;
-    const d = document.createElement('div'); d.className = 'bno'; d.setAttribute('aria-hidden', 'true'); d.innerHTML = `${esc(n.textContent.trim())}<i>.</i>`;
-    sec.prepend(d); sec.classList.add('bn'); });
+// the text sections as statements: the number and heading shrink to a label, and the first paragraph becomes the headline.
+// After a colon, the rest of the line is set in grey, so the idea reads first and the detail after it.
+function statements() {
+  app.querySelectorAll('.N .nb').forEach(sec => { if (sec.classList.contains('stm')) return; sec.classList.add('stm');
+    const p = sec.querySelector('.r p'); if (!p) return; if (p.textContent.length > 110) p.classList.add('long'); if (KM_EDIT || p.children.length) return;
+    const t = p.textContent, k = t.indexOf(': '); if (k > 0 && k < t.length - 3) p.innerHTML = `${esc(t.slice(0, k + 1))} <span class="q">${esc(t.slice(k + 2))}</span>`; });
 }
 function flyIn() {
   flyOff.splice(0).forEach(f => f());
