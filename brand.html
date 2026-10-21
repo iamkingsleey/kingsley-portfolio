@@ -396,14 +396,15 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .N .nhr dl { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px var(--ng); font-size: 14px } .N .nhr dd { margin-top: 4px; color: var(--ink) }
 .N .nf { padding: 0 var(--ne); margin-top: var(--ng) }
 .N .nf .rows { --gap: var(--ng); --mh: 110vh; max-width: none }
-.N .cl { display: grid; gap: var(--ng) }
-.N .clp { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: var(--ng) }
-.N .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } .N .cl .fill.clw { aspect-ratio: 16 / 9 }
-.N .cl .m { position: absolute; inset: 0 } .N .cl .m img, .N .cl .m video { width: 100%; height: 100%; object-fit: cover }
-.N .cl .clt { --fo: 50% 64% }
-.N .clp.asy { grid-template-columns: var(--cols); aspect-ratio: 2 / 1 } .N .clp.asy .fill { aspect-ratio: auto; height: 100% }
-.N .cl .m img, .N .cl .m video { object-position: var(--fo, 50% 50%) }
-.N .cl .fill.own { aspect-ratio: auto } .N .cl .fill.own .m { position: static } .N .cl .fill.own .m img, .N .cl .fill.own .m video { height: auto; display: block }
+.H { --ng: 22px } @media (max-width: 899px) { .H { --ng: 12px } }
+:is(.N, .H) .cl { display: grid; gap: var(--ng) }
+:is(.N, .H) .clp { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: var(--ng) }
+:is(.N, .H) .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } :is(.N, .H) .cl .fill.clw { aspect-ratio: 16 / 9 }
+:is(.N, .H) .cl .m { position: absolute; inset: 0 } :is(.N, .H) .cl .m img, :is(.N, .H) .cl .m video { width: 100%; height: 100%; object-fit: cover }
+:is(.N, .H) .cl .clt { --fo: 50% 64% }
+:is(.N, .H) .clp.asy { grid-template-columns: var(--cols); aspect-ratio: 2 / 1 } :is(.N, .H) .clp.asy .fill { aspect-ratio: auto; height: 100% }
+:is(.N, .H) .cl .m img, :is(.N, .H) .cl .m video { object-position: var(--fo, 50% 50%) }
+:is(.N, .H) .cl .fill.own { aspect-ratio: auto } :is(.N, .H) .cl .fill.own .m { position: static } :is(.N, .H) .cl .fill.own .m img, :is(.N, .H) .cl .fill.own .m video { height: auto; display: block }
 .N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
 @media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 .N .nb { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--ng) 48px; padding: 120px var(--ne) 104px; align-items: start }
@@ -630,6 +631,18 @@ function ROWS(list, cls = '', after = '') {
   return `<div class="rows ${cls}" style="--w:${w}">` + rows.map(({ row, sum, full }) =>
     `<div class="row${full ? ' full' : ''}" style="--sum:${sum.toFixed(3)};--n:${row.length}">${row.map(m => M(m, '', rOf(m))).join('')}</div>`).join('') + after + '</div>';
 }
+// grids: a row of one picture runs the full width (16:9, 2:1 or its own shape); two or three sit side by side, even or
+// asymmetric (one height, the gaps off centre). A section can pick a layout in the CMS (its "grid": a pattern of rows that
+// repeats until its pictures run out); without one it keeps the shape-aware rows.
+const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
+const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
+const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
+  return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
+const rowH = (P, r) => P.length === 1 ? box(P[0], r, true)
+  : ASY[P.length] && ASY[P.length][r.split] ? `<div class="clp asy" style="--cols:${ASY[P.length][r.split]}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
+  : `<div class="clp" style="--n:${Math.min(3, P.length)}">${P.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`;
+const gridH = (list, G) => { let o = '', i = 0, k = 0; while (i < list.length) { const r = G[k++ % G.length] || {}, nn = Math.max(1, Math.min(3, +r.n || 1)); o += rowH(list.slice(i, i + nn), r); i += nn; } return `<div class="cl">${o}</div>`; };
+const gridOf = g => Array.isArray(g) && g.length ? g : null;
 function body(s) {
   let h = '';
   (s.p || []).forEach(p => h += `<p>${esc(p)}</p>`);
@@ -740,7 +753,9 @@ const R = {
       if (last && last.length === 1 && rOf(last[0]) < 1.45) { const ex = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45);
         if (ex) { used.add(key(ex)); list.push(ex); } else list = list.filter(m => key(m) !== key(last[0])); }
       return list; };
-    const pics = (list, label, si) => { list = tidy(list); return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
+    const pics = (list, label, si) => { const G = si !== undefined ? gridOf(((c.sections || [])[si] || {}).grid) : null;   // a layout picked in the CMS, else the shape-aware rows
+      if (G) { list = uniq(list).filter(m => m && !used.has(key(m))); list.forEach(m => used.add(key(m))); } else list = tidy(list);
+      return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${G ? gridH(list, G) + cap(list, 'Fig. ' + pad(++fig), esc(label)) : ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
     // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
     const bigNums = (stats, si) => `<div class="fr"><div class="bign">${stats.map(([a, b], k) => `<div><b data-n="${esc(a)}"${E(`sections.${si}.stats.${k}.0`)}>${esc(a)}</b><span${E(`sections.${si}.stats.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2"${E('impactNote')}>${esc(c.impactNote)}</p>` : ''}</div>`;
     const bigList = (list, base) => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b${base ? E(`${base}.${k}.0`) : ''}>${esc(a)}</b><span${base ? E(`${base}.${k}.1`) : ''}>${esc(b)}</span></div>`).join('')}</div></div>`;
@@ -963,18 +978,6 @@ R.N = function (c) {
     const rows = rowsOf(list), last = rows[rows.length - 1];
     if (last && last.length === 1 && rOf(last[0]) < 1.45) { const extra = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45); if (extra) { used.add(key(extra)); list.push(extra); } }
     return list; };
-  // grids: a row of one picture runs the full width (16:9, 2:1 or its own shape); two or three sit side by side, even or
-  // asymmetric (one height, the gaps off centre). A section can pick a layout in the CMS (its "grid": a pattern of rows that
-  // repeats until its pictures run out); without one it keeps the shape-aware rows.
-  const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
-  const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
-  const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
-    return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
-  const rowH = (P, r) => P.length === 1 ? box(P[0], r, true)
-    : ASY[P.length] && ASY[P.length][r.split] ? `<div class="clp asy" style="--cols:${ASY[P.length][r.split]}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
-    : `<div class="clp" style="--n:${Math.min(3, P.length)}">${P.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`;
-  const gridH = (list, G) => { let o = '', i = 0, k = 0; while (i < list.length) { const r = G[k++ % G.length] || {}, nn = Math.max(1, Math.min(3, +r.n || 1)); o += rowH(list.slice(i, i + nn), r); i += nn; } return `<div class="cl">${o}</div>`; };
-  const gridOf = g => Array.isArray(g) && g.length ? g : null;
   const pics = (list, si, pick, G) => { G = gridOf(G !== undefined ? G : si !== undefined ? ((c.sections || [])[si] || {}).grid : null);
     list = G ? uniq(list).filter(m => !used.has(key(m))) : take(list); if (G) list.forEach(m => used.add(key(m)));
     pick = pick || (si !== undefined ? `sections.${si}` : '');
