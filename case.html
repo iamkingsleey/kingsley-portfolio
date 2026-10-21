@@ -1020,12 +1020,13 @@ R.N = function (c) {
     g = g.map(sec => ({ rows: (sec.rows || []).map(r => ({ ...r, pics: (r.pics || []).filter(Boolean) })).filter(r => r.pics.length) })).filter(sec => sec.rows.length);
     return g.length ? g : null; })();
   if (GAL) {
+    const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
     const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
     const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
       return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
     GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}"` : ''}><div class="cl">${sec.rows.map(r => r.pics.length === 1 ? box(r.pics[0], r, true)
-      : r.pics.length === 2 && (r.split === 'left' || r.split === 'right')   // asymmetric: one height, split 60/40 (wide left) or 40/60 (wide right)
-        ? `<div class="clp asy" style="--cols:${r.split === 'left' ? '3fr 2fr' : '2fr 3fr'}">${r.pics.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
+      : ASY[r.pics.length] && ASY[r.pics.length][r.split]   // asymmetric: one height; two pictures split 60/40 or 40/60, three 60/20/20, 20/60/20 or 20/20/60
+        ? `<div class="clp asy" style="--cols:${ASY[r.pics.length][r.split]}">${r.pics.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
         : `<div class="clp" style="--n:${Math.min(3, r.pics.length)}">${r.pics.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`).join('')}</div></div>`; });
     return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
   }
