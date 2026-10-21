@@ -519,6 +519,12 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .kslot .ksl small { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; opacity: .6 }
 .kslot:hover { border-color: #ff4a1c }
 .klift { opacity: .3 } .ktarget { outline: 2px solid #ff4a1c; outline-offset: -2px; position: relative } .ktarget::after { content: ''; position: absolute; inset: 0; background: rgb(255 74 28 / .14); border: 2px solid #ff4a1c; pointer-events: none; z-index: 3 }
+.km-cms [data-row] { position: relative }
+.khd { position: absolute; top: 0; bottom: 0; width: 22px; margin-left: -11px; z-index: 5; cursor: col-resize; touch-action: none; display: grid; place-items: center }
+.khd i { width: 4px; height: 44px; border-radius: 4px; background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / .25), 0 2px 8px rgb(0 0 0 / .3); opacity: 0; transition: opacity .15s, height .2s }
+[data-row]:hover > .khd i, .khd.on i { opacity: 1 } .khd:hover i, .khd.on i { height: 64px; background: #ff4a1c }
+.khd b { position: absolute; top: calc(50% + 44px); white-space: nowrap; font: 500 11px var(--mono); color: #fff; background: #ff4a1c; padding: 3px 7px; border-radius: 99px; opacity: 0; pointer-events: none } .khd.on b { opacity: 1 }
+.kres, .kres * { cursor: col-resize !important; user-select: none }
 .kghost { position: fixed; left: 0; top: 0; z-index: 99; pointer-events: none; border-radius: 8px; background: #222 center / cover; box-shadow: 0 18px 40px rgb(0 0 0 / .35) }
 .cnav { position: fixed; z-index: 40; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 22px; pointer-events: none }
 .cnav > * { pointer-events: auto }
@@ -626,9 +632,11 @@ const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr'
 const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
 const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
   return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
-const rowH = (P, r) => P.length === 1 ? box(P[0], r, true)
+const cwOf = (r, n) => Array.isArray(r.w) && r.w.length === n && n > 1 ? r.w.map(x => Math.max(1, +x || 1)) : null;   // widths set by dragging in the CMS
+const rowH = (P, r) => cwOf(r, P.length) ? `<div class="clp asy" style="--cols:${cwOf(r, P.length).map(x => x.toFixed(2) + 'fr').join(' ')};aspect-ratio:${r.ar || '2 / 1'}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
+  : P.length === 1 ? box(P[0], r, true)
   : ASY[P.length] && ASY[P.length][r.split] ? `<div class="clp asy" style="--cols:${ASY[P.length][r.split]}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
-  : `<div class="clp" style="--n:${Math.min(3, P.length)}">${P.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`;
+  : `<div class="clp" style="--n:${Math.min(4, P.length)}">${P.slice(0, 4).map(m => box(m, r, false)).join('')}</div>`;
 const gridH = (list, G) => { let o = '', i = 0, k = 0; while (i < list.length) { const r = G[k++ % G.length] || {}, nn = Math.max(1, Math.min(3, +r.n || 1)); o += rowH(list.slice(i, i + nn), r); i += nn; } return `<div class="cl">${o}</div>`; };
 const gridOf = g => Array.isArray(g) && g.length ? g : null;
 // rows set in the CMS (a section's "rows", the cover's "coverRows", a picture section's rows): each row lists its spots
@@ -642,12 +650,13 @@ function spotsRow(r, ri) {
   const P = (r.pics || []).map(x => x || ''), F = P.filter(Boolean);
   if (r.fit === 'auto') return F.length ? tagFig(ROWS(F, 'cla'), ri) : KM_EDIT ? slotBox(r, true, ri, 0, 'Full width') : '';
   if (!KM_EDIT) return !F.length ? '' : F.length === P.length ? rowH(P, r) : rowH(F, { shape: r.shape, focus: r.focus });
-  const n = P.length || 1, sp = ASY[n] && ASY[n][r.split] ? r.split : '', W = sp ? ASY[n][sp].split(' ').map(parseFloat) : Array(n).fill(1), tot = W.reduce((x, y) => x + y, 0);
+  const n = P.length || 1, CW = cwOf(r, n), sp = !CW && ASY[n] && ASY[n][r.split] ? r.split : '', W = CW || (sp ? ASY[n][sp].split(' ').map(parseFloat) : Array(n).fill(1)), tot = W.reduce((x, y) => x + y, 0);
   const cell = (m, j, wide) => m ? tagFig(box(m, wide ? r : { focus: r.focus }, wide), ri, j) : slotBox(r, wide, ri, j, wide ? 'Full width' : Math.round(W[j] / tot * 100) + '%');
   if (n === 1) return cell(P[0], 0, true);
   const cells = P.map((m, j) => cell(m, j, false));
-  return sp ? `<div class="clp asy" style="--cols:${ASY[n][sp]}">${cells.map(x => x.replace('aspect-ratio:1;', '')).join('')}</div>`
-    : `<div class="clp" style="--n:${Math.min(3, n)}">${cells.join('')}</div>`;
+  return CW ? `<div class="clp asy" data-row="${ri}" style="--cols:${CW.map(x => x.toFixed(2) + 'fr').join(' ')};aspect-ratio:${r.ar || '2 / 1'}">${cells.map(x => x.replace('aspect-ratio:1;', '')).join('')}</div>`
+    : sp ? `<div class="clp asy" data-row="${ri}" style="--cols:${ASY[n][sp]}">${cells.map(x => x.replace('aspect-ratio:1;', '')).join('')}</div>`
+    : `<div class="clp" data-row="${ri}" style="--n:${Math.min(4, n)}">${cells.join('')}</div>`;
 }
 const rowsBlock = R => `<div class="cl">${R.map(spotsRow).join('')}</div>`;
 const rowsFilled = R => R.flatMap(r => (r.pics || []).filter(Boolean));
@@ -1249,6 +1258,30 @@ function editable(c) {
     if (d.over) { d.over.classList.remove('ktarget'); const a = spotOf(d.f), b = spotOf(d.over); parent.postMessage({ type: 'km-cms-swap', slug: c.slug, section: a.section, a, b, groups: a.groups }, '*'); } };
   if (!window._kDragOn) { window._kDragOn = true; addEventListener('pointermove', e => window._kMove && window._kMove(e), { passive: false }); addEventListener('pointerup', e => window._kUp && window._kUp(e)); addEventListener('pointercancel', e => window._kUp && window._kUp(e)); }
   window._kMove = onMove; window._kUp = onUp;
+  // widths: drag the line to the right of a picture to set its width; the gap stays and the other pictures in the row share
+  // what's left, keeping their sizes relative to each other. Double-click a line to even the row out.
+  const MINW = 8, placeHandles = () => app.querySelectorAll('[data-pick] [data-row]').forEach(row => {
+    row.querySelectorAll(':scope > .khd').forEach(h => h.remove()); const cells = [...row.children].filter(x => x.matches('.fill')); if (cells.length < 2) return;
+    const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+    cells.slice(0, -1).forEach((cel, j) => { const h = document.createElement('div'); h.className = 'khd'; h.style.left = (cel.offsetLeft + cel.offsetWidth + gap / 2) + 'px'; h.innerHTML = '<i></i><b></b>';
+      h.title = 'Drag to change widths · double-click to even out';
+      h.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); h.setPointerCapture(e.pointerId);
+        const n = cells.length, rect = row.getBoundingClientRect(), inner = rect.width - gap * (n - 1), w0 = cells.map(x => x.getBoundingClientRect().width / inner * 100), x0 = e.clientX;
+        const ar = `${Math.round(rect.width)} / ${Math.round(rect.height)}`, others = w0.reduce((t, x, k) => k === j ? t : t + x, 0); let w = w0;
+        row.style.aspectRatio = ar; h.classList.add('on'); document.documentElement.classList.add('kres');
+        const mv = ev => { let a = w0[j] + (ev.clientX - x0) / inner * 100; a = Math.max(MINW, Math.min(100 - MINW * (n - 1), a));
+          const near = [20, 25, 30, 33.33, 40, 50, 60, 66.67, 70, 75, 80].find(q => Math.abs(q - a) < 1.2); if (near) a = near;
+          w = w0.map((x, k) => k === j ? a : Math.max(MINW, x / others * (100 - a)));
+          row.classList.add('asy'); row.style.setProperty('--cols', w.map(x => x.toFixed(2) + 'fr').join(' ')); [...row.children].filter(x => x.matches('.fill')).forEach(x => x.style.aspectRatio = 'auto');
+          h.style.left = (cells[j].offsetLeft + cells[j].offsetWidth + gap / 2) + 'px'; h.querySelector('b').textContent = w.map(x => Math.round(x)).join(' / ');
+          [...row.children].filter(x => x.matches('.fill')).forEach((x, k) => { const sm = x.querySelector('.ksl small'); if (sm) sm.textContent = Math.round(w[k]) + '%'; }); };
+        const up = () => { h.removeEventListener('pointermove', mv); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up); h.classList.remove('on'); document.documentElement.classList.remove('kres'); dragged = Date.now() + 300;
+          const sec = row.closest('[data-pick]'); parent.postMessage({ type: 'km-cms-widths', slug: c.slug, section: sec.dataset.pick, r: +row.dataset.row, w: w.map(x => +x.toFixed(2)), ar }, '*'); };
+        h.addEventListener('pointermove', mv); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up); });
+      h.addEventListener('dblclick', e => { e.stopPropagation(); const sec = row.closest('[data-pick]'); parent.postMessage({ type: 'km-cms-widths', slug: c.slug, section: sec.dataset.pick, r: +row.dataset.row, w: null }, '*'); });
+      row.append(h); }); });
+  requestAnimationFrame(placeHandles); setTimeout(placeHandles, 400);
+  if (!window._kResOn) { window._kResOn = true; addEventListener('resize', () => window._kPlace && window._kPlace()); } window._kPlace = placeHandles;
   app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
     b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-add', slug: c.slug, section: el.dataset.pick }, '*'); }); el.append(b); });
 }

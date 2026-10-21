@@ -354,13 +354,13 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
-      const tidyRows = R => (R || []).map(r => { const o = { pics: (r.pics || []).map(x => x || '') }; if (r.fit === 'auto') { o.fit = 'auto'; o.pics = o.pics.filter(Boolean); } for (const k of ['split', 'shape', 'focus']) if (r[k] && !(k === 'shape' && r[k] === '16:9')) o[k] = r[k]; return o; }).filter(r => r.pics.length);
+      const tidyRows = R => (R || []).map(r => { const o = { pics: (r.pics || []).map(x => x || '') }; if (r.fit === 'auto') { o.fit = 'auto'; o.pics = o.pics.filter(Boolean); } for (const k of ['split', 'shape', 'focus']) if (r[k] && !(k === 'shape' && r[k] === '16:9')) o[k] = r[k]; if (Array.isArray(r.w) && r.w.length === o.pics.length) { o.w = r.w; if (r.ar) o.ar = r.ar; } return o; }).filter(r => r.pics.length);
       for (const sec of c.sections || []) if (Array.isArray(sec.rows)) { sec.rows = tidyRows(sec.rows); if (!sec.rows.length) delete sec.rows; else sec.media = [...new Set(sec.rows.flatMap(r => r.pics.filter(Boolean)).map(m => JSON.stringify(m)))].map(m => JSON.parse(m)); }
       if (Array.isArray(c.coverRows)) { c.coverRows = tidyRows(c.coverRows); if (!c.coverRows.length) delete c.coverRows; else { const f = c.coverRows.flatMap(r => r.pics).find(Boolean); if (f) c.cover = f; } }
       if (Array.isArray(c.coverMore)) { c.coverMore = c.coverMore.filter(Boolean); if (!c.coverMore.length) delete c.coverMore; }
       if (Array.isArray(c.coverGrid) && !c.coverGrid.length) delete c.coverGrid;
       for (const sec of c.sections || []) if (Array.isArray(sec.grid) && !sec.grid.length) delete sec.grid;
-      if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).map(x => x || '') }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; if (r.split) o.split = r.split; return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
+      if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).map(x => x || '') }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; if (r.split) o.split = r.split; if (Array.isArray(r.w) && r.w.length === o.pics.length) { o.w = r.w; if (r.ar) o.ar = r.ar; } return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
       for (const sec of c.sections || []) for (const k of ['list', 'stats', 'chips', 'p']) if (Array.isArray(sec[k]) && !sec[k].length) delete sec[k];   // an empty part is skipped on the page
     }
     if (name === 'designs') for (const p of d.projects) {
@@ -423,7 +423,9 @@
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
           if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path);
           if ((d.type === 'km-cms-media' || d.type === 'km-cms-add' || d.type === 'km-cms-slot') && d.slug === c.slug) pictureSheet(d);
-          if (d.type === 'km-cms-swap' && d.slug === c.slug) swapSpots(d); };
+          if (d.type === 'km-cms-swap' && d.slug === c.slug) swapSpots(d);
+          if (d.type === 'km-cms-widths' && d.slug === c.slug) { const B = block(d.section), R = B && B.get(); if (!R || !R[d.r]) return;   // widths dragged on the page
+            if (d.w) { R[d.r].w = d.w; R[d.r].ar = d.ar; delete R[d.r].fit; } else { delete R[d.r].w; delete R[d.r].ar; } touch('cases'); send(); } };
         // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet,
         // and give its row a grid. A section's pictures become rows the first time you change one: every other row keeps
         // exactly the shape the page drew it in, and only the row you picked changes.
@@ -443,8 +445,8 @@
           B.set(R); return R; };
         const findSpot = (R, at) => { if (at.r != null && R[at.r] && (at.j == null || at.j < (R[at.r].pics || []).length)) return [at.r, at.j ?? 0];
           for (let r = 0; r < R.length; r++) { const j = (R[r].pics || []).findIndex(m => same(m, at.src)); if (j >= 0) return [r, j]; } return null; };
-        const ROWK = [['wide', 'Full width', 1, ''], ['pairs', 'Pairs', 2, ''], ['p64', '60/40', 2, 'left'], ['p46', '40/60', 2, 'right'], ['threes', 'Threes', 3, ''], ['t622', '60/20/20', 3, 'left'], ['t262', '20/60/20', 3, 'middle'], ['t226', '20/20/60', 3, 'right']];
-        const kindOf = r => r.fit === 'auto' ? 'auto' : (ROWK.find(k => k[2] === (r.pics || []).length && k[3] === (r.split || '')) || [''])[0];
+        const ROWK = [['wide', 'Full width', 1, ''], ['pairs', 'Pairs', 2, ''], ['p64', '60/40', 2, 'left'], ['p46', '40/60', 2, 'right'], ['threes', 'Threes', 3, ''], ['t622', '60/20/20', 3, 'left'], ['t262', '20/60/20', 3, 'middle'], ['t226', '20/20/60', 3, 'right'], ['fours', 'Fours', 4, '']];
+        const kindOf = r => r.fit === 'auto' ? 'auto' : Array.isArray(r.w) ? 'custom' : (ROWK.find(k => k[2] === (r.pics || []).length && k[3] === (r.split || '')) || [''])[0];
         function setRow(R, ri, k) {   // one row only; a picture that no longer fits moves to its own full-width row just below
           const [, , n, sp] = ROWK.find(x => x[0] === k), r = R[ri], P = (r.pics || []).filter(Boolean), keep = P.slice(0, n), spill = P.slice(n);
           while (keep.length < n) keep.push(''); const o = { pics: keep }; if (sp) o.split = sp; if (n === 1 && r.shape) o.shape = r.shape; if (r.focus) o.focus = r.focus;
@@ -461,7 +463,8 @@
               style: k === 'auto' && cur !== 'auto' ? 'display:none' : '', onclick: () => { const R2 = rowsOfBlock(B, d.groups), p = getSpot(true); if (!p) return; setRow(R2, p[0], k); touch('cases'); send(); paint(); } },
               k === 'auto' ? mini(null) : mini([{ n, split: sp }]), el('span', { text: name }))));
             const R2 = B.get(), p2 = getSpot(), empty = R2 ? R2.reduce((a, r) => a + (r.pics || []).filter(x => !x).length, 0) : 0;
-            note.textContent = 'Only this picture’s row changes. ' + (empty ? `${empty} empty spot${empty > 1 ? 's' : ''} in ${B.label}: click one on the page to fill it. Visitors never see an empty spot.` : 'Drag pictures on the page to swap them.');
+            const cr = R2 && p2 && Array.isArray(R2[p2[0]].w) ? 'Custom widths: ' + R2[p2[0]].w.map(x => Math.round(x)).join(' / ') + '. Pick a grid to reset them. ' : '';
+            note.textContent = cr + 'Only this picture’s row changes. On the page, drag the line after a picture to set its width. ' + (empty ? `${empty} empty spot${empty > 1 ? 's' : ''} in ${B.label}: click one on the page to fill it. Visitors never see an empty spot.` : 'Drag pictures on the page to swap them.');
             if (R2 && p2) acts.append(el('button', { class: 'btn ghost small', type: 'button', text: '+ Row below', onclick: () => { R2.splice(p2[0] + 1, 0, { pics: [''] }); touch('cases'); send(); paint(); } }),
               el('button', { class: 'btn ghost small', type: 'button', text: 'Remove this row', onclick: () => { if (!confirm('Remove this whole row from the page?')) return; R2.splice(p2[0], 1); touch('cases'); send(); document.querySelector('.modal:last-of-type')?.remove(); } })); };
           paint();
