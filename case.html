@@ -1021,9 +1021,8 @@ R.N = function (c) {
   if (b.mock) h += pics(mockKeep, b.mock._i);
   if (cl.length) { cl.forEach(m => used.add(key(m)));
     const oth = cl.slice(2), wi = oth.length ? oth.reduce((bi, m, i) => rOf(m) > rOf(oth[bi]) ? i : bi, 0) : -1;
-    const wide = wi >= 0 ? oth[wi] : null, last = oth.filter((_, i) => i !== wi).slice(0, 2);
-    const pair = list => list.length === 2 ? `<div class="clp">${list.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : '';
-    h += `<div class="nf covers"><div class="cl">${pair(first)}${wide ? `<div class="fill clw">${M(wide)}</div>` : ''}${pair(last)}</div></div>`; }
+    const wide = wi >= 0 ? oth[wi] : null;
+    if (wide) h += `<div class="nf covers"><div class="cl"><div class="fill clw">${M(wide)}</div></div></div>`; }
   return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
 };
 // wire the pinned sections once the page is drawn
