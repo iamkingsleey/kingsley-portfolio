@@ -270,8 +270,9 @@
       { k: 'colors', label: 'Brand colours', full: true, help: 'Leave empty to sample colours from the pictures.', type: 'list', itemLabel: 'Colour', def: () => ['', '#000000'], title: c => c[0] + ' ' + c[1], of: { type: 'tuple', fields: [{ label: 'Name' }, { label: 'Hex', type: 'color' }] } } ] },
     { title: 'Picture sections', when: o => o.kind === 'Brand', help: 'The pictures after the Type section, in order. Add as many sections as you like; each is a stack of rows. A row with one picture runs the full width; two or three pictures sit side by side as squares. When this has any pictures, only these show after Type (leave it empty to use the section pictures instead).', fields: [
       { k: 'gallery', label: '', type: 'list', itemLabel: 'Picture section', def: () => ({ rows: [{ pics: [''] }] }), title: (g, i) => `${i + 1} · ${(g.rows || []).map(r => (r.pics || []).length === 1 ? 'Wide' : (r.pics || []).length + ' side by side').join(', ') || 'Empty'}`, of: { type: 'object', fields: [
-        { k: 'rows', label: 'Rows', type: 'list', itemLabel: 'Row', def: () => ({ pics: [''] }), title: (r, i) => `${i + 1} · ${(r.pics || []).length === 1 ? 'One wide picture' : (r.pics || []).length + ' pictures side by side'}`, of: { type: 'object', fields: [
+        { k: 'rows', label: 'Rows', type: 'list', itemLabel: 'Row', def: () => ({ pics: [''] }), title: (r, i) => `${i + 1} · ${(r.pics || []).length === 1 ? 'One wide picture' : (r.pics || []).length + ' pictures side by side' + ((r.pics || []).length === 2 && r.split ? (r.split === 'left' ? ', wide left' : ', wide right') : '')}`, of: { type: 'object', fields: [
           { k: 'pics', label: 'Pictures (1 = full width, 2 or 3 = side by side)', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } },
+          { k: 'split', label: 'Two side by side: split', type: 'select', options: [['', 'Even · two squares (default)'], ['left', 'Wide left · 60/40'], ['right', 'Wide right · 40/60']], help: 'Wide left or right gives an asymmetric pair: one height, the gap off centre' },
           { k: 'shape', label: 'Shape of a full-width picture', type: 'select', options: [['16:9', '16:9 (default)'], ['2:1', '2:1'], ['own', 'Its own shape, uncropped']] },
           { k: 'focus', label: 'Keep in view when cropped', type: 'select', options: [['', 'Middle (default)'], ['top', 'Top'], ['upper', 'Upper'], ['lower', 'Lower'], ['bottom', 'Bottom']] }] } }] } } ] }
   ];
@@ -318,7 +319,7 @@
       if (c.kind !== 'Brand') c.impact = c._imp && c._imp.length ? { stats: c._imp } : (c.impact && c.impact.list ? c.impact : null);
       if (!c.slug) c.slug = slug(c.title); delete c._imp;
       if (c.colors && !c.colors.length) delete c.colors;
-      if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).filter(Boolean) }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
+      if (Array.isArray(c.gallery)) { c.gallery = c.gallery.map(g => ({ rows: (g.rows || []).map(r => { const o = { pics: (r.pics || []).filter(Boolean) }; if (r.shape && r.shape !== '16:9') o.shape = r.shape; if (r.focus) o.focus = r.focus; if (r.split) o.split = r.split; return o; }).filter(r => r.pics.length) })).filter(g => g.rows.length); if (!c.gallery.length) delete c.gallery; }   // empty rows and sections are dropped
       for (const sec of c.sections || []) for (const k of ['list', 'stats', 'chips', 'p']) if (Array.isArray(sec[k]) && !sec[k].length) delete sec[k];   // an empty part is skipped on the page
     }
     if (name === 'designs') for (const p of d.projects) {
