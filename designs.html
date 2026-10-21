@@ -538,6 +538,8 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     if (Math.round(p) !== i) { tap(); goTo(i); } else openDetail(i, e.clientX, e.clientY);
   });
   const chips = $('chips');
+  // a piece belongs to its own category; the Case study chip also holds every case study, brand ones included
+  const inCat = (it, name) => it.cat === name || (name === 'Case study' && it.cs);
   const firstOf = CATS.map(c => items.findIndex(x => x.cat === c.name));
   // The chips are the Designs page's own nav and filter: All (the default) shows every piece; a category shows only its pieces.
   let filt = null;
@@ -545,7 +547,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   chipAll.addEventListener('click', () => { tap(); leaveRole(); if (filt && openIdx < 0 && (history.state || {}).km === 'f') history.back(); else setFilter(null); }); chips.appendChild(chipAll);
   const chipEls = CATS.map((c, ci) => {
     const b = document.createElement('button'); b.type = 'button';
-    b.innerHTML = `${c.name}<sup>${A[c.k].length}</sup>`;
+    b.innerHTML = `${c.name}<sup>${items.filter(it => inCat(it, c.name)).length}</sup>`;
     b.addEventListener('click', () => { tap(); leaveRole(); setFilter(c.name); });
     chips.appendChild(b); return b;
   });
@@ -569,7 +571,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const ovEl = document.getElementById('ov'); if (!ovEl) return;
     ovEl.classList.add('refilt');
     setTimeout(() => {
-      ovEl.querySelectorAll('.ov-t').forEach(t => { t.hidden = !!name && items[+t.dataset.i].cat !== name; });
+      ovEl.querySelectorAll('.ov-t').forEach(t => { t.hidden = !!name && !inCat(items[+t.dataset.i], name); });
       ovEl.scrollTop = 0; ovEl.classList.remove('refilt');
     }, 160);
   }
