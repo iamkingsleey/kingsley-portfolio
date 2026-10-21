@@ -512,6 +512,14 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .km-cms figure.m { cursor: pointer } .km-cms figure.m:hover { outline: 2px solid #3d7bff; outline-offset: 2px; z-index: 2 }
 .km-cms .km-add { display: inline-flex; margin-top: 12px; height: 34px; padding: 0 14px; border: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent); border-radius: 999px; background: var(--bg); color: var(--ink); font: 500 13px var(--body); cursor: pointer }
 .km-cms .km-add:hover { border-style: solid }
+.km-cms figure.m { cursor: grab; touch-action: none } .kdrag, .kdrag * { cursor: grabbing !important; user-select: none }
+.kslot { position: relative; background: transparent !important; border: 1.5px dashed color-mix(in srgb, var(--ink) 30%, transparent) }
+.kslot .ksl { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; width: 100%; border: 0; background: none; color: var(--ink); font: 500 13px var(--body); cursor: pointer }
+.kslot .ksl span { width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 10%, transparent); font-size: 18px }
+.kslot .ksl small { font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; opacity: .6 }
+.kslot:hover { border-color: #ff4a1c }
+.klift { opacity: .3 } .ktarget { outline: 2px solid #ff4a1c; outline-offset: -2px; position: relative } .ktarget::after { content: ''; position: absolute; inset: 0; background: rgb(255 74 28 / .14); border: 2px solid #ff4a1c; pointer-events: none; z-index: 3 }
+.kghost { position: fixed; left: 0; top: 0; z-index: 99; pointer-events: none; border-radius: 8px; background: #222 center / cover; box-shadow: 0 18px 40px rgb(0 0 0 / .35) }
 .cnav { position: fixed; z-index: 40; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(104px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 22px; pointer-events: none }
 .cnav > * { pointer-events: auto }
 .dback { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 10px; border-radius: 999px; background: var(--pill); color: var(--ink); font: 500 13px var(--body); text-decoration: none; transition: background .2s }
@@ -623,6 +631,28 @@ const rowH = (P, r) => P.length === 1 ? box(P[0], r, true)
   : `<div class="clp" style="--n:${Math.min(3, P.length)}">${P.slice(0, 3).map(m => box(m, r, false)).join('')}</div>`;
 const gridH = (list, G) => { let o = '', i = 0, k = 0; while (i < list.length) { const r = G[k++ % G.length] || {}, nn = Math.max(1, Math.min(3, +r.n || 1)); o += rowH(list.slice(i, i + nn), r); i += nn; } return `<div class="cl">${o}</div>`; };
 const gridOf = g => Array.isArray(g) && g.length ? g : null;
+// rows set in the CMS (a section's "rows", the cover's "coverRows", a picture section's rows): each row lists its spots
+// (an empty spot is ''), how they split and its shape. "fit: auto" keeps the pictures' own shapes, as the page drew them.
+// On the site an empty spot never shows: a full row keeps its grid, a row still missing pictures shows the ones it has side
+// by side, and an empty row is left out. In the CMS every spot shows, the empty ones as "+ Add picture".
+const tagFig = (html, ri, j0 = 0) => { let j = j0; return KM_EDIT ? html.replace(/<figure class="m/g, () => `<figure data-r="${ri}" data-j="${j++}" class="m`) : html; };
+const slotBox = (r, wide, ri, j, label) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1';
+  return `<div class="fill kslot${wide ? ' clw' : ''}" style="${a ? `aspect-ratio:${a};` : 'aspect-ratio:16 / 9;'}" data-r="${ri}" data-j="${j}"><button type="button" class="ksl"><span>+</span>Add picture<small>${label}</small></button></div>`; };
+function spotsRow(r, ri) {
+  const P = (r.pics || []).map(x => x || ''), F = P.filter(Boolean);
+  if (r.fit === 'auto') return F.length ? tagFig(ROWS(F, 'cla'), ri) : KM_EDIT ? slotBox(r, true, ri, 0, 'Full width') : '';
+  if (!KM_EDIT) return !F.length ? '' : F.length === P.length ? rowH(P, r) : rowH(F, { shape: r.shape, focus: r.focus });
+  const n = P.length || 1, sp = ASY[n] && ASY[n][r.split] ? r.split : '', W = sp ? ASY[n][sp].split(' ').map(parseFloat) : Array(n).fill(1), tot = W.reduce((x, y) => x + y, 0);
+  const cell = (m, j, wide) => m ? tagFig(box(m, wide ? r : { focus: r.focus }, wide), ri, j) : slotBox(r, wide, ri, j, wide ? 'Full width' : Math.round(W[j] / tot * 100) + '%');
+  if (n === 1) return cell(P[0], 0, true);
+  const cells = P.map((m, j) => cell(m, j, false));
+  return sp ? `<div class="clp asy" style="--cols:${ASY[n][sp]}">${cells.map(x => x.replace('aspect-ratio:1;', '')).join('')}</div>`
+    : `<div class="clp" style="--n:${Math.min(3, n)}">${cells.join('')}</div>`;
+}
+const rowsBlock = R => `<div class="cl">${R.map(spotsRow).join('')}</div>`;
+const rowsFilled = R => R.flatMap(r => (r.pics || []).filter(Boolean));
+const blockRows = (c, pick) => { const R = pick === 'cover' ? c.coverRows : /^sections\.(\d+)$/.test(pick || '') ? ((c.sections || [])[+pick.split('.')[1]] || {}).rows : null;
+  return Array.isArray(R) && R.length ? R : null; };
 function body(s) {
   let h = '';
   (s.p || []).forEach(p => h += `<p>${esc(p)}</p>`);
@@ -733,7 +763,10 @@ const R = {
       if (last && last.length === 1 && rOf(last[0]) < 1.45) { const ex = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45);
         if (ex) { used.add(key(ex)); list.push(ex); } else list = list.filter(m => key(m) !== key(last[0])); }
       return list; };
-    const pics = (list, label, si) => { const G = si !== undefined ? gridOf(((c.sections || [])[si] || {}).grid) : null;   // a layout picked in the CMS, else the shape-aware rows
+    const pics = (list, label, si) => { const RR = si !== undefined ? blockRows(c, `sections.${si}`) : null;
+      if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m)));
+        return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ` data-pick="sections.${si}" data-rows="1"` : ''}>${rowsBlock(RR)}${F.length ? cap(F, 'Fig. ' + pad(++fig), esc(label)) : ''}</div>` : ''; }
+      const G = si !== undefined ? gridOf(((c.sections || [])[si] || {}).grid) : null;   // a layout picked in the CMS, else the shape-aware rows
       if (G) { list = uniq(list).filter(m => m && !used.has(key(m))); list.forEach(m => used.add(key(m))); } else list = tidy(list);
       return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${G ? gridH(list, G) + cap(list, 'Fig. ' + pad(++fig), esc(label)) : ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), esc(label)))}</div>` : ''; };
     // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
@@ -743,7 +776,9 @@ const R = {
     const tags = [...(c.industry || []), ...(c.did || []).slice(0, 2)];
     const st = c.stat && c.stat[0] ? ` <b>${esc(c.stat[0])} ${esc(c.stat[1])}</b>.` : '';
     let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
-      ${(() => { const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh">${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
+      ${(() => { const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
+        if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover" data-rows="1"' : ''}>${rowsBlock(RR)}${F.length ? cap(F, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)) : ''}</div>` : ''; }
+        const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // the backstory: the problem, the goal and my part in it, before any screens
     h += `<section class="tx ch" data-ix="The brief"><span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
       ${c.problem ? `<h4>The problem</h4><p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch"${E('goal')}>${esc(c.goal)}</p>` : ''}
@@ -958,7 +993,10 @@ R.N = function (c) {
     const rows = rowsOf(list), last = rows[rows.length - 1];
     if (last && last.length === 1 && rOf(last[0]) < 1.45) { const extra = spare.find(m => !used.has(key(m)) && rOf(m) < 1.45); if (extra) { used.add(key(extra)); list.push(extra); } }
     return list; };
-  const pics = (list, si, pick, G) => { G = gridOf(G !== undefined ? G : si !== undefined ? ((c.sections || [])[si] || {}).grid : null);
+  const pics = (list, si, pick, G) => { const RR = blockRows(c, pick || (si !== undefined ? `sections.${si}` : ''));
+    if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); const pk = pick || `sections.${si}`;
+      return F.length || KM_EDIT ? `<div class="nf covers"${KM_EDIT ? ` data-pick="${pk}" data-rows="1"` : ''}>${rowsBlock(RR)}</div>` : ''; }
+    G = gridOf(G !== undefined ? G : si !== undefined ? ((c.sections || [])[si] || {}).grid : null);
     list = G ? uniq(list).filter(m => !used.has(key(m))) : take(list); if (G) list.forEach(m => used.add(key(m)));
     pick = pick || (si !== undefined ? `sections.${si}` : '');
     return list.length ? `<div class="nf covers"${KM_EDIT && pick ? ` data-pick="${pick}"` : ''}>${G ? gridH(list, G) : ROWS(list, '')}</div>` : ''; };
@@ -1015,10 +1053,10 @@ R.N = function (c) {
     if (typeof g[0] === 'string' || (g[0] && !g[0].rows)) { const L = g.filter(Boolean), rows = [];
       for (let i = 0; i < L.length; i += 4) { const [a, b2, ...pr] = L.slice(i, i + 4); if (a) rows.push({ pics: [a] }); if (b2) rows.push({ pics: [b2], focus: 'lower' }); if (pr.length) rows.push({ pics: pr }); }
       g = [{ rows }]; }
-    g = g.map(sec => ({ rows: (sec.rows || []).map(r => ({ ...r, pics: (r.pics || []).filter(Boolean) })).filter(r => r.pics.length) })).filter(sec => sec.rows.length);
+    g = g.map(sec => ({ rows: (sec.rows || []).map(r => ({ ...r, pics: (r.pics || []).map(x => x || '') })).filter(r => r.pics.length && (KM_EDIT || r.pics.some(Boolean))) })).filter(sec => sec.rows.length);
     return g.length ? g : null; })();
   if (GAL) {
-    GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}"` : ''}><div class="cl">${sec.rows.map(r => rowH(r.pics, r)).join('')}</div></div>`; });
+    GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}" data-rows="1"` : ''}>${rowsBlock(sec.rows)}</div>`; });
     return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
   }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
@@ -1182,9 +1220,35 @@ function editable(c) {
       parent.postMessage({ type: 'km-cms-edit', slug: c.slug, path: el.dataset.edit, value: v }, '*'); });
   });
   // pictures: click one to replace or remove it right here; "+ Add picture" adds one to that section
-  app.querySelectorAll('figure.m').forEach(f => f.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
-    const v = f.querySelector('video'), im = f.querySelector('img'), src = v ? v.getAttribute('src') : im ? im.getAttribute('src') : null;
-    const sec = f.closest('[data-pick]'); parent.postMessage({ type: 'km-cms-media', slug: c.slug, src, video: !!v, section: sec ? sec.dataset.pick : null }, '*'); }, true));
+  // where a picture sits: its block (section), and its row and spot when the block has rows. A block without rows sends the
+  // rows the page drew (each a list of pictures), so the CMS can turn them into rows without changing how they look.
+  const srcOf = f => { const v = f.querySelector('video'), im = f.querySelector('img'); return v ? v.getAttribute('src') : im ? im.getAttribute('src') : null; };
+  const spotOf = el => { const sec = el.closest('[data-pick]'), f = el.closest('figure.m, .kslot');
+    return { section: sec ? sec.dataset.pick : null, r: f && f.dataset.r != null ? +f.dataset.r : null, j: f && f.dataset.j != null ? +f.dataset.j : null, src: f && f.matches('figure.m') ? srcOf(f) : null,
+      groups: sec && !sec.dataset.rows ? [...sec.querySelectorAll('.row')].map(row => [...row.querySelectorAll('figure.m')].map(srcOf)) : null }; };
+  let dragged = 0;
+  app.querySelectorAll('figure.m').forEach(f => f.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); if (Date.now() < dragged) return;
+    const at = spotOf(f); parent.postMessage({ type: 'km-cms-media', slug: c.slug, src: at.src, video: !!f.querySelector('video'), section: at.section, r: at.r, j: at.j, groups: at.groups }, '*'); }, true));
+  app.querySelectorAll('.kslot').forEach(sl => sl.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); if (Date.now() < dragged) return;
+    const at = spotOf(sl); parent.postMessage({ type: 'km-cms-slot', slug: c.slug, section: at.section, r: at.r, j: at.j }, '*'); }));
+  // drag a picture onto another picture or an empty spot in the same section to swap them
+  let dg = null;
+  app.addEventListener('dragstart', e => { if (e.target.closest && e.target.closest('figure.m')) e.preventDefault(); });   // the browser's own picture drag would cancel ours
+  app.addEventListener('pointerdown', e => { if (e.button > 0) return; const f = e.target.closest('figure.m'); if (!f || !f.closest('[data-pick]')) return;
+    dg = { f, x0: e.clientX, y0: e.clientY, on: false, id: e.pointerId, over: null }; });
+  const onMove = e => { if (!dg || e.pointerId !== dg.id) return;
+    if (!dg.on) { if (Math.hypot(e.clientX - dg.x0, e.clientY - dg.y0) < 6) return; dg.on = true; const r = dg.f.getBoundingClientRect(), w = Math.min(200, r.width);
+      const g = dg.g = document.createElement('div'); g.className = 'kghost'; g.style.width = w + 'px'; g.style.height = (w * r.height / r.width) + 'px';
+      const im = dg.f.querySelector('img'), v = dg.f.querySelector('video'); g.style.backgroundImage = `url("${(im && im.currentSrc) || (v && v.poster) || ''}")`; document.body.append(g);
+      dg.f.classList.add('klift'); document.documentElement.classList.add('kdrag'); }
+    e.preventDefault(); dg.g.style.transform = `translate(${e.clientX - dg.g.offsetWidth / 2}px, ${e.clientY - dg.g.offsetHeight / 2}px) rotate(-2deg)`;
+    const el = document.elementFromPoint(e.clientX, e.clientY), t = el && el.closest('figure.m, .kslot'), ok = t && t !== dg.f && t.closest('[data-pick]') === dg.f.closest('[data-pick]') ? t : null;
+    if (ok !== dg.over) { if (dg.over) dg.over.classList.remove('ktarget'); dg.over = ok; if (ok) ok.classList.add('ktarget'); } };
+  const onUp = e => { if (!dg || e.pointerId !== dg.id) return; const d = dg; dg = null; if (!d.on) return; dragged = Date.now() + 300;
+    d.g.remove(); d.f.classList.remove('klift'); document.documentElement.classList.remove('kdrag');
+    if (d.over) { d.over.classList.remove('ktarget'); const a = spotOf(d.f), b = spotOf(d.over); parent.postMessage({ type: 'km-cms-swap', slug: c.slug, section: a.section, a, b, groups: a.groups }, '*'); } };
+  if (!window._kDragOn) { window._kDragOn = true; addEventListener('pointermove', e => window._kMove && window._kMove(e), { passive: false }); addEventListener('pointerup', e => window._kUp && window._kUp(e)); addEventListener('pointercancel', e => window._kUp && window._kUp(e)); }
+  window._kMove = onMove; window._kUp = onUp;
   app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
     b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-add', slug: c.slug, section: el.dataset.pick }, '*'); }); el.append(b); });
 }

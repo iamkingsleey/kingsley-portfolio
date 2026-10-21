@@ -161,3 +161,6 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 /* thumbnails in list headers */
 .thumbs { display: inline-flex; gap: 4px; flex: none } .thumbs:empty { display: none }
 .thumbs .th { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; background: var(--pill); display: grid; place-items: center; font-size: 10px; font-weight: 600; border: 1px solid var(--line) }
+
+/* a section's rows, read-only in the Form */
+.rowsview { display: grid; gap: 6px } .rowsview .rv { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text) }
