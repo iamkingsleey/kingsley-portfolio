@@ -154,6 +154,11 @@
       circ(o.bg, o.x, o.y, 0, 1, ms).then(() => { if (o.back) history.back(); else location.href = o.href; setTimeout(() => document.querySelectorAll('.km-circ').forEach(n => n.remove()), 1600); });
     }
   };
+  // the browser's own page transition, where it has one (see the view-transition rules in Designs and the case pages):
+  // the page that leaves notes what is happening (KM.vt.set); the page that arrives names its side of the picture and sets
+  // where the circle opens from (or closes into)
+  KM.vt = { ok: 'CSSViewTransitionRule' in window && !reduce,
+    set(o) { try { sessionStorage.setItem('km-vt', JSON.stringify(Object.assign({ t: Date.now() }, o))); } catch (_) {} } };
   // arriving after a morph: the page opens as a circle from the same point
   function reveal() { let k = null; try { k = JSON.parse(sessionStorage.getItem('km-circ') || 'null'); sessionStorage.removeItem('km-circ'); } catch (_) {}
     if (!k || Date.now() - k.t > 9000 || reduce) return; circ(k.bg, k.x, k.y, 1, 0, 520).then(c => c.remove()); }

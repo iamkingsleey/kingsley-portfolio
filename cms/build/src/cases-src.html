@@ -562,7 +562,41 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .cap { position: fixed; z-index: 50; left: 50%; bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 50px); translate: -50% 0; font: 500 12px var(--body); color: var(--muted);
   background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); padding: 6px 12px; border-radius: 999px; white-space: nowrap; max-width: calc(100vw - 24px); overflow: hidden; text-overflow: ellipsis; transition: opacity .3s }
 .cap.off { opacity: 0 }
+
+/* a case study opens out of its picture on Designs and closes back into it: the browser's own page transition (a shared
+   element transition) keeps the old page on screen until the new one is drawn, the picture morphs between the two, and
+   the page opens (or closes) as a circle from it. Browsers without it fall back to the hand-made version in kit.js. */
+@view-transition { navigation: auto }
+::view-transition-group(root) { animation-duration: .32s }
+html.vt-open::view-transition-old(root) { animation: none }
+html.vt-open::view-transition-new(root) { animation: km-vt-in .62s cubic-bezier(.65,0,.2,1) both }
+html.vt-back::view-transition-new(root) { animation: none }
+html.vt-back::view-transition-old(root) { animation: km-vt-out .56s cubic-bezier(.65,0,.2,1) both; z-index: 1 }
+::view-transition-group(km-hero) { animation-duration: .62s; animation-timing-function: cubic-bezier(.65,0,.2,1); z-index: 3 }
+html.vt-back::view-transition-group(km-hero) { animation-duration: .56s }
+::view-transition-old(km-hero), ::view-transition-new(km-hero) { width: 100%; height: 100%; object-fit: cover; animation-duration: .62s }
+@keyframes km-vt-in { from { clip-path: circle(0 at var(--vx, 50%) var(--vy, 50%)) } to { clip-path: circle(150vmax at var(--vx, 50%) var(--vy, 50%)) } }
+@keyframes km-vt-out { from { clip-path: circle(150vmax at var(--vx, 50%) var(--vy, 50%)) } to { clip-path: circle(0 at var(--vx, 50%) var(--vy, 50%)) } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important } }
 </style>
+<link rel="expect" href="#km-ready" blocking="render">
+<script>
+// the arriving side of a case study's page transition: registered before the page draws (kit.js loads too late for it).
+// The page is held back from drawing until its content is in (the "expect" link above), so the transition opens onto
+// the finished page, never a blank one.
+try { window.__kmVt = JSON.parse(sessionStorage.getItem('km-vt') || 'null'); if (window.__kmVt && Date.now() - window.__kmVt.t > 8000) window.__kmVt = null; } catch (_) {}   // (peeked so the page can hold its own entrance animation)
+addEventListener('pagereveal', e => {
+  let k = null; try { k = JSON.parse(sessionStorage.getItem('km-vt') || 'null'); sessionStorage.removeItem('km-vt'); } catch (_) {}
+  if (!e.viewTransition) return; if (!k || Date.now() - k.t > 8000) { e.viewTransition.skipTransition(); return; }
+  const R = document.documentElement, base = u => String(u || '').split(/[?#]/)[0].split('/').pop().replace(/\.(webp|jpe?g|png)$/i, '').replace(/-(md|sm|lg)$/, '');
+  R.style.setProperty('--vx', k.x + 'px'); R.style.setProperty('--vy', k.y + 'px'); R.classList.add(k.kind === 'back' ? 'vt-back' : 'vt-open');
+  let el = k.sel ? document.querySelector(k.sel) : null;
+  if (!el && k.src) { const want = base(k.src), im = [...document.querySelectorAll('figure img')].find(x => base(x.getAttribute('src')) === want && (() => { const r = x.getBoundingClientRect(); return r.width > 40 && r.bottom > 0 && r.top < innerHeight; })()); el = im ? (im.closest('figure') || im) : null; }
+  if (el) el.style.viewTransitionName = 'km-hero';
+  window.__kmVtDone = e.viewTransition.finished.catch(() => {});
+  e.viewTransition.finished.finally(() => { if (el) el.style.viewTransitionName = ''; R.classList.remove('vt-open', 'vt-back'); });
+});
+</script>
 </head>
 <body>
 <div id="app"></div>
@@ -602,7 +636,8 @@ function M(x, cls = '', r) {
 // ---------- shape-aware rows: every picture keeps its own shape; pictures in a row share one height, so their tops and
 // bottoms line up and the row runs exactly edge to edge of the column. Landscapes stand alone, portraits and squares pair up,
 // a portrait next to a landscape when that fills the row well. A row is never taller than --mh.
-const RATIO = {};   // filled with each picture's real shape before the page is drawn
+const RATIO = {};   // each picture's real shape: from the build, then what this visitor's browser measured before
+try { const R0 = JSON.parse(localStorage.getItem('km-ratio') || '{}'); for (const k in R0) if (!(k in RATIO)) RATIO[k] = R0[k]; } catch (_) {}
 const rOf = x => !x ? 1 : typeof x === 'string' ? (RATIO[x] || 1.5) : x.video ? (RATIO[x.poster] || 16 / 9) : x.color ? 4 / 3 : 1;
 const uniq = list => { const seen = new Set(); return list.filter(m => { const k = JSON.stringify(m); if (seen.has(k)) return false; seen.add(k); return true; }); };
 function rowsOf(list) {
@@ -1211,6 +1246,7 @@ function paint(keep) {
     // tile it came from while a circle of the Designs page closes in on it.
     { let fr = null; try { fr = JSON.parse(sessionStorage.getItem('km-from') || 'null'); } catch (_) {}
       const st = history.state, bk = !!(st && st.kmPrev && st.kmPrev === b.href && history.length > 1);
+      if (fr && /designs\.html/.test(b.href) && (fr.page || '').split('#')[1] === c.slug && window.KM && KM.vt && KM.vt.ok) { if (bk) history.back(); else location.href = b.href; return; }   // the page transition does the rest (pageswap, below)
       if (fr && /designs\.html/.test(b.href) && (fr.page || '').split('#')[1] === c.slug && window.KM && KM.morph) {
         const base = u => String(u || '').split(/[?#]/)[0].split('/').pop().replace(/\.(webp|jpe?g|png)$/i, '');
         const vis = im => { const r = im.getBoundingClientRect(); return r.width > 60 && r.bottom > 40 && r.top < innerHeight - 40; };
@@ -1297,6 +1333,17 @@ function editable(c) {
   app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
     b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-add', slug: c.slug, section: el.dataset.pick }, '*'); }); el.append(b); });
 }
+// leaving for Designs (the back pill or the browser's own back): the picture on screen shrinks back into the tile it came from
+addEventListener('pageswap', e => {
+  if (!e.viewTransition || KM_EDIT) return; let fr = null; try { fr = JSON.parse(sessionStorage.getItem('km-from') || 'null'); } catch (_) {}
+  const to = (e.activation && e.activation.entry && e.activation.entry.url) || '';
+  if (!fr || !/designs\.html/.test(to) || (fr.page || '').split('#')[1] !== C) { e.viewTransition.skipTransition(); return; }
+  const base = u => String(u || '').split(/[?#]/)[0].split('/').pop().replace(/\.(webp|jpe?g|png)$/i, '').replace(/-(md|sm|lg)$/, '');
+  const vis = im => { const r = im.getBoundingClientRect(); return r.width > 60 && r.bottom > 40 && r.top < innerHeight - 40; };
+  const ims = [...app.querySelectorAll('figure.m img')], im = ims.find(x => base(x.getAttribute('src')) === base(fr.src) && vis(x)) || ims.find(vis);
+  if (im) (im.closest('figure') || im).style.viewTransitionName = 'km-hero';
+  if (window.KM && KM.vt) KM.vt.set({ kind: 'back', x: fr.x + fr.w / 2, y: fr.y + fr.h / 2, sel: fr.sel });
+});
 if (KM_EDIT) {
   addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-data' || !Array.isArray(d.cases)) return;
     CASES.splice(0, CASES.length, ...d.cases.filter(x => !x.hidden)); const y = scrollY; const cs = CASES.find(x => x.slug === C) || CASES.find(x => x.slug === slugNow());
@@ -1339,17 +1386,21 @@ function shapes(c) {
   const urls = new Set(); const add = x => { if (!x) return; if (typeof x === 'string') urls.add(x); else if (x.video && x.poster) urls.add(x.poster); };
   [c.cover, ...(c.run || []), ...(c.sections || []).flatMap(s => s.media || [])].forEach(add);
   return Promise.all([...urls].filter(u => !RATIO[u]).map(u => new Promise(res => { const im = new Image(), t = setTimeout(res, 4000);
-    im.onload = () => { if (im.naturalWidth) RATIO[u] = +(im.naturalWidth / im.naturalHeight).toFixed(3); clearTimeout(t); res(); }; im.onerror = () => { clearTimeout(t); res(); }; im.src = u; })));
+    im.onload = () => { if (im.naturalWidth) RATIO[u] = +(im.naturalWidth / im.naturalHeight).toFixed(3); clearTimeout(t); res(1); }; im.onerror = () => { clearTimeout(t); res(0); }; im.src = u; })))
+    .then(r => { const n = r.filter(Boolean).length; if (n) try { localStorage.setItem('km-ratio', JSON.stringify(RATIO)); } catch (_) {} return n; });
 }
 function show() {
   const h = slugNow(), any = CASES.find(x => x.slug === h);
   if (any && !casesOf(GRP).includes(any)) { location.replace(OTHER + '#' + h); return; }   // a brand case asked for on the product page, or the other way round
   C = any ? h : casesOf(GRP)[0].slug;
   const c = CASES.find(x => x.slug === C);
-  app.classList.add('wait'); shapes(c).then(() => { paint(); app.classList.remove('wait'); });
+  // draw straight away with the shapes already known; if some were missing, redraw once they arrive (rare: the build and
+  // this browser remember them)
+  paint(); shapes(c).then(n => (window.__kmVtDone || Promise.resolve()).then(() => n)).then(n => { if (n && C === c.slug) { const y = scrollY; paint(true); scrollTo(0, y); } });   // (never mid page transition: redrawing would cut it short)
 }
 addEventListener('hashchange', show);
 show();
 </script>
+<i id="km-ready" hidden></i>
 </body>
 </html>

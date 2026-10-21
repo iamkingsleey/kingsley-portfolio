@@ -3,6 +3,23 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="expect" href="#km-ready" blocking="render">
+<script>
+// the arriving side of a case study's page transition: registered before the page draws (kit.js loads too late for it).
+// The page is held back from drawing until its content is in (the "expect" link above), so the transition opens onto
+// the finished page, never a blank one.
+try { window.__kmVt = JSON.parse(sessionStorage.getItem('km-vt') || 'null'); if (window.__kmVt && Date.now() - window.__kmVt.t > 8000) window.__kmVt = null; } catch (_) {}   // (peeked so the page can hold its own entrance animation)
+addEventListener('pagereveal', e => {
+  let k = null; try { k = JSON.parse(sessionStorage.getItem('km-vt') || 'null'); sessionStorage.removeItem('km-vt'); } catch (_) {}
+  if (!e.viewTransition) return; if (!k || Date.now() - k.t > 8000) { e.viewTransition.skipTransition(); return; }
+  const R = document.documentElement, base = u => String(u || '').split(/[?#]/)[0].split('/').pop().replace(/\.(webp|jpe?g|png)$/i, '').replace(/-(md|sm|lg)$/, '');
+  R.style.setProperty('--vx', k.x + 'px'); R.style.setProperty('--vy', k.y + 'px'); R.classList.add(k.kind === 'back' ? 'vt-back' : 'vt-open');
+  let el = k.sel ? document.querySelector(k.sel) : null;
+  if (!el && k.src) { const want = base(k.src), im = [...document.querySelectorAll('figure img')].find(x => base(x.getAttribute('src')) === want && (() => { const r = x.getBoundingClientRect(); return r.width > 40 && r.bottom > 0 && r.top < innerHeight; })()); el = im ? (im.closest('figure') || im) : null; }
+  if (el) el.style.viewTransitionName = 'km-hero';
+  e.viewTransition.finished.finally(() => { if (el) el.style.viewTransitionName = ''; R.classList.remove('vt-open', 'vt-back'); });
+});
+</script>
 <style>
 /* Layout: the V1 side menu top-left, category chips top-right, a horizontal row of work in the middle where the
    piece on the needle is full size and its neighbours sit smaller and faded, its caption above and meta below,
@@ -367,6 +384,22 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 .next .th { grid-column: 2; grid-row: 1 / 3; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel, var(--tile)); border-radius: 0; filter: none; opacity: 1 }
 .next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
 @media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
+
+/* a case study opens out of its picture on Designs and closes back into it: the browser's own page transition (a shared
+   element transition) keeps the old page on screen until the new one is drawn, the picture morphs between the two, and
+   the page opens (or closes) as a circle from it. Browsers without it fall back to the hand-made version in kit.js. */
+@view-transition { navigation: auto }
+::view-transition-group(root) { animation-duration: .32s }
+html.vt-open::view-transition-old(root) { animation: none }
+html.vt-open::view-transition-new(root) { animation: km-vt-in .62s cubic-bezier(.65,0,.2,1) both }
+html.vt-back::view-transition-new(root) { animation: none }
+html.vt-back::view-transition-old(root) { animation: km-vt-out .56s cubic-bezier(.65,0,.2,1) both; z-index: 1 }
+::view-transition-group(km-hero) { animation-duration: .62s; animation-timing-function: cubic-bezier(.65,0,.2,1); z-index: 3 }
+html.vt-back::view-transition-group(km-hero) { animation-duration: .56s }
+::view-transition-old(km-hero), ::view-transition-new(km-hero) { width: 100%; height: 100%; object-fit: cover; animation-duration: .62s }
+@keyframes km-vt-in { from { clip-path: circle(0 at var(--vx, 50%) var(--vy, 50%)) } to { clip-path: circle(150vmax at var(--vx, 50%) var(--vy, 50%)) } }
+@keyframes km-vt-out { from { clip-path: circle(150vmax at var(--vx, 50%) var(--vy, 50%)) } to { clip-path: circle(0 at var(--vx, 50%) var(--vy, 50%)) } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important } }
 </style>
 
 <div class="station" id="station" data-readout>
@@ -1404,6 +1437,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     setTimeout(() => { f.remove(); cov.remove(); busy = false; }, 1500);
   }
   if (PROJECT_PAGE) setTimeout(() => { [PROJECT_PAGE, 'logo.html', 'product.html', 'showcase.html'].forEach(h => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; document.head.appendChild(l); }); }, 1500);
+  addEventListener('pageswap', e => { if (!e.viewTransition) return; let k = null; try { k = JSON.parse(sessionStorage.getItem('km-vt') || 'null'); } catch (_) {} if (!k || Date.now() - k.t > 4000) e.viewTransition.skipTransition(); });   // only a case study opening gets the page transition
   addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly, .km-keep').forEach(c => c.remove()); busy = false; flyIdx = -1; leaving = false; } });   // back button: nothing left over
   async function openDetail(i, x, y, fr, quiet) {      // fr: the box it flies from (a tile in the All view), else the piece on the dial; quiet: opened from the address
     if (items[i] && items[i].link && !busy) return goPage(i, x, y, fr);
@@ -1694,7 +1728,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   let mFlown = false;
   const flown = new WeakSet();   // each piece flies in once: the first screenful on arrival, the rest as you scroll to them
   function mFly() {
-    if (reduce) return;
+    if (reduce || (window.__kmVt && window.__kmVt.kind === 'back')) return;   // closing a case study back into its tile: the grid is already in place
     const vis = ovTiles.filter(o => !o.t.hidden).map(o => o.t); if (!vis.length) return;
     const cols = innerWidth < 900 ? 2 : 4, spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = vis[0].offsetTop, left0 = vis[0].offsetLeft;
     vis.forEach(t => { if (t.offsetTop - ov.scrollTop > innerHeight * 1.4) return;
@@ -2034,8 +2068,9 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     const i = +t.dataset.i;
     const dest = items[i].link || (items[i].cs && items[i].page);   // a case study goes straight to it; "link" points a piece anywhere
     if (dest && items[i].cs && window.KM && KM.morph) { tap();   // a case study opens out of its picture (and closes back into it)
-      const r = t.querySelector('.ov-im').getBoundingClientRect(), u = mdOf(still(items[i]));
-      try { sessionStorage.setItem('km-return', items[i].t); sessionStorage.setItem('km-from', JSON.stringify({ page: dest, src: u, x: r.left, y: r.top, w: r.width, h: r.height, cx: e.clientX, cy: e.clientY, bg: getComputedStyle(document.body).backgroundColor, t: Date.now() })); } catch (_) {}
+      const tim = t.querySelector('.ov-im'), r = tim.getBoundingClientRect(), u = mdOf(still(items[i]));
+      try { sessionStorage.setItem('km-return', items[i].t); sessionStorage.setItem('km-from', JSON.stringify({ page: dest, sel: `.ov-t[data-i="${i}"] .ov-im`, src: u, x: r.left, y: r.top, w: r.width, h: r.height, cx: e.clientX, cy: e.clientY, bg: getComputedStyle(document.body).backgroundColor, t: Date.now() })); } catch (_) {}
+      if (KM.vt && KM.vt.ok) { tim.style.viewTransitionName = 'km-hero'; KM.vt.set({ kind: 'open', x: e.clientX, y: e.clientY, src: u }); location.href = dest; setTimeout(() => { tim.style.viewTransitionName = ''; }, 1500); return; }
       let th = ''; try { th = localStorage.getItem('km-theme') || ''; } catch (_) {}
       KM.morph.leave({ src: u, rect: r, x: e.clientX, y: e.clientY, href: dest, bg: th === 'dark' ? '#0b0b0b' : '#ffffff' });
       return;
@@ -2221,3 +2256,5 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
   if (document.fonts) document.fonts.ready.then(drawStrip);
 })();
 </script>
+
+<i id="km-ready" hidden></i>

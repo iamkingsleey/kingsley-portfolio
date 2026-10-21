@@ -14,10 +14,19 @@ _KEEP = ('gallery', 'coverRows', 'coverMore', 'coverGrid', 'slug', 'title', 'kin
          'statement', 'exp', 'impact', 'impactNote', 'goal', 'problem', 'type', 'colors', 'run', 'typeView')
 _data = json.dumps([{k: c[k] for k in _KEEP if k in c} for c in _local2(CS2)], ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 _tpl = open(f'{KFM}/cases-src.html', encoding='utf-8').read()
+# picture shapes known before the page loads (see tools/imgsize.py)
+import sys; sys.path.insert(0, f'{KFM}/tools'); from imgsize import ratios as _ratios
+def _urls(o):
+    if isinstance(o, str): return [o] if (o.startswith('http') or o.startswith('assets/')) and not o.lower().split('?')[0].endswith(('.mp4', '.webm', '.mov')) else []
+    if isinstance(o, dict): return _urls(o.get('poster')) if 'video' in o else [x for v in o.values() for x in _urls(v)]
+    if isinstance(o, list): return [x for v in o for x in _urls(v)]
+    return []
+_RAT = json.dumps(_ratios(REPO, _urls(_local2(CS2))), separators=(',', ':'))
 for _out, _L, _title in (('case.html', 'H', 'Product case study'), ('brand.html', 'N', 'Brand case study')):
     t = _tpl
     t = rep(t, '<meta charset="utf-8">\n', '<meta charset="utf-8">\n' + THEME_BOOT + TUNER)
     t = rep(t, '<title>__TITLE__</title>', f'<title>{_title} · Kingsley</title>')
+    t = rep(t, 'const RATIO = {};', 'const RATIO = ' + _RAT + ';')
     t = rep(t, 'const CASES = __DATA__;', 'window.KM_L = "' + _L + '";\nconst CASES = ' + _data + ';')
     t = rep(t, '<script>\nconst CASES', '<script src="popkit.js"></script>\n' + CLICK + '<script>\nconst CASES') if '<script>\nconst CASES' in t else rep(t, '<script>\nwindow.KM_L', '<script src="popkit.js"></script>\n' + CLICK + '<script>\nwindow.KM_L')
     assert '__DATA__' not in t and '__TITLE__' not in t
