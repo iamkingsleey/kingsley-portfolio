@@ -264,7 +264,7 @@
       { k: 'tag', label: 'Tag', help: 'Shown after the type, e.g. Marketplace' }, { k: 'role', label: 'My role' },
       { k: 'year', label: 'Year', ph: '2024 or 2020 – Now' }, { k: 'client', label: 'Client' },
       { k: 'industry', label: 'Industry', type: 'lines', rows: 2, help: 'One per line' }, { k: 'did', label: 'What I did', type: 'lines', rows: 3, help: 'One per line' },
-      { k: 'fxDefault', label: 'Effect on every picture', type: 'select', full: true, options: [['', 'None (plain)'], ['beforeafter', 'Before and after'], ['swap', 'Hover to swap'], ['lens', 'Zoom lens'], ['zoom', 'Click to zoom'], ['pan', 'Drag to look around'], ['hotspots', 'Hotspots'], ['camera', 'Camera'], ['tilt', 'Tilt'], ['kenburns', 'Ken Burns'], ['spotlight', 'Spotlight'], ['reveal', 'Reveal on scroll'], ['parallax', 'Parallax']], help: 'Each picture can still have its own: click it on the page view → Effect. “None” keeps the pictures plain.' },
+      { k: 'fxDefault', label: 'Effect on every picture', type: 'select', full: true, options: [['', 'None (plain)'], ['beforeafter', 'Before and after'], ['swap', 'Hover to swap'], ['lens', 'Zoom lens'], ['zoom', 'Click to zoom'], ['pan', 'Drag to look around'], ['hotspots', 'Hotspots'], ['hoverzoom', 'Zoom on hover'], ['patternzoom', 'Pattern zoom'], ['camera', 'Camera'], ['tilt', 'Tilt'], ['kenburns', 'Ken Burns'], ['spotlight', 'Spotlight'], ['reveal', 'Reveal on scroll'], ['parallax', 'Parallax']], help: 'Each picture can still have its own: click it on the page view → Effect. “None” keeps the pictures plain.' },
       { k: 'hidden', label: 'Hide this case study from the site', type: 'bool', full: true } ] },
     { title: 'Opening', fields: [
       { k: 'headline', label: 'Headline', type: 'br', rows: 2, help: 'Press Enter for a line break' }, { k: 'blurb', label: 'Summary', type: 'textarea' },
@@ -481,9 +481,9 @@
           const j = (c.run || []).findIndex(m => same(m, src)); if (j >= 0) return { arr: c.run, j, label: 'Extra pictures' };
           return null; };
         // a picture's effect, kept by the picture: c.fx[picture] = { k, second, points }. "Same as the case" uses the case's default.
-        const FXL = [['', 'Same as the case' ], ['none', 'None (plain)'], ['beforeafter', 'Before and after', 'Compare'], ['swap', 'Hover to swap', 'Compare'], ['lens', 'Zoom lens', 'Look closer'], ['zoom', 'Click to zoom', 'Look closer'], ['pan', 'Drag to look around', 'Look closer'], ['hotspots', 'Hotspots', 'Look closer'],
+        const FXL = [['', 'Same as the case' ], ['none', 'None (plain)'], ['beforeafter', 'Before and after', 'Compare'], ['swap', 'Hover to swap', 'Compare'], ['lens', 'Zoom lens', 'Look closer'], ['zoom', 'Click to zoom', 'Look closer'], ['pan', 'Drag to look around', 'Look closer'], ['hotspots', 'Hotspots', 'Look closer'], ['hoverzoom', 'Zoom on hover', 'Look closer'], ['patternzoom', 'Pattern zoom', 'Look closer'],
           ['camera', 'Camera', 'Motion'], ['tilt', 'Tilt', 'Motion'], ['kenburns', 'Ken Burns', 'Motion'], ['spotlight', 'Spotlight', 'Motion'], ['reveal', 'Reveal on scroll', 'Motion'], ['parallax', 'Parallax', 'Motion']];
-        const FXH = { beforeafter: 'Drag across to compare with a second picture (leave it empty to compare with the same picture in black and white).', swap: 'Point at it (tap on a phone) to show a second picture.', lens: 'A round magnifier follows the pointer.', zoom: 'Click a spot to zoom in right there; click again to zoom out.',
+        const FXH = { hoverzoom: 'Point at it and it slowly pushes in toward the pointer; it eases back when you leave. Tap on a phone.', patternzoom: 'As visitors scroll past, it zooms slowly into one detail until that fills the frame. Set the detail below.', beforeafter: 'Drag across to compare with a second picture (leave it empty to compare with the same picture in black and white).', swap: 'Point at it (tap on a phone) to show a second picture.', lens: 'A round magnifier follows the pointer.', zoom: 'Click a spot to zoom in right there; click again to zoom out.',
           pan: 'The picture is bigger than its frame: drag to look around.', hotspots: 'Numbered points that open a note. Add them below.', camera: 'A viewfinder that focuses as it comes into view; a click takes the shot.', tilt: 'Leans toward the pointer in 3D.',
           kenburns: 'A slow drift and zoom.', spotlight: 'Dimmed except a circle of light that follows the pointer.', reveal: 'Wipes in each time it scrolls into view.', parallax: 'Moves a little slower than the page as you scroll.' };
         const msrc = m => typeof m === 'string' ? m : m && (m.video || m.poster) || '';
@@ -495,6 +495,9 @@
             const k = cur.k || ''; if (FXH[k]) box.append(el('div', { class: 'help', text: FXH[k] }));
             const upd = patch => { c.fx[src] = Object.assign({}, c.fx[src] || { k }, patch); touch('cases'); send(); };
             if (k === 'beforeafter' || k === 'swap') box.append(el('div', { class: 'f', style: 'margin-top:10px' }, el('label', { text: k === 'swap' ? 'Picture on hover' : 'Before picture' }), mediaField(cur.second || '', v => upd({ second: v || undefined }), { accept: 'image/*' })));
+            if (k === 'patternzoom') box.append(el('div', { class: 'help', style: 'margin-top:10px', text: 'The detail it zooms into: across and down, 0 to 100%.' }),
+              el('div', { class: 'hsr', style: 'grid-template-columns:auto 80px auto 80px' }, el('span', { class: 'mono', text: 'Across' }), el('input', { type: 'number', min: 0, max: 100, value: cur.ox ?? 50, oninput: e => upd({ ox: +e.target.value }) }),
+                el('span', { class: 'mono', text: 'Down' }), el('input', { type: 'number', min: 0, max: 100, value: cur.oy ?? 50, oninput: e => upd({ oy: +e.target.value }) })));
             if (k === 'hotspots') { const pts = (cur.points || []).slice(), list = el('div', { class: 'hsl' });
               const save = () => upd({ points: pts.filter(p => p.t) });
               const row = (p, i) => el('div', { class: 'hsr' }, el('b', { class: 'mono', text: String(i + 1) }),

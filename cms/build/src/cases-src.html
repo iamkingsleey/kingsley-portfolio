@@ -605,6 +605,9 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .kx-spot .kx-dim { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(circle at var(--sx, 50%) var(--sy, 50%), transparent 0, transparent 90px, rgb(8 8 10 / .72) 230px) }
 .kx-rev > .kx-base { clip-path: inset(0 100% 0 0); transform: scale(1.15); transition: clip-path 1.1s cubic-bezier(.65,0,.2,1), transform 1.6s cubic-bezier(.2,.8,.2,1), opacity .5s !important } .kx-rev.in > .kx-base { clip-path: inset(0 0 0 0); transform: none }
 .m.kx-plx > .kx-base { height: 130% !important; top: -15%; bottom: auto; will-change: transform }
+.m.kx-pz > .kx-base { transform-origin: var(--ox, 50%) var(--oy, 50%); will-change: transform }
+.kx-hz > .kx-base { transform-origin: var(--hx, 50%) var(--hy, 50%); transition: transform 1.6s cubic-bezier(.2,.8,.2,1), transform-origin .9s cubic-bezier(.2,.8,.2,1), opacity .5s !important; will-change: transform }
+.kx-hz.on > .kx-base { transform: scale(var(--hz, 1.14)) }
 @media (prefers-reduced-motion: reduce) { .kx-kb > .kx-base { animation: none } .kx-rev > .kx-base { clip-path: none; transform: none } }
 </style>
 </head>
@@ -711,9 +714,9 @@ const blockRows = (c, pick) => { const R = pick === 'cover' ? c.coverRows : /^se
 // ---------- picture effects. In the CMS, click a picture → Effect; a case can also set one effect for all its pictures
 // ("fxDefault"). Stored as c.fx[picture] = { k, second, points }. Plain is the default. In the CMS preview only the ones that
 // move by themselves play; the rest show a small badge, so clicking a picture still edits it.
-const FX_NAMES = { beforeafter: 'Before and after', swap: 'Hover to swap', lens: 'Zoom lens', zoom: 'Click to zoom', pan: 'Drag to look around', hotspots: 'Hotspots',
+const FX_NAMES = { patternzoom: 'Pattern zoom', hoverzoom: 'Zoom on hover', beforeafter: 'Before and after', swap: 'Hover to swap', lens: 'Zoom lens', zoom: 'Click to zoom', pan: 'Drag to look around', hotspots: 'Hotspots',
   camera: 'Camera', tilt: 'Tilt', kenburns: 'Ken Burns', spotlight: 'Spotlight', reveal: 'Reveal on scroll', parallax: 'Parallax' };
-const FX_SELF = new Set(['kenburns', 'reveal', 'parallax']), FX_VIDEO = new Set(['kenburns', 'tilt', 'reveal', 'parallax', 'spotlight']);
+const FX_SELF = new Set(['kenburns', 'reveal', 'parallax', 'patternzoom']), FX_VIDEO = new Set(['kenburns', 'tilt', 'reveal', 'parallax', 'spotlight', 'patternzoom', 'hoverzoom']);
 const kxRel = (el, e) => { const r = el.getBoundingClientRect(); return { x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)), r }; };
 const kxIO = (el, on, off) => { const o = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? on() : off && off()), { threshold: .3 }); o.observe(el); return () => o.disconnect(); };
 const kxReduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -770,6 +773,15 @@ const KFX = {
     f.addEventListener('pointermove', e => { const { x, y } = kxRel(f, e); f.classList.add('move', 'used'); f.style.transform = `perspective(900px) rotateX(${(.5 - y) * 10}deg) rotateY(${(x - .5) * 12}deg) scale(1.02)`; f.style.setProperty('--gx', x * 100 + '%'); f.style.setProperty('--gy', y * 100 + '%'); });
     const rest = () => { f.classList.remove('move'); f.style.transform = ''; }; f.addEventListener('pointerleave', rest); f.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') rest(); }); },
   kenburns(f) { f.classList.add('kx-kb'); },
+  // as you scroll past, the picture zooms slowly into one detail (set in the CMS) until it fills the frame
+  patternzoom(f, im, o) { f.classList.add('kx-pz'); f.style.setProperty('--ox', (o.ox ?? 50) + '%'); f.style.setProperty('--oy', (o.oy ?? 50) + '%'); if (kxReduce) return; let raf = 0;
+    const go = () => { raf = 0; const r = f.getBoundingClientRect(), k = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height))); im.style.transform = `scale(${1 + 1.6 * k * k})`; };
+    const on = () => { if (!raf) raf = requestAnimationFrame(go); }; addEventListener('scroll', on, { passive: true }); addEventListener('resize', on); go(); return () => { removeEventListener('scroll', on); removeEventListener('resize', on); }; },
+  // point at it and the picture slowly pushes in toward the pointer, like a camera move; leave and it eases back. Tap on a phone.
+  hoverzoom(f) { f.classList.add('kx-hz'); const at = e => { const { x, y } = kxRel(f, e); f.style.setProperty('--hx', (30 + x * 40) + '%'); f.style.setProperty('--hy', (30 + y * 40) + '%'); };
+    f.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { at(e); f.classList.add('on'); } }); f.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') at(e); });
+    f.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') f.classList.remove('on'); });
+    f.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') { at(e); f.classList.toggle('on'); snd('pop'); } }); },
   spotlight(f) { f.classList.add('kx-spot'); f.insertAdjacentHTML('beforeend', '<div class="kx-dim"></div>'); let auto = true, raf = 0; const t0 = performance.now();
     const at = (x, y) => { f.style.setProperty('--sx', x * 100 + '%'); f.style.setProperty('--sy', y * 100 + '%'); };
     if (!kxReduce) (function drift(n) { if (!auto) return; const q = (n - t0) / 4000; at(.5 + Math.cos(q * 2 * Math.PI) * .22, .5 + Math.sin(q * 4 * Math.PI) * .14); raf = requestAnimationFrame(drift); })(t0);
