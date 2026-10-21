@@ -87,7 +87,9 @@
    "years": "",
    "what": "Brand design for the Open Source Sustainability Lab in the US, on a contract.",
    "stat": "",
-   "statLabel": ""
+   "statLabel": "",
+   "stat2": "",
+   "stat2Label": ""
   },
   {
    "fq": "101.3",
@@ -129,10 +131,10 @@
    "where": "Resources I share",
    "role": "Creator",
    "what": "3D assets I publish for free on Unsplash, used across platforms like Notion, Typeform, Figma, Trello, Medium, Squarespace, Wix and Unfold.",
-   "stat": "600K+",
+   "stat": "700K+",
    "statLabel": "views",
    "years": "",
-   "stat2": "3K+",
+   "stat2": "4K+",
    "stat2Label": "downloads"
   }
  ]
