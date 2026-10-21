@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 
 <meta charset="utf-8">
 <script>
@@ -522,7 +522,7 @@ figure { margin: 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610211535';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610211602';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -539,6 +539,6 @@ figure { margin: 0 }
 <script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=391e47e6" defer></script>
 <script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=2e3b8a1c" defer></script>
+<script src="feedback.js?v=a6e41f5e" defer></script>
 </body>
 </html>

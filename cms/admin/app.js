@@ -20,7 +20,7 @@
   const src = p => !p ? '' : /^(https?:|data:)/.test(p) ? p : '/site/' + p;
 
   // ---------------------------------------------------------------- state
-  let C = {}, SAVED = {}, INDEX = {}, LIB = null, HAS_TOKEN = false, route = 'dashboard', sub = null;
+  let C = {}, SAVED = {}, INDEX = {}, LIB = null, HAS_TOKEN = false, HAS_IKEY = false, INBOX_NEW = 0, route = 'dashboard', sub = null;
   const dirty = new Set();
   const touch = file => { dirty.add(file); paintDirty(); };
   function paintDirty() {
@@ -375,7 +375,7 @@
 
   // ---------------------------------------------------------------- views
   const NAV = [
-    ['grp', 'Overview'], ['dashboard', 'Analytics', ''],
+    ['grp', 'Overview'], ['dashboard', 'Analytics', ''], ['inbox', 'Inbox', ''],
     ['grp', 'Content'], ['cases', 'Case studies', 'cases'], ['designs', 'Designs', 'designs'], ['about', 'About', 'about'], ['engineering', 'Engineering', 'engineering'], ['projects', 'Projects page', 'projects'],
     ['grp', 'Everything else'], ['text', 'Page text', 'text'], ['media', 'Pictures & videos', 'media'],
     ['grp', 'Site'], ['publish', 'Publish', ''], ['settings', 'Settings', 'site']
@@ -384,7 +384,7 @@
     const n = $('nav'); n.innerHTML = '';
     for (const [k, label, files] of NAV) {
       if (k === 'grp') { n.append(el('div', { class: 'grp mono', text: label })); continue; }
-      n.append(el('button', { type: 'button', class: route === k ? 'on' : '', 'data-files': files, onclick: () => go(k) }, label, el('i')));
+      n.append(el('button', { type: 'button', class: route === k ? 'on' : '', 'data-files': files, onclick: () => go(k) }, label, k === 'inbox' && INBOX_NEW ? el('span', { class: 'ncount', text: String(INBOX_NEW) }) : null, el('i')));
     }
     paintDirty();
   }
@@ -392,7 +392,7 @@
   const head = (crumb, title) => { $('crumb').textContent = crumb; $('title').textContent = title; };
   function render() {
     const v = $('view-root'); v.innerHTML = '';
-    ({ dashboard: vDash, publish: vPublish, cases: vCases, designs: vDesigns, about: vAbout, engineering: vEng, projects: vProjects, text: vText, media: vMedia, settings: vSettings }[route] || vDash)(v);
+    ({ dashboard: vDash, publish: vPublish, cases: vCases, designs: vDesigns, about: vAbout, engineering: vEng, projects: vProjects, text: vText, media: vMedia, settings: vSettings, inbox: vInbox }[route] || vDash)(v);
   }
 
   function thumb(m) { const d = el('div', { class: 'th' }); if (!m) return d; if (typeof m === 'object' && m.color) { d.style.background = m.color; d.style.color = m.ink || '#fff'; d.textContent = m.word || ''; return d; } if (typeof m === 'object') m = m.poster || m.video || ''; if (isVid(m)) d.append(el('video', { src: src(m), muted: true, autoplay: true, loop: true, playsinline: true })); else d.style.backgroundImage = `url("${src(m)}")`; return d; }
@@ -637,6 +637,57 @@
     paint(); v.append(el('div', { class: 'bar' }, tabs), g);
   }
 
+  // ---------------------------------------------------------------- inbox: messages from the site (About's Call in, Shop, feedback)
+  const ITYPES = [['all', 'All'], ['new', 'Unread'], ['Hiring', 'Hiring'], ['Message', 'Messages'], ['Shop', 'Shop'], ['Notify', 'Notify me'], ['Feedback', 'Feedback'], ['done', 'Done'], ['archived', 'Archived']];
+  let IBOX = null;
+  async function inboxPoll() { try { const r = await api('/api/inbox'); if (r.items) { IBOX = r.items; const n = r.items.filter(m => m.status === 'new').length; if (n !== INBOX_NEW) { INBOX_NEW = n; nav(); } } } catch (_) {} }
+  setInterval(() => { if (document.visibilityState === 'visible') inboxPoll(); }, 90000);
+  const when = iso => { const d = new Date(iso), s = (Date.now() - d) / 1000; return s < 60 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 ? Math.round(s / 3600) + ' h ago' : s < 86400 * 7 ? Math.round(s / 86400) + ' d ago' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' }); };
+  async function vInbox(v) {
+    head('Overview', 'Inbox');
+    const body = el('div', {}, el('div', { class: 'mono', text: 'Checking for messages…' })); v.append(body);
+    let r; try { r = await api('/api/inbox'); } catch (e) { body.innerHTML = ''; body.append(el('div', { class: 'err', text: e.message })); return; }
+    body.innerHTML = '';
+    if (!r.configured) { body.append(el('div', { class: 'empty' }, el('h2', { text: 'Set up your inbox' }),
+      el('div', { text: (r.hasUrl ? 'Add the inbox key' : 'Add the inbox address') + ' in Settings → Inbox. The one-time Cloudflare setup is in cms/inbox/README.md (about ten minutes, free).' }),
+      el('button', { class: 'btn small', type: 'button', style: 'margin-top:14px', text: 'Open Settings', onclick: () => go('settings') }))); return; }
+    if (r.error) { body.append(el('div', { class: 'err', text: r.error })); return; }
+    IBOX = r.items || []; INBOX_NEW = IBOX.filter(m => m.status === 'new').length; nav();
+    let f = vInbox.f || 'all', q = '', openKey = vInbox.open || null;
+    const chips = el('div', { class: 'tabs' }), search = el('input', { class: 'search', placeholder: 'Search messages…', oninput: e => { q = e.target.value.toLowerCase(); paint(); } });
+    const list = el('div', { class: 'ibl' }), pane = el('div', { class: 'ibp' });
+    body.append(el('div', { class: 'ibbar' }, chips, search), el('div', { class: 'ib' }, list, pane));
+    const set = async (m, status) => { const was = m.status; m.status = status; paint(); try { const x = await api('/api/inbox/update', { method: 'POST', body: JSON.stringify({ key: m.key, status }) }); if (x.error) throw new Error(x.error); } catch (e) { m.status = was; paint(); toast('Couldn’t update: ' + e.message); } INBOX_NEW = IBOX.filter(x => x.status === 'new').length; nav(); };
+    const shows = m => (f === 'all' ? m.status !== 'archived' : f === 'new' ? m.status === 'new' : f === 'done' || f === 'archived' ? m.status === f : m.type === f && m.status !== 'archived')
+      && (!q || [m.name, m.email, m.subject, m.message, ...Object.values(m.fields || {})].join(' ').toLowerCase().includes(q));
+    function paint() {
+      chips.innerHTML = ''; ITYPES.forEach(([k, n]) => { const c = k === 'all' ? IBOX.filter(m => m.status !== 'archived').length : k === 'new' ? IBOX.filter(m => m.status === 'new').length : k === 'done' || k === 'archived' ? IBOX.filter(m => m.status === k).length : IBOX.filter(m => m.type === k && m.status !== 'archived').length;
+        if (!c && !['all', 'new'].includes(k) && f !== k) return; chips.append(el('button', { type: 'button', class: f === k ? 'on' : '', onclick: () => { f = vInbox.f = k; paint(); } }, n, el('sup', { text: String(c) }))); });
+      const L = IBOX.filter(shows); list.innerHTML = '';
+      if (!L.length) list.append(el('div', { class: 'empty' }, el('h2', { text: IBOX.length ? 'Nothing here' : 'No messages yet' }), el('div', { text: IBOX.length ? 'Try another filter.' : 'When someone writes in from the site, it shows up here.' })));
+      L.forEach(m => list.append(el('button', { type: 'button', class: 'ibi' + (m.status === 'new' ? ' new' : '') + (m.key === openKey ? ' on' : ''), onclick: () => { openKey = vInbox.open = m.key; if (m.status === 'new') set(m, 'read'); paint(); } },
+        el('div', { class: 'ibh' }, el('b', { text: m.name || m.email || 'Someone' }), el('span', { class: 'mono', text: when(m.at) })),
+        el('div', { class: 'ibs' }, el('span', { class: 'ibt t-' + String(m.type).toLowerCase(), text: m.type }), m.subject || ''),
+        el('div', { class: 'ibx', text: (m.message || Object.entries(m.fields || {}).map(([a, b]) => a + ': ' + b).join(' · ')).slice(0, 140) }))));
+      const m = IBOX.find(x => x.key === openKey); pane.innerHTML = '';
+      if (!m) { pane.append(el('div', { class: 'empty' }, el('div', { text: L.length ? 'Pick a message to read it.' : '' }))); return; }
+      const reply = m.email ? `mailto:${m.email}?subject=${encodeURIComponent('Re: ' + (m.subject || 'your message'))}&body=${encodeURIComponent('\n\n—\nOn ' + new Date(m.at).toLocaleString() + ', ' + (m.name || m.email) + ' wrote:\n' + (m.message || '').split('\n').map(l => '> ' + l).join('\n'))}` : null;
+      pane.append(
+        el('div', { class: 'ibph' }, el('span', { class: 'ibt t-' + String(m.type).toLowerCase(), text: m.type }), el('span', { class: 'mono', text: new Date(m.at).toLocaleString() + (m.page ? ' · from ' + m.page : '') + (m.country ? ' · ' + m.country : '') })),
+        el('h2', { text: m.subject || (m.type + ' from ' + (m.name || m.email || 'someone')) }),
+        el('div', { class: 'ibwho' }, el('b', { text: m.name || '—' }), m.email ? el('a', { href: 'mailto:' + m.email, text: m.email }) : null),
+        m.message ? el('div', { class: 'ibmsg', text: m.message }) : null,
+        Object.keys(m.fields || {}).length ? el('dl', { class: 'ibf' }, ...Object.entries(m.fields).flatMap(([a, b]) => [el('dt', { class: 'mono', text: a }), el('dd', { text: b })])) : null,
+        el('div', { class: 'acts', style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:22px' },
+          reply ? el('a', { class: 'btn small', href: reply, text: 'Reply by email' }) : null,
+          el('button', { class: 'btn ghost small', type: 'button', text: m.status === 'done' ? 'Mark not done' : 'Mark done', onclick: () => set(m, m.status === 'done' ? 'read' : 'done') }),
+          el('button', { class: 'btn ghost small', type: 'button', text: m.status === 'new' ? 'Mark read' : 'Mark unread', onclick: () => set(m, m.status === 'new' ? 'read' : 'new') }),
+          el('button', { class: 'btn ghost small', type: 'button', text: m.status === 'archived' ? 'Unarchive' : 'Archive', onclick: () => set(m, m.status === 'archived' ? 'read' : 'archived') }),
+          el('button', { class: 'btn danger small', type: 'button', text: 'Delete', onclick: async () => { if (!confirm('Delete this message for good?')) return; try { const x = await api('/api/inbox/delete', { method: 'POST', body: JSON.stringify({ key: m.key }) }); if (x.error) throw new Error(x.error); IBOX = IBOX.filter(y => y !== m); openKey = null; paint(); INBOX_NEW = IBOX.filter(y => y.status === 'new').length; nav(); } catch (e) { toast('Couldn’t delete: ' + e.message); } } })));
+    }
+    paint();
+  }
+
   async function vSettings(v) {
     head('Site', 'Settings');
     C.site.analytics = C.site.analytics || { goatcounter: '' };
@@ -646,6 +697,12 @@
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };
     v.append(form([{ title: 'Feedback', help: 'After a few minutes on the site, visitors are asked how easy it was to get around (1 to 5), and what they liked or what got in their way. Answers come to your email. The very first one sends you an email from FormSubmit asking you to confirm the address: click Activate in it once, and every answer after that arrives.', fields: [
       { k: 'on', label: 'Ask visitors', type: 'bool' }, { k: 'to', label: 'Send answers to', ph: 'you@example.com' }, { k: 'after', label: 'Minutes on the site before asking', ph: '3' }] }], C.site.feedback, 'site'));
+    C.site.inbox = C.site.inbox || { url: '', email: true };
+    const ikey = el('input', { type: 'text', placeholder: HAS_IKEY ? 'Saved on this Mac · paste a new one to replace it' : 'Paste the KEY you gave the Worker' });
+    v.append(form([{ title: 'Inbox', help: 'Messages from the site (the Call in form on About, Shop requests and “Notify me”, feedback answers) come into Inbox. They are kept by a small free Cloudflare Worker until you read them here: set it up once with the steps in cms/inbox/README.md, then paste its address. Publish after saving so the site starts sending.', fields: [
+      { k: 'url', label: 'Inbox address', ph: 'https://kingsley-inbox.you.workers.dev' }, { k: 'email', label: 'Also email me feedback answers', type: 'bool' }] }], C.site.inbox, 'site'),
+      el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Inbox key' }), el('p', { class: 'help', text: 'The same KEY you saved as a secret on the Worker. It stays on this Mac and is never put on the site.' }),
+        el('div', { class: 'f' }, ikey), el('button', { class: 'btn small', type: 'button', style: 'justify-self:start', text: 'Save key', onclick: async () => { if (!ikey.value.trim()) return; await api('/api/secrets', { method: 'PUT', body: JSON.stringify({ inbox_key: ikey.value.trim() }) }); HAS_IKEY = true; ikey.value = ''; ikey.placeholder = 'Saved on this Mac'; toast('Key saved'); inboxPoll(); } })));
     v.append(form([{ title: 'Analytics', help: 'Free and private: GoatCounter counts visits without cookies. Make an account at goatcounter.com, then put your site code here.', fields: [{ k: 'goatcounter', label: 'GoatCounter code', ph: 'kingsley', help: 'The first part of your GoatCounter address: kingsley.goatcounter.com → kingsley' }] }], C.site.analytics, 'site'),
       el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Analytics API token' }), el('p', { class: 'help', text: 'So this CMS can show your numbers. In GoatCounter: Settings → API → New token, tick “Read statistics”. It stays on this Mac (it is never published).' }),
         el('div', { class: 'f' }, tok), el('button', { class: 'btn small', type: 'button', style: 'justify-self:start', text: 'Save token', onclick: async () => { if (!tok.value.trim()) return; await api('/api/secrets', { method: 'PUT', body: JSON.stringify({ goatcounter_token: tok.value.trim() }) }); HAS_TOKEN = true; tok.value = ''; tok.placeholder = 'Saved on this Mac'; toast('Token saved'); } })));
@@ -771,7 +828,7 @@
   (async function start() {
     try {
       const r = await api('/api/content');
-      C = r.content; INDEX = r.index; HAS_TOKEN = r.hasToken;
+      C = r.content; INDEX = r.index; HAS_TOKEN = r.hasToken; HAS_IKEY = !!r.hasInboxKey; inboxPoll();
       C.cases = C.cases.cases ? C.cases : { cases: [] }; C.designs = C.designs.projects ? C.designs : { projects: [] };
       C.about.chapters = C.about.chapters || []; C.engineering.tools = C.engineering.tools || [];
       C.text = C.text || {}; C.media = C.media || {}; C.site = C.site || {};

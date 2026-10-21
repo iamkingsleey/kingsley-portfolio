@@ -1,0 +1,11 @@
+# Kingsley FM · Inbox (see README.md). Fill in the KV namespace id after step 3.
+name = "kingsley-inbox"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+ORIGINS = "https://iamkingsleey.com,https://www.iamkingsleey.com,https://iamkingsleey.github.io"
+
+[[kv_namespaces]]
+binding = "INBOX"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"

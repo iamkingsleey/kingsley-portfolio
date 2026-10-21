@@ -110,8 +110,16 @@ _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 
 open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
 _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
 _fb = _site.get('feedback') or {}
-SITEJS = '<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
-  'feedback': {'on': _fb.get('on', True) is not False, 'to': _fb.get('to') or 'iamkingsleey@gmail.com', 'after': _fb.get('after') or 3}}) + ';</script>\n'   # settings the pages read (CMS → Settings)
+_ib = _site.get('inbox') or {}
+SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
+  'feedback': {'on': _fb.get('on', True) is not False, 'to': _fb.get('to') or 'iamkingsleey@gmail.com', 'after': _fb.get('after') or 3},
+  'inbox': {'url': (_ib.get('url') or '').strip().rstrip('/'), 'email': _ib.get('email', True) is not False}}) + ';'
+  # kmSend: every form on the site sends through this. With an inbox set up (CMS → Settings → Inbox) the message goes there;
+  # it resolves true once it is stored, false when there is no inbox or it could not be reached (the form then falls back to email)
+  + 'window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);'
+  + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);'
+  + 'return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};'
+  + '</script>\n')   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
 FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
   'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'

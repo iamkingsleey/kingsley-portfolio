@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 
 <meta charset="utf-8">
 <script>
@@ -245,6 +245,9 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .sheet.ready .info > *:nth-child(2) { transition-delay: 40ms } .sheet.ready .info > *:nth-child(3) { transition-delay: 80ms } .sheet.ready .info > *:nth-child(n+4) { transition-delay: 120ms }
 .info > * { transition: opacity .36s var(--ease), translate .52s var(--ease) }
 @media (prefers-reduced-motion: reduce) { .info > *, .pc .im img, .sheet { transition: none !important } }
+.ntf { display: flex; gap: 8px } .ntf input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line, #e6e6e8); background: transparent; color: inherit; font: inherit }
+.ntf input:focus { outline: none; border-color: currentColor } .ntf input[aria-invalid] { border-color: #ff4a1c } .ntf .btn { flex: none }
+.ntf-ok { margin: 0; padding: 12px 0 } .ntf-ok b { font-weight: 500 }
 </style>
 </head>
 <body>
@@ -260,7 +263,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
   <section class="req" id="request" aria-labelledby="reqH">
     <div class="rq-shell">
       <div class="rq-top"><span class="mono">Asset request · <span id="rqN">Step 1 of 3</span></span><h2 id="reqH">Can't find it? Ask for it.</h2><div class="rq-prog" aria-hidden="true"><i class="on"></i><i></i><i></i></div></div>
-      <form class="rq" id="rq" novalidate>
+      <form class="rq" id="rq" novalidate><input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <div class="st on"><h3>What do you need?</h3><div class="tiles" id="rqType" role="group" aria-label="What you need"><button type="button" data-v="3D objects" aria-pressed="true"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3 24 8.5v11L14 25 4 19.5v-11z"/><path d="M4 8.5 14 14l10-5.5M14 14v11"/></svg><span><b>3D objects</b><small>In your brand colours</small></span></button><button type="button" data-v="Icon set" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="2.5"/><rect x="16" y="4" width="8" height="8" rx="2.5"/><rect x="4" y="16" width="8" height="8" rx="2.5"/><rect x="16" y="16" width="8" height="8" rx="2.5"/></svg><span><b>Icon set</b><small>For an app or a site</small></span></button><button type="button" data-v="Illustrations" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 20 14 25l10-5M4 14l10 5 10-5M14 3 4 8l10 5 10-5z"/></svg><span><b>Illustrations</b><small>Scenes or a series</small></span></button><button type="button" data-v="Website template" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="5" width="22" height="18" rx="3"/><path d="M3 10h22M8 15h7M8 19h12"/></svg><span><b>Template</b><small>A website you can edit</small></span></button><button type="button" data-v="Something else" aria-pressed="false"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10"/><path d="M11 11.5a3 3 0 1 1 4.2 2.7c-.8.4-1.2 1-1.2 1.8M14 19.5v.1"/></svg><span><b>Something else</b><small>Tell me, I'll say if I can</small></span></button></div>
           <label class="fld" id="rqOther" hidden><span>What is it?</span><input id="rqOtherIn" name="other" placeholder="A mascot, a pattern, a 3D logo…" autocomplete="off"></label></div>
         <div class="st"><h3>Tell me about it</h3><label class="fld"><span>Describe it</span><textarea id="rqWhat" name="what" rows="4" placeholder="What it's for, how many pieces, colours, style"></textarea></label>
@@ -393,6 +396,13 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
     const p = shown[cur], price = lic === 'commercial' ? (p.priceCommercial || p.price) : p.price;
     if (!p.price && p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Get it free on Figma ↗</a>`;
     else if (p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Buy for ${money(price)} ↗</a><p class="alt">Checkout on Gumroad. The files arrive by email straight away.</p>`;
+    else if ((window.KM_SITE && KM_SITE.inbox || {}).url) { $('buy').innerHTML = `<form class="ntf" novalidate><input type="email" required autocomplete="email" placeholder="Your email" aria-label="Your email"><button class="btn pri" type="submit">Notify me</button></form><p class="alt">Coming soon at ${money(price)}. I'll email you once, the day it's out.</p>`;
+      const nf = $('buy').querySelector('.ntf'); nf.addEventListener('submit', async e => { e.preventDefault(); const ip = nf.querySelector('input'), v = ip.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { ip.focus(); ip.setAttribute('aria-invalid', 'true'); return; } ip.removeAttribute('aria-invalid'); snd('pop');
+        const bt = nf.querySelector('button'); bt.disabled = true; bt.textContent = 'Sending…';
+        const ok = await kmSend({ type: 'Notify', email: v, subject: 'Notify me: ' + p.name, message: 'Tell me when ' + p.name + ' is out.', fields: { Product: p.name, Price: money(price) } });
+        if (ok) { nf.outerHTML = `<p class="ntf-ok"><b>You're on the list.</b> I'll email you when ${p.name} is out.</p>`; snd('detent'); }
+        else location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('Notify me: ' + p.name)}`; }); }
     else $('buy').innerHTML = `<a class="btn pri wide" href="mailto:${EMAIL}?subject=${encodeURIComponent('Notify me: ' + p.name)}">Notify me when it's out</a><p class="alt">Coming soon at ${money(price)}. Or email <button type="button" class="copy" data-copy="${EMAIL}">${EMAIL}</button></p>`;
   }
   $('thumbs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; snd('pop'); showPic([...$('thumbs').children].indexOf(b)); });
@@ -512,7 +522,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
   ['rqOtherIn', 'rqWhat', 'rqName', 'rqEmail'].forEach(id => $(id).addEventListener('input', () => { bad($(id), false); $('rqMsg').textContent = ''; }));
   $('rqBack').addEventListener('click', () => { snd('pop'); go(st - 1); });
   let reqText = '';
-  $('rq').addEventListener('submit', e => {
+  $('rq').addEventListener('submit', async e => {
     e.preventDefault();
     if (st === 0) { if (typeOf() === 'Something else' && bad($('rqOtherIn'), !$('rqOtherIn').value.trim())) { $('rqMsg').textContent = 'Say what you need'; return $('rqOtherIn').focus(); } snd('pop'); return go(1); }
     if (st === 1) { if (bad($('rqWhat'), $('rqWhat').value.trim().length < 8)) { $('rqMsg').textContent = 'Say a little about it'; return $('rqWhat').focus(); } snd('pop'); return go(2); }
@@ -522,7 +532,12 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
     const type = typeOf() === 'Something else' ? $('rqOtherIn').value.trim() : typeOf();
     reqText = `Asset request\n\nName: ${name}\nEmail: ${mail}\nType: ${type}\nBudget: ${budget$()}\nNeeded by: ${when ? longD(when) : 'No rush'}\n\n${$('rqWhat').value.trim()}`;
     snd('pop');
-    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('Asset request: ' + type + ' from ' + name)}&body=${encodeURIComponent(reqText)}`;
+    // to the inbox (CMS → Inbox); without one, or if it can't be reached, an email with the request already written
+    const sb = $('rq').querySelector('button[type=submit]'); if (sb) { sb.disabled = true; sb.dataset.t = sb.dataset.t || sb.textContent; sb.textContent = 'Sending…'; }
+    const ok = window.kmSend ? await kmSend({ type: 'Shop', name, email: mail, subject: 'Asset request: ' + type, message: $('rqWhat').value.trim(),
+      fields: { Type: type, Budget: budget$(), 'Needed by': when ? longD(when) : 'No rush' }, website: ($('rq').website || {}).value || '' }) : false;
+    if (sb) { sb.disabled = false; sb.textContent = sb.dataset.t; }
+    if (!ok) location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('Asset request: ' + type + ' from ' + name)}&body=${encodeURIComponent(reqText)}`;
     $('rq').hidden = true; document.querySelector('.rq-top').hidden = true; $('rqDone').hidden = false;
   });
   $('rqCopy').addEventListener('click', () => { const done = () => { snd('pop'); $('rqCopy').textContent = 'Copied ✓'; setTimeout(() => { $('rqCopy').textContent = 'Copy request'; }, 1800); };
@@ -541,6 +556,6 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 <script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=391e47e6" defer></script>
 <script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=2e3b8a1c" defer></script>
+<script src="feedback.js?v=a6e41f5e" defer></script>
 </body>
 </html>

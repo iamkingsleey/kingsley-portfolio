@@ -147,6 +147,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call label { display: grid; gap: 6px }
 .call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
 .call input:focus, .call textarea:focus { border-color: var(--ink) }
+.call .cerr { margin: 0; color: #ff4a1c }
 .call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
 .call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
 .call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
@@ -247,8 +248,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       <label><span class="mono">Your name</span><input name="n" autocomplete="name" placeholder="Name"></label>
       <label><span class="mono">Email</span><input name="e" type="email" autocomplete="email" placeholder="you@company.com"></label>
       <label><span class="mono">Message</span><textarea name="m" rows="3" placeholder="What are you working on?"></textarea></label>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       <div class="row"><div class="links"><a href="mailto:iamkingsleey@gmail.com">Email</a><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/iamkingsleey" target="_blank" rel="noopener">X</a><a href="https://www.behance.net/iamkingsleey" target="_blank" rel="noopener">Behance</a><a href="https://github.com/iamkingsleey" target="_blank" rel="noopener">GitHub</a></div><button class="send" type="submit">Go on air</button></div>
-      <div class="done"><div><span class="mono"><span class="lamp"></span>You're on air</span><b>Thanks, I'll be in touch.</b><p class="mono" style="margin-top:14px">Preview only: nothing was sent</p></div></div>
+      <div class="done"><div><span class="mono"><span class="lamp"></span>You're on air</span><b>Thanks, I'll be in touch.</b></div></div>
     </form>
   </section>
   <a class="bigmail" href="mailto:iamkingsleey@gmail.com" data-copy><span class="mono">Write to me</span><b><span>iamkingsleey@</span><span>gmail.com</span></b><i class="mono">Click to copy</i></a>
@@ -429,7 +431,19 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     if (!navigator.clipboard || !navigator.clipboard.writeText) return;
     e.preventDefault(); navigator.clipboard.writeText(addr).then(() => { snd('pop'); a.classList.add('copied'); const i = a.querySelector('i'); if (i) i.textContent = 'Copied'; setTimeout(() => { a.classList.remove('copied'); if (i) i.textContent = 'Click to copy'; }, 1800); }, () => { location.href = 'mailto:' + addr; });
   }));
-  $('call').addEventListener('submit', () => { $('call').classList.add('sent'); setTimeout(() => { $('call').classList.remove('sent'); $('call').reset(); }, 4200); });
+  // Call in: sends to the inbox (CMS → Inbox). A recruiter who picked a role under "Hiring for" arrives marked Hiring.
+  // Without an inbox, or if it can't be reached, it opens an email with the message already written.
+  $('call').addEventListener('submit', async () => {
+    const f = $('call'), n = f.n.value.trim(), em = f.e.value.trim(), m = f.m.value.trim(), btn = f.querySelector('button[type=submit], button:not([type])');
+    const say = t => { let x = f.querySelector('.cerr'); if (!x) { x = document.createElement('p'); x.className = 'cerr mono'; const row = f.querySelector('.row'); row ? row.before(x) : f.append(x); } x.textContent = t; x.hidden = !t; };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { say('Add an email I can reply to'); f.e.focus(); return; }
+    if (m.length < 3) { say('Write a short message'); f.m.focus(); return; }
+    say(''); let role = ''; try { role = localStorage.getItem('km-role') || ''; } catch (_) {}
+    if (btn) { btn.disabled = true; btn.dataset.t = btn.dataset.t || btn.textContent; btn.textContent = 'Sending…'; }
+    const ok = await (window.kmSend ? kmSend({ type: role ? 'Hiring' : 'Message', name: n, email: em, subject: role ? 'Hiring for ' + role : 'Call in from About', message: m, fields: role ? { 'Hiring for': role } : {}, website: (f.website || {}).value || '' }) : Promise.resolve(false));
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.t; }
+    if (!ok) { location.href = `mailto:iamkingsleey@gmail.com?subject=${encodeURIComponent('Hello from ' + (n || 'your site'))}&body=${encodeURIComponent(m + '\n\n' + n + (em ? ' · ' + em : ''))}`; return; }
+    f.classList.add('sent'); setTimeout(() => { f.classList.remove('sent'); f.reset(); }, 4200); });
 
   // ---------- arrivals, theme, a pop on every click ----------
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in'); }), { rootMargin: '0px 0px -10% 0px' });

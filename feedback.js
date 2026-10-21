@@ -160,8 +160,12 @@
       Score: `${val} / 5 (${WORD[val]})`, 'Liked most': liked.join(', ') || '—', 'Got in the way': stuck.join(', ') || '—', Note: note || '—',
       Page: page, 'Time on site': Math.round(spent / 60000) + ' min', Screen: `${innerWidth}×${innerHeight}${mobile() ? ' · phone' : ''}`, Theme: isDark() ? 'dark' : 'light' };
     try {
-      const r = await fetch('https://formsubmit.co/ajax/' + encodeURI(TO), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
-      if (!r.ok) throw new Error(r.status);
+      // to the inbox when there is one (CMS → Inbox), and to your email unless that's switched off; sent if either arrives
+      const IB = (window.KM_SITE && KM_SITE.inbox) || {};
+      const toInbox = window.kmSend ? kmSend({ type: 'Feedback', subject: `Site feedback: ${val}/5 · ${WORD[val]}`, message: note || '', fields: { Score: body.Score, 'Liked most': body['Liked most'], 'Got in the way': body['Got in the way'], 'Time on site': body['Time on site'], Screen: body.Screen, Theme: body.Theme } }) : Promise.resolve(false);
+      const toMail = IB.url && IB.email === false ? Promise.resolve(false) : fetch('https://formsubmit.co/ajax/' + encodeURI(TO), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) }).then(r => r.ok).catch(() => false);
+      const [a1, a2] = await Promise.all([toInbox, toMail]);
+      if (!a1 && !a2) throw new Error('not sent');
       state.sent = Date.now(); delete state.snooze; put(K, JSON.stringify(state)); track('/feedback/sent/' + val);
       done();
     } catch (_) {

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 
 <meta charset="utf-8">
 <script>
@@ -157,6 +157,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call label { display: grid; gap: 6px }
 .call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
 .call input:focus, .call textarea:focus { border-color: var(--ink) }
+.call .cerr { margin: 0; color: #ff4a1c }
 .call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
 .call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
 .call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
@@ -416,12 +417,12 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610211535#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610211602#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=e73dc949" defer></script>
 <script src="kit.js?v=391e47e6" defer></script>
 <script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=2e3b8a1c" defer></script>
+<script src="feedback.js?v=a6e41f5e" defer></script>
 </body>
 </html>

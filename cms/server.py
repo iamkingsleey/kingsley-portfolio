@@ -53,6 +53,24 @@ def media_library():
                     out.append({'path': p, 'size': os.path.getsize(os.path.join(root, n)), 'mtime': os.path.getmtime(os.path.join(root, n))})
     return sorted(out, key=lambda x: -x['mtime'])
 
+# ---------------------------------------------------------------- inbox (the Cloudflare Worker in cms/inbox)
+def inbox_call(path, body=None):
+    site = read_json(os.path.join(CONTENT, 'site.json'), {})
+    url = ((site.get('inbox') or {}).get('url') or '').strip().rstrip('/')
+    key = read_json(SECRETS, {}).get('inbox_key', '')
+    if not url or not key: return {'configured': False, 'hasUrl': bool(url), 'hasKey': bool(key)}
+    req = urllib.request.Request(url + path, data=json.dumps(body).encode() if body is not None else None, method='POST' if body is not None else 'GET',
+                                 headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'User-Agent': 'KingsleyCMS'})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r: out = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        try: msg = json.loads(e.read().decode()).get('error')
+        except Exception: msg = None
+        return {'configured': True, 'error': msg or f'The inbox answered {e.code}.'}
+    except Exception as e:
+        return {'configured': True, 'error': 'Could not reach the inbox. Check the address and your connection.'}
+    out['configured'] = True; return out
+
 # ---------------------------------------------------------------- analytics (GoatCounter)
 def gc_get(code, token, path, params):
     url = f'https://{code}.goatcounter.com/api/v0/{path}?' + urllib.parse.urlencode(params)
@@ -232,9 +250,10 @@ class H(SimpleHTTPRequestHandler):
             if not self._local(): return self._json({'error': 'local only'}, 403)
             if u.path == '/api/content':
                 data = {n: read_json(os.path.join(CONTENT, n + '.json'), {}) for n in EDITABLE}
-                return self._json({'content': data, 'index': read_json(INDEX, {}), 'hasToken': bool(read_json(SECRETS, {}).get('goatcounter_token'))})
+                return self._json({'content': data, 'index': read_json(INDEX, {}), 'hasToken': bool(read_json(SECRETS, {}).get('goatcounter_token')), 'hasInboxKey': bool(read_json(SECRETS, {}).get('inbox_key'))})
             if u.path == '/api/media': return self._json({'files': media_library()})
             if u.path == '/api/analytics': return self._json(analytics(max(1, min(366, int((q.get('days') or ['30'])[0])))))
+            if u.path == '/api/inbox': return self._json(inbox_call('/list'))
             if u.path == '/api/status': return self._json(git_status())
             if u.path == '/api/changes': return self._json(changes())
             return self._json({'error': 'not found'}, 404)
@@ -253,13 +272,15 @@ class H(SimpleHTTPRequestHandler):
             write_json(path, data)
             return self._json({'ok': True})
         if u.path == '/api/secrets':
-            data = json.loads(self._body().decode('utf-8') or '{}'); cur = read_json(SECRETS, {}); cur.update({k: v for k, v in data.items() if k == 'goatcounter_token'})
+            data = json.loads(self._body().decode('utf-8') or '{}'); cur = read_json(SECRETS, {}); cur.update({k: v for k, v in data.items() if k in ('goatcounter_token', 'inbox_key')})
             write_json(SECRETS, cur); return self._json({'ok': True})
         return self._json({'error': 'not found'}, 404)
 
     def do_POST(self):
         if not self._local(): return self._json({'error': 'local only'}, 403)
         u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
+        if u.path in ('/api/inbox/update', '/api/inbox/delete'):
+            return self._json(inbox_call(u.path[len('/api/inbox'):], json.loads(self._body().decode() or '{}')))
         if u.path == '/api/build': return self._json(build())
         if u.path == '/api/publish': return self._json(publish(json.loads(self._body().decode() or '{}').get('message')))
         if u.path == '/api/upload':
