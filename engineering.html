@@ -134,38 +134,39 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .say .q p { margin: 14px 0 0; color: var(--ink); font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; max-width: 18ch }
 .say .q small { display: block; margin-top: 18px; font-size: 15px; line-height: 1.55; max-width: 46ch; color: var(--text) }
 
-/* ---------- 6 · on air + call in ---------- */
-.air { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px }
-.onair { background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 22px; min-height: 420px }
-.onair .lt { display: flex; align-items: center; gap: 10px }
-.onair .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--faint) }
-.onair .lamp { position: relative }
-.onair.live .lamp { background: #2fb35b }   /* the same green on-air light as Home's "Open to new work", rippling outwards */
-.onair.live .lamp::before, .onair.live .lamp::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgb(47 179 91 / .7); animation: lampring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
-.onair.live .lamp::after { animation-delay: 1.2s }
-@keyframes lampring { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.4); opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { .onair.live .lamp::before, .onair.live .lamp::after { animation: none; opacity: 0 } }
-.onair .clock { color: var(--ink); font: 500 clamp(56px, 6vw, 88px)/1 var(--body); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
-.onair .clock small { font-size: .32em; color: var(--muted); margin-left: 8px; letter-spacing: 0 }
-.onair dl { margin: auto 0 0; display: grid; gap: 14px }
-.onair dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
-.onair dd { margin: 4px 0 0; color: var(--ink); font-size: 15px }
-.sw { position: relative; width: 44px; height: 24px; border-radius: 99px; background: var(--line); transition: background .3s }
-.sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: translate .5s var(--pop) }
-.sw[aria-pressed="true"] { background: var(--ink) } .sw[aria-pressed="true"]::after { translate: 20px 0 }
-.call { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden }
-.call h3 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
-.call label { display: grid; gap: 6px }
-.call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
-.call input:focus, .call textarea:focus { border-color: var(--ink) }
-.call .cerr { margin: 0; color: #ff4a1c }
-.call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
-.call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
-.call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
-.call .done { position: absolute; inset: 0; background: var(--bg); display: grid; place-items: center; text-align: center; opacity: 0; pointer-events: none; transition: opacity .5s var(--ease) }
-.call.sent .done { opacity: 1; pointer-events: auto }
-.call .done b { display: block; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em; margin-top: 12px }
-.call .done .lamp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); vertical-align: middle; margin-right: 8px }
+/* ---------- 6 · say hello: a compose (sharp box and Send, pill chips) ---------- */
+.avl { display: inline-flex; align-items: center }
+.avl .lamp { position: relative; width: 7px; height: 7px; border-radius: 99px; background: #2fb35b; margin-right: 9px }
+.avl .lamp::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1px solid #2fb35b; animation: lampring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
+.avl.off .lamp { background: var(--faint) } .avl.off .lamp::after { display: none }
+@keyframes lampring { 0% { transform: scale(1); opacity: .8 } 100% { transform: scale(3); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .avl .lamp::after { animation: none; opacity: 0 } }
+.cmp { max-width: 760px; display: grid; gap: 18px }
+.cmp .mail { position: relative; background: var(--panel); overflow: hidden }
+.cmp .ln { display: grid; grid-template-columns: 72px 1fr; align-items: center; gap: 12px; padding: 0 22px; border-bottom: 1px solid var(--line); min-height: 56px }
+.cmp .k { color: var(--muted); font-size: 14px }
+.cmp .in { width: 100%; background: transparent; border: 0; outline: none; padding: 16px 0; color: var(--ink); font-size: 15px; border-radius: 0 } .cmp .in::placeholder { color: var(--muted); opacity: .7 }
+.cmp .to { color: var(--ink); font-size: 15px; display: flex; align-items: center; gap: 8px; min-width: 0 }
+.cmp .to b { font-weight: 500; background: var(--pill); padding: 4px 10px; border-radius: 99px; font-size: 13.5px }
+.cmp .addr { color: var(--muted); font-size: 13.5px }
+.cmp .head { width: 100%; text-align: left; grid-template-columns: 72px 1fr auto; cursor: pointer; border-bottom-color: transparent; transition: border-color .3s }
+.cmp .mail.open .head { border-bottom-color: var(--line) }
+.cmp .cta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13.5px; transition: color .2s } .cmp .head:hover .cta { color: var(--ink) }
+.cmp .cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s var(--ease) }
+.cmp .mail.open .cta svg { transform: rotate(180deg) } .cmp .ct { transition: opacity .2s } .cmp .mail.open .ct { opacity: 0 }
+.cmp .body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s var(--ease) } .cmp .body > div { overflow: hidden; min-height: 0 }
+.cmp .mail.open .body { grid-template-rows: 1fr }
+.cmp .body > div > * { opacity: 0; translate: 0 -6px; transition: opacity .3s, translate .4s var(--ease) } .cmp .mail.open .body > div > * { opacity: 1; translate: 0 0; transition-delay: .12s }
+.cmp .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 0 }
+.cmp .chips button { height: 30px; padding: 0 12px; border-radius: 99px; font-size: 13px; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s, box-shadow .2s }
+.cmp .chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none }
+.cmp textarea.in { padding: 20px 22px; font-size: 16px; line-height: 1.5; min-height: 180px; display: block; resize: none }
+.cmp .foot2 { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 14px 14px 22px; border-top: 1px solid var(--line) }
+.cmp .links { display: flex; gap: 16px } .cmp .links a { color: var(--muted); font-size: 13px; text-decoration: none } .cmp .links a:hover { color: var(--ink) }
+.cmp .send { height: 44px; padding: 0 22px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500; border-radius: 0; transition: opacity .2s } .cmp .send[disabled] { opacity: .35; cursor: default }
+.cmp .cerr { margin: 0; padding: 0 22px 12px; color: #ff4a1c }
+.cmp .done { padding: 56px 22px; text-align: center; display: grid; gap: 8px }
+.cmp .done b { color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em } .cmp .done span { color: var(--muted); font-size: 14px } .cmp .again { color: var(--muted); text-decoration: underline; font-size: 14px }
 /* the email, said plainly: in the Call in card, and as the page's sign-off */
 .cmail { color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -.02em; text-decoration: none; margin-top: -6px; width: fit-content; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px }
 .bigmail { display: grid; gap: 14px; padding: calc(var(--sp) + 20px) 0 0; text-decoration: none; color: var(--ink) }
@@ -184,9 +185,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   .stmt { grid-template-columns: 1fr } .hc { grid-template-columns: 1fr } .hcol { grid-column: 1 }
   .band { --pt: 80px; --pad: 64px }   /* the card drifts a little as you scroll (parallax): room for that too */ .bpin { grid-template-columns: 74px minmax(0, 1fr); gap: 16px; padding-top: var(--pt) }
   .skrow { gap: 8px } .skw { font-size: 17px } .sktools img { width: 28px; height: 28px; border-radius: 7px }
-  .how, .air { grid-template-columns: 1fr } .knob { width: 260px }
+  .how { grid-template-columns: 1fr }
+  .cmp .ln, .cmp .head { grid-template-columns: 58px 1fr; padding: 0 16px } .cmp .head { grid-template-columns: 58px 1fr auto } .cmp .addr { display: none } .cmp textarea.in { padding: 18px 16px } .cmp .foot2 { padding: 12px 12px 12px 16px } .knob { width: 260px }
   .shead { flex-direction: column; align-items: start }
-  .call .row { flex-direction: column; align-items: stretch; gap: 20px } .call .send { width: 100% }   /* Go on air on its own line */
 }
 /* phones: the skills dial stands up. The words stack, the scale runs down beside them, the needle points across at the one picked
    and its tools sit to the right of it */

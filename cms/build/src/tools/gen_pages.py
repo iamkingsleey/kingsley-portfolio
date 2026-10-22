@@ -16,15 +16,15 @@ def make(fq, nm, stmt, h2, sub, tag, CH, out, post=None):
     s = s[:i] + f'<section class="stmt" id="s-stmt"><span class="mono">{fq} · {nm}</span><p id="stmt">{stmt}</p></section>' + s[j:]
     i = s.index('<div class="shead" id="s-band">'); j = s.index('<section class="band"', i)
     s = s[:i] + f'<div class="shead" id="s-band"><div><h2>{h2}</h2><p>{sub}</p></div><span class="mono">{tag}</span></div>\n  ' + s[j:]
-    cut('  <!-- 4 · mixing desk -->', '  <div class="foot">')                 # What I do, How I work, On air, Call in
+    cut('  <!-- 4 · mixing desk -->', '  <div class="foot">')                 # What I do, How I work, Say hello
     rep('<span class="mono">Kingsley M. · 94.0 About</span>', f'<span class="mono">Kingsley M. · {fq} {nm}</span>')
     cut('  // ---------- 4 · what I do:', '  // ---------- arrivals')
     i = s.index('  const CH = ['); j = s.index('  ];', i) + 4
     rows = ',\n'.join('    ' + repr(list(c)) for c in CH)
     s = s[:i] + '  const CH = [\n' + rows + '\n  ];' + s[j:]
-    rep("const SECN = ['About', 'Band', 'Skills', 'On air'], secEls = ['s-band', 's-desk', 's-air'].map($);",
+    rep("const SECN = ['About', 'Band', 'Skills', 'Say hello'], secEls = ['s-band', 's-desk', 's-air'].map($);",
         f"const SECN = ['{nm}', '{h2 if len(h2) < 14 else tag}'], secEls = ['s-band'].map($);")
-    rep("['#bcard', 24], ['.bruler', 9], ['#skills', 16], ['.onair', 10], ['.call', 6], ['.foot', 4]]", "['#bcard', 24], ['.bruler', 9], ['.foot', 4]]")
+    rep("['#bcard', 24], ['.bruler', 9], ['#skills', 16], ['.cmp', 6], ['.foot', 4]]", "['#bcard', 24], ['.bruler', 9], ['.foot', 4]]")
     if post: s = post(s, rep)
     open(out, 'w', encoding='utf-8').write(s)
 
