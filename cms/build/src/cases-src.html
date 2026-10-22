@@ -569,6 +569,16 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .kx { isolation: isolate; user-select: none; -webkit-user-select: none } .kx img { -webkit-user-drag: none }
 .kx .kx-tag { position: absolute; z-index: 6; left: 12px; bottom: 12px; display: inline-flex; align-items: center; height: 28px; padding: 0 11px; border-radius: 99px; background: rgb(14 14 16 / .62); color: #fff; font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); pointer-events: none; transition: opacity .3s }
 .kx.used .kx-tag { opacity: 0 }
+.bad-dial { position: relative; height: 110px; cursor: ew-resize; touch-action: pan-y; outline: none; -webkit-tap-highlight-color: transparent; user-select: none }   /* swipe up and down over it still scrolls the page */ .bad-dial canvas { position: absolute; inset: 0; width: 100%; height: 100% }
+.bad-dial:focus-visible { outline: 2px solid var(--red); outline-offset: 6px }
+.bad-rows { display: grid; gap: 30px; margin-top: 44px }
+.bad-r { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr) 150px; gap: 24px; align-items: center }
+.bad-l { color: var(--ink); font-weight: 500; font-size: 17px } .bad-l small { display: block; color: var(--muted); font-weight: 400; font-size: 13px }
+.bad-tk { height: 2px; background: var(--line); position: relative } .bad-tk i { position: absolute; left: 0; top: -3px; height: 8px; border-radius: 99px; background: var(--ink) }
+.bad-n { font: 600 30px var(--body); letter-spacing: -.03em; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap } .bad-n small { font: 600 12px var(--mono); color: var(--muted); letter-spacing: .04em; margin-left: 6px; vertical-align: 6px }
+.bad-also { display: grid; gap: 6px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line) } .bad-also div { display: flex; gap: 14px; align-items: baseline } .bad-also b { font: 600 30px var(--body); letter-spacing: -.03em; color: var(--ink) } .bad-also span { color: var(--text) }
+.bad-note { margin: 26px 0 0 }
+@media (max-width: 700px) { .bad-dial { height: 92px } .bad-rows { gap: 26px; margin-top: 30px } .bad-r { grid-template-columns: 1fr auto; gap: 10px 16px } .bad-l { font-size: 16px } .bad-tk { grid-column: 1 / -1; grid-row: 2 } .bad-n { font-size: 26px } .bad-n small { display: block; margin: 2px 0 0; vertical-align: 0; text-align: right } .bad-also b { font-size: 24px } .bad-also div { flex-direction: column; gap: 2px } }
 .kb { position: relative; height: 640px; border-radius: 16px; background: radial-gradient(color-mix(in srgb, var(--ink) 14%, var(--panel)) 1.2px, transparent 1.3px) 0 0 / 22px 22px, var(--panel); overflow: hidden; touch-action: pan-y }
 .kb-tidy { position: absolute; z-index: 1; right: 16px; top: 16px; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 99px; background: var(--bg); color: var(--ink); font-size: 14px; font-weight: 500; transition: opacity .3s, background .2s } .kb-tidy[disabled] { opacity: 0; pointer-events: none }
 .kb-tidy svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
@@ -817,6 +827,39 @@ function applyFx(c) {
     if (cs.position === 'static' && cs.aspectRatio === 'auto') { const r = RATIO[src] || (el.naturalWidth ? el.naturalWidth / el.naturalHeight : 0) || (f.offsetWidth / Math.max(1, f.offsetHeight)); f.style.aspectRatio = String(r); }
     f.classList.add('kx'); el.classList.add('kx-base'); const off = KFX[k](f, el, o); if (off) kxOff.push(off); });
 }
+// before / after dial: drag the red needle from before to after and every result moves with it (before = 100).
+// A number like "72%" with "fewer"/"less"/"lower" in its words ends at 28; with "more"/"higher"/"up" at 140. Anything else (a share,
+// a count) isn't a change, so it is listed under the dial as it is.
+const BA = ([a, b]) => { const n = parseFloat(String(a).replace(/[^\d.]/g, '')), w = String(b || '').toLowerCase(); if (!isFinite(n) || !/%/.test(a)) return null;
+  if (/\b(fewer|less|lower|down|drop|decrease|reduction|cut)\b/.test(w)) return { a: 100 - n, d: '−' + n + '%' };
+  if (/\b(more|higher|up|increase|growth|rise|boost)\b/.test(w)) return { a: 100 + n, d: '+' + n + '%' }; return null; };
+const BADIAL = s => { const st = s.stats.map((x, k) => ({ x, k, ba: BA(x) })), ch = st.filter(z => z.ba), rest = st.filter(z => !z.ba); if (!ch.length) return '';
+  const lbl = t => { const m = String(t).match(/^(.*?)(\s+(?:in|for|after|within|over)\s.*)$/i); return m ? [m[1], m[2].trim()] : [t, '']; };
+  return `<div class="fr"><div class="bad" data-mx="${Math.max(150, ...ch.map(z => z.ba.a + 10))}"><div class="bad-dial" tabindex="0" role="slider" aria-label="Before to after" aria-valuemin="0" aria-valuemax="100"><canvas></canvas></div>
+    <div class="bad-rows">${ch.map(({ x, k, ba }) => { const [l, sub] = lbl(x[1]); return `<div class="bad-r" data-a="${ba.a}" data-d="${esc(ba.d)}"><span class="bad-l"${E(`sections.${s._i}.stats.${k}.1`)}>${esc(l.replace(/^(fewer|less|lower|more|higher)\s+/i, w => w))}${sub ? `<small>${esc(sub)}</small>` : ''}</span><div class="bad-tk"><i></i></div><span class="bad-n">100</span></div>`; }).join('')}</div>
+    ${rest.length ? `<div class="bad-also">${rest.map(({ x, k }) => `<div><b${E(`sections.${s._i}.stats.${k}.0`)}>${esc(x[0])}</b><span${E(`sections.${s._i}.stats.${k}.1`)}>${esc(x[1])}</span></div>`).join('')}</div>` : ''}
+    <p class="mono bad-note">Before = 100. Drag from before to after.</p></div></div>`; };
+function setupDials() {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), snd = n => { if (window.Popkit) Popkit.play(n); };
+  document.querySelectorAll('.bad').forEach(box => { const dial = box.querySelector('.bad-dial'), cv = dial.querySelector('canvas'), R = [...box.querySelectorAll('.bad-r')], MX = +box.dataset.mx || 150;
+    let t = 0, tgt = 0, drag = false, auto = false, last = -1, vis = false;
+    const at = e => { const r = dial.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left - 2) / (r.width - 4))); };
+    const tick = () => { const q = Math.round(tgt * 10); if (q !== last) { if (last >= 0 && drag) snd('detent'); last = q; } };
+    let sx = 0, sy = 0, pend = false;
+    dial.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') { drag = auto = true; tgt = at(e); tick(); try { dial.setPointerCapture(e.pointerId); } catch (_) {} } else { pend = true; sx = e.clientX; sy = e.clientY; } });
+    dial.addEventListener('pointermove', e => { if (pend) { const dx = Math.abs(e.clientX - sx), dy = Math.abs(e.clientY - sy); if (dx > 6 && dx > dy) { pend = false; drag = auto = true; try { dial.setPointerCapture(e.pointerId); } catch (_) {} } else if (dy > 8) pend = false; } });
+    dial.addEventListener('pointerup', e => { if (pend) { pend = false; auto = true; tgt = at(e); tick(); } });
+    dial.addEventListener('pointermove', e => { if (drag) { tgt = at(e); tick(); } }); dial.addEventListener('pointerup', () => drag = false); dial.addEventListener('pointercancel', () => drag = false);
+    dial.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); auto = true; tgt = Math.min(1, tgt + .1); } if (e.key === 'ArrowLeft') { e.preventDefault(); auto = true; tgt = Math.max(0, tgt - .1); } });
+    new IntersectionObserver(es => { vis = es[0].isIntersecting; if (vis && !auto) { auto = true; setTimeout(() => { tgt = 1; }, 350); } }, { threshold: .5 }).observe(dial);   // it slides to after by itself the first time you reach it
+    (function f() { requestAnimationFrame(f); if (!vis && Math.abs(tgt - t) < .001) return; t += (tgt - t) * (reduce ? 1 : drag ? .45 : .07); if (Math.abs(tgt - t) < .001) t = tgt; dial.setAttribute('aria-valuenow', Math.round(t * 100));
+      const W = cv.clientWidth, H = cv.clientHeight, d = Math.min(2, devicePixelRatio || 1); if (!W) return; if (cv.width !== Math.round(W * d)) { cv.width = Math.round(W * d); cv.height = Math.round(H * d); }
+      const g = cv.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H); const L = 2, Wd = W - 4, np = L + t * Wd, base = H - 30, ink = css('--ink'), mut = css('--muted');
+      const N = W < 560 ? 30 : 60, M = N / 6; for (let k = 0; k <= N; k++) { const x = L + k / N * Wd, nr = Math.max(0, 1 - Math.abs(x - np) / 70), h = (k % M ? (k % (M / 2) ? 8 : 14) : 20) + nr * 10;   /* fewer ticks on a phone */ g.globalAlpha = .25 + nr * .65; g.fillStyle = ink; g.fillRect(x, base - h, 1, h); }
+      g.globalAlpha = 1; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.fillStyle = t < .1 ? ink : mut; g.textAlign = 'left'; g.fillText('BEFORE', 0, H - 10); g.fillStyle = t > .9 ? ink : mut; g.textAlign = 'right'; g.fillText('AFTER', W, H - 10);
+      g.fillStyle = '#ff4a1c'; (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h)))(g, np - 1.5, base - 40, 3, 42);
+      R.forEach(r => { const a = +r.dataset.a, v = 100 + (a - 100) * t; r.querySelector('i').style.width = v / MX * 100 + '%'; r.querySelector('.bad-n').innerHTML = Math.round(v) + (t > .98 ? `<small>${r.dataset.d}</small>` : ''); }); })(); });
+}
 // sticky notes: one insight each, on a dotted board people can rearrange (any number of notes, set in the CMS)
 const NOTE_C = ['#fff1a8', '#ffd6e0', '#c9f2dc', '#d6e6ff', '#ffe0c2'];
 const NOTES = s => { const N = (s.notes || []).filter(n => n && (n.p || n.t)); if (!N.length) return '';
@@ -987,7 +1030,7 @@ const R = {
     c.secs.forEach((s, i) => {
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
-        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigNums(s.stats, s._i)}${pics(media, s.h, s._i)}`;
+        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${s.view === 'dial' ? BADIAL(s) : bigNums(s.stats, s._i)}${pics(media, s.h, s._i)}`;
         return;
       }
       if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · Results</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, s.h, s._i)}`; return; }
@@ -1370,7 +1413,7 @@ function setupIndex() {
     // it steps aside before the footer reaches it, so the two never overlap
     const nx = app.querySelector('.next'), ir = ix.getBoundingClientRect();
     ix.classList.toggle('on', scrollY > innerHeight * .5 && (!nx || nx.getBoundingClientRect().top > ir.bottom + 48));
-    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
+    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb, .bad')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
     ix.classList.toggle('dim', under);
     if (!raf) raf = requestAnimationFrame(draw);
   };
@@ -1401,7 +1444,7 @@ function paint(keep) {
   app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
     const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
-  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw); setupBoards();
+  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw); setupBoards(); setupDials();
   if (window.KM && KM.trail) KM.trail.mark(undefined, c.title);   // this case's own name, whatever the page said a moment before
   if (KM_EDIT) editable(c);
 }
