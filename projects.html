@@ -257,7 +257,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.webp';
+  const HEAD = 'assets/headshot.jpg';
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -417,7 +417,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610211602#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610221026#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=e73dc949" defer></script>
