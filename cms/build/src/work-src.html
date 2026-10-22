@@ -368,6 +368,23 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 .next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
 @media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
 
+
+/* Grid / Reel: a toggle before the shuffle. Reel shows one piece large in the middle, the rest curving away like the inside of a drum */
+.vtog { position: fixed; z-index: 20; right: calc(max(48px, env(safe-area-inset-right, 0px)) + 54px); top: 101px; display: inline-flex; padding: 3px; border-radius: 99px; background: var(--pill); gap: 2px; transition: opacity .3s }
+.vtog button { position: relative; z-index: 1; width: 38px; height: 38px; border-radius: 99px; display: grid; place-items: center; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; transition: color .25s }
+.vtog button[aria-pressed="true"] { color: var(--ink) } .vtog .knob { position: absolute; top: 3px; left: 3px; width: 38px; height: 38px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 12%, var(--pill)); transition: transform .35s cubic-bezier(.2,.9,.25,1.15) }
+.vtog.reel .knob { transform: translateX(40px) } .vtog svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round }
+body:not(.all) .vtog, body.open .vtog { opacity: 0; pointer-events: none }
+@media (max-width: 900px) { .vtog { top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(max(16px, env(safe-area-inset-right, 0px)) + 96px); } .vtog button, .vtog .knob { width: 34px; height: 34px } .vtog.reel .knob { transform: translateX(36px) } }
+.reelv { position: fixed; z-index: 13; left: 0; right: 0; top: 160px; bottom: 0; opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s; touch-action: pan-y; outline: none }
+body.all.reelon:not(.open) .reelv { opacity: 1; visibility: visible; transition: opacity .45s .1s, visibility 0s }
+body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
+.reelv canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab } .reelv.drag canvas { cursor: grabbing }
+.reelv .rcap { position: absolute; pointer-events: none; transition: opacity .25s } .reelv .rt { color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap }
+.reelv .rm { display: flex; justify-content: space-between; gap: 16px; font: 500 11px/1.6 var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; color: var(--ink) } .reelv .rm i { font-style: normal; color: var(--muted) }
+.reelv .rm .rn::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 99px; background: var(--ink); margin-right: 8px; vertical-align: 1px }
+.reelv.moving .rcap { opacity: 0 }
+@media (max-width: 900px) { .reelv { top: 150px } }
 </style>
 
 <div class="station" id="station" data-readout>
@@ -1459,7 +1476,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     $('bkF').textContent = '98.0'; $('bkN').textContent = 'Home'; $('back').setAttribute('aria-label', 'Tune back to Home, 98.0');
     await new Promise(r => requestAnimationFrame(r));
     const tl = ovOpen && ov.querySelector(`.ov-t[data-i="${i}"] .ov-im`);
-    const to = (tl || slots[i]).getBoundingClientRect();
+    const to = window._kmReel && window._kmReel() && window._kmReelRect ? window._kmReelRect : (tl || slots[i]).getBoundingClientRect();   // in Reel, back to the middle of the reel
     setOrigin(to.left + to.width / 2, to.top + to.height / 2);   // the page closes back into the piece
     document.body.classList.remove('open');
     flyIdx = i;
@@ -1827,6 +1844,66 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
     if (first) deck.forEach(t => { if (t.hidden) return; const a = first.get(t), z = t.getBoundingClientRect(), dx = a.left - z.left, dy = a.top - z.top;
       if ((dx || dy) && Math.abs(dy) < innerHeight * 2.5) t.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }); });
   });
+
+  // ---------- Grid / Reel: a second way to see the pieces. The toggle sits before the shuffle and remembers your choice.
+  // Reel draws on a canvas, column by column, so the pieces at the sides bend away like the inside of a drum; the one in
+  // the middle is flat and large, with its title above and its number and category below. Filter and shuffle apply to both.
+  {
+    const vt = document.createElement('div'); vt.className = 'vtog'; vt.setAttribute('role', 'group'); vt.setAttribute('aria-label', 'View');
+    vt.innerHTML = '<span class="knob"></span><button type="button" data-v="grid" title="Grid" aria-label="Grid view"><svg viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5" height="5"/><rect x="9.5" y="1.5" width="5" height="5"/><rect x="1.5" y="9.5" width="5" height="5"/><rect x="9.5" y="9.5" width="5" height="5"/></svg></button><button type="button" data-v="reel" title="Reel" aria-label="Reel view"><svg viewBox="0 0 16 16"><path d="M1 4.2c1.2.3 1.8.6 2.2.9v5.8c-.4.3-1 .6-2.2.9z"/><rect x="5" y="2.5" width="6" height="11" rx=".6"/><path d="M15 4.2c-1.2.3-1.8.6-2.2.9v5.8c.4.3 1 .6 2.2.9z"/></svg></button>';
+    document.body.appendChild(vt);
+    const rv = document.createElement('div'); rv.className = 'reelv'; rv.tabIndex = 0; rv.setAttribute('aria-roledescription', 'carousel'); rv.setAttribute('aria-label', 'Designs, one at a time');
+    rv.innerHTML = '<canvas></canvas><div class="rcap rt"></div><div class="rcap rm"><span class="rn"></span><span>Category <i></i></span></div>'; document.body.appendChild(rv);
+    const cv = rv.querySelector('canvas'), g = cv.getContext('2d'), rt = rv.querySelector('.rt'), rm = rv.querySelector('.rm');
+    let on = false, L = [], pos = 0, tgt = 0, vel = 0, drag = null, moved = 0, last = -1, W = 0, H = 0, dpr = 1, front = null;
+    const imgs = {}; const imgOf = i => { if (!imgs[i]) { const im = new Image(); im.decoding = 'async'; im.src = mdOf(still(items[i])); imgs[i] = im; } return imgs[i]; };
+    const list = () => { const now = [...ovGrid.children].filter(t => !t.hidden).map(t => +t.dataset.i); const cur = L[Math.round(pos)]; L = now; const k = L.indexOf(cur); if (k >= 0) pos = tgt = k; else pos = tgt = Math.min(Math.round(pos), Math.max(0, L.length - 1)); };
+    new MutationObserver(() => { if (on) list(); }).observe(ovGrid, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    const fit = () => { const r = rv.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); };
+    addEventListener('resize', () => { if (on) fit(); });
+    const geo = () => { const mob = W < 700, ch = Math.min(H * (mob ? .56 : .7), mob ? W * .95 : 640); return { ch, sh: ch * (mob ? .62 : .58), gap: mob ? 18 : 40 }; };
+    const ratio = i => { if (!items[i]) return 1; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(1.35, r)); };
+    const rLayout = function () { if (!L.length) return []; const { ch, sh, gap } = geo(), cx = W / 2, ci = Math.max(0, Math.min(L.length - 1, Math.round(pos))), f = pos - ci, out = [];
+      const hAt = d => { const a = Math.min(1, Math.abs(d)), e = a * a * (3 - 2 * a); return ch + (sh - ch) * e; }, wOf = (k, d) => ratio(L[k]) * hAt(d);
+      const xs = {}; const nb = f > 0 ? ci + 1 : ci - 1; xs[ci] = cx - f * (wOf(ci, f) / 2 + gap + (L[nb] != null ? wOf(nb, f > 0 ? 1 - f : -1 - f) : wOf(ci, f)) / 2);
+      for (let k = ci + 1; k < L.length; k++) { xs[k] = xs[k - 1] + wOf(k - 1, k - 1 - pos) / 2 + gap + wOf(k, k - pos) / 2; if (xs[k] > W * 2) break; }
+      for (let k = ci - 1; k >= 0; k--) { xs[k] = xs[k + 1] - wOf(k + 1, k + 1 - pos) / 2 - gap - wOf(k, k - pos) / 2; if (xs[k] < -W) break; }
+      for (const k in xs) { const d = k - pos, h = hAt(d); out.push({ k: +k, d, x: xs[k], w: ratio(L[k]) * h, h }); } return out; }
+    const bend = x => { const u = Math.max(0, Math.abs(x - W / 2) - geo().ch * .55) / (W / 2); return 1 + .42 * Math.pow(u, 1.5); };
+    const rDraw = function () { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); front = null; if (!L.length) return;
+      const cy = H * .46, ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+      for (const p of ps) { const im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p; if (!im.complete || !im.naturalWidth) continue;
+        g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
+        const ir = im.naturalWidth / im.naturalHeight, cr = p.w / p.h; let sx = 0, sy = 0, sw = im.naturalWidth, sh = im.naturalHeight; if (ir > cr) { sw = sh * cr; sx = (im.naturalWidth - sw) / 2; } else { sh = sw / cr; sy = (im.naturalHeight - sh) / 2; }
+        const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
+        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(im, sx + (x - x0) / p.w * sw, sy, w / p.w * sw, sh, x, cy - h / 2, w, h); } }
+      g.globalAlpha = 1;
+      if (front) { const it = items[L[front.k]], top = cy - front.h / 2, left = front.x - front.w / 2; rt.textContent = it.t; rt.style.left = left + 'px'; rt.style.top = (top - 40) + 'px';
+        rm.style.left = left + 'px'; rm.style.width = front.w + 'px'; rm.style.top = (top + front.h + 14) + 'px'; rm.querySelector('.rn').textContent = String(L[front.k] + 1).padStart(2, '0'); rm.querySelector('i').textContent = it.cat; } }
+    let raf = 0; const loop = () => { raf = 0; if (!on) return; if (!drag && vel) { tgt += vel; vel *= .9; if (Math.abs(vel) < .02) { vel = 0; tgt = Math.round(tgt); } } tgt = Math.max(0, Math.min(L.length - 1, tgt));
+      pos += ((drag ? drag.p : tgt) - pos) * (reduce ? 1 : .14); const r = Math.round(pos); if (r !== last) { if (last >= 0) tick(); last = r; }
+      rv.classList.toggle('moving', Math.abs(pos - r) > .04 || !!drag); rDraw(); raf = requestAnimationFrame(loop); };
+    // open the piece in the middle the way a tile opens: a case study or a link goes there, anything else opens in the small view
+    const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + H * .46 - front.h / 2, width: front.w, height: front.h };
+      const dest = items[i].link || (items[i].cs && items[i].page);
+      if (dest && window.Tuner) { tap(); try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {} if (window.KM && KM.keep && !reduce) KM.keep(mdOf(still(items[i])), r); Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest }); return; }
+      window._kmReelRect = r; openDetail(i, cx, cy, r); };
+    const span = () => geo().ch * .7 + geo().gap;
+    cv.addEventListener('pointerdown', e => { if (e.button > 0) return; drag = { x: e.clientX, p0: pos, p: pos, t: performance.now(), v: 0 }; moved = 0; try { cv.setPointerCapture(e.pointerId); } catch (_) {} rv.classList.add('drag'); });
+    cv.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x; moved = Math.max(moved, Math.abs(dx)); const p2 = Math.max(-.4, Math.min(L.length - .6, drag.p0 - dx / span())), t = performance.now(); drag.v = (p2 - drag.p) / Math.max(1, t - drag.t) * 16; drag.p = p2; drag.t = t; });
+    const up = e => { if (!drag) return; const d = drag; drag = null; rv.classList.remove('drag');
+      if (moved < 6) { const x = e.clientX - cv.getBoundingClientRect().left, hit = rLayout().filter(p => Math.abs(x - p.x) < p.w / 2).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
+        if (hit) { if (Math.abs(hit.d) < .5 && front) openAt(hit.k, e.clientX, e.clientY); else { tap(); tgt = hit.k; } } return; }
+      pos = d.p; tgt = Math.round(d.p + d.v * 6); };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    let wt = 0; rv.addEventListener('wheel', e => { const dl = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (Math.abs(dl) < 1) return; e.preventDefault(); tgt = Math.max(0, Math.min(L.length - 1, tgt + dl / 220)); clearTimeout(wt); wt = setTimeout(() => { tgt = Math.round(tgt); }, 140); }, { passive: false });
+    rv.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); tgt = Math.min(L.length - 1, Math.round(tgt) + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); tgt = Math.max(0, Math.round(tgt) - 1); } if (e.key === 'Enter' && front) { const r = cv.getBoundingClientRect(); openAt(front.k, r.left + front.x, r.top + H * .46); } });
+    const set = (v, quiet) => { on = v === 'reel'; document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+      try { localStorage.setItem('km-dview', v); } catch (_) {} if (on) { fit(); list(); if (!quiet) { const first = [...ovGrid.children].find(t => !t.hidden && t.getBoundingClientRect().bottom > 160); const k = first ? L.indexOf(+first.dataset.i) : 0; pos = tgt = Math.max(0, k); } if (!raf) raf = requestAnimationFrame(loop); setTimeout(() => rv.focus({ preventScroll: true }), 60); } };
+    vt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if ((b.dataset.v === 'reel') !== on) { tap(); set(b.dataset.v); } }));
+    window._kmReel = () => on;
+    let v0 = 'grid'; try { v0 = localStorage.getItem('km-dview') || 'grid'; } catch (_) {} if (v0 === 'reel') requestAnimationFrame(() => set('reel', true));
+  }
   addEventListener('km-role', e => applyRole(e.detail, true));
   applyRole(roleNow, false);
   const DRUM = { radius: .62, narrow: .2, fade: .16, margin: .12 };   // radius and margin (share of screen height), how much far rows narrow, fade band

@@ -43,8 +43,15 @@ open(f'{GEN}/about-src.html', 'w', encoding='utf-8').write(_s)
 
 # Engineering: the things I've built (a tool's link rides at 9 and its button text at 10)
 _en = _rows('engineering')
+# laid out as a workbench: a card per tool with a small live demo on top (cms/build/src/workbench.html)
+def _bench(s, rep):
+    tools = [t for t in _en['tools'] if not t.get('hidden')]
+    i = s.index('<section class="band" id="band">'); j = s.index('</section>', i) + 10
+    s = s[:i] + '<section class="band wbband" id="band" hidden><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>\n  <section class="wb" id="wb" aria-label="' + _en['title'].replace('"', '&quot;') + '"></section>' + s[j:]
+    wb = open(f'{KFM}/workbench.html', encoding='utf-8').read().replace('__TOOLS__', json.dumps(tools, ensure_ascii=False).replace('</', '<\\/'))
+    return s.replace('</body>', wb + '\n</body>', 1)
 make('96.0', 'Engineering', _en['statement'], _en['title'], _en['sub'], _en['tag'],
-     [[t.get(k, '') for k in ['fq', 'name', 'type', 'what', 'stat', 'statLabel', 'tech']] + ([ '', '', t['link'], t.get('linkLabel') or 'Open'] if t.get('link') else []) for t in _en['tools'] if not t.get('hidden')], f'{GEN}/engineering-src.html')
+     [[t.get(k, '') for k in ['fq', 'name', 'type', 'what', 'stat', 'statLabel', 'tech']] + ([ '', '', t['link'], t.get('linkLabel') or 'Open'] if t.get('link') else []) for t in _en['tools'] if not t.get('hidden')], f'{GEN}/engineering-src.html', post=_bench)
 
 # Projects: the case studies
 CASES_ = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden')]

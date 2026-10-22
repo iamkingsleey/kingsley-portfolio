@@ -84,7 +84,8 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .stmt { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 24px; padding: var(--sp) 0 0 }
 main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thing on the page: clear of the readout */
 .stmt p { margin: 0; color: var(--ink); font-size: clamp(28px, 3.4vw, 50px); line-height: 1.12; letter-spacing: -.035em; font-weight: 500 }
-.stmt p span { opacity: .14; transition: opacity .5s var(--ease) } .stmt p span.on { opacity: 1 }
+.stmt p span { opacity: .2; filter: blur(1.4px); transition: opacity .6s var(--ease), filter .6s var(--ease) } .stmt p span.on { opacity: 1; filter: none } .stmt p span.rd { opacity: .5; filter: blur(2.6px) }   /* read and upcoming lines go soft, so only the band reads */
+@media (prefers-reduced-motion: reduce) { .stmt p span { filter: none } }
 
 /* ---------- 3 · career band ---------- */
 .band { position: relative }
@@ -257,7 +258,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.jpg';
+  const HEAD = 'assets/headshot.webp';
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -288,7 +289,15 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
   // statement: words light up as it scrolls through
   const stmt = $('stmt'); stmt.innerHTML = stmt.textContent.split(' ').map(w => `<span>${w}</span>`).join(' '); const sw = [...stmt.children];
-  ticks.push(() => { const r = stmt.getBoundingClientRect(), q = clamp((innerHeight * .85 - r.top) / (r.height + innerHeight * .3), 0, 1), n = Math.round(q * sw.length); sw.forEach((w, i) => w.classList.toggle('on', i < n)); });
+  // a reading band: only the three lines you're reading are lit. The words light up as the band moves down; lines you've
+  // passed settle to a soft grey (still readable), lines ahead wait in the dim
+  let lineOf = [], lw = 0; const lines = () => { lw = innerWidth; let t = null, k = -1; lineOf = sw.map(w => { if (w.offsetTop !== t) { t = w.offsetTop; k++; } return k; }); };
+  addEventListener('resize', () => { lw = 0; });
+  ticks.push(() => { if (lw !== innerWidth || !lineOf.length) lines();
+    // the band starts on the first line where the page opens and reaches the last line as the statement leaves the upper part of the screen
+    const r = stmt.getBoundingClientRect(), y0 = r.top + scrollY, s0 = Math.max(0, y0 - innerHeight * .85), s1 = Math.max(s0 + 1, y0 + r.height - innerHeight * .4);
+    const first = lineOf.filter(L => L === 0).length, q = clamp((scrollY - s0) / (s1 - s0), 0, 1), n = Math.max(r.top < innerHeight * .9 ? first : 0, Math.round(q * sw.length)), hl = n ? lineOf[Math.min(n, sw.length) - 1] : -1;
+    sw.forEach((w, i) => { const L = lineOf[i], on = i < n && L > hl - 3, rd = i < n && !on; w.classList.toggle('on', on); w.classList.toggle('rd', rd); }); });
 
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
@@ -329,8 +338,12 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
         if (Math.abs(a) > 1.45) { el.style.opacity = 0; el.style.visibility = 'hidden'; return; }
         el.style.visibility = '';
         // squash and narrow toward the top and bottom of the curve (flat, so the text never slants)
-        el.style.transform = `translateY(${(Math.sin(a) * (a < 0 ? R * .72 : R)).toFixed(1)}px) scale(${(1 - (1 - ca) * .35).toFixed(4)}, ${ca.toFixed(4)})`;
-        el.style.opacity = (Math.pow(Math.max(0, ca), 6) * (Math.abs(a) < STEP / 2 ? 1 : .42)).toFixed(3);
+        el.style.transform = `translateY(${(Math.sin(a) * (a < 0 ? R * .8 : R)).toFixed(1)}px) scale(${(1 - (1 - ca) * .35).toFixed(4)}, ${ca.toFixed(4)})`;
+        const front = Math.abs(a) < STEP / 2;
+        el.style.opacity = (Math.pow(Math.max(0, ca), 6) * (front ? 1 : .5)).toFixed(3);
+        // the chapters above and below go soft (blurred, not just faint), so they never read across the one in front
+        const bl = front ? Math.max(0, (Math.abs(a) - STEP * .15) / (STEP * .35)) * 2.5 : Math.min(8, 2.5 + (Math.abs(a) - STEP / 2) * 7);
+        el.style.filter = bl > .05 ? `blur(${bl.toFixed(2)}px)` : '';
       });
     }
     // vertical frequency ruler: one major per chapter, minor ticks every 0.1, the needle fixed in the middle
@@ -417,7 +430,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610221026#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610221037#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=e73dc949" defer></script>

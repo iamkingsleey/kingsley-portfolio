@@ -84,7 +84,8 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .stmt { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 24px; padding: var(--sp) 0 0 }
 main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thing on the page: clear of the readout */
 .stmt p { margin: 0; color: var(--ink); font-size: clamp(28px, 3.4vw, 50px); line-height: 1.12; letter-spacing: -.035em; font-weight: 500 }
-.stmt p span { opacity: .14; transition: opacity .5s var(--ease) } .stmt p span.on { opacity: 1 }
+.stmt p span { opacity: .2; filter: blur(1.4px); transition: opacity .6s var(--ease), filter .6s var(--ease) } .stmt p span.on { opacity: 1; filter: none } .stmt p span.rd { opacity: .5; filter: blur(2.6px) }   /* read and upcoming lines go soft, so only the band reads */
+@media (prefers-reduced-motion: reduce) { .stmt p span { filter: none } }
 
 /* ---------- 3 · career band ---------- */
 .band { position: relative }
@@ -224,8 +225,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   <section class="stmt" id="s-stmt"><span class="mono">96.0 · Engineering</span><p id="stmt">When the tool I need doesn’t exist, I build it. Figma plugins, prototypes and small tools in Python and Node, made so the next hundred times are easy.</p></section>
 
   <!-- 3 · career band -->
-  <div class="shead" id="s-band"><div><h2>Things I’ve built</h2><p>Scroll to tune through them. Each one is a station.</p></div><span class="mono">Tools</span></div>
-  <section class="band" id="band"><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
+  <div class="shead" id="s-band"><div><h2>Things I’ve built</h2><p>A small tool on every card, running live. Point at one to watch it work.</p></div><span class="mono">Tools</span></div>
+  <section class="band wbband" id="band" hidden><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
+  <section class="wb" id="wb" aria-label="Things I’ve built"></section>
 
   <div class="foot"><span class="mono">Kingsley M. · 96.0 Engineering</span><a class="mono" href="index.html#home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
 </main>
@@ -244,7 +246,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.jpg';
+  const HEAD = 'assets/headshot.webp';
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -275,7 +277,15 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 
   // statement: words light up as it scrolls through
   const stmt = $('stmt'); stmt.innerHTML = stmt.textContent.split(' ').map(w => `<span>${w}</span>`).join(' '); const sw = [...stmt.children];
-  ticks.push(() => { const r = stmt.getBoundingClientRect(), q = clamp((innerHeight * .85 - r.top) / (r.height + innerHeight * .3), 0, 1), n = Math.round(q * sw.length); sw.forEach((w, i) => w.classList.toggle('on', i < n)); });
+  // a reading band: only the three lines you're reading are lit. The words light up as the band moves down; lines you've
+  // passed settle to a soft grey (still readable), lines ahead wait in the dim
+  let lineOf = [], lw = 0; const lines = () => { lw = innerWidth; let t = null, k = -1; lineOf = sw.map(w => { if (w.offsetTop !== t) { t = w.offsetTop; k++; } return k; }); };
+  addEventListener('resize', () => { lw = 0; });
+  ticks.push(() => { if (lw !== innerWidth || !lineOf.length) lines();
+    // the band starts on the first line where the page opens and reaches the last line as the statement leaves the upper part of the screen
+    const r = stmt.getBoundingClientRect(), y0 = r.top + scrollY, s0 = Math.max(0, y0 - innerHeight * .85), s1 = Math.max(s0 + 1, y0 + r.height - innerHeight * .4);
+    const first = lineOf.filter(L => L === 0).length, q = clamp((scrollY - s0) / (s1 - s0), 0, 1), n = Math.max(r.top < innerHeight * .9 ? first : 0, Math.round(q * sw.length)), hl = n ? lineOf[Math.min(n, sw.length) - 1] : -1;
+    sw.forEach((w, i) => { const L = lineOf[i], on = i < n && L > hl - 3, rd = i < n && !on; w.classList.toggle('on', on); w.classList.toggle('rd', rd); }); });
 
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
@@ -314,8 +324,12 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
         if (Math.abs(a) > 1.45) { el.style.opacity = 0; el.style.visibility = 'hidden'; return; }
         el.style.visibility = '';
         // squash and narrow toward the top and bottom of the curve (flat, so the text never slants)
-        el.style.transform = `translateY(${(Math.sin(a) * (a < 0 ? R * .72 : R)).toFixed(1)}px) scale(${(1 - (1 - ca) * .35).toFixed(4)}, ${ca.toFixed(4)})`;
-        el.style.opacity = (Math.pow(Math.max(0, ca), 6) * (Math.abs(a) < STEP / 2 ? 1 : .42)).toFixed(3);
+        el.style.transform = `translateY(${(Math.sin(a) * (a < 0 ? R * .8 : R)).toFixed(1)}px) scale(${(1 - (1 - ca) * .35).toFixed(4)}, ${ca.toFixed(4)})`;
+        const front = Math.abs(a) < STEP / 2;
+        el.style.opacity = (Math.pow(Math.max(0, ca), 6) * (front ? 1 : .5)).toFixed(3);
+        // the chapters above and below go soft (blurred, not just faint), so they never read across the one in front
+        const bl = front ? Math.max(0, (Math.abs(a) - STEP * .15) / (STEP * .35)) * 2.5 : Math.min(8, 2.5 + (Math.abs(a) - STEP / 2) * 7);
+        el.style.filter = bl > .05 ? `blur(${bl.toFixed(2)}px)` : '';
       });
     }
     // vertical frequency ruler: one major per chapter, minor ticks every 0.1, the needle fixed in the middle
@@ -395,6 +409,68 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   requestAnimationFrame(frame);
 })();
 </script>
+<!-- Engineering · the workbench: a card per tool, each with a small live demo on top (drawn only while on screen).
+     The demo comes from the tool's "demo" setting in the CMS (Line, Mesh, Reel, Dial), or a picture if it has one.
+     Cards not fully in view are soft (blurred), like the stations on About. -->
+<style>
+.wbband { display: none !important }
+.wb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding-bottom: 40px }
+.wb .tool { background: var(--panel); border-radius: 4px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; transition: transform .5s cubic-bezier(.2,.8,.2,1), filter .6s cubic-bezier(.2,.8,.2,1), opacity .6s }
+.wb .tool:hover { transform: translateY(-3px) }
+.wb .view { position: relative; aspect-ratio: 16 / 10; background: color-mix(in srgb, var(--ink) 4%, var(--bg)); border-bottom: 1px solid var(--line); overflow: hidden }
+.wb .view canvas, .wb .view img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover }
+.wb .live { position: absolute; z-index: 2; left: 14px; top: 14px; font: 500 10.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.wb .live::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 99px; background: var(--faint); margin-right: 7px; vertical-align: 1px; transition: background .3s }
+.wb .tool.on .live::before { background: var(--red) }
+.wb .txt { padding: 22px 24px 24px; display: grid; gap: 10px; align-content: start }
+.wb .txt .mono { color: var(--muted) } .wb .txt h3 { margin: 0; color: var(--ink); font-size: 28px; font-weight: 500; letter-spacing: -.03em; line-height: 1.1 } .wb .txt p { margin: 0; color: var(--text) }
+.wb .foot2 { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px }
+.wb .st { display: flex; align-items: baseline; gap: 10px } .wb .st b { color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em; font-variant-numeric: tabular-nums } .wb .st span { font: 500 11px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.wb .go { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 99px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; transition: background .2s }
+.wb .go:hover { background: color-mix(in srgb, var(--ink) 12%, var(--bg)) }
+.wb .tool.out { filter: blur(6px); opacity: .35 }
+@media (max-width: 860px) { .wb { grid-template-columns: 1fr } .wb .txt h3 { font-size: 24px } }
+@media (prefers-reduced-motion: reduce) { .wb .tool.out { filter: none; opacity: 1 } }
+</style>
+<script>
+(() => {
+  const TOOLS = [{"fq": "88.1", "name": "LineCraft", "type": "Figma plugin", "what": "Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.", "stat": "200+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1666142410490475207/linecraft", "linkLabel": "Get it on Figma"}, {"fq": "91.4", "name": "MeshCraft", "type": "Figma plugin", "what": "3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.", "stat": "130+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1668399347356779904/meshcraft", "linkLabel": "Get it on Figma"}, {"fq": "94.7", "name": "Protoreel", "type": "Playwright tool", "what": "Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.", "stat": "", "statLabel": "", "tech": "Node · Playwright", "link": "https://github.com/iamkingsleey/protoreel", "linkLabel": "View on GitHub"}, {"fq": "101.3", "name": "This portfolio", "type": "Design engineering", "what": "A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.", "stat": "", "statLabel": "", "tech": "HTML · CSS · JavaScript"}], host = document.getElementById('wb'); if (!host) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const guess = t => t.demo || (/line/i.test(t.name) ? 'line' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
+  const col = () => { const s = getComputedStyle(document.documentElement); return { ink: s.getPropertyValue('--ink').trim() || '#000', muted: s.getPropertyValue('--muted').trim() || '#888', panel: s.getPropertyValue('--panel').trim() || '#eee', red: '#ff4a1c' }; };
+  const DEMOS = {
+    line(g, W, H, t, C) { g.lineWidth = 2; g.lineJoin = 'round'; const rows = 7;
+      for (let r = 0; r < rows; r++) { const y0 = H * (.2 + r * .6 / (rows - 1)), amp = H * .045 * (1 + Math.sin(t * .0012 + r * .6) * .6), n = 9 + r, ph = t * .0006 * (r % 2 ? 1 : -1);
+        g.globalAlpha = r === 3 ? 1 : .55; g.strokeStyle = r === 3 ? C.red : C.ink; g.beginPath(); for (let i = 0; i <= n * 2; i++) { const x = W * .12 + (W * .76) * i / (n * 2), y = y0 + (i % 2 ? -amp : amp) * Math.cos(ph + i * .2); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } g.globalAlpha = 1; },
+    mesh(g, W, H, t, C) { const R = Math.min(W, H) * .32, cx = W / 2, cy = H / 2, a = t * .0005, b = .45, P = (la, lo) => { const x = Math.cos(la) * Math.cos(lo + a), y = Math.sin(la), z = Math.cos(la) * Math.sin(lo + a); return [cx + x * R, cy + (y * Math.cos(b) - z * Math.sin(b)) * R]; };
+      g.lineWidth = 1.2; g.strokeStyle = C.ink; g.globalAlpha = .5; for (let i = 1; i < 9; i++) { const la = -Math.PI / 2 + i * Math.PI / 9; g.beginPath(); for (let k = 0; k <= 60; k++) { const [x, y] = P(la, k / 60 * Math.PI * 2); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+      for (let j = 0; j < 12; j++) { const lo = j / 12 * Math.PI * 2; g.beginPath(); for (let k = 0; k <= 40; k++) { const [x, y] = P(-Math.PI / 2 + k / 40 * Math.PI, lo); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.globalAlpha = j ? .32 : 1; g.strokeStyle = j ? C.ink : C.red; g.lineWidth = j ? 1.2 : 2; g.stroke(); } g.globalAlpha = 1; },
+    reel(g, W, H, t, C) { const fx = W * .14, fy = H * .14, fw = W * .72, fh = H * .56; g.globalAlpha = .08; g.fillStyle = C.ink; g.fillRect(fx, fy, fw, fh); g.globalAlpha = .12; g.fillRect(fx, fy, fw, 16); g.globalAlpha = .2; for (let i = 0; i < 3; i++) g.fillRect(fx + 20, fy + 34 + i * 26, fw * (.5 - i * .1), 12); g.globalAlpha = 1;
+      const q = (t % 4000) / 4000, bx = fx + fw * .62, by = fy + fh * .62, hit = q > .45 && q < .62; g.fillStyle = hit ? C.red : C.ink; g.beginPath(); g.roundRect ? g.roundRect(bx, by, fw * .26, 26, 13) : g.rect(bx, by, fw * .26, 26); g.fill();
+      const [cx, cy] = q < .5 ? [fx + fw * (.2 + .55 * Math.sin(q / .5 * Math.PI / 2)), fy + fh * (.3 + .4 * q / .5)] : [bx + fw * .13, by + 13];
+      g.fillStyle = C.ink; g.strokeStyle = C.panel; g.lineWidth = 1.5; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + 11, cy + 13); g.lineTo(cx + 5, cy + 13); g.lineTo(cx, cy + 18); g.closePath(); g.fill(); g.stroke();
+      if (hit) { g.strokeStyle = C.red; g.globalAlpha = .6; g.beginPath(); g.arc(cx, cy, 10 + (q - .45) * 200, 0, 7); g.stroke(); g.globalAlpha = 1; }
+      const ty = H * .8; g.globalAlpha = .15; g.fillStyle = C.ink; g.fillRect(fx, ty, fw, 4); g.globalAlpha = 1; g.fillStyle = C.red; g.fillRect(fx, ty, fw * q, 4); g.fillStyle = C.muted; g.font = '500 10px ui-monospace, monospace'; g.fillText('● REC  00:0' + Math.floor(q * 4) + ' / 00:04', fx, ty + 20); },
+    dial(g, W, H, t, C) { const mid = W / 2, off = (Math.sin(t * .0007) * .5 + .5) * 260, gap = 12, by = H * .66; g.fillStyle = C.ink; for (let i = -10; i < 60; i++) { const x = mid + i * gap - off; if (x < 0 || x > W) continue; g.globalAlpha = Math.max(.1, 1 - Math.abs(x - mid) / mid); const h = i % 10 === 0 ? 30 : i % 5 === 0 ? 18 : 10; g.fillRect(x, by - h, 1.2, h); }
+      g.globalAlpha = 1; g.fillStyle = C.red; g.fillRect(mid - 1.5, by - 46, 3, 54); g.fillStyle = C.ink; g.font = '500 ' + Math.round(H * .16) + 'px Geist, ui-sans-serif, sans-serif'; g.textAlign = 'center'; g.fillText((88 + off / 60).toFixed(1), mid, H * .36); g.textAlign = 'left'; }
+  };
+  const live = [];
+  TOOLS.forEach(t => { const el = document.createElement('article'); el.className = 'tool out'; const kind = t.picture ? 'picture' : guess(t);
+    el.innerHTML = `<div class="view">${t.picture ? `<img alt="" loading="lazy" src="${esc(t.picture)}">` : '<canvas></canvas>'}<span class="live">${t.picture ? '' : 'Live · '}${esc(t.type)}</span></div>
+      <div class="txt"><span class="mono">${esc(t.fq)} FM${t.tech ? ' · ' + esc(t.tech) : ''}</span><h3>${esc(t.name)}</h3><p>${esc(t.what)}</p>
+      <div class="foot2">${t.stat ? `<div class="st"><b>${esc(t.stat)}</b><span>${esc(t.statLabel)}</span></div>` : '<span></span>'}${t.link ? `<a class="go" href="${esc(t.link)}" target="_blank" rel="noopener">${esc(t.linkLabel || 'Open')} ↗</a>` : ''}</div></div>`;
+    host.append(el); el.addEventListener('pointerenter', () => el.classList.add('on')); el.addEventListener('pointerleave', () => el.classList.remove('on'));
+    const c = el.querySelector('canvas'); if (c && DEMOS[kind]) live.push({ c, kind, el, vis: false }); });
+  // soft until fully in view; demos draw only while on screen
+  const io = new IntersectionObserver(es => es.forEach(e => { e.target.classList.toggle('out', e.intersectionRatio < .92); const L = live.find(x => x.el === e.target); if (L) L.vis = e.isIntersecting; }), { threshold: [0, .5, .92, 1] });
+  host.querySelectorAll('.tool').forEach(el => io.observe(el));
+  let C = col(); new MutationObserver(() => { C = col(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  (function loop(t) { for (const L of live) { if (!L.vis) continue; const W = L.c.clientWidth, H = L.c.clientHeight, d = Math.min(2, devicePixelRatio || 1); if (!W) continue;
+      if (L.c.width !== Math.round(W * d)) { L.c.width = Math.round(W * d); L.c.height = Math.round(H * d); } const g = L.c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H); DEMOS[L.kind](g, W, H, reduce ? 1200 : t, C); }
+    requestAnimationFrame(loop); })(0);
+})();
+</script>
+
 <script>
     ['back', 'back2'].forEach(function (id) { var a = document.getElementById(id); if (!a) return;
       a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
