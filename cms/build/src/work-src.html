@@ -257,7 +257,7 @@ canvas.static { position: fixed; inset: 0 0 96px 0; width: 100%; height: calc(10
 .shuf.on { color: var(--ink) }
 .shuf svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
 body.open .shuf { opacity: 0; pointer-events: none }
-@media (max-width: 900px) { .shuf { top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(max(16px, env(safe-area-inset-right, 0px)) + 48px); width: 40px; height: 40px } }   /* left of the menu button */
+@media (max-width: 900px) { .shuf { top: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: auto; left: calc(50% + 22px); width: 40px; height: 40px; box-shadow: 0 6px 20px rgba(0,0,0,.18) } }   /* phones: floats bottom-centre beside the view toggle, clear of the sound/theme/menu buttons */
 .allbtn { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--pill); font-size: 13px; font-weight: 500; color: var(--ink); transition: background .2s, color .2s }
 .allbtn svg { width: 12px; height: 12px; fill: currentColor }
 .allbtn:hover { background: var(--hover) }
@@ -375,7 +375,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 .vtog button[aria-pressed="true"] { color: var(--ink) } .vtog .knob { position: absolute; top: 3px; left: 3px; width: 38px; height: 38px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 12%, var(--pill)); transition: transform .35s cubic-bezier(.2,.9,.25,1.15) }
 .vtog.reel .knob { transform: translateX(40px) } .vtog svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round }
 body:not(.all) .vtog, body.open .vtog { opacity: 0; pointer-events: none }
-@media (max-width: 900px) { .vtog { top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(max(16px, env(safe-area-inset-right, 0px)) + 96px); } .vtog button, .vtog .knob { width: 34px; height: 34px } .vtog.reel .knob { transform: translateX(36px) } }
+@media (max-width: 900px) { .vtog { top: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: auto; left: calc(50% - 62px); box-shadow: 0 6px 20px rgba(0,0,0,.18) } .vtog button, .vtog .knob { width: 34px; height: 34px } .vtog.reel .knob { transform: translateX(36px) } }
 .reelv { position: fixed; z-index: 13; left: 0; right: 0; top: 160px; bottom: 0; opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s; touch-action: pan-y; outline: none }
 body.all.reelon:not(.open) .reelv { opacity: 1; visibility: visible; transition: opacity .45s .1s, visibility 0s }
 body.all.reelon .ov { opacity: 0 !important; pointer-events: none }

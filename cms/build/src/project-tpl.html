@@ -257,6 +257,7 @@ __POPKIT__<script>
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
   let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}   // Home's sound switch
+  addEventListener('km-sound', e => { soundOn = e.detail; });
   const snd = n => { if (soundOn && window.Popkit) Popkit.play(n); };
 
   // stand-in copy per category; real projects carry their own

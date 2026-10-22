@@ -124,6 +124,33 @@ CORNERS = ('<style id="km-corners">'
   'html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}'
   'html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}'
   '</style>\n')
+# The sound and theme buttons from Home, on every other page too, in the same places: bottom right on a computer, beside the
+# menu button on a phone. They share Home's settings (km-sound, km-theme), so a change on any page holds everywhere.
+TOGGLES = ('<style id="km-toggles">'
+  '.km-tg{position:fixed;z-index:150;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;'
+  'background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}'
+  '.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}'
+  '#themeBtn.km-tg{right:max(24px,env(safe-area-inset-right,0px))}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 44px)}'
+  '#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}'
+  '@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}'
+  '#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}'
+  '@media print{.km-tg{display:none}}'
+  '</style>'
+  '<button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button>'
+  '<button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>\n'
+  '<script>(function(){'
+  'var sb=document.getElementById("soundBtn"),si=document.getElementById("soundIco"),tb=document.getElementById("themeBtn"),ti=document.getElementById("themeIco");'
+  'var ON=\'<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>\','
+  'OFF=\'<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>\','
+  'MOON=\'<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>\','
+  'SUN=\'<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>\';'
+  'var on=true;try{on=localStorage.getItem("km-sound")!=="off"}catch(e){}'
+  'function ps(){si.innerHTML=on?ON:OFF;sb.setAttribute("aria-pressed",on);sb.setAttribute("aria-label",on?"Mute sound":"Turn sound on");if(window.Popkit)Popkit.mute(!on)}'
+  'sb.addEventListener("click",function(){on=!on;try{localStorage.setItem("km-sound",on?"on":"off")}catch(e){}ps();dispatchEvent(new CustomEvent("km-sound",{detail:on}));if(on&&window.Popkit)Popkit.play("pop")});'
+  'function pt(){var d=document.documentElement.dataset.theme==="dark";ti.innerHTML=d?SUN:MOON;tb.setAttribute("aria-pressed",d);tb.setAttribute("aria-label",d?"Light mode":"Dark mode")}'
+  'tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});'
+  'new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});'
+  'ps();pt();addEventListener("load",ps)})();</script>\n')
 _fb = _site.get('feedback') or {}
 _ib = _site.get('inbox') or {}
 SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
@@ -211,6 +238,7 @@ for _p in PAGES:
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
     if 'src="kit.js' not in _s: _s = _s.replace('</body>', '<script src="kit.js" defer></script>\n</body>', 1)   # one feel across the site (cms/build/src/kit.js)
     if 'src="protips.js' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
+    if _p != 'index.html' and 'id="soundBtn"' not in _s and '</body>' in _s: _s = _s.replace('</body>', TOGGLES + '</body>', 1)   # Home's sound and theme buttons, on every page
     if 'src="feedback.js' not in _s: _s = _s.replace('</body>', '<script src="feedback.js" defer></script>\n</body>', 1)   # after a few minutes: how easy was it to get around?
     if _p == 'index.html' and 'src="home.js' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
