@@ -732,6 +732,8 @@
     if (C.site.available === undefined) C.site.available = true;
     const tok = el('input', { type: 'text', placeholder: HAS_TOKEN ? 'Saved on this Mac · paste a new one to replace it' : 'Paste your GoatCounter API token' });
     v.append(form([{ title: 'Availability', help: 'Shown on Home (“Open to new work”), on About (On air) and in the For recruiters card.', fields: [{ k: 'available', label: 'Taking new work', type: 'bool' }] }], C.site, 'site'));
+    if (!C.site.needle) C.site.needle = 'line';
+    v.append(form([{ title: 'Dials', help: 'The head on the red needle, on every dial across the site (About, Engineering, the case study rulers and the logo and product pages).', fields: [{ k: 'needle', label: 'Needle head', type: 'select', options: [['line', 'Plain line (as now)'], ['dot', 'Dot'], ['triangle', 'Arrow'], ['diamond', 'Diamond'], ['cap', 'T cap']] }] }], C.site, 'site'));
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };
     v.append(form([{ title: 'Feedback', help: 'After a few minutes on the site, visitors are asked how easy it was to get around (1 to 5), and what they liked or what got in their way. Answers come to your email. The very first one sends you an email from FormSubmit asking you to confirm the address: click Activate in it once, and every answer after that arrives.', fields: [
       { k: 'on', label: 'Ask visitors', type: 'bool' }, { k: 'to', label: 'Send answers to', ph: 'you@example.com' }, { k: 'after', label: 'Minutes on the site before asking', ph: '3' }] }], C.site.feedback, 'site'));

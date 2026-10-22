@@ -1092,7 +1092,7 @@ function nruler(cv, q, n, col) {
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H); const SP = 12, mid = W / 2;
   for (let k = -60; k <= (n - 1) * 10 + 60; k++) { const x = mid + (k - q * 10) * SP; if (x < 0 || x > W) continue; const major = k % 10 === 0 && k >= 0 && k <= (n - 1) * 10;
     cx.globalAlpha = major ? .9 : .28; cx.strokeStyle = col; cx.lineWidth = major ? 2 : 1; cx.beginPath(); cx.moveTo(x, H); cx.lineTo(x, H - (major ? 22 : 9)); cx.stroke(); }
-  cx.globalAlpha = 1; cx.fillStyle = RED; cx.fillRect(mid - 1.5, H - 34, 3, 34);
+  cx.globalAlpha = 1; cx.fillStyle = RED; (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h)))(cx, mid - 1.5, H - 34, 3, 34);
 }
 // ---------- palette playground: pick a background and a text colour from the brand's palette and the whole page takes them on ----------
 const lumi = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };

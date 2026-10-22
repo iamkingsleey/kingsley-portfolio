@@ -127,9 +127,9 @@
       TOOLS.forEach((tl, k) => { const pos = posOf(FQ[k]), on = k === i && a < .5; g.globalAlpha = on ? 1 : .55; g.fillStyle = on ? C.ink : C.muted; g.textAlign = 'left';
         if (hz) { g.fillRect(pos, H - 66, 1.5, 36); if (k === i) { g.globalAlpha = 1 - a * .6; g.fillStyle = C.ink; g.font = '500 13px Geist, ui-sans-serif, sans-serif'; const w = g.measureText(tl.name).width; g.fillText(tl.name, Math.max(0, Math.min(W - w, np - w / 2)), 14); } }
         else { g.fillRect(0, pos, 30, 1.5); g.font = (on ? '500 18px' : '400 15px') + ' Geist, ui-sans-serif, sans-serif'; g.fillText(tl.name, 74, pos + 5); g.font = '500 10px "Geist Mono", ui-monospace, monospace'; g.fillStyle = C.muted; g.fillText(tl.fq, 74, pos + 21); } });
-      g.globalAlpha = 1; g.fillStyle = C.red; if (hz) g.fillRect(np - 1, 22, 2, H - 48); else { g.fillRect(0, np - 1, 64, 2); g.beginPath(); g.arc(64, np, 3.5, 0, 7); g.fill(); } }
+      g.globalAlpha = 1; g.fillStyle = C.red; const nd = (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h))); if (hz) nd(g, np - 1, 22, 2, H - 48); else nd(g, 0, np - 1, 64, 2); }
     // the tool on the stage
-    if (!TOOLS[i].picture) { const [g, W, H] = fit(demo); const k = TOOLS[i].picture ? '' : guess(TOOLS[i]); if (DEMOS[k] && W) DEMOS[k](g, W, H, reduce ? 1200 : t, C); }
+    if (!TOOLS[i].picture) { const [g, W, H] = fit(demo), k = guess(TOOLS[i]); if (DEMOS[k] && W) DEMOS[k](g, W, H, reduce ? 1200 : t, C); }
     // static between tools
     { const [g, W, H] = fit(sc); if (a > .01) { g.fillStyle = C.ink; for (let n = 0; n < 900 * a; n++) { g.globalAlpha = Math.random() * .5 * a; g.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); }
         g.globalAlpha = .06 * a; for (let y = (t * .1) % 4; y < H; y += 4) g.fillRect(0, y, W, 1); g.globalAlpha = 1; } }

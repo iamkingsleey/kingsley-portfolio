@@ -317,7 +317,7 @@ h1 .w.in > span { translate: 0 0 }
         cx.beginPath(); cx.moveTo(x, base); cx.lineTo(x, base - (st ? 20 : major ? 13 : 7)); cx.stroke();
         if (st) { cx.fillStyle = col; cx.font = '500 9.5px "Geist Mono", monospace'; cx.textAlign = 'center'; cx.fillText((t / 10).toFixed(1), x, base + 12); }
       }
-      cx.globalAlpha = 1; cx.fillStyle = RED; cx.fillRect(mid - 1.5, base - 30, 3, 32);
+      cx.globalAlpha = 1; cx.fillStyle = RED; (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h)))(cx, mid - 1.5, base - 30, 3, 32);
     };
   }
   // ---- Story: the text stays, the screens scroll; the needle points at the paragraph for the screen in view ----
@@ -556,7 +556,7 @@ h1 .w.in > span { translate: 0 0 }
       sx.beginPath(); sx.moveTo(right, y); sx.lineTo(right - L, y); sx.stroke();
       if (major && Wd >= 60) { sx.globalAlpha = (d < 2.5 ? 1 : .5) * edge; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'right'; sx.textBaseline = 'middle'; sx.fillText(SECN[q / 5].toUpperCase(), right - L - 8, y); }
     }
-    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(right + 6 - (Wd < 60 ? 28 : 34), mid - 1.5, Wd < 60 ? 28 : 34, 3);   // the needle
+    sx.globalAlpha = 1; sx.fillStyle = RED; (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h)))(sx, right + 6 - (Wd < 60 ? 28 : 34), mid - 1.5, Wd < 60 ? 28 : 34, 3);   // the needle
     requestAnimationFrame(frame);
   }
   addEventListener('resize', fill);

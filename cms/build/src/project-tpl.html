@@ -521,7 +521,7 @@ __POPKIT__<script>
       sx.beginPath(); sx.moveTo(x, base); sx.lineTo(x, base - L); sx.stroke();
       if (major) { sx.globalAlpha = d < 2.5 ? 1 : .5; sx.fillStyle = col; sx.font = '500 9.5px "Geist Mono", monospace'; sx.textAlign = 'center'; sx.fillText(SECN[q / 5].toUpperCase(), x, base + 15); }
     }
-    sx.globalAlpha = 1; sx.fillStyle = RED; sx.fillRect(W / 2 - 1.5, base - 34, 3, 36);
+    sx.globalAlpha = 1; sx.fillStyle = RED; (window.kmNeedle || ((c, x, y, w, h) => c.fillRect(x, y, w, h)))(sx, W / 2 - 1.5, base - 34, 3, 36);
     requestAnimationFrame(frame);
   }
 
