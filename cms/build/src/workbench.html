@@ -16,6 +16,16 @@
 .wb .live .dot::before, .wb .live .dot::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 1px solid var(--red); animation: wbring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
 .wb .live .dot::after { animation-delay: 1.2s }
 .wb .stage.static .live .dot { background: var(--faint) } .wb .stage.static .live .dot::before, .wb .stage.static .live .dot::after { border-color: var(--muted) }
+.wb .stage { transition: transform .5s cubic-bezier(.2,.8,.2,1) }   /* leans towards the pointer */
+.wb .stage.play { cursor: crosshair }
+.wb .stage .hint { position: absolute; z-index: 3; left: 24px; bottom: 18px; font: 600 11px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); opacity: 0; transition: opacity .3s; pointer-events: none } .wb .stage.play .hint { opacity: .8 }
+/* changing tool, like changing channel: a burst of static, the picture squeezes to a bright line, then rolls back in with a brief colour split */
+.wb .stage.chan .demo, .wb .stage.chan img { animation: chan .7s cubic-bezier(.5,0,.2,1) }
+.wb .stage.chan .live, .wb .stage.chan .fqr { animation: flick .35s steps(6) }
+.wb .stage.chan::after { content: ''; position: absolute; z-index: 4; left: 0; right: 0; top: calc(50% + 32px); height: 2px; margin-top: -1px; background: var(--ink); box-shadow: 0 0 18px 2px var(--ink), 0 0 2px 1px var(--red); animation: beam .7s cubic-bezier(.5,0,.2,1) forwards; pointer-events: none }
+@keyframes chan { 0% { transform: scaleY(1); filter: none; opacity: 1 } 14% { transform: scaleY(1); filter: blur(1px); opacity: .5 } 34% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 46% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 72% { transform: scaleY(1.06) translateY(-4%); filter: drop-shadow(4px 0 rgb(255 74 28 / .85)) drop-shadow(-4px 0 rgb(0 190 255 / .6)) } 86% { transform: scaleY(.98) translateY(1%); filter: drop-shadow(1.5px 0 rgb(255 74 28 / .6)) drop-shadow(-1.5px 0 rgb(0 190 255 / .4)) } 100% { transform: none; filter: none; opacity: 1 } }
+@keyframes flick { 0%, 100% { opacity: 1 } 20% { opacity: .2 } 40% { opacity: .9 } 60% { opacity: .1 } 80% { opacity: .7 } }
+@keyframes beam { 0%, 20% { opacity: 0; transform: scaleX(.3) } 34% { opacity: 1; transform: scaleX(1) } 46% { opacity: 1; transform: scaleX(1) } 62% { opacity: 0; transform: scaleX(.02) } 100% { opacity: 0 } }
 @keyframes wbring { 0% { transform: scale(1); opacity: .8 } 100% { transform: scale(3.2); opacity: 0 } }
 .wb .stage canvas.demo { position: absolute; left: 0; right: 0; top: 64px; width: 100%; height: calc(100% - 64px); display: block }
 .wb .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block }
@@ -27,9 +37,9 @@
 .wb .tx .meta { font: 600 11.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .wb .tx .meta i { font-style: normal; color: var(--ink) }
 .wb .arr { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 99px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 17px; transition: background .2s, color .2s, transform .25s }
 .wb .arr:hover { background: var(--ink); color: var(--bg); transform: rotate(45deg) }
-@media (max-width: 860px) { .wb { grid-template-columns: 1fr; gap: 24px; padding-top: 115px } .wb .dial { min-height: 96px; height: 96px }
+@media (max-width: 860px) { .wb .stage .hint { left: 18px; bottom: 14px } .wb .stage.chan::after { top: calc(50% + 25px) } .wb { grid-template-columns: 1fr; gap: 24px; padding-top: 115px } .wb .dial { min-height: 96px; height: 96px }
   .wb .stage .live, .wb .stage .fqr { top: 18px; font-size: 11.5px } .wb .stage .live { left: 18px } .wb .stage .fqr { right: 18px } .wb .stage canvas.demo { top: 50px; height: calc(100% - 50px) } .wb .tx h3 { font-size: 26px } }
-@media (prefers-reduced-motion: reduce) { .wb .live .dot::before, .wb .live .dot::after { animation: none; opacity: 0 } .wb .tx { transition: none } }
+@media (prefers-reduced-motion: reduce) { .wb .stage.chan .demo, .wb .stage.chan img, .wb .stage.chan .live, .wb .stage.chan .fqr, .wb .stage.chan::after { animation: none } .wb .live .dot::before, .wb .live .dot::after { animation: none; opacity: 0 } .wb .tx { transition: none } }
 </style>
 <script>
 (() => {
@@ -37,17 +47,20 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const guess = t => t.demo || (/line/i.test(t.name) ? 'line' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
   const col = () => { const s = getComputedStyle(document.documentElement); return { ink: s.getPropertyValue('--ink').trim() || '#000', muted: s.getPropertyValue('--muted').trim() || '#888', panel: s.getPropertyValue('--panel').trim() || '#eee', red: '#ff4a1c' }; };
+  const PT = { on: false, x: .5, y: .5, rot: 0, t0: 0 };   // the visitor's pointer over the stage
   const DEMOS = {
-    line(g, W, H, t, C) { g.lineWidth = 2; g.lineJoin = 'round'; const rows = 7;
-      for (let r = 0; r < rows; r++) { const y0 = H * (.2 + r * .6 / (rows - 1)), amp = H * .045 * (1 + Math.sin(t * .0012 + r * .6) * .6), n = 9 + r, ph = t * .0006 * (r % 2 ? 1 : -1);
+    line(g, W, H, t, C) { g.lineWidth = 2; g.lineJoin = 'round'; const rows = 7, sharp = PT.on ? .25 + PT.x * 2.2 : 1;   // move across: flatter to sharper
+      for (let r = 0; r < rows; r++) { const y0 = H * (.2 + r * .6 / (rows - 1)), amp = H * .045 * sharp * (1 + Math.sin(t * .0012 + r * .6) * .6), n = 9 + r, ph = t * .0006 * (r % 2 ? 1 : -1);
         g.globalAlpha = r === 3 ? 1 : .55; g.strokeStyle = r === 3 ? C.red : C.ink; g.beginPath(); for (let i = 0; i <= n * 2; i++) { const x = W * .12 + (W * .76) * i / (n * 2), y = y0 + (i % 2 ? -amp : amp) * Math.cos(ph + i * .2); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } g.globalAlpha = 1; },
-    mesh(g, W, H, t, C) { const R = Math.min(W, H) * .32, cx = W / 2, cy = H / 2, a = t * .0005, b = .45, P = (la, lo) => { const x = Math.cos(la) * Math.cos(lo + a), y = Math.sin(la), z = Math.cos(la) * Math.sin(lo + a); return [cx + x * R, cy + (y * Math.cos(b) - z * Math.sin(b)) * R]; };
+    mesh(g, W, H, t, C) { const R = Math.min(W, H) * .32, cx = W / 2, cy = H / 2, a = t * .0005 + PT.rot, b = .45 + (PT.on ? (PT.y - .5) * .9 : 0),   // drag to spin, up and down to tilt
+      P = (la, lo) => { const x = Math.cos(la) * Math.cos(lo + a), y = Math.sin(la), z = Math.cos(la) * Math.sin(lo + a); return [cx + x * R, cy + (y * Math.cos(b) - z * Math.sin(b)) * R]; };
       g.lineWidth = 1.2; g.strokeStyle = C.ink; g.globalAlpha = .5; for (let i = 1; i < 9; i++) { const la = -Math.PI / 2 + i * Math.PI / 9; g.beginPath(); for (let k = 0; k <= 60; k++) { const [x, y] = P(la, k / 60 * Math.PI * 2); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
       for (let j = 0; j < 12; j++) { const lo = j / 12 * Math.PI * 2; g.beginPath(); for (let k = 0; k <= 40; k++) { const [x, y] = P(-Math.PI / 2 + k / 40 * Math.PI, lo); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.globalAlpha = j ? .32 : 1; g.strokeStyle = j ? C.ink : C.red; g.lineWidth = j ? 1.2 : 2; g.stroke(); } g.globalAlpha = 1; },
     // a quick scripted session on a ghost dashboard: everything drawn as faint rounded outlines (a sidebar, an input,
     // a card with a switch, a pill button). The cursor darts between them; each click lands with a small ring and a little push in.
     reel(g, W, H, t, C) {
-      const T = 3600, q = (t % T) / T, step = Math.min(2, Math.floor(q * 3)), u = q * 3 - step;
+      t = t - PT.t0; const T = 3600, q = (t % T) / T,   // a click starts the run again
+       step = Math.min(2, Math.floor(q * 3)), u = q * 3 - step;
       const eo = x => 1 - Math.pow(1 - x, 3), back = x => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
       const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); };
       const ghost = (x, y, w, h, r, a = .2) => { g.strokeStyle = C.ink; g.globalAlpha = a; g.lineWidth = 1; rr(x + .5, y + .5, w, h, r); g.stroke(); g.globalAlpha = 1; };
@@ -85,17 +98,19 @@
       const sq = 1 - kick * .2; g.save(); g.translate(cx, cy); g.scale(sq, sq); g.fillStyle = C.ink; g.strokeStyle = C.panel; g.lineWidth = 1.5; g.beginPath(); g.moveTo(0, 0); g.lineTo(11, 13); g.lineTo(5.5, 13); g.lineTo(1, 18); g.closePath(); g.fill(); g.stroke(); g.restore();
       // the take: one thin rounded line
       const ly = fy + fh + 26; g.fillStyle = C.ink; g.globalAlpha = .12; rr(fx, ly, fw, 2, 1); g.fill(); g.globalAlpha = 1; g.fillStyle = C.red; rr(fx, ly, fw * q, 2, 1); g.fill();  g.restore(); },
-    dial(g, W, H, t, C) { const mid = W / 2, off = (Math.sin(t * .0007) * .5 + .5) * 260, gap = 12, by = H * .66; g.fillStyle = C.ink; for (let i = -10; i < 60; i++) { const x = mid + i * gap - off; if (x < 0 || x > W) continue; g.globalAlpha = Math.max(.1, 1 - Math.abs(x - mid) / mid); const h = i % 10 === 0 ? 30 : i % 5 === 0 ? 18 : 10; g.fillRect(x, by - h, 1.2, h); }
+    dial(g, W, H, t, C) { const mid = W / 2, off = PT.on ? PT.x * 260 : (Math.sin(t * .0007) * .5 + .5) * 260,   // move across to tune
+      gap = 12, by = H * .66; g.fillStyle = C.ink; for (let i = -10; i < 60; i++) { const x = mid + i * gap - off; if (x < 0 || x > W) continue; g.globalAlpha = Math.max(.1, 1 - Math.abs(x - mid) / mid); const h = i % 10 === 0 ? 30 : i % 5 === 0 ? 18 : 10; g.fillRect(x, by - h, 1.2, h); }
       g.globalAlpha = 1; g.fillStyle = C.red; g.fillRect(mid - 1.5, by - 46, 3, 54); g.fillStyle = C.ink; g.font = '500 ' + Math.round(H * .16) + 'px Geist, ui-sans-serif, sans-serif'; g.textAlign = 'center'; g.fillText((88 + off / 60).toFixed(1), mid, H * .36); g.textAlign = 'left'; }
   };
   // ---------- the dial ----------
   const FQ = TOOLS.map(t => parseFloat(t.fq) || 0), lo = Math.floor(Math.min(...FQ) - 1.5), hi = Math.ceil(Math.max(...FQ) + 1.5);
   host.innerHTML = `<div class="dial" tabindex="0" role="slider" aria-label="Tune to a tool" aria-valuemin="${lo}" aria-valuemax="${hi}"><canvas></canvas></div>
-    <div class="right"><div class="stage"><span class="live"><i class="dot"></i><span class="lt"></span></span><span class="fqr"></span><canvas class="demo"></canvas><img alt="" hidden><canvas class="st"></canvas></div><div class="tx" aria-live="polite"></div></div>`;
+    <div class="right"><div class="stage"><span class="live"><i class="dot"></i><span class="lt"></span></span><span class="fqr"></span><canvas class="demo"></canvas><img alt="" hidden><canvas class="st"></canvas><span class="hint" aria-hidden="true"></span></div><div class="tx" aria-live="polite"></div></div>`;
   const dial = host.querySelector('.dial'), dc = dial.querySelector('canvas'), stage = host.querySelector('.stage'), demo = stage.querySelector('.demo'), pic = stage.querySelector('img'), sc = stage.querySelector('.st'), tx = host.querySelector('.tx'), fqr = stage.querySelector('.fqr'), lt = stage.querySelector('.lt');
   const near = x => FQ.reduce((b, f, i) => Math.abs(f - x) < Math.abs(FQ[b] - x) ? i : b, 0);
   let v = FQ[0], tgt = FQ[0], drag = false, cur = -1, lastSt = 0, user = false, vis = false;
-  const show = i => { if (i === cur) return; cur = i; const t = TOOLS[i];
+  let burst = -1e9;
+  const show = i => { if (i === cur) return; if (cur >= 0 && !reduce) { stage.classList.remove('chan'); void stage.offsetWidth; stage.classList.add('chan'); burst = performance.now(); } cur = i; const t = TOOLS[i]; if (window._wbHint) window._wbHint();
     lt.textContent = (t.picture ? '' : 'Live · ') + t.type; pic.hidden = !t.picture; demo.hidden = !!t.picture; if (t.picture) pic.src = t.picture;
     tx.innerHTML = `<div class="hd"><h3>${esc(t.name)}</h3>${t.link ? `<a class="arr" href="${esc(t.link)}" target="_blank" rel="noopener" aria-label="${esc(t.linkLabel || 'Open')}" title="${esc(t.linkLabel || 'Open')}">↗</a>` : ''}</div>
       <p>${esc(t.what)}</p><span class="meta">${t.stat ? `<i>${esc(t.stat)} ${esc(t.statLabel)}</i> · ` : ''}${esc(t.fq)} FM${t.tech ? ' · ' + esc(t.tech) : ''}</span>`; };
@@ -110,6 +125,17 @@
   dial.addEventListener('pointerup', up); dial.addEventListener('pointercancel', up);
   let wt; dial.addEventListener('wheel', e => { const dl = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (!dl) return; e.preventDefault(); e.stopPropagation(); user = true; tgt = Math.max(lo, Math.min(hi, tgt + dl * .02)); clearTimeout(wt); wt = setTimeout(settle, 160); }, { passive: false });
   dial.addEventListener('keydown', e => { const dir = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!dir) return; e.preventDefault(); user = true; tgt = FQ[Math.max(0, Math.min(FQ.length - 1, near(tgt) + dir))]; });
+  // try it yourself: the drawing answers the pointer, and the stage leans towards it a little
+  const hint = stage.querySelector('.hint'), fine = matchMedia('(pointer: fine)').matches; let spin = null;
+  const hintFor = () => { const k = guess(TOOLS[Math.max(0, cur)]); return { line: 'Move across to sharpen the zig zags', mesh: 'Drag to spin it', reel: (fine ? 'Click' : 'Tap') + ' to run it again', dial: 'Move across to tune' }[k] || ''; };
+  window._wbHint = () => { if (stage.classList.contains('play')) hint.textContent = hintFor(); };
+  stage.addEventListener('pointerenter', () => { if (TOOLS[Math.max(0, cur)].picture) return; stage.classList.add('play'); hint.textContent = hintFor(); });
+  stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    PT.on = true; PT.x = Math.max(0, Math.min(1, x)); PT.y = Math.max(0, Math.min(1, y)); if (spin !== null) { PT.rot += (e.clientX - spin) * .01; spin = e.clientX; } hint.textContent = hintFor();
+    if (fine && !reduce) stage.style.transform = `perspective(1200px) rotateX(${((.5 - y) * 6).toFixed(2)}deg) rotateY(${((x - .5) * 8).toFixed(2)}deg)`; });
+  stage.addEventListener('pointerleave', () => { PT.on = false; spin = null; stage.classList.remove('play'); stage.style.transform = ''; });
+  stage.addEventListener('pointerdown', e => { spin = e.clientX; if (guess(TOOLS[Math.max(0, cur)]) === 'reel') PT.t0 = performance.now() % 3600; });
+  addEventListener('pointerup', () => { spin = null; if (!fine) PT.on = false; });
   new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(host);
   let C = col(); new MutationObserver(() => { C = col(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   const fit = c => { const W = c.clientWidth, H = c.clientHeight, d = Math.min(2, devicePixelRatio || 1); if (c.width !== Math.round(W * d) || c.height !== Math.round(H * d)) { c.width = Math.round(W * d); c.height = Math.round(H * d); } const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H); return [g, W, H]; };
@@ -131,8 +157,8 @@
     // the tool on the stage
     if (!TOOLS[i].picture) { const [g, W, H] = fit(demo), k = guess(TOOLS[i]); if (DEMOS[k] && W) DEMOS[k](g, W, H, reduce ? 1200 : t, C); }
     // static between tools
-    { const [g, W, H] = fit(sc); if (a > .01) { g.fillStyle = C.ink; for (let n = 0; n < 900 * a; n++) { g.globalAlpha = Math.random() * .5 * a; g.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); }
-        g.globalAlpha = .06 * a; for (let y = (t * .1) % 4; y < H; y += 4) g.fillRect(0, y, W, 1); g.globalAlpha = 1; } }
+    { const [g, W, H] = fit(sc), aS = Math.max(a, 1 - (performance.now() - burst) / 200); if (aS > .01) { g.fillStyle = C.ink; for (let n = 0; n < 900 * aS; n++) { g.globalAlpha = Math.random() * .5 * aS; g.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); }
+        g.globalAlpha = .06 * aS; for (let y = (t * .1) % 4; y < H; y += 4) g.fillRect(0, y, W, 1); g.globalAlpha = 1; } }
   })(0);
 })();
 </script>

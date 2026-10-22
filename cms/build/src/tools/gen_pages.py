@@ -51,7 +51,7 @@ def _bench(s, rep):
     wb = open(f'{KFM}/workbench.html', encoding='utf-8').read().replace('__TOOLS__', json.dumps(tools, ensure_ascii=False).replace('</', '<\\/'))
     # the statement is commented out for now (it stays in the CMS); an empty stand-in keeps the page's script happy
     i = s.index('<section class="stmt" id="s-stmt">'); j = s.index('</section>', i) + 10
-    s = s[:i] + '<!-- ' + s[i:j].replace('--', '- -') + ' -->\n  <p id="stmt" hidden></p>\n  <style>main > #s-band { margin-top: 0; padding-top: 150px } @media (max-width: 899px) { main > #s-band { padding-top: 96px } }</style>' + s[j:]
+    s = s[:i] + '<!-- ' + s[i:j].replace('--', '- -') + ' -->\n  <p id="stmt" hidden></p>\n  <style>main > #s-band { margin-top: 0; padding-top: 150px; padding-bottom: 28px } main > #s-band h2 { font-size: clamp(40px, 5.2vw, 72px); line-height: 1.02; letter-spacing: -.045em } main > #s-band p { margin-top: 14px; font-size: 17px; max-width: 62ch } @media (max-width: 899px) { main > #s-band { padding-top: 96px } main > #s-band p { font-size: 16px } }</style>' + s[j:]
     return s.replace('</body>', wb + '\n</body>', 1)
 make('96.0', 'Engineering', _en['statement'], _en['title'], _en['sub'], _en['tag'],
      [[t.get(k, '') for k in ['fq', 'name', 'type', 'what', 'stat', 'statLabel', 'tech']] + ([ '', '', t['link'], t.get('linkLabel') or 'Open'] if t.get('link') else []) for t in _en['tools'] if not t.get('hidden')], f'{GEN}/engineering-src.html', post=_bench)
