@@ -113,7 +113,10 @@ _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
 CORNERS = ('<style id="km-corners">'
   'html[data-corners="rounded"]{--km-r:14px}'
   # the frames that hold a picture: round them and clip what is inside
-  'html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in){border-radius:var(--km-r)!important;overflow:hidden}'
+  'html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in,.d-frame,.d-pic,span.th,.keep,.gal .main){border-radius:var(--km-r)!important;overflow:hidden}'
+  'html[data-corners="rounded"] .lb img{border-radius:var(--km-r)!important}'
+  'html[data-corners="rounded"] figure.sw .m img{border-radius:var(--km-r)!important}'
+  'html[data-corners="rounded"] :is(.gal .thumbs button,#strip button,.d-gt){border-radius:8px!important;overflow:hidden}html[data-corners="rounded"] :is(#strip button,.d-gt) img{border-radius:inherit}'
   'html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}'
   # pictures that sit straight in a frame with a caption beside them: round the picture itself
   'html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}'
