@@ -15,7 +15,7 @@
   .pt-pill.on { opacity: 1; transform: translate(-50%, 0) }
   .pt-pill b { font-weight: 500; color: #ff4a1c }
   .pt-cue { position: fixed; z-index: 30; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: grid; justify-items: center; gap: 2px;
-    font: 500 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--muted, #888); background: none; border: 0; cursor: pointer; transition: opacity .3s }
+    font: 600 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--muted, #888); background: none; border: 0; cursor: pointer; transition: opacity .3s }
   .pt-cue svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: ptb 1.6s cubic-bezier(.45,0,.55,1) infinite }
   .pt-cue:hover { color: var(--ink, #111) }
   @keyframes ptb { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
@@ -30,7 +30,7 @@
     background: var(--bg, #fff); color: var(--text, #333); box-shadow: 0 0 0 1px var(--edge, rgb(0 0 0 / .07)), 0 24px 60px rgb(0 0 0 / .18); font: 14px/1.5 Geist, system-ui, sans-serif;
     opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left; pointer-events: none; transition: opacity .2s, transform .3s cubic-bezier(.2,.8,.2,1) }
   .pt-card.on { opacity: 1; transform: none; pointer-events: auto }
-  .pt-card .lb { font: 500 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888) }
+  .pt-card .lb { font: 600 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888) }
   .pt-card .rr { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 12px; font-size: 12.5px; color: var(--muted, #888) }
   .pt-card .rr span { margin-right: 4px }
   .pt-card .rr button { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: var(--pill, #f2f2f2); color: var(--muted, #888); font: 500 12px Geist, system-ui, sans-serif; cursor: pointer; transition: background .18s, color .18s }

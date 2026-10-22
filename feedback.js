@@ -61,7 +61,7 @@
   .kfb.mob .sc { pointer-events: auto } .kfb.mob.on .sc { opacity: 1 }
   .kfb.mob .cd { right: auto; bottom: auto; left: 50%; top: 50%; width: calc(100vw - 32px); max-width: 400px; translate: -50% -46%; scale: .96 }
   .kfb.mob.on .cd { translate: -50% -50%; scale: 1 }
-  .kfb .mo { font: 500 11px/1.4 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--m) }
+  .kfb .mo { font: 600 11px/1.4 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--m) }
   .kfb .hd { display: flex; align-items: center; justify-content: space-between; gap: 12px }
   .kfb .x { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--m); margin: -6px -6px 0 0; transition: background .2s, color .2s }
   .kfb .x:hover { background: var(--p); color: var(--i) }

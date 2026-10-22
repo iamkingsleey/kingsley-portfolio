@@ -19,7 +19,7 @@
     .sound-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: calc(max(64px, env(safe-area-inset-right, 0px)) + 44px) !important }
   }
   .vsw { position: fixed; z-index: 150; left: max(48px, env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill, #f2f2f2);
-    font: 500 12px "Geist Mono", ui-monospace, monospace; letter-spacing: .3px }
+    font: 600 12px "Geist Mono", ui-monospace, monospace; letter-spacing: .3px }
   .vsw a { padding: 5px 10px; border-radius: 999px; color: var(--muted, #888); text-decoration: none; transition: color .2s, background .2s }
   .vsw a:hover { color: var(--ink, #111) }
   .vsw a.on { background: var(--bg, #fff); color: var(--ink, #111) }

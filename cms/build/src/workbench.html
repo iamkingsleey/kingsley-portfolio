@@ -10,8 +10,8 @@
 .wb .dial:focus-visible { outline: 2px solid var(--red); outline-offset: 6px }
 .wb .right { display: grid; gap: 30px; align-content: start; min-width: 0 }
 .wb .stage { position: relative; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--ink) 2%, var(--bg)) }
-.wb .stage .live { position: absolute; z-index: 3; left: 24px; top: 24px; display: flex; align-items: center; font: 500 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
-.wb .stage .fqr { position: absolute; z-index: 3; right: 24px; top: 24px; font: 500 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums }
+.wb .stage .live { position: absolute; z-index: 3; left: 24px; top: 24px; display: flex; align-items: center; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.wb .stage .fqr { position: absolute; z-index: 3; right: 24px; top: 24px; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums }
 .wb .live .dot { position: relative; width: 8px; height: 8px; border-radius: 99px; background: var(--red); margin-right: 10px }
 .wb .live .dot::before, .wb .live .dot::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 1px solid var(--red); animation: wbring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
 .wb .live .dot::after { animation-delay: 1.2s }
@@ -24,7 +24,7 @@
 .wb .tx .hd { display: flex; align-items: center; gap: 14px }
 .wb .tx h3 { margin: 0 auto 0 0; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.035em; line-height: 1.1 }
 .wb .tx p { margin: 0 0 10px; color: var(--text); font-size: 16px; line-height: 1.55; max-width: 54ch }
-.wb .tx .meta { font: 500 11.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .wb .tx .meta i { font-style: normal; color: var(--ink) }
+.wb .tx .meta { font: 600 11.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .wb .tx .meta i { font-style: normal; color: var(--ink) }
 .wb .arr { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 99px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 17px; transition: background .2s, color .2s, transform .25s }
 .wb .arr:hover { background: var(--ink); color: var(--bg); transform: rotate(45deg) }
 @media (max-width: 860px) { .wb { grid-template-columns: 1fr; gap: 24px; padding-top: 115px } .wb .dial { min-height: 96px; height: 96px }

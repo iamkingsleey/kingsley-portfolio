@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Showcase Pages</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* Showcase layouts for work with no story to tell, just pieces to enjoy.
    3D (#3d): a dial carousel you turn by dragging, a table where the pieces can be thrown around,
@@ -31,7 +31,7 @@ img { display: block; max-width: 100% }
 button, a { font: inherit; color: inherit }
 button { background: none; border: 0; padding: 0; cursor: pointer }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
-.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.mono { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gut) }
 
 /* chrome */
@@ -114,7 +114,7 @@ h1 .w.in > span { translate: 0 0 }
   box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 18px 34px -18px rgb(0 0 0 / .35); transition: box-shadow .3s }
 .print.held { cursor: grabbing; box-shadow: 0 2px 4px rgb(0 0 0 / .08), 0 44px 60px -24px rgb(0 0 0 / .45) }
 .print img { width: 100%; aspect-ratio: var(--r); object-fit: cover; pointer-events: none }
-.print span { display: block; padding-top: calc(var(--pw) * .04); font: 500 9.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: #8c8c8c }
+.print span { display: block; padding-top: calc(var(--pw) * .04); font: 600 9.5px var(--mono); letter-spacing: .5px; text-transform: uppercase; color: #8c8c8c }
 
 /* ---------- Illustration · loupe ---------- */
 .lpanel { position: relative; aspect-ratio: 16 / 9.6; background: var(--panel); overflow: hidden; cursor: none; touch-action: none; display: grid; place-items: center }
@@ -131,7 +131,7 @@ h1 .w.in > span { translate: 0 0 }
 .sbig img { width: 78%; height: 78%; object-fit: contain; transition: opacity .3s, scale .7s var(--pop) }
 .sbig img.out { opacity: 0; scale: .94 }
 .sw { display: grid; grid-template-rows: repeat(5, 1fr); gap: 0 }
-.sw button { position: relative; display: flex; align-items: end; justify-content: space-between; padding: 14px 16px; font: 500 11px var(--mono); letter-spacing: .5px; text-transform: uppercase; transition: background .6s var(--ease), color .6s }
+.sw button { position: relative; display: flex; align-items: end; justify-content: space-between; padding: 14px 16px; font: 600 11px var(--mono); letter-spacing: .5px; text-transform: uppercase; transition: background .6s var(--ease), color .6s }
 .sw button em { font-style: normal; opacity: .7 }
 .strip { display: flex; gap: 8px; margin-top: 16px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none }
 .strip button { flex: none; width: 86px; aspect-ratio: 4 / 5; background: var(--panel); opacity: .45; transition: opacity .3s, translate .5s var(--pop) }
@@ -162,10 +162,10 @@ h1 .w.in > span { translate: 0 0 }
 .cred { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 120px 0 80px; border-bottom: 1px solid var(--line) }
 .cred h2 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
 .cred dl { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 32px }
-.cred dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.cred dt { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .cred dd { margin: 8px 0 0; color: var(--ink); font-size: 15px; line-height: 1.5 }
 .next { display: block; padding: 64px 0 160px; text-decoration: none }
-.next .fq { font: 500 12px var(--mono); color: var(--muted) }
+.next .fq { font: 600 12px var(--mono); color: var(--muted) }
 .next b { display: block; margin-top: 10px; color: var(--ink); font-weight: 500; font-size: clamp(28px, 4vw, 52px); letter-spacing: -.04em; line-height: 1 }
 .next i { font-style: normal; display: inline-block; transition: translate .6s var(--pop) } .next:hover i { translate: 10px 0 }
 
@@ -187,7 +187,7 @@ h1 .w.in > span { translate: 0 0 }
 
 /* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
 .next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
-.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
 .next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
 .next:hover h5 { transform: translateX(10px) }

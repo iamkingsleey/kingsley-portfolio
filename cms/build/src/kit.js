@@ -26,7 +26,7 @@
   /* keyboard focus: a clear ring wherever a page hasn't drawn its own */
   :where(a, button, [role="button"], [tabindex], input, select, textarea, summary):focus-visible { outline: 2px solid var(--km-ring); outline-offset: 2px }   /* neutral: red is kept for the active tick */
   /* in-place confirmation */
-  .km-say { position: fixed; z-index: 2147482000; padding: 5px 10px; border-radius: 999px; background: var(--ink, #111); color: var(--bg, #fff); font: 500 11.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .2px;
+  .km-say { position: fixed; z-index: 2147482000; padding: 5px 10px; border-radius: 999px; background: var(--ink, #111); color: var(--bg, #fff); font: 600 11.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .2px;
     white-space: nowrap; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity var(--km-leave) var(--km-ease), transform var(--km-leave) var(--km-ease) }
   .km-say.on { opacity: 1; transform: none; transition-duration: var(--km-quick) }
   /* blur-up */

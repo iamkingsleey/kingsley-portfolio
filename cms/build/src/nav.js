@@ -69,7 +69,7 @@
       opacity: 0; visibility: hidden; transition: opacity .28s, visibility 0s .28s }
     html.kmn-open .kmn-menu { opacity: 1; visibility: visible; transition: opacity .22s }
     html.kmn-open, html.kmn-open body { overflow: hidden }
-    .kmn-menu .lb { font: 500 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888); margin-bottom: 8px }
+    .kmn-menu .lb { font: 600 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888); margin-bottom: 8px }
     .kmn-menu ul { list-style: none; margin: 0; padding: 0 }
     .kmn-menu button { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 16px 0 16px 0; border: 0; border-bottom: 1px solid var(--line, rgb(127 127 127 / .16)); background: none;
       font: 600 34px/1.05 Geist, system-ui, sans-serif; letter-spacing: -1px; color: var(--muted, #999); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;

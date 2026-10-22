@@ -28,7 +28,7 @@
 <title>Product design · Kingsley M.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* Product design (UI/UX), simple versions. One feature, a few large screens on calm panels, short text,
    credits. Shared by every version: the opening screen is the working prototype (drag the dial), and the
@@ -58,7 +58,7 @@ button, a { font: inherit; color: inherit }
 button { background: none; border: 0; padding: 0; cursor: pointer }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
 figure { margin: 0 }
-.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.mono { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .wrap { padding: 0 var(--gut) }
 
 /* station readout + preview theme switch */
@@ -78,7 +78,7 @@ html:not([data-theme="dark"]) .ph { box-shadow: 0 0 0 1px rgb(0 0 0 / .1), 0 30p
 .scr video, .scr > img { width: 100%; height: 100%; object-fit: cover }
 .s-pad { position: absolute; inset: 9% 7% 5%; display: flex; flex-direction: column; gap: 4% }
 .s-t { font-weight: 600; font-size: 1.6em; letter-spacing: -.04em; line-height: 1 }
-.s-sm { font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .6 }
+.s-sm { font: 600 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .6 }
 .s-card { border-radius: .9em; padding: 7%; background: rgb(255 255 255 / .06) }
 .s-row { display: flex; align-items: center; gap: 6%; padding: 4% 0; border-bottom: 1px solid rgb(255 255 255 / .08) }
 .s-av { width: 2.3em; height: 2.3em; border-radius: .5em; flex: none }
@@ -150,7 +150,7 @@ html[data-theme="dark"] { --panel: #141414 }
 .slot .gfx { display: grid; place-items: center; left: -60px; right: -60px; width: auto }   /* wider than the slot, so the sideways pan never shows an edge */
 .slot .lab { position: absolute; top: 0; margin-top: -30px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; color: #fff; mix-blend-mode: difference; pointer-events: none; will-change: transform }
 .split-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; margin-top: -1.5px; background: var(--red); z-index: 4; pointer-events: none; opacity: 0; will-change: transform }
-.split-tag { position: absolute; top: -11px; right: 12px; z-index: 5; padding: 4px 8px; background: var(--red); color: #fff; font: 500 10px var(--mono); letter-spacing: .5px; opacity: 0; pointer-events: none; will-change: transform }
+.split-tag { position: absolute; top: -11px; right: 12px; z-index: 5; padding: 4px 8px; background: var(--red); color: #fff; font: 600 10px var(--mono); letter-spacing: .5px; opacity: 0; pointer-events: none; will-change: transform }
 
 /* panels: sharp, quiet, the screen floats in the middle */
 .pn { position: relative; background: var(--panel); overflow: hidden; display: grid; place-items: center; aspect-ratio: 16 / 9.4; transition: background .6s var(--ease) }
@@ -178,7 +178,7 @@ html.colour .pn[data-c="3"] { background: var(--a3) } html.colour .pn[data-c="4"
 .live .ld:active { cursor: grabbing }
 .live .ld i { position: absolute; left: 50%; top: 50%; width: 3px; height: 46%; margin-left: -1.5px; background: #fff; border-radius: 2px; transform-origin: 50% 0; rotate: var(--a, 180deg) }
 .live .ld::after { content: ""; position: absolute; left: 50%; top: 2%; width: 4px; height: 14%; margin-left: -2px; background: var(--red); border-radius: 2px }
-.live .lh { margin-top: auto; font: 500 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .55 }
+.live .lh { margin-top: auto; font: 600 .62em var(--mono); letter-spacing: .05em; text-transform: uppercase; opacity: .55 }
 .ld.hint { animation: hint 2.4s var(--ease) 1.2s 2 }
 @keyframes hint { 0%, 100% { rotate: 0deg } 30% { rotate: 24deg } 60% { rotate: -8deg } }
 
@@ -245,10 +245,10 @@ h1 .w.in > span { translate: 0 0 }
 .cred { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 120px 0 80px; border-bottom: 1px solid var(--line) }
 .cred h2 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500 }
 .cred dl { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 32px }
-.cred dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.cred dt { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .cred dd { margin: 8px 0 0; color: var(--ink); font-size: 15px; line-height: 1.5 }
 .next { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 64px 0 160px; text-decoration: none }
-.next .fq { font: 500 12px var(--mono); color: var(--muted) }
+.next .fq { font: 600 12px var(--mono); color: var(--muted) }
 .next b { display: block; margin-top: 10px; color: var(--ink); font-weight: 500; font-size: clamp(28px, 4vw, 52px); letter-spacing: -.04em; line-height: 1 }
 .next i { font-style: normal; display: inline-block; transition: translate .6s var(--pop) } .next:hover i { translate: 10px 0 }
 
@@ -285,7 +285,7 @@ h1 .w.in > span { translate: 0 0 }
 
 /* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
 .next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
-.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
 .next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
 .next:hover h5 { transform: translateX(10px) }
@@ -711,7 +711,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610221135';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610221143';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -725,9 +725,9 @@ h1 .w.in > span { translate: 0 0 }
   addEventListener('hashchange', function () { location.reload(); });   // next piece with the same layout: same file, new address
 })();
 </script>
-<script src="nav.js?v=e73dc949" defer></script>
-<script src="kit.js?v=391e47e6" defer></script>
-<script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=a6e41f5e" defer></script>
+<script src="nav.js?v=f066ff04" defer></script>
+<script src="kit.js?v=08f08a9c" defer></script>
+<script src="protips.js?v=bd51fe50" defer></script>
+<script src="feedback.js?v=14e2e38a" defer></script>
 </body>
 </html>

@@ -41,7 +41,7 @@ TUNER = '<script src="tuner.js"></script>\n'   # page-to-page transition (see tu
 # ================================================================ index.html
 s = orig
 # Geist and Geist Mono everywhere; Jockey One only for the name on Home
-s = rep(s, 'family=Jockey+One&family=Geist:wght@400;500;600&display=swap', 'family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap')
+s = rep(s, 'family=Jockey+One&family=Geist:wght@400;500;600&display=swap', 'family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600;700&display=swap')
 s = rep(s, ".needle { stroke: var(--ink); stroke-linecap: round }",
         ".needle { stroke: #ff4a1c; stroke-linecap: round }   /* the dial's main tick: the same red as the Designs needle */")
 s = rep(s, '<style>\n', THEME_BOOT.replace('<script>\n', '<script>\n  var BUILD = "' + BUILD + '";   // changes every build so browsers fetch the new Designs page\n', 1) + TUNER + '<style>\n')

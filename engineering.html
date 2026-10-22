@@ -15,7 +15,7 @@
 <title>Engineering · Kingsley M.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* About page: the signal tunes in to a face (lines across the whole screen), one statement, the career as a
    band you tune through, skills as a mixing desk, on air from Lagos and calling in to the station. Geist throughout; Jockey One only for the name. */
@@ -40,7 +40,7 @@ img { display: block; max-width: 100% }
 button, a, input, textarea { font: inherit; color: inherit }
 button { background: none; border: 0; padding: 0; cursor: pointer }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
-.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.mono { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 max(var(--gut), 128px) 0 var(--gut) }
 .todo { font-style: italic; color: var(--muted) }
 
@@ -99,7 +99,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 /* the bulge: the chapters sit on a drum that turns as you scroll, like the Designs grid. The one facing you is flat and full size; the ones above and below bend away, shrink and fade */
 .bcard.drum .ch { transition: none; translate: none; transform-origin: 0 35%; will-change: transform, opacity }
 .bpin:has(.bcard.drum) { -webkit-mask-image: linear-gradient(transparent 100px, #000 230px, #000 calc(100% - 140px), transparent calc(100% - 20px)); mask-image: linear-gradient(transparent 100px, #000 230px, #000 calc(100% - 140px), transparent calc(100% - 20px)) }   /* the curve fades out well before the nav */
-.bcard .fqv { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .5px }
+.bcard .fqv { font: 600 12px var(--mono); color: var(--muted); letter-spacing: .5px }
 .bcard h3 { margin: 14px 0 0; color: var(--ink); font-size: clamp(36px, 4.6vw, 68px); line-height: .98; font-weight: 500; letter-spacing: -.045em; max-width: 14ch }
 .bcard .role { margin-top: 14px; color: var(--ink); font-size: 16px }
 .bcard p { margin: 14px 0 0; font-size: 16px; line-height: 1.6; max-width: 52ch }
@@ -148,7 +148,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .onair .clock { color: var(--ink); font: 500 clamp(56px, 6vw, 88px)/1 var(--body); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
 .onair .clock small { font-size: .32em; color: var(--muted); margin-left: 8px; letter-spacing: 0 }
 .onair dl { margin: auto 0 0; display: grid; gap: 14px }
-.onair dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.onair dt { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .onair dd { margin: 4px 0 0; color: var(--ink); font-size: 15px }
 .sw { position: relative; width: 44px; height: 24px; border-radius: 99px; background: var(--line); transition: background .3s }
 .sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: translate .5s var(--pop) }
@@ -421,8 +421,8 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .wb .dial:focus-visible { outline: 2px solid var(--red); outline-offset: 6px }
 .wb .right { display: grid; gap: 30px; align-content: start; min-width: 0 }
 .wb .stage { position: relative; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--ink) 2%, var(--bg)) }
-.wb .stage .live { position: absolute; z-index: 3; left: 24px; top: 24px; display: flex; align-items: center; font: 500 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
-.wb .stage .fqr { position: absolute; z-index: 3; right: 24px; top: 24px; font: 500 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums }
+.wb .stage .live { position: absolute; z-index: 3; left: 24px; top: 24px; display: flex; align-items: center; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.wb .stage .fqr { position: absolute; z-index: 3; right: 24px; top: 24px; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums }
 .wb .live .dot { position: relative; width: 8px; height: 8px; border-radius: 99px; background: var(--red); margin-right: 10px }
 .wb .live .dot::before, .wb .live .dot::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 1px solid var(--red); animation: wbring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
 .wb .live .dot::after { animation-delay: 1.2s }
@@ -435,7 +435,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .wb .tx .hd { display: flex; align-items: center; gap: 14px }
 .wb .tx h3 { margin: 0 auto 0 0; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.035em; line-height: 1.1 }
 .wb .tx p { margin: 0 0 10px; color: var(--text); font-size: 16px; line-height: 1.55; max-width: 54ch }
-.wb .tx .meta { font: 500 11.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .wb .tx .meta i { font-style: normal; color: var(--ink) }
+.wb .tx .meta { font: 600 11.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .wb .tx .meta i { font-style: normal; color: var(--ink) }
 .wb .arr { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 99px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 17px; transition: background .2s, color .2s, transform .25s }
 .wb .arr:hover { background: var(--ink); color: var(--bg); transform: rotate(45deg) }
 @media (max-width: 860px) { .wb { grid-template-columns: 1fr; gap: 24px; padding-top: 115px } .wb .dial { min-height: 96px; height: 96px }
@@ -553,9 +553,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
         if (window.Tuner) Tuner.go({ from: 96, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
   </script>
-  <script src="nav.js?v=e73dc949" defer></script>
-<script src="kit.js?v=391e47e6" defer></script>
-<script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=a6e41f5e" defer></script>
+  <script src="nav.js?v=f066ff04" defer></script>
+<script src="kit.js?v=08f08a9c" defer></script>
+<script src="protips.js?v=bd51fe50" defer></script>
+<script src="feedback.js?v=14e2e38a" defer></script>
 </body>
 </html>

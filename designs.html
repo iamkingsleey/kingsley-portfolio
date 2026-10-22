@@ -15,7 +15,7 @@
 </script>
 <script src="tuner.js?v=1210095b"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: the V1 side menu top-left, category chips top-right, a horizontal row of work in the middle where the
    piece on the needle is full size and its neighbours sit smaller and faded, its caption above and meta below,
@@ -46,7 +46,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- Station indicator: where you are, and the way back to Home (98.0) ---------- */
 .station { position: fixed; left: max(48px, env(safe-area-inset-left, 0px)); top: 108px; z-index: 20;   /* level with the filter row */ display: flex; align-items: center; gap: 6px }
-.back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 500 12px var(--mono); color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
+.back { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pill); font: 600 12px var(--mono); color: var(--muted); letter-spacing: .3px; transition: background .25s, color .25s }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s cubic-bezier(.2,.8,.2,1) }
 .back span { font-family: var(--body); font-size: 13px; letter-spacing: -.1px }
 .back:hover { background: var(--hover); color: var(--ink) }
@@ -69,18 +69,18 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 .top { position: fixed; left: 50%; transform: translateX(-50%); top: 106px; z-index: 20; display: flex; align-items: center; gap: 18px }
 .chips { display: flex; gap: 4px } .chips button { white-space: nowrap }
 :root[data-theme="light"] .ov-t.fits .ov-c .fit { box-shadow: inset 0 0 0 1px rgb(0 0 0 / .14) }   /* the white tag keeps an edge on the light page */   /* the white selection already shows it's active */
-.ov-c .fit, .ov-t.fits .ov-c .fit { display: none } .ov-t.fits .ov-c .fit-x { margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
+.ov-c .fit, .ov-t.fits .ov-c .fit { display: none } .ov-t.fits .ov-c .fit-x { margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 600 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
 .chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
-.chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
+.chips button sup { font: 600 9px var(--mono); margin-left: 3px; opacity: .7 }
 .chips button:hover { color: var(--ink) }
 .chips button.on { background: var(--ink); color: var(--on-ink) }
-.count { font: 500 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; text-align: right }
+.count { font: 600 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; text-align: right }
 .count b { color: var(--ink); font-weight: 500 }
 
 /* ---------- Row of work ---------- */
 .row { position: fixed; inset: 0 0 96px 0; z-index: 5; touch-action: pan-y; cursor: grab }
 .row.drag { cursor: grabbing }
-.slot .cstag { position: absolute; top: 12px; left: 12px; z-index: 4; display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px 6px 8px; border-radius: 999px; background: rgb(0 0 0 / .55); color: #fff; font: 500 9.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none }
+.slot .cstag { position: absolute; top: 12px; left: 12px; z-index: 4; display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px 6px 8px; border-radius: 999px; background: rgb(0 0 0 / .55); color: #fff; font: 600 9.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none }
 .slot .cstag::before, .cap .csc::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #ff4a1c }
 .cap .csc { display: inline-flex; align-items: center; gap: 6px; color: var(--ink) }
 /* the small view for a design shot: the picture, its title and a line about it */
@@ -94,7 +94,7 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 .d-info { display: grid; gap: 44px; max-width: 620px; margin-top: 44px }
 .d-ih h1 { margin: 0; color: var(--ink); font-size: clamp(36px, 4.4vw, 60px); line-height: .95; font-weight: 500; letter-spacing: -0.045em }
 .d-yr { display: block; margin-top: 12px; color: var(--muted); font-size: 15px }
-.d-chip { display: inline-block; margin-top: 16px; padding: 7px 11px; background: var(--tile); color: var(--ink); font: 500 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase }
+.d-chip { display: inline-block; margin-top: 16px; padding: 7px 11px; background: var(--tile); color: var(--ink); font: 600 10.5px var(--mono); letter-spacing: .5px; text-transform: uppercase }
 .d-ib h3 { margin: 0 0 12px; color: var(--ink); font-size: 15px; font-weight: 600 }
 .d-ib p { margin: 0; color: var(--text); font-size: 17px; line-height: 1.6 }
 .d-read { display: inline-block; margin-top: 18px; color: var(--ink); font-size: 15px; font-weight: 500; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px }
@@ -111,7 +111,7 @@ canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-
 /* Caption: follows the piece on the needle */
 .cap { position: absolute; left: 50%; top: 0; z-index: 6; pointer-events: none; will-change: transform, opacity }
 .cap h2 { position: absolute; left: 0; bottom: 14px; margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.5px; color: var(--ink); white-space: nowrap }
-.cap .num { position: absolute; left: 0; font: 500 12px var(--mono); color: var(--muted) }
+.cap .num { position: absolute; left: 0; font: 600 12px var(--mono); color: var(--muted) }
 .cap .num i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); margin-right: 7px; vertical-align: 1px }
 .cap .meta { position: absolute; right: 0; text-align: right; font: 11px/1.6 var(--mono); letter-spacing: .3px; text-transform: uppercase; color: var(--muted); white-space: nowrap }
 .cap .meta b { color: var(--ink); font-weight: 500 }
@@ -164,7 +164,7 @@ body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.no
 .d-wrap { max-width: 1180px; margin: 0 auto; padding: 160px 32px 180px; transition: opacity .3s }
 .d-wrap.swap { opacity: 0 }
 .d-sec { padding: 0 0 120px }
-.d-label { font: 500 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center }
+.d-label { font: 600 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center }
 .d-label i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink) }
 .d-frame { position: relative; width: 100%; height: min(74vh, 720px); overflow: hidden; background: var(--tile) }
 .d-frame.white { background: #fff; outline: 1px solid var(--edge); outline-offset: -1px }
@@ -196,7 +196,7 @@ body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.no
 .d-hero h1 { margin: 18px 0 0; font-size: clamp(44px, 6vw, 84px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; color: var(--ink); text-wrap: balance }
 .d-sum { margin: 22px 0 0; font-size: 19px; line-height: 1.45; max-width: 30ch; color: var(--text); text-wrap: pretty }
 .d-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 28px; margin: 44px 0 0; max-width: 420px }
-.d-meta dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.d-meta dt { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .d-meta dd { margin: 6px 0 0; font-size: 14px; font-weight: 500; color: var(--ink) }
 .d-media { position: relative; overflow: hidden; background: var(--tile) }
 .d-media img, .d-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block }
@@ -208,23 +208,23 @@ body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.no
 .d-cols p { margin: 0 }
 .d-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px; position: relative }
 .d-step { padding: 18px 16px 20px; border-radius: 10px; background: var(--tile); min-height: 150px; display: flex; flex-direction: column; justify-content: space-between }
-.d-step .n { font: 500 11px var(--mono); color: var(--muted) }
+.d-step .n { font: 600 11px var(--mono); color: var(--muted) }
 .d-step b { display: block; font-size: 16px; font-weight: 500; color: var(--ink); letter-spacing: -.2px }
 .d-step span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--muted) }
 .d-crops { display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: auto auto; gap: 12px; margin-top: 28px }
 .d-crop { border-radius: 8px; background-repeat: no-repeat; background-color: var(--tile); aspect-ratio: 1; position: relative; overflow: hidden }
 .d-crop:first-child { grid-row: span 2; aspect-ratio: auto }
-.d-crop em { position: absolute; left: 12px; bottom: 10px; font: 500 10.5px var(--mono); font-style: normal; letter-spacing: .5px; text-transform: uppercase; background: rgb(255 255 255 / .9); color: var(--ink); padding: 4px 8px; border-radius: 999px }
+.d-crop em { position: absolute; left: 12px; bottom: 10px; font: 600 10.5px var(--mono); font-style: normal; letter-spacing: .5px; text-transform: uppercase; background: rgb(255 255 255 / .9); color: var(--ink); padding: 4px 8px; border-radius: 999px }
 .d-pal { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px }
-.d-sw { border-radius: 10px; aspect-ratio: 1 / 1.15; display: flex; align-items: flex-end; padding: 14px; font: 500 11px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .06) }
+.d-sw { border-radius: 10px; aspect-ratio: 1 / 1.15; display: flex; align-items: flex-end; padding: 14px; font: 600 11px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .06) }
 .d-ar { position: absolute; top: 50%; translate: 0 -50%; z-index: 3; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--ink); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: .9; transition: opacity .2s, transform .2s }
 .d-ar:hover { opacity: 1 } .d-ar:active { transform: scale(.94) } .d-ar.l { left: 14px } .d-ar.r { right: 14px }
 .d-ar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round }
-.d-cnt { position: absolute; z-index: 3; left: 14px; bottom: 12px; padding: 4px 9px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--ink); font: 500 11px var(--mono); letter-spacing: .4px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px) }
+.d-cnt { position: absolute; z-index: 3; left: 14px; bottom: 12px; padding: 4px 9px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--ink); font: 600 11px var(--mono); letter-spacing: .4px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px) }
 /* the whole set, right under the piece: rows that run edge to edge, each picture in its own shape */
 .d-gal { display: grid; gap: 12px; margin: 56px 0 24px }
 .d-gh { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px }
-.d-gh h3 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 500 } .d-gh .mono { font: 500 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.d-gh h3 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 500 } .d-gh .mono { font: 600 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .d-grow { display: flex; gap: 12px }
 .d-gt { flex: calc(var(--r) * 100) 1 0; aspect-ratio: var(--r); min-width: 0; padding: 0; border: 0; background: var(--tile); overflow: hidden; cursor: pointer; position: relative; opacity: .82; transition: opacity .2s }
 .d-gt img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.8,.2,1) }
@@ -307,7 +307,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
 @media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
 .ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
-.ov-c b { font: 500 12px var(--mono); color: var(--muted); margin-right: 4px }
+.ov-c b { font: 600 12px var(--mono); color: var(--muted); margin-right: 4px }
 .ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
 /* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
    category starts, a fixed needle in the middle. It moves with the page; drag it or tap a label to travel. */
@@ -373,7 +373,7 @@ body.open .phys, body.all .phys, body.open .fmwave, body.all .fmwave { opacity: 
 
 /* next on the dial: one structure everywhere (label, then the name under it on the left; the picture on the right) */
 .next { display: grid; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 48px; row-gap: 0; grid-template-rows: auto 1fr; align-items: start; padding: 40px 0 200px; text-decoration: none; cursor: pointer }
-.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.next > .mono, .next > .fq, .next > .d-label { grid-column: 1; grid-row: 1; margin: 0; font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .next .r { display: contents } .next .r > :first-child { grid-column: 1; grid-row: 2; margin-left: -0.065em }
 .next h5 { margin: 12px 0 0; color: var(--ink); font-size: clamp(36px, 5vw, 72px); line-height: .95; font-weight: 500; letter-spacing: -0.045em; transition: transform .4s cubic-bezier(.2,.8,.2,1) }
 .next:hover h5 { transform: translateX(10px) }
@@ -392,9 +392,10 @@ body:not(.all) .vtog, body.open .vtog { opacity: 0; pointer-events: none }
 .reelv { position: fixed; z-index: 13; left: 0; right: 0; top: 160px; bottom: 0; opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s; touch-action: pan-y; outline: none }
 body.all.reelon:not(.open) .reelv { opacity: 1; visibility: visible; transition: opacity .45s .1s, visibility 0s }
 body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
+.reelv:focus, .reelv:focus-visible { outline: none !important; box-shadow: none !important }   /* no ring around the reel when it takes the keys */
 .reelv canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab } .reelv.drag canvas { cursor: grabbing }
 .reelv .rcap { position: absolute; pointer-events: none; transition: opacity .25s } .reelv .rt { color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap }
-.reelv .rm { display: flex; justify-content: space-between; gap: 16px; font: 500 11px/1.6 var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; color: var(--ink) } .reelv .rm i { font-style: normal; color: var(--muted) }
+.reelv .rm { display: flex; justify-content: space-between; gap: 16px; font: 600 11px/1.6 var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; color: var(--ink) } .reelv .rm i { font-style: normal; color: var(--muted) }
 .reelv .rm .rn::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 99px; background: var(--ink); margin-right: 8px; vertical-align: 1px }
 .reelv.moving .rcap { opacity: 0 }
 @media (max-width: 900px) { .reelv { top: 150px } }
@@ -2316,10 +2317,10 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   if (document.fonts) document.fonts.ready.then(drawStrip);
 })();
 </script>
-<script src="nav.js?v=e73dc949" defer></script>
-<script src="kit.js?v=391e47e6" defer></script>
-<script src="protips.js?v=9d9b4541" defer></script>
-<script src="feedback.js?v=a6e41f5e" defer></script>
+<script src="nav.js?v=f066ff04" defer></script>
+<script src="kit.js?v=08f08a9c" defer></script>
+<script src="protips.js?v=bd51fe50" defer></script>
+<script src="feedback.js?v=14e2e38a" defer></script>
 <script src="flow.js?v=f8f6166b" defer></script>
 </body>
 </html>

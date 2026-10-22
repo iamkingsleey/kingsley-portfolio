@@ -6,7 +6,7 @@
 <title>Shop · Kingsley M.</title>
 <meta name="description" content="3D icon packs, illustration sets and website templates by Kingsley Mkpandiok.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* Shop (102.0): the files Kingsley makes for his own work, packed up to sell. A tall title, one statement, filter chips,
    then the products as cards; a card opens the product on its own sheet (gallery, what's inside, licence, buy).
@@ -30,7 +30,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 img { display: block; max-width: 100% }
 button, a { font: inherit; color: inherit }
 button { background: none; border: 0; padding: 0; cursor: pointer }
-.mono { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.mono { font: 600 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
 .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--gut); padding-right: var(--gut) }
 
 /* chrome: the readout top left (the nav is added by nav.js; the theme is switched on Home) */
@@ -52,7 +52,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .chips { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none }
 .chips::-webkit-scrollbar { display: none }
 .chips button { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; transition: background .18s, color .18s }
-.chips button sup { font: 500 9px var(--mono); margin-left: 3px; opacity: .7 }
+.chips button sup { font: 600 9px var(--mono); margin-left: 3px; opacity: .7 }
 .chips button:hover { color: var(--ink) }
 .chips button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
 @media (max-width: 899px) { .chips button { height: 38px; padding: 0 14px } }
@@ -74,7 +74,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .pc:hover .im img:first-of-type { scale: 1.02 }
 .pc.swap .im img + img { opacity: 1 }
 .pc .im .gfx { position: absolute; inset: 0 }
-.tag { position: absolute; left: 12px; top: 12px; z-index: 3; height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; background: #fff; color: #0a0a0a; font: 500 10.5px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: 0 0 0 1px rgb(0 0 0 / .06) }
+.tag { position: absolute; left: 12px; top: 12px; z-index: 3; height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; background: #fff; color: #0a0a0a; font: 600 10.5px var(--mono); letter-spacing: .4px; text-transform: uppercase; box-shadow: 0 0 0 1px rgb(0 0 0 / .06) }
 .dots { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 3; display: flex; justify-content: center; gap: 5px; opacity: 0; transition: opacity .3s }
 .dots i { width: 5px; height: 5px; border-radius: 50%; background: #fff; opacity: .45; box-shadow: 0 0 0 1px rgb(0 0 0 / .08) }
 .dots i.on { opacity: 1 }
@@ -156,7 +156,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
 .cal-h button:hover { background: var(--pill-hover) } .cal-h button[disabled] { opacity: .3; pointer-events: none }
 .cal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
 .cal-w, .cal-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center }
-.cal-w span { font: 500 10.5px var(--mono); color: var(--muted); padding: 6px 0 }
+.cal-w span { font: 600 10.5px var(--mono); color: var(--muted); padding: 6px 0 }
 .cal-d button { aspect-ratio: 1; border-radius: 50%; font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; transition: background .15s, color .15s, scale .12s }
 .cal-d button:hover, .cal-d button:focus-visible { background: var(--pill); outline: none } .cal-d button:active { scale: .92 }
 .cal-d button.out, .cal-d button[disabled] { color: var(--faint) } .cal-d button[disabled] { pointer-events: none }
