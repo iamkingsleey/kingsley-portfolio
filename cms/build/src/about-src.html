@@ -124,39 +124,38 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .say .q p { margin: 14px 0 0; color: var(--ink); font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; max-width: 18ch }
 .say .q small { display: block; margin-top: 18px; font-size: 15px; line-height: 1.55; max-width: 46ch; color: var(--text) }
 
-/* ---------- 6 · say hello: a compose (sharp box and Send, pill chips) ---------- */
-.avl { display: inline-flex; align-items: center }
-.avl .lamp { position: relative; width: 7px; height: 7px; border-radius: 99px; background: #2fb35b; margin-right: 9px }
-.avl .lamp::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1px solid #2fb35b; animation: lampring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
-.avl.off .lamp { background: var(--faint) } .avl.off .lamp::after { display: none }
-@keyframes lampring { 0% { transform: scale(1); opacity: .8 } 100% { transform: scale(3); opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { .avl .lamp::after { animation: none; opacity: 0 } }
-.cmp { max-width: 760px; display: grid; gap: 18px }
-.cmp .mail { position: relative; background: var(--panel); overflow: hidden }
-.cmp .ln { display: grid; grid-template-columns: 72px 1fr; align-items: center; gap: 12px; padding: 0 22px; border-bottom: 1px solid var(--line); min-height: 56px }
-.cmp .k { color: var(--muted); font-size: 14px }
-.cmp .in { width: 100%; background: transparent; border: 0; outline: none; padding: 16px 0; color: var(--ink); font-size: 15px; border-radius: 0 } .cmp .in::placeholder { color: var(--muted); opacity: .7 }
-.cmp .to { color: var(--ink); font-size: 15px; display: flex; align-items: center; gap: 8px; min-width: 0 }
-.cmp .to b { font-weight: 500; background: var(--pill); padding: 4px 10px; border-radius: 99px; font-size: 13.5px }
-.cmp .addr { color: var(--muted); font-size: 13.5px }
-.cmp .head { width: 100%; text-align: left; grid-template-columns: 72px 1fr auto; cursor: pointer; border-bottom-color: transparent; transition: border-color .3s }
-.cmp .mail.open .head { border-bottom-color: var(--line) }
-.cmp .cta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13.5px; transition: color .2s } .cmp .head:hover .cta { color: var(--ink) }
-.cmp .cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s var(--ease) }
-.cmp .mail.open .cta svg { transform: rotate(180deg) } .cmp .ct { transition: opacity .2s } .cmp .mail.open .ct { opacity: 0 }
-.cmp .body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s var(--ease) } .cmp .body > div { overflow: hidden; min-height: 0 }
-.cmp .mail.open .body { grid-template-rows: 1fr }
-.cmp .body > div > * { opacity: 0; translate: 0 -6px; transition: opacity .3s, translate .4s var(--ease) } .cmp .mail.open .body > div > * { opacity: 1; translate: 0 0; transition-delay: .12s }
-.cmp .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 0 }
-.cmp .chips button { height: 30px; padding: 0 12px; border-radius: 99px; font-size: 13px; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); transition: color .2s, background .2s, box-shadow .2s }
-.cmp .chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none }
-.cmp textarea.in { padding: 20px 22px; font-size: 16px; line-height: 1.5; min-height: 180px; display: block; resize: none }
-.cmp .foot2 { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 14px 14px 22px; border-top: 1px solid var(--line) }
-.cmp .links { display: flex; gap: 16px } .cmp .links a { color: var(--muted); font-size: 13px; text-decoration: none } .cmp .links a:hover { color: var(--ink) }
-.cmp .send { height: 44px; padding: 0 22px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500; border-radius: 0; transition: opacity .2s } .cmp .send[disabled] { opacity: .35; cursor: default }
-.cmp .cerr { margin: 0; padding: 0 22px 12px; color: #ff4a1c }
-.cmp .done { padding: 56px 22px; text-align: center; display: grid; gap: 8px }
-.cmp .done b { color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em } .cmp .done span { color: var(--muted); font-size: 14px } .cmp .again { color: var(--muted); text-decoration: underline; font-size: 14px }
+/* ---------- 6 · on air + call in ---------- */
+.air { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px }
+.onair { background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 22px; min-height: 420px }
+.onair .lt { display: flex; align-items: center; gap: 10px }
+.onair .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--faint) }
+.onair .lamp { position: relative }
+.onair.live .lamp { background: #2fb35b }   /* the same green on-air light as Home's "Open to new work", rippling outwards */
+.onair.live .lamp::before, .onair.live .lamp::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgb(47 179 91 / .7); animation: lampring 2.4s cubic-bezier(.2,.6,.3,1) infinite }
+.onair.live .lamp::after { animation-delay: 1.2s }
+@keyframes lampring { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.4); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .onair.live .lamp::before, .onair.live .lamp::after { animation: none; opacity: 0 } }
+.onair .clock { color: var(--ink); font: 500 clamp(56px, 6vw, 88px)/1 var(--body); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
+.onair .clock small { font-size: .32em; color: var(--muted); margin-left: 8px; letter-spacing: 0 }
+.onair dl { margin: auto 0 0; display: grid; gap: 14px }
+.onair dt { font: 500 10.5px var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--muted) }
+.onair dd { margin: 4px 0 0; color: var(--ink); font-size: 15px }
+.sw { position: relative; width: 44px; height: 24px; border-radius: 99px; background: var(--line); transition: background .3s }
+.sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: translate .5s var(--pop) }
+.sw[aria-pressed="true"] { background: var(--ink) } .sw[aria-pressed="true"]::after { translate: 20px 0 }
+.call { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden }
+.call h3 { margin: 0; color: var(--ink); font-size: 22px; font-weight: 500; letter-spacing: -.02em }
+.call label { display: grid; gap: 6px }
+.call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
+.call input:focus, .call textarea:focus { border-color: var(--ink) }
+.call .cerr { margin: 0; color: #ff4a1c }
+.call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
+.call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
+.call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
+.call .done { position: absolute; inset: 0; background: var(--bg); display: grid; place-items: center; text-align: center; opacity: 0; pointer-events: none; transition: opacity .5s var(--ease) }
+.call.sent .done { opacity: 1; pointer-events: auto }
+.call .done b { display: block; color: var(--ink); font-size: 34px; font-weight: 500; letter-spacing: -.03em; margin-top: 12px }
+.call .done .lamp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); vertical-align: middle; margin-right: 8px }
 /* the email, said plainly: in the Call in card, and as the page's sign-off */
 .cmail { color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -.02em; text-decoration: none; margin-top: -6px; width: fit-content; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px }
 .bigmail { display: grid; gap: 14px; padding: calc(var(--sp) + 20px) 0 0; text-decoration: none; color: var(--ink) }
@@ -175,9 +174,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   .stmt { grid-template-columns: 1fr } .hc { grid-template-columns: 1fr } .hcol { grid-column: 1 }
   .band { --pt: 80px; --pad: 64px }   /* the card drifts a little as you scroll (parallax): room for that too */ .bpin { grid-template-columns: 74px minmax(0, 1fr); gap: 16px; padding-top: var(--pt) }
   .skrow { gap: 8px } .skw { font-size: 17px } .sktools img { width: 28px; height: 28px; border-radius: 7px }
-  .how { grid-template-columns: 1fr }
-  .cmp .ln, .cmp .head { grid-template-columns: 58px 1fr; padding: 0 16px } .cmp .head { grid-template-columns: 58px 1fr auto } .cmp .addr { display: none } .cmp textarea.in { padding: 18px 16px } .cmp .foot2 { padding: 12px 12px 12px 16px } .knob { width: 260px }
+  .how, .air { grid-template-columns: 1fr } .knob { width: 260px }
   .shead { flex-direction: column; align-items: start }
+  .call .row { flex-direction: column; align-items: stretch; gap: 20px } .call .send { width: 100% }   /* Go on air on its own line */
 }
 /* phones: the skills dial stands up. The words stack, the scale runs down beside them, the needle points across at the one picked
    and its tools sit to the right of it */
@@ -232,20 +231,25 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   <section class="how" id="how"><div class="knob" id="knob"></div><div class="say" id="say"></div></section>
 
   -->
-  <!-- 6 · say hello: a compose, folded to its To line until you open it -->
-  <div class="shead" id="s-air"><div><h2>Say hello</h2><p>Write to me straight from here.</p></div><span class="mono avl" id="avl"><span class="lamp"></span><span id="avlt">Open to new work</span></span></div>
-  <section class="cmp" id="cmp">
-    <span class="mono">Usually replies within a day</span>
-    <form class="mail" id="call" onsubmit="return false" novalidate>
-      <button type="button" class="ln head" aria-expanded="false" aria-controls="cbody"><span class="k">To</span><span class="to"><b>Kingsley</b><span class="addr">iamkingsleey@gmail.com</span></span><span class="cta"><span class="ct">Write a message</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></span></button>
-      <div class="body" id="cbody"><div>
-        <div class="ln"><span class="k">From</span><input class="in" name="e" type="email" placeholder="you@company.com" autocomplete="email" aria-label="Your email"></div>
-        <div class="ln"><span class="k">About</span><div class="chips" role="group" aria-label="About"><button type="button" aria-pressed="true">Hiring</button><button type="button" aria-pressed="false">A project</button><button type="button" aria-pressed="false">Speaking</button><button type="button" aria-pressed="false">Just hello</button></div></div>
-        <textarea class="in" name="m" placeholder="Hi Kingsley," aria-label="Message"></textarea>
-        <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-        <div class="foot2"><div class="links"><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/iamkingsleey" target="_blank" rel="noopener">X</a></div><button class="send" type="submit" disabled>Send</button></div>
-      </div></div>
-      <div class="done" hidden><b>Thanks, I'll be in touch.</b><span>Your note is on its way. <button type="button" class="again">Write another</button></span></div>
+  <!-- 6 · on air + call in -->
+  <div class="shead" id="s-air"><div><h2>On air</h2><p>Where I am, what I'm on, and how to reach me.</p></div></div>
+  <section class="air" id="air">
+    <div class="onair live" id="onair">
+      <div class="lt"><span class="lamp"></span><span class="mono" id="airlab">On air · open to new work</span></div>
+      <div class="clock" id="clock">00:00<small>GMT+1</small></div>
+      <dl>
+        <div><dt>Broadcasting from</dt><dd>Lagos, Nigeria</dd></div>
+      </dl>
+    </div>
+    <form class="call" id="call" onsubmit="return false">
+      <span class="mono">Call in</span>
+      <h3>Say hello. I read every message.</h3>
+      <label><span class="mono">Your name</span><input name="n" autocomplete="name" placeholder="Name"></label>
+      <label><span class="mono">Email</span><input name="e" type="email" autocomplete="email" placeholder="you@company.com"></label>
+      <label><span class="mono">Message</span><textarea name="m" rows="3" placeholder="What are you working on?"></textarea></label>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      <div class="row"><div class="links"><a href="mailto:iamkingsleey@gmail.com">Email</a><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/iamkingsleey" target="_blank" rel="noopener">X</a><a href="https://www.behance.net/iamkingsleey" target="_blank" rel="noopener">Behance</a><a href="https://github.com/iamkingsleey" target="_blank" rel="noopener">GitHub</a></div><button class="send" type="submit">Go on air</button></div>
+      <div class="done"><div><span class="mono"><span class="lamp"></span>You're on air</span><b>Thanks, I'll be in touch.</b></div></div>
     </form>
   </section>
   <a class="bigmail" href="mailto:iamkingsleey@gmail.com" data-copy><span class="mono">Write to me</span><b><span>iamkingsleey@</span><span>gmail.com</span></b><i class="mono">Click to copy</i></a>
@@ -426,34 +430,31 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     const c = clamp(Math.round((ka + 150) / STEP), 0, N - 1); if (c !== kcur) { if (kcur >= 0) snd('detent'); kcur = c; [...say.children].forEach((q, k) => q.classList.toggle('on', k === c)); } });
 
   */
-  // ---------- 6 · say hello: availability (set in the CMS, Settings → Taking new work), and the compose ----------
-  { const on = (window.KM_SITE || {}).available !== false; $('avl').classList.toggle('off', !on); $('avlt').textContent = on ? 'Open to new work' : 'Fully booked right now'; }
+  // ---------- 6 · on air: Lagos time, availability; call in ----------
+  const clock = $('clock'); let lastClock = '';
+  const tickClock = () => { const t = new Date().toLocaleTimeString('en-GB', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit' }); if (t !== lastClock) { lastClock = t; clock.innerHTML = `${t}<small>GMT+1</small>`; } };
+  tickClock(); setInterval(tickClock, 5000);
+  // availability is set in the CMS (Settings → Taking new work), not by visitors
+  { const on = (window.KM_SITE || {}).available !== false; $('onair').classList.toggle('live', on); $('airlab').textContent = on ? 'On air · open to new work' : 'Off air · fully booked'; }
   // the email links copy the address (and still open the mail app if copying isn't allowed)
   document.querySelectorAll('[data-copy]').forEach(a => a.addEventListener('click', e => {
     const addr = a.getAttribute('href').replace('mailto:', '');
     if (!navigator.clipboard || !navigator.clipboard.writeText) return;
     e.preventDefault(); navigator.clipboard.writeText(addr).then(() => { snd('pop'); a.classList.add('copied'); const i = a.querySelector('i'); if (i) i.textContent = 'Copied'; setTimeout(() => { a.classList.remove('copied'); if (i) i.textContent = 'Click to copy'; }, 1800); }, () => { location.href = 'mailto:' + addr; });
   }));
-  // the compose opens from its To line and folds away again. Send turns on once there's an email and a message.
-  // It sends to the inbox (CMS → Inbox); a recruiter who picked a role under "Hiring for" arrives marked Hiring.
+  // Call in: sends to the inbox (CMS → Inbox). A recruiter who picked a role under "Hiring for" arrives marked Hiring.
   // Without an inbox, or if it can't be reached, it opens an email with the message already written.
-  { const f = $('call'), head = f.querySelector('.head'), btn = f.querySelector('.send'), chips = [...f.querySelectorAll('.chips button')], done = f.querySelector('.done');
-    const okMail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()), check = () => { btn.disabled = !(okMail(f.e.value) && f.m.value.trim().length > 2); };
-    const open = o => { f.classList.toggle('open', o); head.setAttribute('aria-expanded', String(o)); if (o) setTimeout(() => f.e.focus({ preventScroll: true }), 350); };
-    head.addEventListener('click', () => open(!f.classList.contains('open')));
-    chips.forEach(b => b.addEventListener('click', () => chips.forEach(x => x.setAttribute('aria-pressed', String(x === b)))));
-    f.addEventListener('input', check);
-    f.addEventListener('submit', async () => { if (btn.disabled) return;
-      const em = f.e.value.trim(), m = f.m.value.trim(), topic = (chips.find(x => x.getAttribute('aria-pressed') === 'true') || {}).textContent || 'Just hello';
-      let role = ''; try { role = localStorage.getItem('km-role') || ''; } catch (_) {}
-      const hiring = topic === 'Hiring' || !!role, fields = { About: topic }; if (role) fields['Hiring for'] = role;
-      btn.disabled = true; btn.textContent = 'Sending…';
-      const ok = await (window.kmSend ? kmSend({ type: hiring ? 'Hiring' : 'Message', name: '', email: em, subject: role ? 'Hiring for ' + role : topic + ' · from About', message: m, fields, website: (f.website || {}).value || '' }) : Promise.resolve(false));
-      btn.textContent = 'Send'; check();
-      if (!ok) { location.href = `mailto:iamkingsleey@gmail.com?subject=${encodeURIComponent(topic + ' · from your site')}&body=${encodeURIComponent(m + '\n\n' + em)}`; return; }
-      snd('pop'); head.hidden = true; f.querySelector('.body').hidden = true; done.hidden = false; });
-    done.querySelector('.again').addEventListener('click', () => { done.hidden = true; head.hidden = false; f.querySelector('.body').hidden = false; f.reset(); chips.forEach((x, i) => x.setAttribute('aria-pressed', String(!i))); check(); open(true); });
-  }
+  $('call').addEventListener('submit', async () => {
+    const f = $('call'), n = f.n.value.trim(), em = f.e.value.trim(), m = f.m.value.trim(), btn = f.querySelector('button[type=submit], button:not([type])');
+    const say = t => { let x = f.querySelector('.cerr'); if (!x) { x = document.createElement('p'); x.className = 'cerr mono'; const row = f.querySelector('.row'); row ? row.before(x) : f.append(x); } x.textContent = t; x.hidden = !t; };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { say('Add an email I can reply to'); f.e.focus(); return; }
+    if (m.length < 3) { say('Write a short message'); f.m.focus(); return; }
+    say(''); let role = ''; try { role = localStorage.getItem('km-role') || ''; } catch (_) {}
+    if (btn) { btn.disabled = true; btn.dataset.t = btn.dataset.t || btn.textContent; btn.textContent = 'Sending…'; }
+    const ok = await (window.kmSend ? kmSend({ type: role ? 'Hiring' : 'Message', name: n, email: em, subject: role ? 'Hiring for ' + role : 'Call in from About', message: m, fields: role ? { 'Hiring for': role } : {}, website: (f.website || {}).value || '' }) : Promise.resolve(false));
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.t; }
+    if (!ok) { location.href = `mailto:iamkingsleey@gmail.com?subject=${encodeURIComponent('Hello from ' + (n || 'your site'))}&body=${encodeURIComponent(m + '\n\n' + n + (em ? ' · ' + em : ''))}`; return; }
+    f.classList.add('sent'); setTimeout(() => { f.classList.remove('sent'); f.reset(); }, 4200); });
 
   // ---------- arrivals, theme, a pop on every click ----------
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target); e.target.classList.add('in'); }), { rootMargin: '0px 0px -10% 0px' });
@@ -470,13 +471,13 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     addEventListener('scroll', () => { if (!SS.mine) SS.cur = SS.target = scrollY; SS.mine = false; }, { passive: true });
   }
   function go(y) { y = clamp(y, 0, maxY()); if (smooth) SS.target = y; else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); }
-  const SECN = ['About', 'Band', 'Skills', 'Say hello'], secEls = ['s-band', 's-desk', 's-air'].map($);   // with the hero back: ['Hello', 'About', …] and 's-stmt' first   // add 'How' / 's-how' back with the section
+  const SECN = ['About', 'Band', 'Skills', 'On air'], secEls = ['s-band', 's-desk', 's-air'].map($);   // with the hero back: ['Hello', 'About', …] and 's-stmt' first   // add 'How' / 's-how' back with the section
   const sd = $('sdial'), sx = sd.getContext('2d'); let sp = 0, lastSt = -1;
   sd.addEventListener('click', e => { const r = sd.getBoundingClientRect(), k = clamp(Math.round(sp + (e.clientY - r.top - r.height / 2) / 150), 0, SECN.length - 1); go(k ? secEls[k - 1].getBoundingClientRect().top + scrollY - 40 : 0); snd('pop'); });
   // ---------- fluid motion: everything floats on springs ----------
   // Each text block and panel hangs on its own spring. The cursor pulls them a little (deeper ones further), and
   // scrolling makes them trail behind for a moment, then settle with a soft overshoot, so the page moves like liquid.
-  const PX = [['#stmt', 22], ['.stmt > .mono', 8], ['.shead h2', 12], ['.shead p', 7], ['.shead > .mono', 5], ['#bcard', 24], ['.bruler', 9], ['#skills', 16], ['.cmp', 6], ['.foot', 4]]
+  const PX = [['#stmt', 22], ['.stmt > .mono', 8], ['.shead h2', 12], ['.shead p', 7], ['.shead > .mono', 5], ['#bcard', 24], ['.bruler', 9], ['#skills', 16], ['.onair', 10], ['.call', 6], ['.foot', 4]]
     .flatMap(([q, d]) => [...document.querySelectorAll(q)].map(el => ({ el, d, x: 0, y: 0, vx: 0, vy: 0, k: 150 - d * 3.2 })));
   let ptx = 0, pty = 0, lastSY = scrollY, sVel = 0;
   if (!reduce) {
