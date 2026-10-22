@@ -180,7 +180,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .bigmail .cpill { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); font-weight: 500; font-size: 15px; text-decoration: none; transition: background .2s, color .2s }
 .bigmail .cpill:hover { background: var(--ink); color: var(--bg) } .bigmail .cpill svg { width: 15px; height: 15px; fill: currentColor } .bigmail .cpill i { font-style: normal }
 .bigmail .tfq { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums } .bigmail .tfq b { all: unset; color: var(--red) }
-@media (max-width: 700px) { .bigmail b { white-space: normal; font-size: 10.4vw } .bigmail b span { display: inline-block; white-space: nowrap } }   /* on phones it wraps after the @ */
+@media (max-width: 700px) { .bigmail b { white-space: normal; font-size: 10.4vw } .bigmail b span { display: inline-block; white-space: nowrap } }   /* on phones it wraps before @gmail.com */
 .foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
 
 @media (max-width: 899px) {

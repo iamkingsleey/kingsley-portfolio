@@ -170,7 +170,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .bigmail .cpill { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); font-weight: 500; font-size: 15px; text-decoration: none; transition: background .2s, color .2s }
 .bigmail .cpill:hover { background: var(--ink); color: var(--bg) } .bigmail .cpill svg { width: 15px; height: 15px; fill: currentColor } .bigmail .cpill i { font-style: normal }
 .bigmail .tfq { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums } .bigmail .tfq b { all: unset; color: var(--red) }
-@media (max-width: 700px) { .bigmail b { white-space: normal; font-size: 10.4vw } .bigmail b span { display: inline-block; white-space: nowrap } }   /* on phones it wraps after the @ */
+@media (max-width: 700px) { .bigmail b { white-space: normal; font-size: 10.4vw } .bigmail b span { display: inline-block; white-space: nowrap } }   /* on phones it wraps before @gmail.com */
 .foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
 
 @media (max-width: 899px) {
@@ -260,7 +260,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       <div class="done"><div><span class="mono"><span class="lamp"></span>You're on air</span><b>Thanks, I'll be in touch.</b></div></div>
     </form>
   </section>
-  <div class="bigmail"><span class="mono">Write to me</span><a class="bm" href="mailto:iamkingsleey@gmail.com" data-copy aria-label="iamkingsleey@gmail.com"><b><span>iamkingsleey@</span><span>gmail.com</span></b></a><div class="mrow"><a class="cpill" href="mailto:iamkingsleey@gmail.com" data-copy role="button"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".55"/></svg><i>Copy</i></a><span class="mono tfq" aria-hidden="true">Tuning · 88.0</span></div></div>
+  <div class="bigmail"><span class="mono">Write to me</span><a class="bm" href="mailto:iamkingsleey@gmail.com" data-copy aria-label="iamkingsleey@gmail.com"><b><span>iamkingsleey</span><span>@gmail.com</span></b></a><div class="mrow"><a class="cpill" href="mailto:iamkingsleey@gmail.com" data-copy role="button"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".55"/></svg><i>Copy</i></a><span class="mono tfq" aria-hidden="true">Tuning · 88.0</span></div></div>
   <div class="foot"><span class="mono">Kingsley M. · 94.0 About</span><span class="mono">Back to 98.0 Home</span></div>
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
