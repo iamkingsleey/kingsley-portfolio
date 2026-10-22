@@ -1878,7 +1878,11 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
         const ir = im.naturalWidth / im.naturalHeight, cr = p.w / p.h; let sx = 0, sy = 0, sw = im.naturalWidth, sh = im.naturalHeight; if (ir > cr) { sw = sh * cr; sx = (im.naturalWidth - sw) / 2; } else { sh = sw / cr; sy = (im.naturalHeight - sh) / 2; }
         const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
-        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(im, sx + (x - x0) / p.w * sw, sy, w / p.w * sw, sh, x, cy - h / 2, w, h); } }
+        const rnd = document.documentElement.dataset.corners === 'rounded', rr = 14;   // CMS → Settings → Corners
+        if (rnd) { g.save(); g.beginPath(); const k0 = flat ? 1 : bend(Math.max(x0, 0) + 1), k1 = flat ? 1 : bend(Math.min(x1, W) - 1), hh = p.h * Math.max(k0, k1);
+          if (g.roundRect) g.roundRect(x0, cy - hh / 2, p.w, hh, rr); else g.rect(x0, cy - hh / 2, p.w, hh); g.clip(); }
+        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(im, sx + (x - x0) / p.w * sw, sy, w / p.w * sw, sh, x, cy - h / 2, w, h); }
+        if (rnd) g.restore(); }
       g.globalAlpha = 1;
       if (front) { const it = items[L[front.k]], top = cy - front.h / 2, left = front.x - front.w / 2; rt.textContent = it.t; rt.style.left = left + 'px'; rt.style.top = (top - 40) + 'px';
         rm.style.left = left + 'px'; rm.style.width = front.w + 'px'; rm.style.top = (top + front.h + 14) + 'px'; rm.querySelector('.rn').textContent = String(L[front.k] + 1).padStart(2, '0'); rm.querySelector('i').textContent = it.cat; } }

@@ -109,12 +109,26 @@ _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
 _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
 open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
 _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
+# Rounded corners for pictures, videos and panels across the site (CMS → Settings → Corners). Sharp leaves each page as it is.
+CORNERS = ('<style id="km-corners">'
+  'html[data-corners="rounded"]{--km-r:14px}'
+  # the frames that hold a picture: round them and clip what is inside
+  'html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in){border-radius:var(--km-r)!important;overflow:hidden}'
+  'html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}'
+  # pictures that sit straight in a frame with a caption beside them: round the picture itself
+  'html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}'
+  # pieces that come rounded on their own (the sticky-notes board, the Engineering stage) go square with the Sharp setting
+  'html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}'
+  'html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}'
+  '</style>\n')
 _fb = _site.get('feedback') or {}
 _ib = _site.get('inbox') or {}
 SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
   'feedback': {'on': _fb.get('on', True) is not False, 'to': _fb.get('to') or 'iamkingsleey@gmail.com', 'after': _fb.get('after') or 3},
   'inbox': {'url': (_ib.get('url') or '').strip().rstrip('/'), 'email': _ib.get('email', True) is not False},
-  'needle': _site.get('needle') or 'line'}) + ';'
+  'needle': _site.get('needle') or 'line', 'corners': _site.get('corners') or 'rounded'}) + ';'
+  # corners (CMS → Settings → Corners): set on <html> before anything paints, so pictures and panels never flash sharp
+  + 'document.documentElement.dataset.corners=window.KM_SITE.corners;'
   # kmNeedle: every dial draws its red needle through this, so the head (CMS → Settings → Dials) is the same everywhere.
   # A bar wider than tall points right (head at its right end); a taller one points up (head at its top).
   + 'window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();'
@@ -126,7 +140,7 @@ SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('avai
   + 'window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);'
   + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);'
   + 'return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};'
-  + '</script>\n')   # settings the pages read (CMS → Settings)
+  + '</script>\n' + CORNERS)   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
 FLOWHEAD = ('<script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");'
   'if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};'

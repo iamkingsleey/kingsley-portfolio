@@ -733,6 +733,8 @@
     if (C.site.available === undefined) C.site.available = true;
     const tok = el('input', { type: 'text', placeholder: HAS_TOKEN ? 'Saved on this Mac · paste a new one to replace it' : 'Paste your GoatCounter API token' });
     v.append(form([{ title: 'Availability', help: 'Shown on Home (“Open to new work”), on About (On air) and in the For recruiters card.', fields: [{ k: 'available', label: 'Taking new work', type: 'bool' }] }], C.site, 'site'));
+    if (!C.site.corners) C.site.corners = 'rounded';
+    v.append(form([{ title: 'Corners', help: 'The corners on pictures, videos and panels across the whole site: Designs, case studies, brand pages, Shop, Showcase and About.', fields: [{ k: 'corners', label: 'Corner style', type: 'select', options: [['rounded', 'Rounded'], ['sharp', 'Sharp (square corners)']] }] }], C.site, 'site'));
     if (!C.site.needle) C.site.needle = 'line';
     v.append(form([{ title: 'Dials', help: 'The head on the red needle, on every dial across the site (About, Engineering, the case study rulers and the logo and product pages).', fields: [{ k: 'needle', label: 'Needle head', type: 'select', options: [['line', 'Plain line (as now)'], ['dot', 'Dot'], ['triangle', 'Arrow'], ['diamond', 'Diamond'], ['cap', 'T cap']] }] }], C.site, 'site'));
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };
