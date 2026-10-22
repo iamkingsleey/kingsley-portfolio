@@ -168,16 +168,19 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call .done .lamp { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); vertical-align: middle; margin-right: 8px }
 /* the email, said plainly: in the Call in card, and as the page's sign-off */
 .cmail { color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -.02em; text-decoration: none; margin-top: -6px; width: fit-content; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px }
-.bigmail { display: grid; gap: 14px; padding: calc(var(--sp) + 20px) 0 0; text-decoration: none; color: var(--ink) }
-.bigmail b { font-size: clamp(34px, 6.1vw, 96px); line-height: .98; font-weight: 600; letter-spacing: -.055em; transition: opacity .25s }
-.bigmail b span { white-space: nowrap; display: inline-block }   /* if it has to wrap, it wraps after the @ */
-.bigmail:hover b { opacity: .72 }
-.bigmail i { font-style: normal; color: var(--muted) }
+.bigmail { display: grid; gap: 0; padding: calc(var(--sp) + 20px) 0 0; color: var(--ink) }
+.bigmail > .mono { margin-bottom: 22px }
+.bigmail .bm { color: var(--ink); text-decoration: none; cursor: pointer }
+.bigmail b { display: block; font-size: clamp(36px, 7vw, 108px); line-height: 1; font-weight: 600; letter-spacing: -.05em; white-space: nowrap; font-variant-numeric: tabular-nums }
+.bigmail b span { display: inline }
 /* tune in: when the address comes into view, each letter rolls through static and locks in from left to right */
 .bigmail b em { font-style: normal; display: inline-block; transition: color .2s }
 .bigmail b em.rx { color: var(--muted); font-family: var(--mono); font-weight: 500; letter-spacing: -.08em }
-.bigmail .mrow { display: flex; gap: 18px; align-items: center; flex-wrap: wrap }
-.bigmail .tfq { font-variant-numeric: tabular-nums } .bigmail .tfq b { all: unset; color: var(--red) }
+.bigmail .mrow { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-top: 34px }
+.bigmail .cpill { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); font-weight: 500; font-size: 15px; text-decoration: none; transition: background .2s, color .2s }
+.bigmail .cpill:hover { background: var(--ink); color: var(--bg) } .bigmail .cpill svg { width: 15px; height: 15px; fill: currentColor } .bigmail .cpill i { font-style: normal }
+.bigmail .tfq { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums } .bigmail .tfq b { all: unset; color: var(--red) }
+@media (max-width: 700px) { .bigmail b { white-space: normal; font-size: 10.4vw } .bigmail b span { display: inline-block; white-space: nowrap } }   /* on phones it wraps after the @ */
 .foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
 
 @media (max-width: 899px) {
