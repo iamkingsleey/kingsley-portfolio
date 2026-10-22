@@ -1,0 +1,102 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Email Styles</title>
+<!-- Archive for the grid-editor skill: five email sign-off styles explored for About (Oct 2026).
+     B · Tune in is the one in use on About; A · Stacked caps, C · Ticker, D · Cursor pill and E · Outline split are kept here as references. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap">
+<style>
+:root { --bg:#0b0b0b; --panel:#141414; --ink:#fff; --text:#c9c9c9; --muted:#7a7a7a; --line:#242424; --pill:#1c1c1c; --red:#ff4a1c; --mono:"Geist Mono",ui-monospace,monospace; --ease:cubic-bezier(.2,.8,.2,1); color-scheme:dark }
+:root[data-theme="light"] { --bg:#fff; --panel:#f3f3f3; --ink:#000; --text:#3b3b3b; --muted:#8c8c8c; --line:#e4e4e4; --pill:#f2f2f2; color-scheme:light }
+* { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--text); font:400 15px/1.5 Geist,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden }
+button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer }
+.mono { font:600 11.5px var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted) }
+.top { max-width:1240px; margin:0 auto; padding:28px 16px 0; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center } @media (min-width:700px) { .top { padding:36px 48px 0 } }
+.seg { display:inline-flex; flex-wrap:wrap; padding:3px; border-radius:99px; background:var(--pill); gap:2px } .seg button { height:34px; padding:0 14px; border-radius:99px; font-size:13px; font-weight:500; color:var(--muted) } .seg button[aria-pressed="true"] { background:var(--ink); color:var(--bg) }
+.note { max-width:1240px; margin:16px auto 0; padding:0 16px; color:var(--muted); max-width:min(1240px,100%) } @media (min-width:700px) { .note { padding:0 48px } } .note b { color:var(--ink); font-weight:500 }
+.stage { max-width:1240px; margin:0 auto; padding:120px 16px 160px; min-height:70vh; position:relative } @media (min-width:700px) { .stage { padding:140px 48px 180px } }
+[hidden] { display:none !important }
+.lab { display:block; margin-bottom:22px }
+.toast { position:fixed; left:50%; bottom:28px; translate:-50% 20px; background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:99px; font-weight:500; font-size:14px; opacity:0; transition:opacity .25s, translate .35s var(--ease); pointer-events:none; z-index:50 } .toast.on { opacity:1; translate:-50% 0 }
+.pillb { display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 20px; border-radius:99px; box-shadow:inset 0 0 0 1.5px var(--ink); color:var(--ink); font-weight:500; font-size:15px; transition:background .2s, color .2s } .pillb:hover { background:var(--ink); color:var(--bg) }
+.pillb svg { width:15px; height:15px; fill:currentColor }
+
+/* A · Stacked caps: big condensed caps on two lines, a copy pill beside */
+.A { display:flex; align-items:center; gap:40px; flex-wrap:wrap }
+.A .big { margin:0; font:400 clamp(56px,11vw,170px)/.88 "Jockey One",Geist,sans-serif; color:var(--ink); text-transform:uppercase; letter-spacing:-.005em; text-decoration:none; display:block }
+.A .big span { display:block } .A .big span:last-child { color:var(--ink) }
+.A .big:hover span:first-child { color:var(--red) }
+/* B · Tune in: letters roll through static and lock in, left to right */
+.B .big { margin:0; display:block; font:600 clamp(36px,7vw,108px)/1 Geist,sans-serif; letter-spacing:-.05em; color:var(--ink); white-space:nowrap; cursor:pointer; font-variant-numeric:tabular-nums }
+.B .big i { font-style:normal; display:inline-block; transition:color .2s } .B .big i.rx { color:var(--muted); font-family:var(--mono); font-weight:500; letter-spacing:-.08em } .B .big i.lk { color:var(--ink) }
+.B .row { display:flex; align-items:center; gap:18px; margin-top:34px; flex-wrap:wrap } .B .fq { font:600 12px var(--mono); letter-spacing:.08em; color:var(--muted) } .B .fq b { color:var(--red); font-weight:600 }
+@media (max-width:700px) { .B .big { white-space:normal; font-size:11.5vw; word-break:break-all } }
+/* C · Ticker: the address runs across the page; hover slows it, click copies */
+.C { margin:0 -48px; overflow:hidden; border-block:1px solid var(--line); padding:26px 0; cursor:pointer; position:relative } @media (max-width:700px) { .C { margin:0 -16px } }
+.C .tr { display:flex; width:max-content; animation:tick 26s linear infinite } .C:hover .tr { animation-duration:70s }
+.C .tr span { font:600 clamp(44px,8vw,120px)/1 Geist,sans-serif; letter-spacing:-.05em; color:var(--ink); padding-right:.5em; white-space:nowrap; display:inline-flex; align-items:center; gap:.5em }
+.C .tr span::after { content:''; width:.22em; height:.22em; border-radius:99px; background:var(--red); flex:none }
+.C .tr span:nth-child(even) { color:transparent; -webkit-text-stroke:1.5px var(--ink) }
+@keyframes tick { to { transform:translateX(-50%) } }
+.C + .row { display:flex; justify-content:space-between; margin-top:22px; gap:16px; flex-wrap:wrap }
+/* D · Cursor pill: big address; a Copy pill follows the pointer, letters lift as you pass */
+.D .big { display:block; font:600 clamp(40px,8vw,128px)/1 Geist,sans-serif; letter-spacing:-.055em; color:var(--ink); cursor:none; text-decoration:none; white-space:nowrap }
+.D .big i { font-style:normal; display:inline-block; transition:transform .45s var(--ease), color .3s }
+.D .cur { position:fixed; left:0; top:0; z-index:40; pointer-events:none; height:46px; padding:0 18px; border-radius:99px; background:var(--red); color:#fff; display:flex; align-items:center; gap:8px; font-weight:500; opacity:0; scale:.6; transition:opacity .2s, scale .3s var(--ease) }
+.D .cur.on { opacity:1; scale:1 } .D .cur svg { width:15px; height:15px; fill:currentColor }
+@media (max-width:700px) { .D .big { white-space:normal; font-size:12vw } .D .tap { display:inline-flex } }
+.D .tap { display:none; margin-top:24px }
+/* E · Outline split: the name solid, @gmail.com in outline that fills in as you hover */
+.E .big { display:block; text-decoration:none; font:700 clamp(46px,9.5vw,150px)/.95 Geist,sans-serif; letter-spacing:-.06em; color:var(--ink) }
+.E .big b { display:block; font-weight:700 }
+.E .big em { display:block; font-style:normal; color:transparent; -webkit-text-stroke:1.6px var(--ink); background:linear-gradient(90deg,var(--ink) 50%,transparent 50%) 100% 0/200% 100% no-repeat; -webkit-background-clip:text; background-clip:text; transition:background-position .7s var(--ease) }
+.E .big:hover em, .E .big.done em { background-position:0 0 }
+.E .row { display:flex; justify-content:space-between; align-items:center; margin-top:30px; gap:16px; flex-wrap:wrap }
+</style>
+<div class="top"><span class="mono">About · sign-off · email lab</span><div style="display:flex;gap:8px;flex-wrap:wrap">
+<div class="seg" id="v"><button aria-pressed="true" data-k="A">A · Stacked caps</button><button aria-pressed="false" data-k="B">B · Tune in</button><button aria-pressed="false" data-k="C">C · Ticker</button><button aria-pressed="false" data-k="D">D · Cursor pill</button><button aria-pressed="false" data-k="E">E · Outline split</button></div>
+<div class="seg" id="th"><button aria-pressed="true" data-k="dark">Dark</button><button aria-pressed="false" data-k="light">Light</button></div></div></div>
+<p class="note" id="note"></p>
+<div class="stage">
+  <section data-v="A"><span class="mono lab">Write to me</span><div class="A"><a class="big" href="mailto:iamkingsleey@gmail.com" data-copy><span>iamkingsleey</span><span>@gmail.com</span></a><button class="pillb" data-copy type="button"><svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".55"/></svg><span>Copy</span></button></div></section>
+  <section data-v="B" class="B" hidden><span class="mono lab">Write to me</span><a class="big" id="bt" data-copy href="mailto:iamkingsleey@gmail.com" aria-label="iamkingsleey@gmail.com"></a><div class="row"><button class="pillb" data-copy type="button"><svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".55"/></svg><span>Copy</span></button><span class="fq" id="bfq">TUNING · 88.0</span></div></section>
+  <section data-v="C" hidden><span class="mono lab">Write to me</span><div class="C" data-copy role="button" tabindex="0" aria-label="Copy iamkingsleey@gmail.com"><div class="tr"></div></div><div class="row"><span class="mono">Click anywhere on it to copy</span><a class="mono" href="mailto:iamkingsleey@gmail.com" style="color:var(--ink);text-decoration:none">Open in mail ↗</a></div></section>
+  <section data-v="D" class="D" hidden><span class="mono lab">Write to me</span><a class="big" id="dt" data-copy href="mailto:iamkingsleey@gmail.com" aria-label="iamkingsleey@gmail.com"></a><button class="pillb tap" data-copy type="button">Copy</button><div class="cur" id="dcur"><svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".6"/></svg><span>Copy</span></div></section>
+  <section data-v="E" class="E" hidden><span class="mono lab">Write to me</span><a class="big" id="et" data-copy href="mailto:iamkingsleey@gmail.com"><b>iamkingsleey</b><em>@gmail.com</em></a><div class="row"><span class="mono">Point at it, click to copy</span><button class="pillb" data-copy type="button"><svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="2"/><rect x="2" y="4" width="9" height="11" rx="2" opacity=".55"/></svg><span>Copy</span></button></div></section>
+</div>
+<div class="toast" id="toast">Copied iamkingsleey@gmail.com</div>
+<script>
+(() => {
+  const MAIL = 'iamkingsleey@gmail.com', $$ = (s, r = document) => [...r.querySelectorAll(s)], reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let ac; const pop = (f = 880, d = .07, v = .05) => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, ac.currentTime); o.frequency.exponentialRampToValueAtTime(f * 1.6, ac.currentTime + d); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + d + .02); } catch (_) {} };
+  const toast = document.getElementById('toast'); let tt;
+  const copied = el => { pop(660, .06); setTimeout(() => pop(990, .08), 70); toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('on'), 1600);
+    $$('.pillb span, .cur span', el.closest('section') || document).forEach(s => { s.textContent = 'Copied'; setTimeout(() => s.textContent = 'Copy', 1600); }); const e = document.getElementById('et'); if (e) { e.classList.add('done'); setTimeout(() => e.classList.remove('done'), 1600); } };
+  const copy = (e, el) => { e.preventDefault(); const go = () => copied(el); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(MAIL).then(go, () => { location.href = 'mailto:' + MAIL; }); else location.href = 'mailto:' + MAIL; };
+  $$('[data-copy]').forEach(el => { el.addEventListener('click', e => copy(e, el)); el.addEventListener('keydown', e => { if (e.key === 'Enter' && el.tagName === 'DIV') copy(e, el); }); });
+  // B: tune in, one letter at a time, each time it comes into view (and on hover)
+  { const bt = document.getElementById('bt'), fq = document.getElementById('bfq'), G = '#%&*+=?/<>0123456789';
+    bt.innerHTML = [...MAIL].map(c => `<i>${c}</i>`).join(''); const L = $$('i', bt); let run = 0;
+    const tune = () => { if (reduce) { L.forEach((l, k) => { l.textContent = MAIL[k]; l.className = 'lk'; }); return; } const id = ++run, t0 = performance.now();
+      (function f(t) { if (id !== run) return; const p = (t - t0) / 1300; let done = 0;
+        L.forEach((l, k) => { const at = k / L.length * .8; if (p > at + .18) { if (l.className !== 'lk') { l.textContent = MAIL[k]; l.className = 'lk'; } done++; } else { l.textContent = G[Math.floor(Math.random() * G.length)]; l.className = 'rx'; } });
+        fq.innerHTML = done >= L.length ? 'LOCKED · <b>94.0</b>' : 'TUNING · ' + (88 + p * 6).toFixed(1); if (done < L.length) requestAnimationFrame(f); })(t0); };
+    new IntersectionObserver(es => { if (es[0].isIntersecting) tune(); }).observe(bt); bt.addEventListener('mouseenter', tune); window._tuneB = tune; }
+  // C: the ticker
+  { const tr = document.querySelector('.C .tr'); tr.innerHTML = Array(8).fill(`<span>${MAIL}</span>`).join(''); }
+  // D: letters lift around the pointer; a Copy pill follows it
+  { const dt = document.getElementById('dt'), cur = document.getElementById('dcur'); dt.innerHTML = [...MAIL].map(c => (c === '@' ? '<wbr>' : '') + `<i>${c}</i>`).join('');   /* if it has to wrap, it wraps before the @ */ const L = $$('i', dt);
+    let x = 0, y = 0, tx = 0, ty = 0;
+    dt.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; tx = e.clientX; ty = e.clientY; cur.classList.add('on');
+      L.forEach(l => { const r = l.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2)), k = Math.max(0, 1 - d / 140); l.style.transform = `translateY(${(-k * 18).toFixed(1)}px)`; l.style.color = k > .7 ? 'var(--red)' : ''; }); });
+    dt.addEventListener('pointerleave', () => { cur.classList.remove('on'); L.forEach(l => { l.style.transform = ''; l.style.color = ''; }); });
+    (function f() { x += (tx - x) * .22; y += (ty - y) * .22; cur.style.transform = `translate(${x + 14}px, ${y + 14}px)`; requestAnimationFrame(f); })(); }
+  const NOTE = { A: '<b>A · Stacked caps.</b> Like your reference: the address in tall condensed caps (Jockey One, the face you already use for display), split onto two lines at the @, with an outlined Copy pill beside it. Hover turns the name red.',
+    B: '<b>B · Tune in.</b> When it scrolls into view, each letter rolls through static and locks in from left to right, while a little readout tunes from 88.0 to 94.0, About\'s station. Hover to tune it again.',
+    C: '<b>C · Ticker.</b> The address runs across the full width, alternating solid and outline, with a red dot between. Hover slows it right down; click anywhere on it to copy.',
+    D: '<b>D · Cursor pill.</b> A big plain address. Point at it and a red Copy pill follows your cursor while the letters near it lift and turn red. Click to copy. On phones it shows a normal Copy button instead.',
+    E: '<b>E · Outline split.</b> Your name solid, @gmail.com in outline. Point at it and the outline fills in from left to right; it fills too when you copy.' };
+  const show = k => { $$('[data-v]').forEach(s => s.hidden = s.dataset.v !== k); $$('#v button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k))); document.getElementById('note').innerHTML = NOTE[k]; if (k === 'B') window._tuneB(); try { localStorage.setItem('maillab', k); } catch (_) {} };
+  $$('#v button').forEach(b => b.addEventListener('click', () => { pop(); show(b.dataset.k); }));
+  $$('#th button').forEach(b => b.addEventListener('click', () => { document.documentElement.dataset.theme = b.dataset.k; $$('#th button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
+  let k0 = 'A'; try { k0 = localStorage.getItem('maillab') || 'A'; } catch (_) {} show(k0);
+})();
+</script>

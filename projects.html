@@ -173,6 +173,11 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .bigmail b span { white-space: nowrap; display: inline-block }   /* if it has to wrap, it wraps after the @ */
 .bigmail:hover b { opacity: .72 }
 .bigmail i { font-style: normal; color: var(--muted) }
+/* tune in: when the address comes into view, each letter rolls through static and locks in from left to right */
+.bigmail b em { font-style: normal; display: inline-block; transition: color .2s }
+.bigmail b em.rx { color: var(--muted); font-family: var(--mono); font-weight: 500; letter-spacing: -.08em }
+.bigmail .mrow { display: flex; gap: 18px; align-items: center; flex-wrap: wrap }
+.bigmail .tfq { font-variant-numeric: tabular-nums } .bigmail .tfq b { all: unset; color: var(--red) }
 .foot { padding: var(--sp) 0 140px; display: flex; justify-content: space-between; gap: 16px }
 
 @media (max-width: 899px) {
@@ -430,7 +435,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610221224#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610221315#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=f066ff04" defer></script>
