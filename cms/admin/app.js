@@ -281,6 +281,7 @@
         { k: 'list', label: 'Points (optional)', type: 'list', itemLabel: 'Point', def: () => ['', ''], title: x => x[0] || 'Point', of: PAIR('Title', 'Text') },
         { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
         { k: 'chips', label: 'Colour or type names (brand, optional)', type: 'lines', rows: 2, help: 'One per line' },
+        { k: 'notes', label: 'Sticky notes (product, optional)', type: 'list', itemLabel: 'Note', def: () => ({ t: '', p: '', w: '' }), title: (n, i) => `${i + 1} · ${(n && n.p) || 'Empty note'}`, help: 'Insights shown as sticky notes visitors can move around. Add as many as you like; leave it empty for no board.', of: { type: 'object', fields: [{ k: 't', label: 'Label', help: 'e.g. Buyer, Seller' }, { k: 'p', label: 'Insight' }, { k: 'w', label: 'From', help: 'e.g. Buyer interviews' }] } },
         { k: 'media', label: 'Pictures and videos', type: 'list', itemLabel: 'Picture', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true }, when: s => !(s.rows && s.rows.length) },
         { k: 'rows', label: 'Grid', type: 'rowsnote' }] } } ] },
     { title: 'Extra pictures', help: 'Spare pictures the page uses to pair with a picture that would otherwise sit alone, so every row runs edge to edge.', fields: [
@@ -694,7 +695,7 @@
     let f = vInbox.f || 'all', q = '', openKey = vInbox.open || null;
     const chips = el('div', { class: 'tabs' }), search = el('input', { class: 'search', placeholder: 'Search messages…', oninput: e => { q = e.target.value.toLowerCase(); paint(); } });
     const list = el('div', { class: 'ibl' }), pane = el('div', { class: 'ibp' });
-    body.append(el('div', { class: 'ibbar' }, chips, search), el('div', { class: 'ib' }, list, pane));
+    body.append(el('div', { class: 'ibbar' }, chips, search), el('div', { class: 'ibox' }, list, pane));
     const set = async (m, status) => { const was = m.status; m.status = status; paint(); try { const x = await api('/api/inbox/update', { method: 'POST', body: JSON.stringify({ key: m.key, status }) }); if (x.error) throw new Error(x.error); } catch (e) { m.status = was; paint(); toast('Couldn’t update: ' + e.message); } INBOX_NEW = IBOX.filter(x => x.status === 'new').length; nav(); };
     const shows = m => (f === 'all' ? m.status !== 'archived' : f === 'new' ? m.status === 'new' : f === 'done' || f === 'archived' ? m.status === f : m.type === f && m.status !== 'archived')
       && (!q || [m.name, m.email, m.subject, m.message, ...Object.values(m.fields || {})].join(' ').toLowerCase().includes(q));

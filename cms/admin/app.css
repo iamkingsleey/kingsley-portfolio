@@ -168,7 +168,7 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 /* inbox */
 #nav .ncount { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: #ff4a1c; color: #fff; font: 600 11px/20px var(--mono); text-align: center }
 .ibbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px } .ibbar .tabs { margin: 0 } .ibbar .search { margin: 0; max-width: 280px }
-.ib { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; min-height: 520px; background: var(--bg) }
+.ibox { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; min-height: 520px; background: var(--bg) }
 .ibl { border-right: 1px solid var(--line); overflow: auto; max-height: 74vh } .ibp { padding: 26px 28px; overflow: auto; max-height: 74vh }
 .ibi { all: unset; display: grid; gap: 4px; width: 100%; box-sizing: border-box; padding: 14px 16px; border-bottom: 1px solid var(--line); cursor: pointer }
 .ibi:hover { background: var(--side) } .ibi.on { background: var(--pill) } .ibi.new .ibh b::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 99px; background: #ff4a1c; margin-right: 7px; vertical-align: 1px }
@@ -180,7 +180,7 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 .ibwho { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 18px } .ibwho b { color: var(--ink); font-weight: 500 } .ibwho a { color: var(--muted) }
 .ibmsg { white-space: pre-wrap; color: var(--ink); font-size: 15px; line-height: 1.6; max-width: 66ch }
 .ibf { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--line) } .ibf dd { margin: 0; color: var(--ink) }
-@media (max-width: 900px) { .ib { grid-template-columns: 1fr } .ibl { border-right: 0; border-bottom: 1px solid var(--line); max-height: 44vh } }
+@media (max-width: 900px) { .ibox { grid-template-columns: 1fr } .ibl { border-right: 0; border-bottom: 1px solid var(--line); max-height: 44vh } }
 
 /* picture effect: hotspot points */
 .hsl { display: grid; gap: 6px } .hsr { display: grid; grid-template-columns: 18px 64px 64px minmax(0, 1fr) minmax(0, 1.4fr) 34px; gap: 6px; align-items: center }

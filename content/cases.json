@@ -74,6 +74,46 @@
      ]
     },
     {
+     "h": "User insights",
+     "title": "What people told me",
+     "p": [
+      "What buyers and sellers said in interviews, one note each. Move them around."
+     ],
+     "media": [],
+     "notes": [
+      {
+       "t": "Buyers",
+       "p": "Couldn't tell who they were paying until the money had already gone.",
+       "w": "Buyer interviews"
+      },
+      {
+       "t": "Sellers",
+       "p": "Honest sellers lost sales because buyers assumed anyone could be a scammer.",
+       "w": "Seller interviews"
+      },
+      {
+       "t": "Buyers",
+       "p": "Wanted a sign they could see at a glance before trusting a seller.",
+       "w": "Buyer interviews"
+      },
+      {
+       "t": "Sellers",
+       "p": "Happy to verify, as long as it took minutes, not days.",
+       "w": "Seller interviews"
+      },
+      {
+       "t": "Support",
+       "p": "Most scam reports began with a seller who had no way to prove they were real.",
+       "w": "Support team"
+      },
+      {
+       "t": "Businesses",
+       "p": "Shops wanted to look official, not like one more personal account.",
+       "w": "Business owners"
+      }
+     ]
+    },
+    {
      "h": "UX strategy",
      "list": [
       [

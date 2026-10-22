@@ -569,6 +569,18 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .kx { isolation: isolate; user-select: none; -webkit-user-select: none } .kx img { -webkit-user-drag: none }
 .kx .kx-tag { position: absolute; z-index: 6; left: 12px; bottom: 12px; display: inline-flex; align-items: center; height: 28px; padding: 0 11px; border-radius: 99px; background: rgb(14 14 16 / .62); color: #fff; font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); pointer-events: none; transition: opacity .3s }
 .kx.used .kx-tag { opacity: 0 }
+.kb { position: relative; height: 640px; border-radius: 16px; background: radial-gradient(color-mix(in srgb, var(--ink) 14%, var(--panel)) 1.2px, transparent 1.3px) 0 0 / 22px 22px, var(--panel); overflow: hidden; touch-action: pan-y }
+.kb-tidy { position: absolute; z-index: 1; right: 16px; top: 16px; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 99px; background: var(--bg); color: var(--ink); font-size: 14px; font-weight: 500; transition: opacity .3s, background .2s } .kb-tidy[disabled] { opacity: 0; pointer-events: none }
+.kb-tidy svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+.kb-hint { position: absolute; right: 20px; bottom: 16px; transition: opacity .4s; pointer-events: none } .kb.moved .kb-hint { opacity: 0 }
+.kb-n { position: absolute; left: 0; top: 0; width: 228px; min-height: 200px; padding: 20px 20px 18px; background: var(--c); color: #1a1a1a; border-radius: 3px; box-shadow: 0 1px 1px rgb(0 0 0 / .06), 0 8px 18px -8px rgb(0 0 0 / .25); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; display: flex; flex-direction: column; gap: 12px; transition: box-shadow .25s, scale .35s cubic-bezier(.3,1.6,.5,1), opacity .3s; will-change: transform }
+.kb-n::before { content: ''; position: absolute; left: 50%; top: -9px; width: 58px; height: 20px; margin-left: -29px; background: rgb(255 255 255 / .55); box-shadow: 0 1px 2px rgb(0 0 0 / .08); rotate: -2deg }   /* a strip of tape */
+.kb-n .tg { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; opacity: .55 }
+.kb-n p { margin: 0 !important; font: 500 17px/1.32 var(--body) !important; letter-spacing: -.015em; color: #1a1a1a !important; max-width: none !important }
+.kb-n .who { margin-top: auto; font: 500 12px var(--mono); opacity: .5; letter-spacing: .04em }
+.kb-n.held { cursor: grabbing; scale: 1.06; box-shadow: 0 2px 2px rgb(0 0 0 / .06), 0 26px 40px -14px rgb(0 0 0 / .38) }
+.kb-n:focus-visible { outline: 2px solid var(--red); outline-offset: 4px }
+@media (max-width: 700px) { .kb-n { width: 160px; min-height: 160px; padding: 16px 14px 14px } .kb-n p { font-size: 15px !important } .kb-tidy { right: 10px; top: 10px; height: 34px; padding: 0 13px; font-size: 13px } }
 .kx-badge { position: absolute; z-index: 6; right: 10px; top: 10px; height: 24px; padding: 0 9px; border-radius: 99px; background: #3d7bff; color: #fff; font: 600 10.5px/24px var(--mono); letter-spacing: .05em; text-transform: uppercase; pointer-events: none }
 .kx-ba { cursor: ew-resize; touch-action: pan-y } .kx-ba .kx-before { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 calc(100% - var(--p, 50%)) 0 0); pointer-events: none; z-index: 1 }
 .kx-ba .kx-before.mono { filter: grayscale(1) contrast(.85) brightness(1.06) }
@@ -805,6 +817,43 @@ function applyFx(c) {
     if (cs.position === 'static' && cs.aspectRatio === 'auto') { const r = RATIO[src] || (el.naturalWidth ? el.naturalWidth / el.naturalHeight : 0) || (f.offsetWidth / Math.max(1, f.offsetHeight)); f.style.aspectRatio = String(r); }
     f.classList.add('kx'); el.classList.add('kx-base'); const off = KFX[k](f, el, o); if (off) kxOff.push(off); });
 }
+// sticky notes: one insight each, on a dotted board people can rearrange (any number of notes, set in the CMS)
+const NOTE_C = ['#fff1a8', '#ffd6e0', '#c9f2dc', '#d6e6ff', '#ffe0c2'];
+const NOTES = s => { const N = (s.notes || []).filter(n => n && (n.p || n.t)); if (!N.length) return '';
+  return `<div class="fr"><div class="kb" data-kb="${N.length}"><button class="kb-tidy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2 2v3h3"/></svg>Tidy up</button><span class="mono kb-hint">Drag the notes</span>
+    ${N.map((n, k) => `<div class="kb-n" tabindex="0" role="note" style="--c:${NOTE_C[k % NOTE_C.length]}" aria-label="${esc((n.t ? n.t + ': ' : '') + (n.p || ''))}">${n.t ? `<span class="tg">${esc(n.t)}</span>` : ''}<p${E(`sections.${s._i}.notes.${k}.p`)}>${esc(n.p || '')}</p>${n.w ? `<span class="who">${esc(n.w)}</span>` : ''}</div>`).join('')}</div></div>`; };
+function setupBoards() {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, snd = n => { if (window.Popkit) Popkit.play(n); };
+  document.querySelectorAll('.kb').forEach(board => {
+    const tidyB = board.querySelector('.kb-tidy'), els = [...board.querySelectorAll('.kb-n')].map(e => ({ e, x: 0, y: 0, r: 0, hx: 0, hy: 0, hr: 0 }));
+    const RT = [-4, 3, -2, 5, -3, 2, -5, 4];
+    // the board grows with the number of notes; the notes sit in a loose, hand-placed grid
+    const size = () => { const W = board.clientWidth, cols = W < 560 ? 2 : W < 980 ? 3 : 4, rows = Math.ceil(els.length / cols), nh = els.length ? Math.max(...els.map(n => n.e.offsetHeight)) : 200;
+      board.style.height = Math.round(rows * (nh + (W < 560 ? 34 : 56)) + (W < 560 ? 70 : 110)) + 'px'; return { W, cols, rows, nh }; };
+    const home = () => { const { W, cols, rows, nh } = size(), H = board.clientHeight, nw = els[0].e.offsetWidth;
+      els.forEach((n, i) => { const c = i % cols, rw = Math.floor(i / cols), inRow = Math.min(cols, els.length - rw * cols);
+        const cx = (W - nw) * (inRow === 1 ? .5 : c / (cols - 1)) * .88 + (W - nw) * .06, cy = (H - nh) * (rows === 1 ? .5 : rw / (rows - 1)) * .8 + (H - nh) * .1;
+        n.hx = Math.max(6, Math.min(W - nw - 6, cx + ((i * 37) % 23 - 11) * (W < 560 ? .5 : 1.4))); n.hy = cy + ((i * 53) % 19 - 9) * 1.2; n.hr = RT[i % RT.length]; }); };
+    const place = (n, anim) => { n.e.style.transition = anim && !reduce ? 'transform .7s cubic-bezier(.3,1.6,.5,1), box-shadow .25s, scale .35s cubic-bezier(.3,1.6,.5,1)' : ''; n.e.style.transform = `translate(${n.x}px, ${n.y}px) rotate(${n.r}deg)`; };
+    const tidy = anim => { home(); els.forEach(n => { n.x = n.hx; n.y = n.hy; n.r = n.hr; place(n, anim); }); tidyB.disabled = true; board.classList.remove('moved'); };
+    let z = 10;
+    els.forEach(n => { const e = n.e; let g = null;
+      e.addEventListener('pointerdown', ev => { if (ev.button > 0) return; ev.preventDefault(); g = { sx: ev.clientX, sy: ev.clientY, x0: n.x, y0: n.y, vx: 0, lx: ev.clientX, lt: performance.now() }; e.style.zIndex = ++z; e.classList.add('held'); e.style.transition = 'box-shadow .25s, scale .35s cubic-bezier(.3,1.6,.5,1)'; try { e.setPointerCapture(ev.pointerId); } catch (_) {} snd('pop'); });
+      e.addEventListener('pointermove', ev => { if (!g) return; const W = board.clientWidth - e.offsetWidth, H = board.clientHeight - e.offsetHeight, now = performance.now();
+        g.vx = (ev.clientX - g.lx) / Math.max(1, now - g.lt); g.lx = ev.clientX; g.lt = now;
+        n.x = Math.max(-10, Math.min(W + 10, g.x0 + ev.clientX - g.sx)); n.y = Math.max(-10, Math.min(H + 10, g.y0 + ev.clientY - g.sy)); n.r = Math.max(-12, Math.min(12, g.vx * 6));   // it tilts with the way you swing it
+        place(n, false); board.classList.add('moved'); tidyB.disabled = false; });
+      const drop = () => { if (!g) return; g = null; e.classList.remove('held'); n.r = Math.round(Math.random() * 8 - 4); place(n, true); snd('pop'); };
+      e.addEventListener('pointerup', drop); e.addEventListener('pointercancel', drop);
+      e.addEventListener('keydown', ev => { const d = { ArrowLeft: [-24, 0], ArrowRight: [24, 0], ArrowUp: [0, -24], ArrowDown: [0, 24] }[ev.key]; if (!d) return; ev.preventDefault(); n.x += d[0]; n.y += d[1]; e.style.zIndex = ++z; place(n, true); tidyB.disabled = false; board.classList.add('moved'); }); });
+    tidyB.addEventListener('click', () => tidy(true));
+    // the notes drop onto the board when it comes into view
+    let shown = false; tidy(false); els.forEach(n => { n.e.style.opacity = 0; });
+    new IntersectionObserver(es => { if (!es[0].isIntersecting || shown) return; shown = true; home();
+      els.forEach((n, i) => { n.x = n.hx; n.y = n.hy - 60; n.r = n.hr * 3; place(n, false); setTimeout(() => { n.e.style.opacity = 1; n.y = n.hy; n.r = n.hr; place(n, true); }, reduce ? 0 : 120 + i * 90); }); }, { threshold: .2 }).observe(board);
+    let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (board.classList.contains('moved')) { size(); els.forEach(n => { n.x = Math.min(n.x, board.clientWidth - n.e.offsetWidth); place(n, false); }); } else tidy(false); }, 150); });
+  });
+}
 function body(s) {
   let h = '';
   (s.p || []).forEach(p => h += `<p>${esc(p)}</p>`);
@@ -943,7 +992,7 @@ const R = {
       }
       if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · Results</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, s.h, s._i)}`; return; }
       const lead = s.list ? `<div class="lead">${s.list.map(([a, b], k) => `<div><b${E(`sections.${s._i}.list.${k}.0`)}>${esc(a)}</b>. <span${E(`sections.${s._i}.list.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>` : '';
-      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${lead}</section>${pics(media, s.h, s._i)}`;
+      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}"><span class="eb">${pad(i + 1)} · ${ph(s)[0]}</span><h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${lead}</section>${NOTES(s)}${pics(media, s.h, s._i)}`;
       if (i === 2 && c.statement) h += `<section class="tx ch"><span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`;
     });
     if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list, 'impact.list')}`;
@@ -1321,7 +1370,7 @@ function setupIndex() {
     // it steps aside before the footer reaches it, so the two never overlap
     const nx = app.querySelector('.next'), ir = ix.getBoundingClientRect();
     ix.classList.toggle('on', scrollY > innerHeight * .5 && (!nx || nx.getBoundingClientRect().top > ir.bottom + 48));
-    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
+    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
     ix.classList.toggle('dim', under);
     if (!raf) raf = requestAnimationFrame(draw);
   };
@@ -1352,7 +1401,7 @@ function paint(keep) {
   app.querySelectorAll('a.dback').forEach(a => a.addEventListener('click', e => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); if (KM_EDIT) return; snd('pop'); const b = backTo();
     const o = { from: +(c.fq || 100), to: /designs/.test(b.href) ? 100 : 98 }; if (window.KM && KM.trail && KM.trail.go) KM.trail.go(b, o); else if (window.Tuner) Tuner.go(Object.assign(o, { name: b.name, href: b.href })); else location.href = b.href; }));
   if (!keep) scrollTo(0, 0);
-  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw);
+  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw); setupBoards();
   if (window.KM && KM.trail) KM.trail.mark(undefined, c.title);   // this case's own name, whatever the page said a moment before
   if (KM_EDIT) editable(c);
 }
