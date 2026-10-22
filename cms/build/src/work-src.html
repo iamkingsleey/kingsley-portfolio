@@ -1856,7 +1856,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const rv = document.createElement('div'); rv.className = 'reelv'; rv.tabIndex = 0; rv.setAttribute('aria-roledescription', 'carousel'); rv.setAttribute('aria-label', 'Designs, one at a time');
     rv.innerHTML = '<canvas></canvas><div class="rcap rt"></div><div class="rcap rm"><span class="rn"></span><span>Category <i></i></span></div>'; document.body.appendChild(rv);
     const cv = rv.querySelector('canvas'), g = cv.getContext('2d'), rt = rv.querySelector('.rt'), rm = rv.querySelector('.rm');
-    let on = false, L = [], pos = 0, tgt = 0, vel = 0, drag = null, moved = 0, last = -1, W = 0, H = 0, dpr = 1, front = null;
+    let land = -1e9, wasMv = false, on = false, L = [], pos = 0, tgt = 0, vel = 0, drag = null, moved = 0, last = -1, W = 0, H = 0, dpr = 1, front = null;
     const imgs = {}; const imgOf = i => { if (!imgs[i]) { const im = new Image(); im.decoding = 'async'; im.src = mdOf(still(items[i])); imgs[i] = im; } return imgs[i]; };
     const list = () => { const now = [...ovGrid.children].filter(t => !t.hidden).map(t => +t.dataset.i); const cur = L[Math.round(pos)]; L = now; const k = L.indexOf(cur); if (k >= 0) pos = tgt = k; else pos = tgt = Math.min(Math.round(pos), Math.max(0, L.length - 1)); };
     new MutationObserver(() => { if (on) list(); }).observe(ovGrid, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
@@ -1873,7 +1873,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const bend = x => { const u = Math.max(0, Math.abs(x - W / 2) - geo().ch * .55) / (W / 2); return 1 + .42 * Math.pow(u, 1.5); };
     const rDraw = function () { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); front = null; if (!L.length) return;
       const cy = H * .46, ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
-      for (const p of ps) { const im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p; if (!im.complete || !im.naturalWidth) continue;
+      const bt = (performance.now() - land) / 1000, bz = bt < 1.2 ? 1 + .07 * Math.exp(-bt * 5.5) * Math.sin(bt * 17) : 1;   // the landing bounce
+      for (const p of ps) { if (Math.abs(p.d) < .5 && bz !== 1) { p.w *= bz; p.h *= bz; } const im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p; if (!im.complete || !im.naturalWidth) continue;
         g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
         const ir = im.naturalWidth / im.naturalHeight, cr = p.w / p.h; let sx = 0, sy = 0, sw = im.naturalWidth, sh = im.naturalHeight; if (ir > cr) { sw = sh * cr; sx = (im.naturalWidth - sw) / 2; } else { sh = sw / cr; sy = (im.naturalHeight - sh) / 2; }
         const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
@@ -1883,7 +1884,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         rm.style.left = left + 'px'; rm.style.width = front.w + 'px'; rm.style.top = (top + front.h + 14) + 'px'; rm.querySelector('.rn').textContent = String(L[front.k] + 1).padStart(2, '0'); rm.querySelector('i').textContent = it.cat; } }
     let raf = 0; const loop = () => { raf = 0; if (!on) return; if (!drag && vel) { tgt += vel; vel *= .9; if (Math.abs(vel) < .02) { vel = 0; tgt = Math.round(tgt); } } tgt = Math.max(0, Math.min(L.length - 1, tgt));
       pos += ((drag ? drag.p : tgt) - pos) * (reduce ? 1 : .14); const r = Math.round(pos); if (r !== last) { if (last >= 0) tick(); last = r; }
-      rv.classList.toggle('moving', Math.abs(pos - r) > .04 || !!drag); rDraw(); raf = requestAnimationFrame(loop); };
+      const mv = Math.abs(pos - r) > .04 || !!drag; if (wasMv && !mv && !reduce) land = performance.now(); wasMv = mv; rv.classList.toggle('moving', mv); rDraw(); raf = requestAnimationFrame(loop); };
     // open the piece in the middle the way a tile opens: a case study or a link goes there, anything else opens in the small view
     const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + H * .46 - front.h / 2, width: front.w, height: front.h };
       const dest = items[i].link || (items[i].cs && items[i].page);
