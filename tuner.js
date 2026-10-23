@@ -62,7 +62,7 @@
       cx.beginPath(); cx.moveTo(x, base); cx.lineTo(x, base - L); cx.stroke();
       if (major) { cx.fillStyle = col; cx.font = '500 10px "Geist Mono", ui-monospace, monospace'; cx.textAlign = 'center'; cx.fillText((q / 10).toFixed(0), x, base + 16); }
     }
-    cx.globalAlpha = 1; cx.fillStyle = '#ff4a1c'; cx.fillRect(mid - 1.5, base - 40, 3, 42);
+    cx.globalAlpha = 1; cx.fillStyle = '#fb233b'; cx.fillRect(mid - 1.5, base - 40, 3, 42);
   }
   // ease: leaving speeds up (ease-in), arriving slows into the station (ease-out); together one smooth sweep
   function count(from, to, ms, ease, done) {

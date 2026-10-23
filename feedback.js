@@ -204,7 +204,7 @@
         cx.beginPath(); cx.moveTo(x, base); cx.lineTo(x, base - L); cx.stroke();
         if (major) { const on = d < .5 && picked; cx.globalAlpha = (on ? 1 : .6) * e; cx.fillStyle = on ? ink : mu; cx.font = `500 ${on ? 13 : 12}px "Geist Mono", ui-monospace, monospace`; cx.textAlign = 'center'; cx.fillText(String(v), x, TY + 48); }
       }
-      cx.globalAlpha = 1; cx.fillStyle = '#ff4a1c'; cx.fillRect(mid - 1.5, TY - 8, 3, 34);
+      cx.globalAlpha = 1; cx.fillStyle = '#fb233b'; cx.fillRect(mid - 1.5, TY - 8, 3, 34);
     };
     let pt = performance.now();
     const loop = now => { if (!live) return; const dt = Math.min(64, now - pt); pt = now;

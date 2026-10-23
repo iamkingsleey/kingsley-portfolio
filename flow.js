@@ -57,7 +57,7 @@
   // couple of seconds) goes. One stray scroll at the top of Designs never throws you back.
   let armed = 0, armGesture = -1, gesture = 0, tipEl = null;
   const tip = on => {
-    if (!tipEl) { tipEl = document.createElement('div'); tipEl.innerHTML = TOUCH ? 'Pull down <b style="font-weight:500;color:#ff4a1c">once more ↓</b> to go Home' : 'Once more, <b style="font-weight:500;color:#ff4a1c">scroll ↑</b> to go Home';   /* same words and red as Home's "scroll ↓" tip, so the two directions read as a pair on any device */
+    if (!tipEl) { tipEl = document.createElement('div'); tipEl.innerHTML = TOUCH ? 'Pull down <b style="font-weight:500;color:#fb233b">once more ↓</b> to go Home' : 'Once more, <b style="font-weight:500;color:#fb233b">scroll ↑</b> to go Home';   /* same words and red as Home's "scroll ↓" tip, so the two directions read as a pair on any device */
       tipEl.style.cssText = 'white-space:nowrap;position:fixed;z-index:151;left:50%;top:calc(88px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);opacity:0;pointer-events:none;padding:7px 13px;border-radius:999px;background:#fff;color:#111;font:500 13px Geist,system-ui,sans-serif;transition:opacity .2s,transform .35s cubic-bezier(.2,.8,.2,1)';
       if (matchMedia('(max-width: 899px)').matches) { tipEl.style.top = 'auto'; tipEl.style.bottom = 'calc(92px + env(safe-area-inset-bottom,0px))'; }
       document.body.append(tipEl); }

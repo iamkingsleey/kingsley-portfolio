@@ -1,5 +1,5 @@
 // Offline page: keeps a copy of offline.html and shows it in place of any page that can't load (built by cms/build/src/tools/post.py)
-const V = 'km-offline-01d1471c', OFF = 'offline.html';
+const V = 'km-offline-eadef49c', OFF = 'offline.html';
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.add(new Request(OFF, { cache: 'reload' }))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil((async () => {
   for (const k of await caches.keys()) if (k !== V && k.startsWith('km-offline')) await caches.delete(k);

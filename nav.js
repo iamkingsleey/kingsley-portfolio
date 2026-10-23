@@ -17,7 +17,7 @@
   const PARENT = { 'case.html': 'Designs', 'brand.html': 'Designs',   // case studies sit under Designs while Projects is off
     'logo.html': 'Designs', 'product.html': 'Designs', 'project.html': 'Designs', 'showcase.html': 'Designs' };
   const cur = STATIONS.find(s => s.href === file) || STATIONS.find(s => s.name === PARENT[file]) || STATIONS[0];
-  const ci = STATIONS.indexOf(cur), RED = '#ff4a1c', SP = 74;
+  const ci = STATIONS.indexOf(cur), RED = '#fb233b', SP = 74;
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
   const go = s => {
     if (s === cur && !PARENT[file]) { scrollTo({ top: 0, behavior: 'smooth' }); return; }   // already here: back to the top
