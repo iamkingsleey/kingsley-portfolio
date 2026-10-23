@@ -273,7 +273,7 @@ body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, vi
 .ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
 body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
 .ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
-.ov.flat .ov-im { opacity: 1; background-size: cover; background-position: center }   /* fallback: the plain pictures, when the canvas can't draw them */
+.ov.flat .ov-im { opacity: 1; background-image: var(--bg, none), var(--th, none); background-size: cover; background-position: center }   /* the 240px thumbnail first; the sharp picture is laid over it as the tile nears the screen */   /* fallback: the plain pictures, when the canvas can't draw them */
 .ovc { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0 }
 .ov-grid { position: relative; z-index: 1 }
 .ov-t:hover .ov-c b { color: var(--ink) }
@@ -511,6 +511,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
   const okDraw = im => !(im && im.dataset && im.dataset.nox);
   // the 1000px copy of a design (made by the build next to each WebP) for places that show it small: the All grid and the tap ripple
+  const thOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/thumbs/') : mdOf(u);
+  const smOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/sm/') : u;   // 640px, for the grid tiles
   const mdOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/')
     : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
   const row = $('row');
@@ -1331,10 +1333,9 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     if (!im) { im = new Image(); im.decoding = 'async'; im.src = path.replace('assets/designs/', 'assets/designs/thumbs/'); thumbCache.set(path, im); }
     return im;
   }
-  items.forEach(it => thumbFor(still(it)));
   function texImg(src) { let im = texCache.get(src); if (!im) { im = xo(new Image(), src); im.src = src; texCache.set(src, im); } return im; }
   const loadRow = () => slots.forEach(s => { const im = s.querySelector('img[data-src]'); if (im) { im.src = im.dataset.src; im.removeAttribute('data-src'); } });
-  items.forEach(it => texImg(mdOf(still(it))));   // the grid's pictures are small (1000px): fetch them all straight away
+  // the grid's 1000px pictures load as their tiles come near the screen (see gridWarm below); the 240px thumbnails stand in until then
   const warm = () => { if (!ovOpen) loadRow(); };
   if (document.readyState === 'complete') setTimeout(warm, 200); else addEventListener('load', () => setTimeout(warm, 200));          // warm up so the first tap can ripple
   function makeRipple(src, W, H, cx, cy) {
@@ -1670,7 +1671,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // ---------- See everything ----------
   // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
   const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
-  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" style="background-image:url(${mdOf(it.video ? it.poster : it.src)})"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
+  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${smOf(it.video ? it.poster : it.src)}"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
   document.body.appendChild(ov);
   let ovOpen = false;
   function openOverview() {
@@ -1748,10 +1749,19 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   }
   // each piece's real shape comes from its picture (the case-study covers too); a piece shows once its picture is here
   let mT = 0;
-  ovTiles.forEach(o => { const u = mdOf(still(items[o.i])), i = new Image();
+  // the shape is read from the tiny thumbnail (same proportions), so the page doesn't wait on 6 MB of grid pictures to lay itself out
+  ovTiles.forEach(o => { const u = thOf(still(items[o.i])), i = new Image();
     i.onload = () => { const r = i.naturalWidth / i.naturalHeight; o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
-    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) o.t.style.setProperty('--r', items[o.i].r); i.src = u; });
+    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u; });   // shape known from the CMS: wait until the tile nears the screen
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); mScrollFly(); });
+  // each tile's sharp grid picture (sm, 640px) is fetched as it nears the screen; the 240px thumbnail shows until then
+  const warmTile = o => { if (o.load) { o.load(); o.load = null; } if (o.im.dataset.th) { o.im.style.setProperty('--th', `url(${o.im.dataset.th})`); o.im.removeAttribute('data-th'); } if (o.im.dataset.bg) { o.im.style.setProperty('--bg', `url(${o.im.dataset.bg})`); o.im.removeAttribute('data-bg'); } };
+  // until the page has loaded only the tiles on screen fetch; after that, the next screen's worth too
+  const gridIO = m => new IntersectionObserver((es, io) => es.forEach(e => { if (!e.isIntersecting) return; const o = ovTiles.find(x => x.t === e.target); if (o) warmTile(o); io.unobserve(e.target); }), { root: ov, rootMargin: m });
+  if ('IntersectionObserver' in window) { const io0 = gridIO('0px'); ovTiles.forEach(o => io0.observe(o.t));
+    const later = () => { io0.disconnect(); const io1 = gridIO('100% 0px'); ovTiles.forEach(o => { if (o.im.dataset.bg) io1.observe(o.t); }); };
+    if (document.readyState === 'complete') setTimeout(later, 300); else addEventListener('load', () => setTimeout(later, 300)); }
+  else ovTiles.forEach(warmTile);
   addEventListener('resize', () => requestAnimationFrame(mSpans));
   // ---------- pointer effects on the grid. One is picked with PFX (or "km-fx" while comparing); 'none' turns them off.
   //   ripple: moving drops rings that travel outward, pieces rise and settle as each passes

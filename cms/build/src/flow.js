@@ -111,8 +111,10 @@
     // (the page itself is fetched, not pre-built: a page built in the background loses its WebGL grid and its scroll handling)
     try { const sr = document.createElement('script'); sr.type = 'speculationrules'; sr.textContent = JSON.stringify({ prefetch: [next, prev].filter(Boolean).map(u => ({ source: 'list', urls: [u] })) }); document.head.append(sr); } catch (_) {}
     [next, prev].filter(Boolean).forEach(u => fetch(u, { credentials: 'same-origin' }).then(r => r.text()).then(t => {
-      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = /^assets\/designs\/[^/]+\.webp$/.test(s) ? s.replace('assets/designs/', 'assets/designs/md/') : s; /* Designs shows the 1000px copies; fetched the same way Designs asks for them, so the cached copy works there */ } });
+      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = /^assets\/designs\/[^/]+\.webp$/.test(s) ? s.replace('assets/designs/', 'assets/designs/sm/') : s; /* the Designs grid shows the 640px copies, so those are the ones worth having ready */ } });
     }).catch(() => {}));
   };
-  (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warm, { timeout: 2500 });
+  // only once this page has finished loading, so the neighbours never compete with it
+  const idle = () => (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warm, { timeout: 2500 });
+  if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
 })();

@@ -60,6 +60,7 @@
 
   // ---------- blur-up ----------
   const THUMB = /(^|\/)assets\/designs\/(?:md\/)?([^/?#]+)\.(webp|jpe?g|png)(\?.*)?$/i;
+  const lqIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; lqIO.unobserve(e.target); const f = e.target._kmLq; e.target._kmLq = null; if (f) f(); }), { rootMargin: '600px 0px' }) : null;
   function prep(img) {
     if (img.dataset.kmImg || img.closest('.tuner, .km-keep, [data-nokit]')) return; img.dataset.kmImg = '1';
     const src = img.getAttribute('src') || '';
@@ -67,7 +68,12 @@
     if (img.complete && img.naturalWidth) return;                                  // already here: nothing to do
     const m = src.match(THUMB), lq = m && !/\/thumbs\//.test(src) ? src.replace(/assets\/designs\/(?:md\/)?/, 'assets/designs/thumbs/').replace(/\?.*$/, '') : null;
     if (reduce) return;
-    if (lq) { img.style.backgroundImage = `url("${lq}")`; img.classList.add('km-lq'); } else img.classList.add('km-fade');
+    if (lq) {
+      // a lazy picture gets its blurred stand-in only as it nears the screen, so the stand-ins don't all download up front
+      const put = () => { if (img.complete && img.naturalWidth) return; img.style.backgroundImage = `url("${lq}")`; };
+      if (img.loading === 'lazy' && lqIO) { img._kmLq = put; lqIO.observe(img); } else put();
+      img.classList.add('km-lq');
+    } else img.classList.add('km-fade');
     const done = () => {
       const t = getComputedStyle(img).transition, own = t && !/^all 0s/.test(t) ? t + ', ' : '';
       img.style.transition = own + `filter ${M.move}ms ${M.ease}, opacity ${M.move}ms ${M.ease}`;

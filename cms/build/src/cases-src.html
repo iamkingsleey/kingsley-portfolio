@@ -1561,8 +1561,10 @@ function countUp() {
 function shapes(c) {
   const urls = new Set(); const add = x => { if (!x) return; if (typeof x === 'string') urls.add(x); else if (x.video && x.poster) urls.add(x.poster); };
   [c.cover, ...(c.run || []), ...(c.sections || []).flatMap(s => s.media || [])].forEach(add);
+  // a shape only needs a small copy: Framer pictures are measured from their 512px version, not the 2400px one the page shows
+  const small = u => /framerusercontent\.com\/images\//.test(u) ? (/[?&]scale-down-to=\d+/.test(u) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=512') : u + (u.includes('?') ? '&' : '?') + 'scale-down-to=512') : u;
   return Promise.all([...urls].filter(u => !RATIO[u]).map(u => new Promise(res => { const im = new Image(), t = setTimeout(res, 4000);
-    im.onload = () => { if (im.naturalWidth) RATIO[u] = +(im.naturalWidth / im.naturalHeight).toFixed(3); clearTimeout(t); res(1); }; im.onerror = () => { clearTimeout(t); res(0); }; im.src = u; })))
+    im.onload = () => { if (im.naturalWidth) RATIO[u] = +(im.naturalWidth / im.naturalHeight).toFixed(3); clearTimeout(t); res(1); }; im.onerror = () => { clearTimeout(t); res(0); }; im.src = small(u); })))
     .then(r => { const n = r.filter(Boolean).length; if (n) try { localStorage.setItem('km-ratio', JSON.stringify(RATIO)); } catch (_) {} return n; });
 }
 function show() {

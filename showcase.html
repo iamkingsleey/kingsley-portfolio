@@ -245,6 +245,7 @@ h1 .w.in > span { translate: 0 0 }
     return [it, ...same, ...rest].map(x => ({ t: x.t, src: x.src, r: x.r || .8 })); })();
   // the 1000px copy (made by the build) wherever a piece is shown small; the full picture is kept for the large view
   const MD = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/') : u;
+  const TH = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/thumbs/') : MD(u);   // 240px, for the little strip buttons
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -388,7 +389,7 @@ h1 .w.in > span { translate: 0 0 }
 
       <div class="shead" id="s-col"><div><h2>Colours, pulled from each piece</h2><p>Pick a piece below. Tap a swatch to copy its hex.</p></div><span class="mono">Sampled live</span></div>
       <div class="swrap"><div class="sbig"><img id="sbi" src="${P[0].src}" alt=""></div><div class="sw" id="sw"></div></div>
-      <div class="strip" id="strip">${P.map((p, i) => `<button type="button" data-i="${i}" aria-label="${p.t}"><img src="${MD(p.src)}" alt=""></button>`).join('')}</div>
+      <div class="strip" id="strip">${P.map((p, i) => `<button type="button" data-i="${i}" aria-label="${p.t}"><img data-src="${TH(p.src)}" alt="" decoding="async"></button>`).join('')}</div>
 
       <div class="shead" id="s-sheet"><div><h2>Contact sheet</h2><p>The whole set at a glance. Tap one to see it large.</p></div><span class="mono">${P.length} pieces</span></div>
       <div class="sheet" id="sheet">${P.map((p, i) => `<figure data-i="${PICS.indexOf(p)}"><div class="im"><img src="${MD(p.src)}" alt="${p.t}" loading="lazy"></div><figcaption class="cap mono"><span>${String(i + 1).padStart(2, '0')}</span><span>${FQ(i)}</span></figcaption></figure>`).join('')}</div>
@@ -437,6 +438,10 @@ h1 .w.in > span { translate: 0 0 }
 
     // ---- colours: sample five from the picked piece ----
     const sw = $('sw'), sbi = $('sbi'), strip = [...$('strip').children];
+    // the strip's little pictures load as they scroll into its row (a browser's own lazy loading fetched all of them at once)
+    { const sx = $('strip'), on = im => { if (im.dataset.src) { im.src = im.dataset.src; im.removeAttribute('data-src'); } };
+      if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { on(e.target); io.unobserve(e.target); } }), { root: sx, rootMargin: '0px 300px' }); sx.querySelectorAll('img[data-src]').forEach(im => io.observe(im)); }
+      else sx.querySelectorAll('img[data-src]').forEach(on); }
     function sample(src) { return new Promise(res => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'), S = 48; c.width = S; c.height = S; const x = c.getContext('2d'); x.drawImage(im, 0, 0, S, S);
       const d = x.getImageData(0, 0, S, S).data, B = {}; for (let i = 0; i < d.length; i += 4) { const k = (d[i] >> 4) + ',' + (d[i + 1] >> 4) + ',' + (d[i + 2] >> 4); (B[k] = B[k] || [0, 0, 0, 0]); B[k][0] += d[i]; B[k][1] += d[i + 1]; B[k][2] += d[i + 2]; B[k][3]++; }
       const L = Object.values(B).sort((a, b) => b[3] - a[3]).map(b => [b[0] / b[3], b[1] / b[3], b[2] / b[3]]), out = [];
@@ -524,7 +529,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610231228';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610231519';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -539,7 +544,7 @@ h1 .w.in > span { translate: 0 0 }
 })();
 </script>
 <script src="nav.js?v=f066ff04" defer></script>
-<script src="kit.js?v=08f08a9c" defer></script>
+<script src="kit.js?v=7231f72d" defer></script>
 <script src="protips.js?v=bd51fe50" defer></script>
 <style id="km-toggles">.km-tg{position:fixed;z-index:150;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}#themeBtn.km-tg{right:max(24px,env(safe-area-inset-right,0px))}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 44px)}#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}@media print{.km-tg{display:none}}</style><button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
 <script>(function(){var sb=document.getElementById("soundBtn"),si=document.getElementById("soundIco"),tb=document.getElementById("themeBtn"),ti=document.getElementById("themeIco");var ON='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',OFF='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',MOON='<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>',SUN='<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>';var on=true;try{on=localStorage.getItem("km-sound")!=="off"}catch(e){}function ps(){si.innerHTML=on?ON:OFF;sb.setAttribute("aria-pressed",on);sb.setAttribute("aria-label",on?"Mute sound":"Turn sound on");if(window.Popkit)Popkit.mute(!on)}sb.addEventListener("click",function(){on=!on;try{localStorage.setItem("km-sound",on?"on":"off")}catch(e){}ps();dispatchEvent(new CustomEvent("km-sound",{detail:on}));if(on&&window.Popkit)Popkit.play("pop")});function pt(){var d=document.documentElement.dataset.theme==="dark";ti.innerHTML=d?SUN:MOON;tb.setAttribute("aria-pressed",d);tb.setAttribute("aria-label",d?"Light mode":"Dark mode")}tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});ps();pt();addEventListener("load",ps)})();</script>

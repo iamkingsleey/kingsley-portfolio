@@ -188,6 +188,37 @@ for _d in _dz:
         _t = _im['src'].replace('assets/designs/', 'assets/designs/thumbs/', 1)   # the trail is small and blurred: the thumbnail is plenty
         _bg.append({'src': _t if _t != _im['src'] and os.path.exists(f'{REPO}/{_t}') else _im['src'], 'ratio': _im.get('ratio', 1)})
 HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
+# ---- case-study pictures that still live on Framer: Framer hands out 2400px PNGs (often 1-3 MB each), which kept the
+# case pages loading for seconds. The first build that can reach the internet saves each one here as a 2048px WebP in
+# assets/cases/, and the pages point at that copy. A picture that can't be fetched (offline, say) keeps its Framer link,
+# and is tried again next build. GIFs stay on Framer so they keep moving.
+_FR = re.compile(r'https://framerusercontent\.com/images/([A-Za-z0-9]+)\.(?:png|jpe?g|webp)(?:\?[^"\'`)\s\\]*)?')
+_LOCAL = {}
+try:
+    from PIL import Image as _Im0
+    import io as _io0, urllib.request as _ur0, concurrent.futures as _cf0
+    _ids = sorted(set(_FR.findall(open(f'{REPO}/content/cases.json', encoding='utf-8').read())))
+    os.makedirs(f'{REPO}/assets/cases', exist_ok=True)
+    def _grab(_id):
+        _dst = f'{REPO}/assets/cases/{_id}.webp'
+        if os.path.exists(_dst): return _id
+        _url = next(m.group(0) for m in _FR.finditer(open(f'{REPO}/content/cases.json', encoding='utf-8').read()) if m.group(1) == _id)
+        _url = re.sub(r'\?.*$', '', _url) + '?scale-down-to=2048'
+        try:
+            with _ur0.urlopen(_ur0.Request(_url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20) as _r: _b = _r.read()
+            _im = _Im0.open(_io0.BytesIO(_b)); _im = _im.convert('RGBA' if _im.mode in ('RGBA', 'LA', 'P') else 'RGB')
+            if max(_im.size) > 2048: _im.thumbnail((2048, 2048))
+            _im.save(_dst + '.part', 'WEBP', quality=82, method=6); os.replace(_dst + '.part', _dst); return _id
+        except Exception: return None
+    if _ids:
+        with _cf0.ThreadPoolExecutor(6) as _ex:
+            for _id in _ex.map(_grab, _ids):
+                if _id: _LOCAL[_id] = f'assets/cases/{_id}.webp'
+        _miss = len(_ids) - len(_LOCAL)
+        print(f'case pictures: {len(_LOCAL)} local' + (f', {_miss} still on Framer (offline?)' if _miss else ''))
+except ImportError: pass
+def _localize(html):
+    return _FR.sub(lambda m: _LOCAL.get(m.group(1), m.group(0)), html) if _LOCAL else html
 # ---- pictures: a WebP copy of every JPEG/PNG under assets/ (usually a third smaller, same look), plus a 1000px
 # "md" copy of each design for places that show them small (the Designs grid, the 3D page's cards). The pages then
 # point at the WebP; a picture without one (no Pillow on this machine, say) keeps its original. Copies are only
@@ -212,7 +243,28 @@ try:
                     if not os.path.exists(_md) or os.path.getmtime(_md) < os.path.getmtime(_src):
                         os.makedirs(os.path.dirname(_md), exist_ok=True)
                         _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((1000, 1000 * 4)); _m.save(_md, 'WEBP', quality=80, method=6)
+                    # "sm" (640px) for the Designs grid tiles: about a third of md's weight, still sharp on a 3x phone screen
+                    _sm = f'{REPO}/assets/designs/sm/' + os.path.basename(_out)
+                    if not os.path.exists(_sm) or os.path.getmtime(_sm) < os.path.getmtime(_src):
+                        os.makedirs(os.path.dirname(_sm), exist_ok=True)
+                        _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((640, 640 * 4)); _m.save(_sm, 'WEBP', quality=78, method=6)
             except Exception as _e: print('webp skipped', _rel, _e)
+    # WebPs uploaded as-is (no JPG/PNG beside them) can be huge lossless files: one 360 KB picture held the Shop back
+    # past 2 s on a phone. Over 250 KB they're re-saved lossy once; the smaller copy is kept only if it saves 40%+, so a
+    # file is never squeezed twice.
+    for _dp, _dn, _fn in os.walk(f'{REPO}/assets'):
+        if '/md' in _dp or '/sm' in _dp or '/thumbs' in _dp: continue
+        for _n in _fn:
+            if not _n.lower().endswith('.webp'): continue
+            _f = os.path.join(_dp, _n); _stem = _f[:-5]
+            if any(os.path.exists(_stem + e) for e in ('.jpg', '.jpeg', '.png', '.JPG', '.PNG')) or os.path.getsize(_f) < 250_000: continue
+            try:
+                import io as _io
+                _im = _Im.open(_f); _im.load(); _b = _io.BytesIO()
+                _im.save(_b, 'WEBP', quality=85, alpha_quality=90, method=6)
+                if _b.tell() < os.path.getsize(_f) * .6:
+                    open(_f, 'wb').write(_b.getvalue()); print('webp squeezed', os.path.relpath(_f, REPO))
+            except Exception as _e: print('webp squeeze skipped', _n, _e)
 except ImportError:
     print('note: Pillow not installed, pictures keep their original format')
 _PIC = re.compile(r'assets/[\w./-]+?\.(?:jpe?g|png)(?=["\'`)\s?#])', re.I)
@@ -244,6 +296,7 @@ for _p in PAGES:
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
         _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
         _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)   # Designs: pull down at the top to go Home (phones only; flow.js decides)
+    _s = _localize(_s)   # Framer pictures -> their saved WebP copies
     _s = _webpify(_s)
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
