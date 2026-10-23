@@ -7,12 +7,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
+<script>
+  // CMS theme: your choice (the switch at the bottom of the sidebar), else the system setting
+  (function () { var t; try { t = localStorage.getItem('km-cms-theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
 </head>
 <body>
 <aside class="side">
   <div class="brand"><b>Kingsley FM</b><span class="mono">CMS</span></div>
   <nav id="nav"></nav>
-  <div class="side-foot mono" id="sidefoot">Saved to this Mac</div>
+  <div class="side-foot"><div class="mono" id="sidefoot">Saved to this Mac</div>
+    <div class="themesw" role="group" aria-label="Theme"><button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button></div></div>
 </aside>
 <main class="main">
   <header class="top">
@@ -27,6 +34,13 @@
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true"><header><b id="mtitle"></b><button class="x" type="button" id="mclose" aria-label="Close">×</button></header><div class="mbody" id="mbody"></div></div></div>
+<script>
+  (function () { var bs = document.querySelectorAll('.themesw button'), sync = function () { bs.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.t === document.documentElement.dataset.theme)); }); };
+    var preview = function (t) { try { localStorage.setItem('km-theme', t); } catch (e) {}   // the page previews inside the CMS follow along
+      document.querySelectorAll('iframe').forEach(function (f) { try { f.contentDocument.documentElement.dataset.theme = t; } catch (e) {} }); };
+    bs.forEach(function (b) { b.onclick = function () { document.documentElement.dataset.theme = b.dataset.t; try { localStorage.setItem('km-cms-theme', b.dataset.t); } catch (e) {} preview(b.dataset.t); sync(); }; });
+    preview(document.documentElement.dataset.theme); sync(); })();
+</script>
 <script src="app.js"></script>
 </body>
 </html>
