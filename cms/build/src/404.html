@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Not found · Kingsley M.</title>
+<meta name="robots" content="noindex">
+<script>
+  // Theme: the same remembered choice as the rest of the site (km-theme), else the system setting
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500;600&display=swap">
+<style>
+/* The 404 page (lab idea N2, "Gap in the dial"). GitHub Pages shows this file for any address that doesn't exist.
+   The site's ruler with a stretch of ticks missing past Shop; the needle sits in the gap. Drag it to a station. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #ff4a1c;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
+@media (max-width: 899px) { :root { --gut: max(16px, env(safe-area-inset-left, 0px)) } }
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow: hidden }
+a { color: inherit }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none }
+canvas.drag { cursor: grabbing }
+canvas:focus-visible { outline: none }
+.top { position: fixed; left: var(--gut); right: var(--gut); top: calc(32px + env(safe-area-inset-top, 0px)); display: flex; align-items: baseline; gap: 9px; z-index: 2; pointer-events: none }
+.top b { font-weight: 400; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; transition: color .3s }
+.top span { font-size: 13px; font-weight: 500 }
+body.on .top b { color: var(--red) }
+.head { position: fixed; left: var(--gut); right: var(--gut); top: 21vh; display: grid; gap: 14px; z-index: 2; max-width: 820px; pointer-events: none }
+.mono { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+h1 { margin: 0; font-size: clamp(40px, 5.6vw, 84px); font-weight: 500; letter-spacing: -.05em; line-height: .95; text-wrap: balance }
+.head p { margin: 0; font-size: clamp(15px, 1.3vw, 18px); color: var(--muted); max-width: 40ch; line-height: 1.5 }
+.low { position: fixed; left: var(--gut); right: var(--gut); bottom: calc(32px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; z-index: 2 }
+.pill { display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 99px; background: var(--pill); font-size: 14px; font-weight: 500; text-decoration: none; transition: background .2s, transform .2s, opacity .3s, translate .3s }
+.pill:hover { background: color-mix(in srgb, var(--ink) 8%, var(--pill)) }
+.pill:active { transform: scale(.97) }
+.pill.go { background: var(--ink); color: var(--bg); display: none }
+.pill.go:hover { background: color-mix(in srgb, var(--ink) 85%, var(--bg)) }
+body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9, .3, 1.2) }
+@keyframes goin { from { opacity: 0; translate: 0 6px } }
+.hint { margin-left: auto }
+@media (max-width: 899px) { .top { top: calc(20px + env(safe-area-inset-top, 0px)) } .top b { font-size: 22px } .head { top: 17vh } .hint { display: none } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+</head>
+<body>
+<canvas id="cv" tabindex="0" role="slider" aria-label="Tune the dial to a station" aria-valuemin="88" aria-valuemax="108"></canvas>
+<div class="top"><b id="fq">404.0</b><span id="nm">Not found</span></div>
+<main class="head">
+  <span class="mono" id="kk">Error 404</span>
+  <h1 id="tt">Nothing on this part of the dial.</h1>
+  <p id="pp">There's no page at this address. Drag the needle to a station.</p>
+</main>
+<div class="low"><a class="pill go" id="go" href="index.html">Tune in</a><a class="pill" id="home" href="index.html">Back to Home</a><span class="mono hint">Drag the needle, or use ← →</span></div>
+<script>
+(function () {
+  'use strict';
+  // where the site lives: the root of its own domain, or a folder on GitHub Pages (filled in by the build)
+  var BASE = '__BASE__'; if (location.pathname.indexOf(BASE) !== 0) BASE = '/';
+  var STATIONS = [[94.0, 'About', 'about.html'], [96.0, 'Engineering', 'engineering.html'], [98.0, 'Home', 'index.html'], [100.0, 'Designs', 'designs.html'], [102.0, 'Shop', 'shop.html']];
+  var $ = function (id) { return document.getElementById(id); };
+  $('home').href = BASE + 'index.html';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var L = 88, R = 108, GAP = [103.0, 105.6];          // the stretch of the dial with nothing on it
+  var f = 104.2, drag = false, snap = null, moved = false, at = null;
+
+  var C = {};
+  var tokens = function () { var s = getComputedStyle(document.documentElement); ['ink', 'muted', 'faint', 'line', 'red'].forEach(function (k) { C[k] = s.getPropertyValue('--' + k).trim(); }); };
+  tokens(); new MutationObserver(tokens).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ---- sound: a light click as the needle passes each whole number, a soft pop when it lands on a station.
+  // Only from your own drags and keys, and only if sound is on (the speaker button elsewhere on the site, km-sound).
+  var ac = null, soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (e) {}
+  var wake = function () { if (!soundOn) return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} };
+  addEventListener('pointerdown', wake); addEventListener('keydown', wake);
+  var blip = function (fr, dur, vol, type, t0) { if (!ac || !soundOn || ac.state !== 'running') return; var t = ac.currentTime + (t0 || 0), o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(fr, t); o.frequency.exponentialRampToValueAtTime(fr * .82, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + .02); };
+  var lastWhole = Math.floor(f), lastClick = 0;
+  var detent = function () { var w = Math.floor(f); if (w === lastWhole) return; lastWhole = w; var n = performance.now(); if (n - lastClick < 30) return; lastClick = n; blip(1500 + (w - L) * 30, .028, .11, 'triangle'); };
+  var landSnd = function () { blip(880, .09, .13, 'sine'); blip(1320, .16, .11, 'sine', .07); };
+
+  // ---- what the page says for where the needle is
+  var stationAt = function () { for (var i = 0; i < STATIONS.length; i++) if (Math.abs(STATIONS[i][0] - f) < .05) return STATIONS[i]; return null; };
+  var ui = function () {
+    var s = stationAt(), gap = f > GAP[0] && f < GAP[1];
+    document.body.classList.toggle('on', !!s);
+    $('fq').textContent = s ? s[0].toFixed(1) : gap ? '404.0' : f.toFixed(1);
+    $('nm').textContent = s ? s[1] : gap ? 'Not found' : 'Static';
+    $('kk').textContent = s ? 'Station found' : 'Error 404';
+    $('tt').textContent = s ? s[1] + '.' : gap ? 'Nothing on this part of the dial.' : 'Just static here.';
+    $('pp').textContent = s ? 'On ' + s[0].toFixed(1) + '. Tune in to go there.' : gap ? "There's no page at this address. Drag the needle to a station." : 'Keep going. The stations are marked on the dial.';
+    if (s) { $('go').textContent = 'Tune in · ' + s[1]; $('go').href = BASE + s[2]; }
+    $('cv').setAttribute('aria-valuenow', f.toFixed(1)); $('cv').setAttribute('aria-valuetext', s ? s[1] + ', ' + s[0].toFixed(1) : f.toFixed(1));
+  };
+
+  // ---- dragging and keys
+  var cv = $('cv'), g = cv.getContext('2d');
+  var geo = function () { var W = innerWidth, pad = W < 700 ? 16 : 48; return { W: W, pad: pad, span: W - pad * 2 }; };
+  var xOf = function (q) { var o = geo(); return o.pad + (q - L) / (R - L) * o.span; };
+  var qOf = function (x) { var o = geo(); return Math.max(L, Math.min(R, L + (x - o.pad) / o.span * (R - L))); };
+  var nearest = function () { return STATIONS.reduce(function (a, b) { return Math.abs(b[0] - f) < Math.abs(a[0] - f) ? b : a; }); };
+  cv.addEventListener('pointerdown', function (e) { if (e.button) return; drag = true; moved = true; snap = null; at = { x: e.clientX, f: f }; cv.setPointerCapture(e.pointerId); cv.classList.add('drag'); });
+  cv.addEventListener('pointermove', function (e) { if (!drag) return; f = qOf(xOf(at.f) + (e.clientX - at.x)); detent(); ui(); });
+  var up = function (e) { if (!drag) return; drag = false; cv.classList.remove('drag');
+    if (e && Math.abs(e.clientX - at.x) < 4) { f = qOf(e.clientX); }   // a tap: jump the needle there
+    var s = nearest(); if (Math.abs(s[0] - f) < .9) snap = s[0]; ui(); };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', function () { up(); });
+  addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); moved = true; var d = e.key === 'ArrowLeft' ? -1 : 1, list = STATIONS.map(function (s) { return s[0]; });
+      var nx = d < 0 ? list.slice().reverse().filter(function (q) { return q < f - .01; })[0] : list.filter(function (q) { return q > f + .01; })[0];
+      snap = nx != null ? nx : d > 0 ? 104.2 : list[0]; }
+    else if (e.key === 'Enter' && stationAt() && document.activeElement === cv) location.href = $('go').href;
+  });
+
+  // ---- drawing: the site's ruler, with the ticks missing in the gap
+  var fit = function () { var d = Math.min(2, devicePixelRatio || 1), w = Math.round(innerWidth * d), h = Math.round(innerHeight * d); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } return d; };
+  var frame = function (t) {
+    requestAnimationFrame(frame);
+    if (snap != null) { var before = f; f += (snap - f) * (reduce ? 1 : .2); if (Math.abs(snap - f) < .01) { f = snap; snap = null; if (stationAt()) landSnd(); } if (before !== f) { detent(); ui(); } }
+    var d = fit(), W = innerWidth, H = innerHeight; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H);
+    var narrow = W < 700, base = H * (narrow ? .64 : .68), tall = Math.min(H * .12, 84), roomy = (xOf(96) - xOf(94)) > 96;
+    for (var i = 0; i <= (R - L) * 5; i++) {
+      var q = L + i / 5, x = xOf(q), maj = i % 5 === 0, lab = i % 10 === 0, gap = q > GAP[0] - .01 && q < GAP[1] + .01;
+      if (narrow && !maj && i % 2) continue;   // fewer ticks on a phone
+      if (gap) { g.fillStyle = C.faint; g.globalAlpha = .6; g.fillRect(Math.round(x), base - 1, 2, 1); g.globalAlpha = 1; continue; }
+      var h = lab ? tall : maj ? tall * .7 : tall * .35; g.fillStyle = maj ? C.ink : C.faint; g.fillRect(Math.round(x), base - h, 1, h);
+      if (lab) { g.fillStyle = C.muted; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.fillText(q.toFixed(0), x, base + 22); }
+    }
+    // the gap, marked faintly
+    var gx0 = xOf(GAP[0]), gx1 = xOf(GAP[1]); g.fillStyle = C.red; g.globalAlpha = .07; g.fillRect(gx0, base - tall * 1.3, gx1 - gx0, tall * 1.3); g.globalAlpha = 1;
+    g.fillStyle = C.red; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.fillText('404', (gx0 + gx1) / 2, base - tall * 1.3 - 8);
+    // the stations: names where there's room (always for the one the needle is near), dots otherwise
+    STATIONS.forEach(function (s) { var x = xOf(s[0]), near = Math.abs(s[0] - f) < 1.1, on = Math.abs(s[0] - f) < .05;
+      if (roomy || near) { g.fillStyle = on ? C.ink : near ? C.ink : C.muted; g.globalAlpha = on || near ? 1 : .8; g.font = (on ? '600' : '500') + ' 13px Geist, ui-sans-serif, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(s[1], x, base - tall - 14); g.globalAlpha = 1; }
+      else { g.fillStyle = C.faint; g.beginPath(); g.arc(x, base - tall - 18, 2.5, 0, 7); g.fill(); } });
+    // the needle: drifts a little while it waits in the gap
+    var sway = drag || snap != null || stationAt() || reduce ? 0 : Math.sin(t * .002) * 1.5, nx = xOf(f) + sway;
+    g.fillStyle = C.red; g.fillRect(Math.round(nx) - 1, base - tall * 1.15, 2, tall * 1.15 + 4);
+  };
+  ui(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

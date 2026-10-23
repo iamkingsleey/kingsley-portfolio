@@ -67,6 +67,7 @@ nav button i { width: 6px; height: 6px; border-radius: 50%; background: var(--re
 
 /* forms */
 .form { display: grid; gap: 26px }
+.form + .form, .form + .group, .group + .form, .group + .group { margin-top: 26px }   /* separate settings cards stacked in one view */
 .group { display: grid; gap: 16px; padding: 22px 22px 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface) }
 .group > h2 { font-size: 15px; font-weight: 600 } .group > p.help { margin: -10px 0 0; color: var(--muted); font-size: 13px }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px }

@@ -314,6 +314,19 @@ self.addEventListener('fetch', e => {{
   }})());
 }});
 """)
+# ---- 404 page (cms/build/src/404.html): GitHub Pages shows it for any address that doesn't exist. It can be shown at
+# any depth (/kingsley-portfolio/a/b/c), so its links start from the site's own folder: the root when the site has its
+# own domain (a CNAME file), otherwise /<repo>/ on github.io.
+def _base():
+    if os.path.exists(f'{REPO}/CNAME'): return '/'
+    try:
+        import subprocess
+        u = subprocess.run(['git', '-C', REPO, 'remote', 'get-url', 'origin'], capture_output=True, text=True, timeout=5).stdout.strip()
+        name = re.sub(r'\.git$', '', u.rstrip('/').split('/')[-1]) if u else ''
+    except Exception: name = ''
+    if not name: name = os.path.basename(os.path.abspath(REPO))
+    return '/' if name.endswith('.github.io') else f'/{name}/'
+open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())))
 SWREG = "<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>\n"
 INDEX = {}
 for _p in PAGES:
