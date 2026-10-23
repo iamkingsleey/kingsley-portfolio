@@ -194,5 +194,6 @@ document.addEventListener('click', e => {
 addEventListener('wheel', e => {
   if (e.ctrlKey || Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 1.5) return;
   if (document.getElementById('allBtn') && !document.body.classList.contains('all')) return;   /* Designs' row view scrolls sideways itself */
+  if (document.body.classList.contains('reelon') && e.target.closest && e.target.closest('.reelv')) return;   /* the Designs Reel: a sideways swipe moves through the pieces */
   e.stopPropagation();
 }, { capture: true, passive: true });
