@@ -131,7 +131,10 @@ body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9
     requestAnimationFrame(frame);
     if (snap != null) { var before = f; f += (snap - f) * (reduce ? 1 : .2); if (Math.abs(snap - f) < .01) { f = snap; snap = null; if (stationAt()) landSnd(); } if (before !== f) { detent(); ui(); } }
     var d = fit(), W = innerWidth, H = innerHeight; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H);
-    var narrow = W < 700, base = H * (narrow ? .64 : .68), tall = Math.min(H * .12, 84), roomy = (xOf(96) - xOf(94)) > 96;
+    var narrow = W < 700, base = H * (narrow ? .64 : .68), tall = Math.min(H * .12, 84);
+    g.font = '600 13px Geist, ui-sans-serif, system-ui, sans-serif';
+    var widest = Math.max.apply(null, STATIONS.map(function (s) { return g.measureText(s[1]).width; })), roomy = (xOf(96) - xOf(94)) > widest + 20;   // every name fits without touching
+    var closest = nearest();
     settle += ((drag || snap != null ? 1 : 0) - settle) * .08;
     var nx0 = xOf(f), sx = (t / 2600 % 1.4 - .2) * W;   // the needle, and the sweep's place as it travels left to right
     for (var i = 0; i <= (R - L) * 5; i++) {
@@ -150,7 +153,7 @@ body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9
     var gx0 = xOf(GAP[0]), gx1 = xOf(GAP[1]); g.fillStyle = C.red; g.globalAlpha = .07; g.fillRect(gx0, base - tall * .95, gx1 - gx0, tall * .95); g.globalAlpha = 1;
     g.fillStyle = C.red; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.fillText('404', (gx0 + gx1) / 2, base - tall * .95 - 8);
     // the stations: names where there's room (always for the one the needle is near), dots otherwise
-    STATIONS.forEach(function (s) { var x = xOf(s[0]), near = Math.abs(s[0] - f) < 1.1, on = Math.abs(s[0] - f) < .05;
+    STATIONS.forEach(function (s) { var x = xOf(s[0]), near = s === closest && Math.abs(s[0] - f) < 1.1, on = Math.abs(s[0] - f) < .05;   // only one name at a time when they'd crowd
       if (roomy || near) { g.fillStyle = on ? C.ink : near ? C.ink : C.muted; g.globalAlpha = on || near ? 1 : .8; g.font = (on ? '600' : '500') + ' 13px Geist, ui-sans-serif, system-ui, sans-serif'; g.textAlign = 'center'; g.fillText(s[1], x, base - tall - 6); g.globalAlpha = 1; }
       else { g.fillStyle = C.faint; g.beginPath(); g.arc(x, base - tall - 10, 2.5, 0, 7); g.fill(); } });
     // the needle: drifts a little while it waits in the gap
