@@ -341,7 +341,7 @@ for _p in PAGES:
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
     if 'src="kit.js' not in _s: _s = _s.replace('</body>', '<script src="kit.js" defer></script>\n</body>', 1)   # one feel across the site (cms/build/src/kit.js)
     if 'src="protips.js' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
-    if _p != 'index.html' and 'id="soundBtn"' not in _s and '</body>' in _s: _s = _s.replace('</body>', TOGGLES + '</body>', 1)   # Home's sound and theme buttons, on every page
+    if _p not in ('index.html', 'designs.html') and 'id="soundBtn"' not in _s and '</body>' in _s: _s = _s.replace('</body>', TOGGLES + '</body>', 1)   # Home's sound and theme buttons, on every page but Designs (its own view controls sit there)
     if 'src="feedback.js' not in _s: _s = _s.replace('</body>', '<script src="feedback.js" defer></script>\n</body>', 1)   # after a few minutes: how easy was it to get around?
     if _p == 'index.html' and 'src="home.js' not in _s: _s = _s.replace('</body>', '<script src="home.js" defer></script>\n</body>', 1)
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
