@@ -8,5 +8,12 @@
   "on": true,
   "to": "iamkingsleey@gmail.com",
   "after": 3
+ },
+ "corners": "rounded",
+ "accent": "#FB233B",
+ "needle": "line",
+ "inbox": {
+  "url": "",
+  "email": true
  }
 }
