@@ -288,7 +288,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.webp';
+  const HEAD = 'assets/headshot.jpg';
   const $ = id => document.getElementById(id);
   const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -342,7 +342,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     ["101.3", "Bulvds", "UX Designer · Lagos, Nigeria", "Short-lets and rentals in Lagos. I designed the Bulvds Wallet: payments, refunds and commissions in one place.", "", "", "2025"],
     ["103.5", "My own stations", "Founder", "Ventures in commerce and payments for African users, from WhatsApp-native shopping to splitting bills with friends.", "", "", ""],
     ["105.7", "Tools I build", "Design engineer", "Figma plugins like LineCraft and MeshCraft, and a recorder that turns prototypes into videos. When the tool is missing, I make it.", "2", "plugins", ""],
-    ["107.9", "Resources I share", "Creator", "3D assets I publish for free on Unsplash, used across platforms like Notion, Typeform, Figma, Trello, Medium, Squarespace, Wix and Unfold.", "700K+", "views", "", "5K+", "downloads"]
+    ["107.9", "Resources I share", "Creator", "3D assets I publish for free on Unsplash, used across platforms like Notion, Typeform, Figma, Trello, Medium, Squarespace, Wix and Unfold.", "700K+", "views", "", "6K+", "downloads"]
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
   band.style.height = (CH.length * 56 + 40) + 'vh';
