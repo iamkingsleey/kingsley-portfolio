@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Offline · Kingsley M.</title>
+<meta name="robots" content="noindex">
+<script>
+  // Theme: the same remembered choice as the rest of the site (km-theme), else the system setting
+  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t; })();
+</script>
+<style>
+/* The offline page (lab idea E1 + E3). The service worker (sw.js) keeps a copy of this file and shows it in place of
+   any page that can't load. Everything it needs is in this one file, so it works with no connection at all. */
+:root {
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #ff4a1c;
+  --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gut: max(48px, env(safe-area-inset-left, 0px));
+  color-scheme: light;
+}
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
+@media (max-width: 899px) { :root { --gut: max(16px, env(safe-area-inset-left, 0px)) } }
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow: hidden }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.top { position: fixed; left: var(--gut); right: var(--gut); top: calc(32px + env(safe-area-inset-top, 0px)); display: flex; align-items: baseline; gap: 9px; z-index: 2 }
+.top b { font-weight: 400; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; transition: color .3s }
+.top span { font-size: 13px; font-weight: 500 }
+body.on .top b { color: var(--red) }
+.head { position: fixed; left: var(--gut); right: var(--gut); top: 21vh; display: grid; gap: 14px; z-index: 2; max-width: 760px }
+.mono { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+body.on .head .mono { color: var(--red) }
+h1 { margin: 0; font-size: clamp(40px, 5.6vw, 84px); font-weight: 500; letter-spacing: -.05em; line-height: .95; text-wrap: balance }
+.head p { margin: 0; font-size: clamp(15px, 1.3vw, 18px); color: var(--muted); max-width: 40ch; line-height: 1.5 }
+.low { position: fixed; left: var(--gut); right: var(--gut); bottom: calc(32px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 2 }
+.try { height: 40px; padding: 0 16px; border-radius: 99px; background: var(--pill); font-size: 14px; font-weight: 500; transition: background .2s, transform .2s, opacity .3s }
+.try:hover { background: color-mix(in srgb, var(--ink) 8%, var(--pill)) }
+.try:active { transform: scale(.97) }
+body.on .try { opacity: 0; pointer-events: none }
+@media (max-width: 899px) { .top { top: calc(20px + env(safe-area-inset-top, 0px)) } .top b { font-size: 22px } .head { top: 17vh } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+</head>
+<body>
+<canvas id="cv" aria-hidden="true"></canvas>
+<div class="top"><b id="fq">—</b><span id="nm">No signal</span></div>
+<main class="head">
+  <span class="mono" id="kk">Offline</span>
+  <h1 id="tt">Lost the signal.</h1>
+  <p id="pp">You're offline. This page comes back by itself when you are.</p>
+</main>
+<div class="low"><span class="mono" id="cd" aria-live="polite">Retrying in 5s</span><button type="button" class="try" id="try">Try now</button></div>
+<script>
+(function () {
+  'use strict';
+  // ---- which page the visitor was on: this file is shown in place of it, so the address is still theirs
+  var STATIONS = [[94.0, 'About', 'about'], [96.0, 'Engineering', 'engineering'], [98.0, 'Home', 'index'], [100.0, 'Designs', 'designs'], [102.0, 'Shop', 'shop']];
+  var file = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+  var DESIGNS = ['case', 'brand', 'project', 'logo', 'product', 'showcase'];   // the pages you reach from Designs
+  var tgt = STATIONS.filter(function (s) { return s[2] === file; })[0] || (DESIGNS.indexOf(file) >= 0 ? STATIONS[3] : file === 'projects' ? STATIONS[1] : STATIONS[2]);
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('pp').textContent = "You're offline. " + (tgt[1] === 'Home' ? 'This page' : tgt[1]) + ' comes back by itself when you are.';
+
+  // ---- colours from the page's own tokens (they follow the theme)
+  var C = {};
+  var tokens = function () { var s = getComputedStyle(document.documentElement); ['ink', 'muted', 'faint', 'line', 'red'].forEach(function (k) { C[k] = s.getPropertyValue('--' + k).trim(); }); };
+  tokens(); new MutationObserver(tokens).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ---- sound: light clicks as the ruler's ticks stand up, a soft two-note pop when the needle locks in.
+  // Only after a tap on this page (browsers need one), and only if sound is on (the speaker button, km-sound).
+  var ac = null, soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (e) {}
+  var wake = function () { if (!soundOn) return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} };
+  addEventListener('pointerdown', wake); addEventListener('keydown', wake);
+  var blip = function (f, dur, vol, type, at) { if (!ac || !soundOn || ac.state !== 'running') return; var t = ac.currentTime + (at || 0), o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * .82, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + .02); };
+  var lastClick = 0, tickSnd = function (k) { var n = performance.now(); if (n - lastClick < 28) return; lastClick = n; blip(1500 + k * 38, .028, .12, 'triangle'); };
+  var lockSnd = function () { blip(880, .09, .14, 'sine'); blip(1320, .16, .12, 'sine', .07); };
+
+  // ---- coming back: check for a connection every few seconds (and the moment the browser says it's online)
+  var on = false, t0 = 0, n = 5, timer = 0, checking = false;
+  var check = function () {
+    if (on || checking) return; checking = true; $('cd').textContent = 'Checking…';
+    fetch(location.pathname + '?km-ping=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+      .then(function () { back(); })   // any answer at all means the connection is back
+      .catch(function () { n = 5; $('cd').textContent = 'Retrying in ' + n + 's'; })
+      .then(function () { checking = false; });
+  };
+  var countdown = function () { clearInterval(timer); n = 5; $('cd').textContent = 'Retrying in ' + n + 's';
+    timer = setInterval(function () { if (on || checking) return; n--; if (n <= 0) check(); else $('cd').textContent = 'Retrying in ' + n + 's'; }, 1000); };
+  var back = function () {
+    if (on) return; on = true; t0 = performance.now(); clearInterval(timer); document.body.classList.add('on');
+    $('fq').textContent = tgt[0].toFixed(1); $('nm').textContent = tgt[1]; $('kk').textContent = 'Connected';
+    $('tt').textContent = 'Back on air.'; $('pp').textContent = 'Tuned back in to ' + tgt[1] + ', ' + tgt[0].toFixed(1) + '.';
+    var k = reduce ? 2 : 4; $('cd').textContent = 'Reloading in ' + k + 's';
+    var iv = setInterval(function () { k--; if (k > 0) $('cd').textContent = 'Reloading in ' + k + 's'; else { clearInterval(iv); $('cd').textContent = 'Reloading'; location.reload(); } }, 1000);
+  };
+  $('try').addEventListener('click', check);
+  addEventListener('online', check);
+  countdown();
+
+  // ---- the drawing: E1's flat line with its drifting blip; coming back, a red pulse runs down it and the
+  // ruler's ticks stand up behind it, then the needle drops onto the page you were on (E3)
+  var cv = $('cv'), g = cv.getContext('2d'), hs = [], nd = 0, clicked = {}, locked = false;
+  var sm = function (x) { return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); };
+  var fit = function () { var d = Math.min(2, devicePixelRatio || 1), w = Math.round(innerWidth * d), h = Math.round(innerHeight * d); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } return d; };
+  var frame = function (t) {
+    requestAnimationFrame(frame);
+    var d = fit(), W = innerWidth, H = innerHeight; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H);
+    var narrow = W < 700, y0 = H * (narrow ? .66 : .7), e = (t - t0) / 1000, px = on ? (reduce ? W * 3 : -40 + e * W * .85) : -999;
+    var L = 90, R = 106, pad = narrow ? 16 : 48, span = W - pad * 2, N = (R - L) * 5, tall = Math.min(H * .13, 96);
+    // E1's faint grid, fading as the ruler takes over
+    var gridA = on ? 1 - sm(e / 1.2) : 1;
+    if (gridA > .01) { g.globalAlpha = gridA; g.strokeStyle = C.line; g.lineWidth = 1; g.beginPath(); for (var x = 0; x <= W; x += W / (narrow ? 12 : 24)) { g.moveTo(Math.round(x) + .5, y0 - tall * 1.1); g.lineTo(Math.round(x) + .5, y0 + tall * 1.1); } g.stroke(); g.globalAlpha = 1; }
+    // the ruler's ticks: flat while offline, standing up as the pulse passes them
+    for (var i = 0; i <= N; i++) {
+      var q = L + i / 5, tx = pad + i / N * span, maj = i % 5 === 0, lab = i % 10 === 0, target = 0;
+      if (narrow && !maj && i % 5 !== 0 && i % 2) { hs[i] = 0; continue; }   // fewer ticks on a phone
+      if (on && tx < px) target = (lab ? tall : maj ? tall * .7 : tall * .35) * sm((px - tx) / (W * .06));
+      hs[i] = (hs[i] || 0) + (target - (hs[i] || 0)) * .3;
+      if (on && maj && tx < px && !clicked[i]) { clicked[i] = 1; tickSnd(i / 5); }
+      if (hs[i] > .4) { g.fillStyle = maj ? C.ink : C.faint; g.fillRect(Math.round(tx), y0 - hs[i], 1, hs[i]); }
+      if (lab && hs[i] > 2) { g.globalAlpha = Math.min(1, hs[i] / tall); g.fillStyle = C.muted; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.fillText(q.toFixed(0), tx, y0 + 22); g.globalAlpha = 1; }
+    }
+    // the line: flat with its blip offline; coming back, the pulse runs along it, red behind
+    var bx = ((t * .00009) % 1.3 - .15) * W;
+    var yAt = function (x) {
+      if (!on) { var db = x - bx; return Math.abs(db) < 26 ? y0 - Math.sin(db / 26 * Math.PI) * 10 * Math.exp(-Math.abs(db) / 14) : y0; }
+      var dp = x - px; return Math.abs(dp) < 40 ? y0 - Math.exp(-dp * dp / 110) * Math.min(H * .11, 80) * (dp < 0 ? 1 : -.35) : y0;
+    };
+    var split = on ? Math.max(0, Math.min(W, px)) : 0, red = on ? 1 - sm((e - 2.4) / .8) : 0, xx;
+    g.lineWidth = 1.6; g.lineJoin = 'round';
+    if (split > 0) {
+      g.strokeStyle = C.red; g.globalAlpha = .25 + .75 * red; g.beginPath(); for (xx = 0; xx <= split; xx += 2) xx ? g.lineTo(xx, yAt(xx)) : g.moveTo(0, yAt(0)); g.stroke(); g.globalAlpha = 1;
+      if (red < 1) { g.strokeStyle = C.ink; g.globalAlpha = 1 - red; g.beginPath(); g.moveTo(0, y0); g.lineTo(split, y0); g.stroke(); g.globalAlpha = 1; }
+    }
+    g.strokeStyle = C.ink; g.beginPath(); for (xx = split; xx <= W; xx += 2) xx === split ? g.moveTo(xx, yAt(xx)) : g.lineTo(xx, yAt(xx)); g.stroke();
+    g.fillStyle = C.red;
+    if (!on && bx > 0 && bx < W) { g.beginPath(); g.arc(bx, y0, 3, 0, 7); g.fill(); }
+    if (on && px > 0 && px < W) { g.beginPath(); g.arc(px, yAt(px), 4, 0, 7); g.fill(); }
+    // the needle drops onto the page you were on once the ruler is up
+    var hx = pad + (tgt[0] - L) / (R - L) * span, drop = on ? sm((px - W - 20) / (W * .25)) : 0; nd += (drop - nd) * .2;
+    if (on && !locked && nd > .6) { locked = true; lockSnd(); }
+    if (nd > .01) { var h = tall * 1.7 * nd; g.fillStyle = C.red; g.fillRect(Math.round(hx) - 1, y0 - h, 2, h + 4); g.globalAlpha = nd; g.font = '500 14px Geist, ui-sans-serif, system-ui, sans-serif'; g.textAlign = 'center'; g.fillStyle = C.ink; g.fillText(tgt[1], hx, y0 - h - 10); g.globalAlpha = 1; }
+  };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

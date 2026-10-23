@@ -736,6 +736,20 @@
     v.append(form([{ title: 'Availability', help: 'Shown on Home (“Open to new work”), on About (On air) and in the For recruiters card.', fields: [{ k: 'available', label: 'Taking new work', type: 'bool' }] }], C.site, 'site'));
     if (!C.site.corners) C.site.corners = 'rounded';
     v.append(form([{ title: 'Corners', help: 'The corners on pictures, videos and panels across the whole site: Designs, case studies, brand pages, Shop, Showcase and About.', fields: [{ k: 'corners', label: 'Corner style', type: 'select', options: [['rounded', 'Rounded'], ['sharp', 'Sharp (square corners)']] }] }], C.site, 'site'));
+    if (!C.site.accent) C.site.accent = '#ff4a1c';
+    { // Accent colour: every place the site uses its orange-red (needles, live dots, links, highlights) takes this colour
+      const g = form([{ title: 'Accent colour', help: 'The orange-red used across the whole site: the red needle on every dial, live dots, highlights, the offline page and the tuner between pages. Pick a preset or any colour. Pictures keep their own colours.', fields: [{ k: 'accent', label: 'Colour', type: 'color' }] }], C.site, 'site');
+      const box = g.querySelector('.group'), tx = box.querySelector('.color input[type=text]'), pk = box.querySelector('.color input[type=color]');
+      const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+      const note = el('div', { class: 'help' });
+      const check = () => { const v = (tx.value || '').trim(); if (!/^#[0-9a-f]{6}$/i.test(v)) { note.textContent = 'Use a hex colour like #ff4a1c.'; return; }
+        const onW = 1.05 / (lum(v) + .05), onB = (lum(v) + .05) / .05;
+        note.textContent = onW < 3 ? 'Light colour: the few small labels with white text on the accent may be hard to read. A deeper shade works better.' : onB < 3 ? 'Dark colour: it may be hard to see on the dark theme.' : 'Reads well on both the light and dark themes.'; };
+      const PRE = [['#ff4a1c', 'Signal red (default)'], ['#2f5bff', 'Cobalt'], ['#7a4dff', 'Violet'], ['#ff2e7e', 'Magenta'], ['#0fa968', 'Green'], ['#ff9f0a', 'Amber']];
+      const sw = el('div', { class: 'swatches' }, ...PRE.map(([h, n]) => el('button', { type: 'button', class: 'sw', title: n, 'aria-label': n, style: `background:${h}`,
+        onclick: () => { tx.value = h; pk.value = h; tx.dispatchEvent(new Event('input')); check(); } })));
+      tx.addEventListener('input', check); pk.addEventListener('input', check); box.append(sw, note); check(); v.append(g);
+    }
     if (!C.site.needle) C.site.needle = 'line';
     v.append(form([{ title: 'Dials', help: 'The head on the red needle, on every dial across the site (About, Engineering, the case study rulers and the logo and product pages).', fields: [{ k: 'needle', label: 'Needle head', type: 'select', options: [['line', 'Plain line (as now)'], ['dot', 'Dot'], ['triangle', 'Arrow'], ['diamond', 'Diamond'], ['cap', 'T cap']] }] }], C.site, 'site'));
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };

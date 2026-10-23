@@ -109,6 +109,18 @@ _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
 _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
 open(f'{REPO}/protips.js', 'w', encoding='utf-8').write(open(f'{KFM}/protips.js', encoding='utf-8').read().replace('__DESIGNS_HINT__', _hint))
 _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
+# Accent colour (CMS → Settings → Accent colour): the site's orange-red, #ff4a1c, is written straight into the page and
+# script sources. Every build starts from those sources, so swapping the literal here recolours the whole site, and
+# going back to the default restores it.
+ACCENT = str(_site.get('accent') or '#ff4a1c').strip().lower()
+if not re.fullmatch(r'#[0-9a-f]{6}', ACCENT): ACCENT = '#ff4a1c'
+def _acc(s): return re.sub(r'#ff4a1c', ACCENT, s, flags=re.I) if ACCENT != '#ff4a1c' else s
+_sh.copy(f'{KFM}/tuner.js', f'{REPO}/tuner.js')   # the page-to-page transition (its source now lives with the others)
+for _js in ('nav', 'kit', 'feedback', 'home', 'flow', 'protips', 'tuner'):
+    _jf = f'{REPO}/{_js}.js'
+    if os.path.exists(_jf):
+        _t = open(_jf, encoding='utf-8').read(); _t2 = _acc(_t)
+        if _t2 != _t: open(_jf, 'w', encoding='utf-8').write(_t2)
 # Rounded corners for pictures, videos and panels across the site (CMS → Settings → Corners). Sharp leaves each page as it is.
 CORNERS = ('<style id="km-corners">'
   'html[data-corners="rounded"]{--km-r:14px}'
@@ -277,6 +289,27 @@ def _ver(n):
         try: _vers[n] = _hl.md5(open(f'{REPO}/{n}.js', 'rb').read()).hexdigest()[:8]
         except OSError: _vers[n] = '0'
     return _vers[n]
+# ---- offline page (cms/build/src/offline.html) and the small service worker that shows it when a page can't load.
+# The worker only steps in when the network fails; online, every page comes straight from the site as before.
+_off = _acc(open(f'{KFM}/offline.html', encoding='utf-8').read())
+open(f'{REPO}/offline.html', 'w', encoding='utf-8').write(_off)
+_swv = _hl.md5(_off.encode('utf-8')).hexdigest()[:8]
+open(f'{REPO}/sw.js', 'w', encoding='utf-8').write(f"""// Offline page: keeps a copy of offline.html and shows it in place of any page that can't load (built by cms/build/src/tools/post.py)
+const V = 'km-offline-{_swv}', OFF = 'offline.html';
+self.addEventListener('install', e => {{ e.waitUntil(caches.open(V).then(c => c.add(new Request(OFF, {{ cache: 'reload' }}))).then(() => self.skipWaiting())); }});
+self.addEventListener('activate', e => {{ e.waitUntil((async () => {{
+  for (const k of await caches.keys()) if (k !== V && k.startsWith('km-offline')) await caches.delete(k);
+  if (self.registration.navigationPreload) await self.registration.navigationPreload.enable();
+  await self.clients.claim(); }})()); }});
+self.addEventListener('fetch', e => {{
+  const r = e.request; if (r.mode !== 'navigate' || r.method !== 'GET') return;   // pictures, scripts and the rest go straight to the network
+  e.respondWith((async () => {{
+    try {{ const p = await e.preloadResponse; if (p) return p; return await fetch(r); }}
+    catch (_) {{ const c = await caches.open(V); return (await c.match(OFF)) || Response.error(); }}
+  }})());
+}});
+""")
+SWREG = "<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>\n"
 INDEX = {}
 for _p in PAGES:
     _f = f'{REPO}/{_p}'
@@ -296,6 +329,8 @@ for _p in PAGES:
     if _p in ('index.html', 'designs.html') and 'src="flow.js' not in _s:   # Designs keeps the arrival settle; only Home has the scroll
         _s = _s.replace('</head>', FLOWHEAD + '\n</head>', 1)
         _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)   # Designs: pull down at the top to go Home (phones only; flow.js decides)
+    if 'serviceWorker.register' not in _s: _s = _s.replace('</body>', SWREG + '</body>', 1)   # offline: show offline.html when a page can't load
+    _s = _acc(_s)   # the accent colour from Settings
     _s = _localize(_s)   # Framer pictures -> their saved WebP copies
     _s = _webpify(_s)
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip

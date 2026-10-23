@@ -185,3 +185,8 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 /* picture effect: hotspot points */
 .hsl { display: grid; gap: 6px } .hsr { display: grid; grid-template-columns: 18px 64px 64px minmax(0, 1fr) minmax(0, 1.4fr) 34px; gap: 6px; align-items: center }
 .hsr input { min-width: 0 } @media (max-width: 640px) { .hsr { grid-template-columns: 18px 56px 56px minmax(0, 1fr) 34px } .hsr input:nth-of-type(4) { grid-column: 2 / -2 } }
+
+/* Settings → Accent colour presets */
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px }
+.swatches .sw { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--bg, #fff); box-shadow: 0 0 0 1px rgb(0 0 0 / .15); cursor: pointer; padding: 0 }
+.swatches .sw:hover { transform: scale(1.08) }
