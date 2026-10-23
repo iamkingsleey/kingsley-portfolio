@@ -144,10 +144,10 @@ CORNERS = ('<style id="km-corners">'
 # The sound and theme buttons from Home, on every other page too, in the same places: bottom right on a computer, beside the
 # menu button on a phone. They share Home's settings (km-sound, km-theme), so a change on any page holds everywhere.
 TOGGLES = ('<style id="km-toggles">'
-  '.km-tg{position:fixed;z-index:150;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;'
+  '.km-tg{position:fixed;z-index:150;top:calc(48px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;'
   'background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}'
   '.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}'
-  '#themeBtn.km-tg{right:max(24px,env(safe-area-inset-right,0px))}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 44px)}'
+  '#themeBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 40px)}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 84px)}'   # top right, same spot as Home
   '#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}'
   '@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}'
   '#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}'
