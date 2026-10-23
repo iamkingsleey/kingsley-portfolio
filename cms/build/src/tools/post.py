@@ -114,7 +114,12 @@ _site = json.load(open(f'{REPO}/content/site.json', encoding='utf-8'))
 # going back to the default restores it.
 ACCENT = str(_site.get('accent') or '#ff4a1c').strip().lower()
 if not re.fullmatch(r'#[0-9a-f]{6}', ACCENT): ACCENT = '#ff4a1c'
-def _acc(s): return re.sub(r'#ff4a1c', ACCENT, s, flags=re.I) if ACCENT != '#ff4a1c' else s
+_AR = ' '.join(str(int(ACCENT[i:i + 2], 16)) for i in (1, 3, 5))   # the same colour as "R G B", for the soft tints written as rgb(255 74 28 / .14)
+def _acc(s):
+    if ACCENT == '#ff4a1c': return s
+    s = re.sub(r'#ff4a1c', ACCENT, s, flags=re.I)
+    s = re.sub(r'rgba?\(\s*255[\s,]+74[\s,]+28\b', lambda m: ('rgba(' if m.group(0).startswith('rgba') else 'rgb(') + (_AR.replace(' ', ', ') if ',' in m.group(0) else _AR), s)
+    return s
 _sh.copy(f'{KFM}/tuner.js', f'{REPO}/tuner.js')   # the page-to-page transition (its source now lives with the others)
 for _js in ('nav', 'kit', 'feedback', 'home', 'flow', 'protips', 'tuner'):
     _jf = f'{REPO}/{_js}.js'

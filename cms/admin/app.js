@@ -745,7 +745,7 @@
       const check = () => { const v = (tx.value || '').trim(); if (!/^#[0-9a-f]{6}$/i.test(v)) { note.textContent = 'Use a hex colour like #ff4a1c.'; return; }
         const onW = 1.05 / (lum(v) + .05), onB = (lum(v) + .05) / .05;
         note.textContent = onW < 3 ? 'Light colour: the few small labels with white text on the accent may be hard to read. A deeper shade works better.' : onB < 3 ? 'Dark colour: it may be hard to see on the dark theme.' : 'Reads well on both the light and dark themes.'; };
-      const PRE = [['#ff4a1c', 'Signal red (default)'], ['#2f5bff', 'Cobalt'], ['#7a4dff', 'Violet'], ['#ff2e7e', 'Magenta'], ['#0fa968', 'Green'], ['#ff9f0a', 'Amber']];
+      const PRE = [['#ff4a1c', 'Signal red (default)'], ['#fb233b', 'Crimson'], ['#2f5bff', 'Cobalt'], ['#7a4dff', 'Violet'], ['#ff2e7e', 'Magenta'], ['#0fa968', 'Green'], ['#ff9f0a', 'Amber']];
       const sw = el('div', { class: 'swatches' }, ...PRE.map(([h, n]) => el('button', { type: 'button', class: 'sw', title: n, 'aria-label': n, style: `background:${h}`,
         onclick: () => { tx.value = h; pk.value = h; tx.dispatchEvent(new Event('input')); check(); } })));
       tx.addEventListener('input', check); pk.addEventListener('input', check); box.append(sw, note); check(); v.append(g);
