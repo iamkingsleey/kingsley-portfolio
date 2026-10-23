@@ -1890,7 +1890,15 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
         const rnd = document.documentElement.dataset.corners === 'rounded', rr = 14;   // CMS → Settings → Corners
         if (rnd) { g.save(); g.beginPath(); const k0 = flat ? 1 : bend(Math.max(x0, 0) + 1), k1 = flat ? 1 : bend(Math.min(x1, W) - 1), hh = p.h * Math.max(k0, k1);
-          if (g.roundRect) g.roundRect(x0, cy - hh / 2, p.w, hh, rr); else g.rect(x0, cy - hh / 2, p.w, hh); g.clip(); }
+          if (flat || Math.abs(p.d) < 1.5) { if (g.roundRect) g.roundRect(x0, cy - hh / 2, p.w, hh, rr); else g.rect(x0, cy - hh / 2, p.w, hh); }   // the front piece and its two neighbours, as they are
+          else { // further out: follow the bent shape, so all four corners round evenly
+            const hy = x => p.h * bend(Math.max(0, Math.min(W, x))) / 2, r = Math.min(rr, p.w / 4), tp = x => cy - hy(x), bt = x => cy + hy(x);
+            g.moveTo(x0, tp(x0) + r); g.quadraticCurveTo(x0, tp(x0), x0 + r, tp(x0 + r));
+            for (let x = x0 + r; x < x1 - r; x += 6) g.lineTo(x, tp(x));
+            g.lineTo(x1 - r, tp(x1 - r)); g.quadraticCurveTo(x1, tp(x1), x1, tp(x1) + r); g.lineTo(x1, bt(x1) - r); g.quadraticCurveTo(x1, bt(x1), x1 - r, bt(x1 - r));
+            for (let x = x1 - r; x > x0 + r; x -= 6) g.lineTo(x, bt(x));
+            g.lineTo(x0 + r, bt(x0 + r)); g.quadraticCurveTo(x0, bt(x0), x0, bt(x0) - r); g.closePath(); }
+          g.clip(); }
         for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(im, sx + (x - x0) / p.w * sw, sy, w / p.w * sw, sh, x, cy - h / 2, w, h); }
         if (rnd) g.restore(); }
       g.globalAlpha = 1;
