@@ -163,13 +163,23 @@
       // to the inbox when there is one (CMS → Inbox), and to your email unless that's switched off; sent if either arrives
       const IB = (window.KM_SITE && KM_SITE.inbox) || {};
       const toInbox = window.kmSend ? kmSend({ type: 'Feedback', subject: `Site feedback: ${val}/5 · ${WORD[val]}`, message: note || '', fields: { Score: body.Score, 'Liked most': body['Liked most'], 'Got in the way': body['Got in the way'], 'Time on site': body['Time on site'], Screen: body.Screen, Theme: body.Theme } }) : Promise.resolve(false);
-      const toMail = IB.url && IB.email === false ? Promise.resolve(false) : fetch('https://formsubmit.co/ajax/' + encodeURI(TO), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) }).then(r => r.ok).catch(() => false);
-      const [a1, a2] = await Promise.all([toInbox, toMail]);
+      // never wait forever: each route gets 15 seconds, and the button says so if it's slow
+      const cap = (pr, ms) => Promise.race([pr, new Promise(r => setTimeout(() => r(false), ms))]);
+      const ac = 'AbortController' in window ? new AbortController() : null, slow = setTimeout(() => { btn.textContent = 'Still sending…'; }, 5000);
+      const toMail = IB.url && IB.email === false ? Promise.resolve(false) : fetch('https://formsubmit.co/ajax/' + encodeURI(TO), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body), signal: ac && ac.signal })
+        .then(r => r.json().catch(() => ({})).then(j => {
+          // FormSubmit answers 200 even when it didn't send (for example before the address is confirmed), so read its reply
+          const ok = r.ok && String(j.success) !== 'false';
+          if (!ok) console.warn('Feedback email not sent:', j.message || r.status);
+          return ok; }))
+        .catch(() => false);
+      const [a1, a2] = await Promise.all([cap(toInbox, 15000), cap(toMail, 15000)]);
+      clearTimeout(slow); if (ac) ac.abort();
       if (!a1 && !a2) throw new Error('not sent');
       state.sent = Date.now(); delete state.snooze; put(K, JSON.stringify(state)); track('/feedback/sent/' + val);
       done();
     } catch (_) {
-      btn.disabled = false; btn.textContent = 'Try again'; err.hidden = false; err.textContent = 'That didn’t send. Check your connection and try again.';
+      btn.disabled = false; btn.textContent = 'Try again'; err.hidden = false; err.textContent = 'That didn’t send. Check your connection and try again in a moment.';
     }
   }
   function done() {
