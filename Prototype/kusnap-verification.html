@@ -32,7 +32,8 @@ svg { display: block; flex: none }
 .av { width: 33px; height: 33px; border-radius: 999px; background: #67bc40; overflow: hidden }
 .av img { width: 33px; height: 33px; display: block }
 .me b { font-family: Inter, sans-serif; font-weight: 500; font-size: 14px; line-height: 1.43; color: var(--ink); padding: 4px 8px }
-.chev { width: 32px; height: 32px; border-radius: 100px; background: var(--bg); display: grid; place-items: center }
+.chev { width: 32px; height: 32px; border-radius: 100px; background: var(--bg); display: grid; place-items: center; transition: background .2s }
+.me:hover .chev { background: #eef1f5 } .me:hover .chev svg { transform: translateY(1px) } .chev svg { transition: transform .2s }
 
 /* page */
 main { padding: clamp(48px, 11vh, 156px) 16px 96px }
@@ -46,7 +47,8 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .view.narrow .head { margin-bottom: 23px }
 .stack { display: flex; flex-direction: column; gap: 16px }
 .view.narrow .stack { gap: 12px }
-.card { background: #fff; border-radius: 12px; box-shadow: var(--card-shadow); padding: 39px 35px }
+.card { background: #fff; border-radius: 12px; box-shadow: var(--card-shadow); padding: 39px 35px; transition: box-shadow .3s }
+.card:focus-within { box-shadow: 0 0 1px 1px rgba(239, 239, 239, .6), 0 12px 32px -18px rgba(16, 24, 40, .18) }
 .card.d1 { box-shadow: 0 1px 4px rgba(12, 12, 13, .05); padding: 39px 40px }
 .view.narrow .card { padding: 46px 48px }
 .view.narrow .card.id1 { padding: 38px 47px }
@@ -69,7 +71,9 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .badge.lock { background: var(--g25); color: var(--g300) }
 .badge.ok { background: var(--ok-bg); color: var(--ok) }
 .badge.ok svg { color: var(--ok) }
-.badge.pop { animation: pop .5s var(--ease) both }
+.badge.pop { animation: pop .5s var(--ease) both; position: relative; overflow: hidden }
+.badge.ok.pop::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .8) 50%, transparent 70%); transform: translateX(-120%); animation: shine .9s .45s var(--ease) forwards }
+@keyframes shine { to { transform: translateX(120%) } }
 @keyframes pop { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.06) } }
 
 /* inputs */
@@ -79,30 +83,40 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .input.muted { color: var(--g300) }
 .input input, .input select { border: 0; outline: 0; background: none; width: 100%; height: 100%; padding: 0; font-size: 14px; color: var(--g800) }
 .input select { appearance: none; -webkit-appearance: none; cursor: pointer }
+.input { transition: border-color .2s, box-shadow .2s }
+.input:hover { border-color: var(--g200) }
 .input:focus-within { border-color: #9cc8f2; box-shadow: 0 0 0 3px rgba(7, 118, 216, .12) }
 .input.tx { padding-left: 11px }
 .input.sel { padding-right: 10px; position: relative }
 .input.sel svg { width: 24px; height: 24px; pointer-events: none; position: absolute; right: 12px }
 .link { font-size: 14px; line-height: 1.8; color: var(--g800) }
-.link:hover { text-decoration: underline }
+.link { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .25s var(--ease) }
+.link:is(:hover, .hov) { background-size: 100% 1px }
 .plain { display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.8; color: var(--g900) }
 .plain svg { width: 18px; height: 18px; color: var(--g800) }
 
 /* buttons */
-.btn { position: relative; height: 48px; border-radius: 8px; font-family: Inter, sans-serif; font-weight: 600; font-size: 14px; line-height: 1.43; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; overflow: hidden; transition: background .2s, transform .12s }
+.btn { position: relative; height: 48px; border-radius: 8px; font-family: Inter, sans-serif; font-weight: 600; font-size: 14px; line-height: 1.43; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; overflow: hidden; transition: background .2s, transform .22s var(--ease), box-shadow .22s var(--ease) }
 .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none }
 .btn.dark { background: var(--g800); width: 231px }
 .btn.dark::after { box-shadow: inset 0 -4px 1px var(--dark-edge) }
 .btn.blue { background: var(--brand); width: 100% }
 .btn.blue::after { box-shadow: inset 0 -4px 1px var(--brand-edge) }
-.btn:active:not(:disabled) { transform: translateY(1px) }
-.btn.dark:hover:not(:disabled) { background: #26354a }
-.btn.blue:hover:not(:disabled) { background: #0a6cc4 }
+.btn.dark:is(:hover, .hov):not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 18px -6px rgba(16, 24, 40, .45) }
+.btn.blue:is(:hover, .hov):not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 22px -8px rgba(7, 118, 216, .6) }
+.btn:is(:active, .prs):not(:disabled) { transform: translateY(1px); box-shadow: 0 2px 4px -2px rgba(16, 24, 40, .3); transition-duration: .08s }
+.btn:is(:active, .prs):not(:disabled)::after { box-shadow: inset 0 -2px 1px var(--dark-edge) }
+.btn.blue:is(:active, .prs):not(:disabled)::after { box-shadow: inset 0 -2px 1px var(--brand-edge) }
+.btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%); transform: translateX(-120%); pointer-events: none }
+.btn:is(:hover, .hov):not(:disabled)::before { transform: translateX(120%); transition: transform .7s var(--ease) }
+.btn.dark:is(:hover, .hov):not(:disabled) { background: #26354a }
+.btn.blue:is(:hover, .hov):not(:disabled) { background: #0a6cc4 }
 .btn:disabled { background: var(--g200); cursor: default; height: 29px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 500; margin: 9px 0 10px }
 .btn:disabled::after { box-shadow: none }
 .btn .spin { width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff; border-radius: 50%; animation: rot .7s linear infinite }
-.flat { background: var(--g800); color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 14px; line-height: 1.5; width: 100%; transition: background .2s }
-.flat:hover { background: #26354a }
+.flat { background: var(--g800); color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 14px; line-height: 1.5; width: 100%; transition: background .2s, transform .22s var(--ease), box-shadow .22s var(--ease) }
+.flat:is(:hover, .hov):not(.off) { background: #26354a; transform: translateY(-2px); box-shadow: 0 8px 18px -6px rgba(16, 24, 40, .45) }
+.flat:is(:active, .prs):not(.off) { transform: translateY(1px); box-shadow: none; transition-duration: .08s }
 .flat.off { background: var(--g200); cursor: default }
 .btnwrap { margin-top: 24px; display: inline-block }
 .card.locked .ttl { color: var(--g300) }
@@ -113,6 +127,8 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .otp { display: flex; gap: 12px }
 .otp input { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--g100); background: #fff; text-align: center; font-size: 16px; font-weight: 800; line-height: 1.8; color: var(--g800); outline: 0; padding: 0; caret-color: var(--brand); transition: background .15s, border-color .15s, box-shadow .15s }
 .otp input.on { background: var(--g25); border-color: transparent; box-shadow: 0 0 1px rgba(0, 0, 0, .1) }
+.otp input.land { animation: land .32s var(--ease) }
+@keyframes land { 0% { transform: translateY(-5px) scale(.9) } 60% { transform: translateY(1px) scale(1.04) } }
 .otp input:focus { border-color: #9cc8f2; box-shadow: 0 0 0 3px rgba(7, 118, 216, .12) }
 .otp.shake { animation: shake .36s }
 @keyframes shake { 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
@@ -174,11 +190,14 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .help a { color: var(--g800); font-weight: 700; margin-left: 4px; text-decoration: none }
 .replay { display: flex; justify-content: center; margin-top: 40px }
 .replay button { font-size: 13px; color: var(--g300); display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px }
-.replay button:hover { color: var(--g500); background: #f2f4f7 }
+.replay button { transition: color .2s, background .2s } .replay button svg { transition: transform .5s var(--ease) }
+.replay button:is(:hover, .hov) { color: var(--g500); background: #f2f4f7 } .replay button:is(:hover, .hov) svg { transform: rotate(-200deg) }
 
 /* the code arrives as a message */
 .sms { position: fixed; top: 80px; right: 16px; z-index: 9; width: min(340px, calc(100vw - 32px)); background: rgba(255, 255, 255, .92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 16px; box-shadow: 0 10px 30px rgba(16, 24, 40, .14), 0 0 0 1px rgba(16, 24, 40, .05); padding: 12px 14px; display: flex; gap: 12px; text-align: left; transform: translateY(-16px); opacity: 0; pointer-events: none; transition: transform .45s var(--ease), opacity .3s }
-.sms.show { transform: none; opacity: 1; pointer-events: auto }
+.sms.show { transform: none; opacity: 1; pointer-events: auto; cursor: pointer }
+.sms.show:is(:hover, .hov) { transform: translateY(-3px) scale(1.01); box-shadow: 0 16px 36px rgba(16, 24, 40, .18), 0 0 0 1px rgba(16, 24, 40, .06) }
+.sms.show.prs { transform: scale(.98); transition-duration: .08s }
 .sms .app { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(#5bf675, #29c445); display: grid; place-items: center; color: #fff; flex: none }
 .sms .app svg { width: 20px; height: 20px }
 .sms .top { display: flex; justify-content: space-between; font-size: 12px; color: var(--g500); line-height: 1.4 }
@@ -200,7 +219,8 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 /* autoplay: a cursor walks through the flow on its own */
 .cur { position: fixed; z-index: 20; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; opacity: 0; transform: translate(var(--x, 50vw), var(--y, 60vh)); transition: transform .9s cubic-bezier(.45, .05, .2, 1), opacity .3s; filter: drop-shadow(0 2px 3px rgba(16, 24, 40, .25)) }
 .cur.on { opacity: 1 }
-.cur svg { width: 26px; height: 26px; transform-origin: 6px 4px; transition: transform .12s }
+.cur svg { position: absolute; left: 0; top: 0; width: 26px; height: 26px; transform-origin: 6px 4px; transition: transform .12s, opacity .15s }
+.cur .hd { opacity: 0; transform-origin: 10px 4px } .cur.hand .hd { opacity: 1 } .cur.hand .ar { opacity: 0 }
 .cur.down svg { transform: scale(.82) }
 .cur i { position: absolute; left: 6px; top: 4px; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: rgba(7, 118, 216, .22); transform: scale(0); opacity: 0 }
 .cur.tap i { animation: tap .5s ease-out }
@@ -295,7 +315,7 @@ const V = {
       b.addEventListener('input', () => {
         const d = b.value.replace(/\D/g, '');
         if (d.length > 1) { fill(val().slice(0, i) + d); return; }
-        b.value = d; sync(); if (d && box[i + 1]) box[i + 1].focus(); else if (d && val().length === 6) b.blur();
+        b.value = d; sync(); if (d) { b.classList.remove('land'); void b.offsetWidth; b.classList.add('land'); } if (d && box[i + 1]) box[i + 1].focus(); else if (d && val().length === 6) b.blur();
       });
       b.addEventListener('keydown', e => {
         if (e.key === 'Backspace' && !b.value && box[i - 1]) { box[i - 1].value = ''; box[i - 1].focus(); sync(); e.preventDefault(); }
@@ -311,7 +331,7 @@ const V = {
     const code = String(Math.floor(100000 + Math.random() * 900000));
     document.getElementById('smscode').textContent = code;
     sms.onclick = () => { sms.classList.remove('show'); box.forEach(b => b.value = ''); sync();
-      [...code].forEach((d, i) => later(() => { box[i].value = d; box[i].classList.add('on'); box[i].focus({ preventScroll: true }); if (i === 5) { sync(); document.activeElement.blur(); } }, 120 + i * 110)); };
+      [...code].forEach((d, i) => later(() => { box[i].value = d; box[i].classList.add('on'); box[i].classList.remove('land'); void box[i].offsetWidth; box[i].classList.add('land'); box[i].focus({ preventScroll: true }); if (i === 5) { sync(); document.activeElement.blur(); } }, 120 + i * 110)); };
     later(() => sms.classList.add('show'), 1400);
     later(() => sms.classList.remove('show'), 9000);
     let left = 30; const rs = document.getElementById('rs');
@@ -443,7 +463,8 @@ go('start');
 (function autoplay() {
   if (!/[?&]autoplay=(1|true|yes)/.test(location.search)) return;
   const cur = document.createElement('div'); cur.className = 'cur'; cur.setAttribute('aria-hidden', 'true');
-  cur.innerHTML = '<i></i><svg viewBox="0 0 26 26"><path d="M6 3.5v17.2l4.6-4.3 2.9 6.6 3-1.3-2.9-6.5h6.3z" fill="#101828" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  cur.innerHTML = '<i></i><svg class="ar" viewBox="0 0 26 26"><path d="M6 3.5v17.2l4.6-4.3 2.9 6.6 3-1.3-2.9-6.5h6.3z" fill="#101828" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+    + '<svg class="hd" viewBox="0 0 26 26"><path d="M9.2 12.4V5.6a1.7 1.7 0 0 1 3.4 0v5.3l.1-1.2a1.6 1.6 0 0 1 3.2.2v1.3a1.6 1.6 0 0 1 3.1.4v1.1a1.5 1.5 0 0 1 3 .3v4.4c0 3.5-2.6 6.1-6.1 6.1h-1.6c-2 0-3.4-.8-4.6-2.4l-3.6-4.8a1.6 1.6 0 0 1 2.4-2.1z" fill="#fff" stroke="#101828" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   const chip = document.createElement('div'); chip.className = 'demo-chip'; chip.innerHTML = '<b></b>Playing on its own · click anywhere to try it';
   document.body.append(cur, chip);
   let live = true, x = innerWidth * .62, y = innerHeight * .7;
@@ -457,10 +478,13 @@ go('start');
     await sleep(pause); if (!live) return false;
     let r = e.getBoundingClientRect();
     if (r.top < 70 || r.bottom > innerHeight - 20) { scrollBy({ top: r.top + r.height / 2 - innerHeight / 2, behavior: 'smooth' }); await sleep(700); r = e.getBoundingClientRect(); }   // scroll this page only, never the case study around it
-    cur.classList.add('on'); place(r.left + Math.min(r.width * .55, r.width - 10), r.top + r.height * .55); await sleep(950); if (!live) return false;
+    cur.classList.remove('hand'); cur.classList.add('on'); place(r.left + Math.min(r.width * .55, r.width - 10), r.top + r.height * .55);
+    await sleep(720); if (!live) return false;
     e = ready(sel, test); if (!e) return false;
-    cur.classList.add('down'); await sleep(110); cur.classList.remove('down', 'tap'); void cur.offsetWidth; cur.classList.add('tap');
-    e.click(); return true;
+    cur.classList.add('hand'); e.classList.add('hov'); await sleep(520); if (!live) { e.classList.remove('hov'); return false; }   // arrive: the cursor turns to a hand and the button lifts
+    e.classList.add('prs'); cur.classList.add('down'); await sleep(130);
+    cur.classList.remove('down', 'tap'); void cur.offsetWidth; cur.classList.add('tap'); e.classList.remove('prs');
+    await sleep(90); e.classList.remove('hov'); e.click(); setTimeout(() => cur.classList.remove('hand'), 300); return true;
   }
   const typed = () => { const b = q('#vi'); return b && !b.disabled; };
   async function loop() {
