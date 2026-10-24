@@ -24,7 +24,7 @@
     "50,000+",
     "users"
    ],
-   "cover": "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
+   "cover": "assets/uploads/kusnap-casestudy-cover.jpg",
    "story": [
     "A verification system that kept signing up fast",
     [
@@ -53,7 +53,8 @@
      ],
      "media": [
       "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "Key feature",
@@ -62,7 +63,8 @@
      ],
      "media": [
       "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "Pain points",
@@ -71,7 +73,8 @@
      ],
      "media": [
       "https://framerusercontent.com/images/GhcET0PPsIu9JGObSBX6KoMRDFs.png?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "User insights",
@@ -132,7 +135,8 @@
      "media": [
       "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400",
       "https://framerusercontent.com/images/H7WcabwraavJ4jjDLBtZBr7W50.png?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "High fidelity",
@@ -142,7 +146,8 @@
      "media": [
       "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
       "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "Business shops",
@@ -156,7 +161,8 @@
       },
       "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400",
       "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     },
     {
      "h": "Impact",
@@ -181,7 +187,8 @@
      "media": [
       "https://framerusercontent.com/images/BtD6uLaddiRFiYI6Tlcl5tlvBA.png?scale-down-to=2400",
       "https://framerusercontent.com/images/5cgx7cDSzXovP0Dmw3fJT66imo.png?scale-down-to=2400"
-     ]
+     ],
+     "notes": []
     }
    ],
    "statement": "Trust has to be visible before anyone pays.",
