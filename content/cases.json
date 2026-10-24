@@ -73,12 +73,7 @@
      "p": [
       "What buyers and sellers said in interviews, one note each. Move them around."
      ],
-     "media": [
-      {
-       "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
-       "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
-      }
-     ],
+     "media": [],
      "notes": [
       {
        "t": "Buyers",
@@ -273,11 +268,10 @@
    "briefBlocks": [
     {
      "t": "proto",
-     "src": "Prototype/kusnap-verification.html",
+     "src": "assets/protos/kusnap-verification.html",
      "h": 780,
      "cap": "User verification",
-     "addr": "Kusnap · account verification",
-     "auto": true
+     "addr": "Kusnap · account verification"
     }
    ]
   },
