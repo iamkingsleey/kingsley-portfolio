@@ -270,6 +270,7 @@
       { k: 'fxDefault', label: 'Effect on every picture', type: 'select', full: true, options: [['', 'None (plain)'], ['beforeafter', 'Before and after'], ['swap', 'Hover to swap'], ['lens', 'Zoom lens'], ['zoom', 'Click to zoom'], ['pan', 'Drag to look around'], ['hotspots', 'Hotspots'], ['hoverzoom', 'Zoom on hover'], ['patternzoom', 'Pattern zoom'], ['camera', 'Camera'], ['tilt', 'Tilt'], ['kenburns', 'Ken Burns'], ['spotlight', 'Spotlight'], ['reveal', 'Reveal on scroll'], ['parallax', 'Parallax']], help: 'Each picture can still have its own: click it on the page view → Effect. “None” keeps the pictures plain.' },
       { k: 'hidden', label: 'Hide this case study from the site', type: 'bool', full: true } ] },
     { title: 'Opening', fields: [
+      { k: 'flow', label: 'Page layout', type: 'select', options: [['', 'Classic'], ['v2', 'Case study: details row, at a glance, decisions']], when: c => c.kind !== 'Brand' },
       { k: 'headline', label: 'Headline', type: 'br', rows: 2, help: 'Press Enter for a line break' }, { k: 'blurb', label: 'Summary', type: 'textarea' },
       { k: 'stat', label: 'Headline number', ...PAIR('Number', 'What it counts') }, { k: 'cover', label: 'Cover picture', type: 'media', rich: true, help: 'Shown on Projects and Designs' } ] },
     { title: 'Story', fields: [
@@ -465,14 +466,15 @@
         // text column) or "N:after" (after section N's pictures). A section's old paragraphs become text blocks the first time.
         const FRESH = { text: () => ({ t: 'text', v: '' }), heading: () => ({ t: 'heading', v: '' }), sub: () => ({ t: 'sub', v: '' }), quote: () => ({ t: 'quote', v: '' }),
           picture: () => ({ t: 'picture', m: '', cap: '' }), video: () => ({ t: 'video', m: '', cap: '' }), points: () => ({ t: 'points', items: [['', ''], ['', '']] }),
-          numbers: () => ({ t: 'numbers', items: [['', ''], ['', '']] }), notes: () => ({ t: 'notes', items: [{ p: '', w: '' }, { p: '', w: '' }, { p: '', w: '' }] }), proto: () => ({ t: 'proto', src: '', h: 760, cap: '' }) };
+          numbers: () => ({ t: 'numbers', items: [['', ''], ['', '']] }), notes: () => ({ t: 'notes', items: [{ p: '', w: '' }, { p: '', w: '' }, { p: '', w: '' }] }), proto: () => ({ t: 'proto', src: '', h: 760, cap: '' }),
+          pairs: () => ({ t: 'pairs', items: [['', ''], ['', '']] }), decisions: () => ({ t: 'decisions', items: [{ t: '', no: '', yes: '', why: '', cost: '' }] }) };
         const placeOf = w => { if (w === 'brief') { c.briefBlocks = c.briefBlocks || []; return { list: c.briefBlocks, path: 'briefBlocks', si: -1 }; }
           const [n, where] = String(w).split(':'), sec = (c.sections || [])[+n]; if (!sec) return null;
           if (where === 'after') { sec.after = sec.after || []; return { list: sec.after, path: `sections.${n}.after`, si: +n }; }
           if (!sec.blocks) { sec.blocks = (sec.p || []).map(v => ({ t: 'text', v })); delete sec.p; }
           return { list: sec.blocks, path: `sections.${n}.blocks`, si: +n }; };
         const objAt = path => path.split('.').reduce((o, k) => o == null ? o : o[/^\d+$/.test(k) ? +k : k], c);
-        const focusOf = (P, j, b) => !b ? null : b.t === 'points' || b.t === 'numbers' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' || b.t === 'proto' ? null : `${P.path}.${j}.v`;
+        const focusOf = (P, j, b) => !b ? null : b.t === 'decisions' ? `${P.path}.${j}.items.0.t` : b.t === 'points' || b.t === 'numbers' || b.t === 'pairs' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' || b.t === 'proto' ? null : `${P.path}.${j}.v`;
         const tidyList = P => { if (P.si >= 0) { const sec = c.sections[P.si]; if (sec.after && !sec.after.length) delete sec.after; } else if (!c.briefBlocks.length) delete c.briefBlocks; };
         // a prototype block: which interactive page it shows (any .html in the Prototype folder, or a full link), how tall, and what the bar says
         function blockProto(b) { const done = () => { m.remove(); send(); }, set = (k, v) => { b[k] = v; touch('cases'); };
@@ -502,8 +504,8 @@
         function blockOp(d) {
           if (d.op === 'section') { const at = d.w === 'brief' ? 0 : +String(d.w).split(':')[0] + 1; c.sections = c.sections || [];
             c.sections.splice(at, 0, { h: 'New section', title: '', blocks: [{ t: 'text', v: '' }], media: [] }); touch('cases'); send(`sections.${at}.title`); toast('Section added'); return; }
-          if (d.op === 'more') { const b = objAt(d.path); if (!b) return; b.items = b.items || []; b.items.push(b.t === 'notes' ? { p: '', w: '' } : ['', '']); touch('cases');
-            send(b.t === 'notes' ? `${d.path}.items.${b.items.length - 1}.p` : `${d.path}.items.${b.items.length - 1}.0`); return; }
+          if (d.op === 'more') { const b = objAt(d.path); if (!b) return; b.items = b.items || []; b.items.push(b.t === 'notes' ? { p: '', w: '' } : b.t === 'decisions' ? { t: '', no: '', yes: '', why: '', cost: '' } : ['', '']); touch('cases');
+            send(b.t === 'notes' ? `${d.path}.items.${b.items.length - 1}.p` : b.t === 'decisions' ? `${d.path}.items.${b.items.length - 1}.t` : `${d.path}.items.${b.items.length - 1}.0`); return; }
           if (d.op === 'media') { blockMedia(d.path); return; }
           const P = placeOf(d.w); if (!P) return; const L = P.list, j = d.pos;
           if (d.op === 'insert' || d.op === 'replace') { const b = (FRESH[d.t] || FRESH.text)();
@@ -519,7 +521,7 @@
             const prev = j > 0 && L[j - 1] && TEXTY.includes(L[j - 1].t || 'text') ? `${P.path}.${j - 1}.v` : null; send(d.quiet ? prev : null);
             if (!d.quiet) toast((NAMEB[gone.t || 'text'] || 'Block') + ' deleted'); }
         }
-        const TEXTY = ['text', 'heading', 'sub', 'quote'], NAMEB = { text: 'Text', heading: 'Heading', sub: 'Small heading', quote: 'Pull quote', picture: 'Picture', video: 'Video', points: 'Points', numbers: 'Big numbers', notes: 'Sticky notes', proto: 'Prototype' };
+        const TEXTY = ['text', 'heading', 'sub', 'quote'], NAMEB = { text: 'Text', heading: 'Heading', sub: 'Small heading', quote: 'Pull quote', picture: 'Picture', video: 'Video', points: 'Points', numbers: 'Big numbers', notes: 'Sticky notes', proto: 'Prototype', pairs: 'Findings', decisions: 'Decisions' };
         // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet,
         // and give its row a grid. A section's pictures become rows the first time you change one: every other row keeps
         // exactly the shape the page drew it in, and only the row you picked changes.
