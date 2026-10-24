@@ -239,6 +239,10 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .bign.l b { font-size: clamp(36px, 4.4vw, 68px); line-height: 1.02; letter-spacing: -.04em; margin-top: 12px }
 .H .bign.l i { font-style: normal }
 .H .bign + .cap2 { margin-top: 14px }
+/* results sit in the text column, so their left edge lines up with the chapter heading above them */
+.H .fr.nums { width: min(var(--tx), calc(100% - 2 * var(--gut))) }
+@media (min-width: 1200px) { .H .fr.nums { width: min(var(--tx), calc(100vw - 2 * 340px)) } }
+.H .fr.nums .bign b { font-size: clamp(40px, 4vw, 56px) }
 @media (max-width: 640px) { .H .bign { grid-template-columns: 1fr } .H .bign > div, .H .bign > div:nth-child(even) { padding: 28px 0 32px; border-left: 0 } }
 
 @media (max-width: 640px) { .H .lede { font-size: 18px } .H .ch { padding-top: 88px } .H .cred { grid-template-columns: 1fr 1fr } }
@@ -1074,7 +1078,7 @@ const R = {
       if (t === 'points') { const L = (b.items || []).map((x, k) => [x, k]).filter(([x]) => KM_EDIT || (x && (x[0] || x[1])));
         return L.length ? `<div class="lead">${L.map(([x, k]) => `<div><b${E(`${base}.items.${k}.0`)} data-ph="Point">${esc(x[0] || '')}</b>. <span${E(`${base}.items.${k}.1`)} data-ph="What it means">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Point</button>` : ''}` : ''; }
       if (t === 'numbers') { const L = (b.items || []).map((x, k) => [x, k]).filter(([x]) => KM_EDIT || (x && x[0]));
-        return L.length ? `<div class="fr"><div class="bign">${L.map(([x, k]) => `<div><b data-n="${esc(x[0] || '')}"${E(`${base}.items.${k}.0`)} data-ph="72%">${esc(x[0] || '')}</b><span${E(`${base}.items.${k}.1`)} data-ph="what it measures">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Number</button>` : ''}</div>` : ''; }
+        return L.length ? `<div class="fr nums"><div class="bign">${L.map(([x, k]) => `<div><b data-n="${esc(x[0] || '')}"${E(`${base}.items.${k}.0`)} data-ph="72%">${esc(x[0] || '')}</b><span${E(`${base}.items.${k}.1`)} data-ph="what it measures">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Number</button>` : ''}</div>` : ''; }
       if (t === 'notes') return NOTES({ notes: b.items || [] }, base + '.items') + (KM_EDIT ? `<div class="fr"><button type="button" class="kchip" data-kmore="${base}">+ Note</button></div>` : '');
       if (t === 'picture' || t === 'video') { const m = b.m;
         if (!m) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div></div>` : '';
@@ -1129,7 +1133,7 @@ const R = {
       if (!list.length && KM_EDIT && si !== undefined) return `<div class="fr kempty" data-pick="sections.${si}"></div>`;   // nothing yet: just the add button
       return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${G ? gridH(list, G) + cap(list, 'Fig. ' + pad(++fig), cpath ? label : esc(label), cpath) : ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), cpath ? label : esc(label), cpath))}</div>` : ''; };
     // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
-    const bigNums = (stats, si) => `<div class="fr"><div class="bign">${stats.map(([a, b], k) => `<div><b data-n="${esc(a)}"${E(`sections.${si}.stats.${k}.0`)}>${esc(a)}</b><span${E(`sections.${si}.stats.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2"${E('impactNote')}>${esc(c.impactNote)}</p>` : ''}</div>`;
+    const bigNums = (stats, si) => `<div class="fr nums"><div class="bign">${stats.map(([a, b], k) => `<div><b data-n="${esc(a)}"${E(`sections.${si}.stats.${k}.0`)}>${esc(a)}</b><span${E(`sections.${si}.stats.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2"${E('impactNote')}>${esc(c.impactNote)}</p>` : ''}</div>`;
     const bigList = (list, base) => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b${base ? E(`${base}.${k}.0`) : ''}>${esc(a)}</b><span${base ? E(`${base}.${k}.1`) : ''}>${esc(b)}</span></div>`).join('')}</div></div>`;
     const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
     // tags: each one can be typed over in the CMS; clear one to remove it. "+ Tag" adds one
