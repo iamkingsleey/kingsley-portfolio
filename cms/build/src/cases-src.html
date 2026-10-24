@@ -220,6 +220,9 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H.v2 .lede { font-size: 18px; line-height: 1.6 }
 .H.v2 .ch { padding-top: 112px }
 .H.v2 .tx + .fr, .km-cms .H.v2 .tx + .kblk > .fr { margin-top: clamp(72px, 8vw, 112px) }   /* text, then a picture: a clear pause between them */
+/* v2 rhythm: one gap (112px) between every chapter, picture and the text that carries on after it; numbers stay with their heading */
+.H.v2 .kcont { padding-top: clamp(72px, 8vw, 112px) } .H.v2 .glance { margin-top: clamp(72px, 8vw, 112px) }
+.H.v2 .tx + .fr.nums { margin-top: 32px }
 .H.v2 .hd + .fr { margin-top: clamp(80px, 9vw, 128px) }   /* room between the tags and the overview picture */
 .H .meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 24px; margin: 28px 0 0; padding-top: 22px; border-top: 1px solid var(--line) }
 .H .glance .meta { grid-column: 1 / -1; margin: 0; padding: 22px 0 24px; border-top: 0; border-bottom: 1px solid var(--line) }
