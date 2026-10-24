@@ -142,8 +142,10 @@
 
   // ---------- the way back: the pages this visit has passed through (per tab). A page's own back control returns to the page
   // you came from (a case study opened from Projects goes back to Projects; one opened from a piece on Designs goes back to that piece);
-  // only when you arrived from nowhere does it fall back to its usual place. Moving within a page (next case, a hash) replaces its entry.
+  // only when you arrived from nowhere does it fall back to its usual place. Moving within a page (a hash, a Designs filter) replaces its entry,
+  // except on the case study pages, where each case is its own place: Kusnap → next → Bulvds, and back returns to Kusnap.
   const TR = 'km-trail', fileOf = u => u.split('#')[0].split('?')[0] || 'index.html';
+  const placeOf = u => /^(case|brand)\.html$/.test(fileOf(u)) ? fileOf(u) + '#' + (u.split('#')[1] || '') : fileOf(u);
   const here = () => (location.pathname.split('/').pop() || 'index.html') + location.hash;
   const readT = () => { try { return JSON.parse(sessionStorage.getItem(TR)) || []; } catch (_) { return []; } };
   const writeT = a => { try { sessionStorage.setItem(TR, JSON.stringify(a.slice(-30))); } catch (_) {} };
@@ -154,14 +156,14 @@
       if (t === undefined) t = back && back.t ? back.t : top && top.u === u && top.t ? top.t : nameHere();   // an automatic mark never renames a place the page already named (e.g. a Designs filter), even when you come back to it
       const e = { u, t };
       if (a.length > 1 && a[a.length - 2].u === u) { a.pop(); a[a.length - 1] = e; }                      // went back a step
-      else if (a.length && fileOf(a[a.length - 1].u) === fileOf(u)) a[a.length - 1] = e;                 // same page, new place on it
+      else if (a.length && placeOf(a[a.length - 1].u) === placeOf(u)) a[a.length - 1] = e;               // same place, updated
       else a.push(e);
       writeT(a); },
     // the page before this one, read as if this page were already marked (so it is right from the first moment, and when you have just come back)
-    prev() { const a = readT(), u = here(), f = fileOf(u);
+    prev() { const a = readT(), u = here(), f = placeOf(u);
       if (a.length > 1 && a[a.length - 2].u === u) a.pop();                       // came back a step: the last entry is where we came back from
-      else if (!a.length || fileOf(a[a.length - 1].u) !== f) a.push({ u });      // new here: this page goes on the end
-      for (let i = a.length - 2; i >= 0; i--) if (fileOf(a[i].u) !== f) return a[i];
+      else if (!a.length || placeOf(a[a.length - 1].u) !== f) a.push({ u });     // new here: this place goes on the end
+      for (let i = a.length - 2; i >= 0; i--) if (placeOf(a[i].u) !== f) return a[i];
       return null; },
     // where a back control should go, and what to call it
     back(fallback, fallbackName) { const p = KM.trail.prev(); if (!p) return { href: fallback, name: fallbackName };
@@ -178,7 +180,11 @@
   try { const st = history.state; if (st && 'kmPrev' in st) kmPrev = st.kmPrev;
     else { const p = KM.trail.prev(); let rf = ''; try { const r = new URL(document.referrer); if (r.origin === location.origin) rf = r.pathname.split('/').pop() || 'index.html'; } catch (_) {}
       kmPrev = p && rf && fileOf(p.u) === rf ? p.u : null; history.replaceState(KM.trail.state(), ''); } } catch (_) {}
-  addEventListener('hashchange', () => { try { if (!history.state || !('kmPrev' in history.state)) history.replaceState(KM.trail.state(), ''); } catch (_) {} KM.trail.mark(); });
+  // a new hash: if it is a new place (another case study), the place we just left is the one right behind it in the history
+  addEventListener('hashchange', e => { try { const st = history.state;
+      if (st && 'kmPrev' in st) kmPrev = st.kmPrev;
+      else { const o = String(e.oldURL || '').split('/').pop(); if (o && placeOf(o) !== placeOf(here())) kmPrev = o; history.replaceState(KM.trail.state(), ''); } } catch (_) {}
+    KM.trail.mark(); });
   addEventListener('pageshow', e => { if (!e.persisted) return;
     // back with the browser's back button: the page comes back exactly as it was left, so clear what leaving put on it
     // (the picture lifted off its tile, page covers, flying copies, blurs)

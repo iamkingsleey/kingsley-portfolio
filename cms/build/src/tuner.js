@@ -87,14 +87,17 @@
     requestAnimationFrame(function () { el.classList.add('on'); });
     count(o.from, mid, leg, easeIn, function () {
       try { sessionStorage.setItem(KEY, JSON.stringify({ v: mid, to: o.to, name: o.name, ms: total - leg, t: Date.now() })); } catch (e) {}
-      leave();                                           // the readout holds at mid while the next page comes in
-      var u = null; try { u = new URL(o.href, location.href); } catch (e) {}
-      if (!o.back && u && u.pathname === location.pathname && u.search === location.search) {   // same page, new place (the next case): finish here
+      var here = function () {                           // the new place is on this same page: finish the readout here
         try { sessionStorage.removeItem(KEY); } catch (e) {}
         count(mid, o.to, Math.max(140, total - leg), easeOut, function () {
           if (!el) { going = false; return; } document.documentElement.classList.add('tuned'); el.classList.add('out'); el.classList.remove('on');
           setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } going = false; }, 200); });
-      }
+      };
+      // going back to another case study on this page only changes the hash, so no new page arrives to finish the readout
+      if (o.back) addEventListener('hashchange', here, { once: true });
+      leave();                                           // the readout holds at mid while the next page comes in
+      var u = null; try { u = new URL(o.href, location.href); } catch (e) {}
+      if (!o.back && u && u.pathname === location.pathname && u.search === location.search) here();   // same page, new place (the next case)
     });
   }
 

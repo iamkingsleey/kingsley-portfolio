@@ -11,7 +11,7 @@
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js?v=1962ec67"></script>
+<script src="tuner.js?v=b4b640b3"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Product case study · Kingsley</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -230,6 +230,8 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H.v2 .lede { font-size: 18px; line-height: 1.6 }
 .H.v2 .ch { padding-top: 112px }
 .H .meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 24px; margin: 28px 0 0; padding-top: 22px; border-top: 1px solid var(--line) }
+.H .glance .meta { grid-column: 1 / -1; margin: 0; padding: 22px 0 24px; border-top: 0; border-bottom: 1px solid var(--line) }
+.H .glance .meta > div { padding: 0; border: 0 }
 .H .meta div { display: grid; gap: 4px; align-content: start; min-width: 0 } .H .meta dd { margin: 0; font-size: 15px; color: var(--ink) }
 .H .glance { position: relative; margin-top: 72px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); --ktop: 0px }
 .H .glance > div { padding: 26px 24px 28px 0; display: grid; gap: 8px; align-content: start; min-width: 0 }
@@ -1229,13 +1231,13 @@ const R = {
     const V2 = c.flow === 'v2', OFF = c.off || {};
     // v2: role, team, timeline and platforms in one row under the tags (each one editable on the page)
     const metaH = V2 ? `<dl class="meta">${[['My role', 'role'], ['Team', 'team'], ['Timeline', 'timeline'], ['Platforms', 'platforms']].map(([l, k]) => (c[k] || KM_EDIT) ? `<div><dt class="mono">${l}</dt><dd${E(k)} data-ph="${l}">${esc(c[k] || '')}</dd></div>` : '').join('')}</dl>` : '';
-    let h = `${TOP(c)}<main class="H${V2 ? ' v2' : ''}"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${V2 ? '' : st}</p><div class="tags">${tagsH}</div>${metaH}</header>
+    let h = `${TOP(c)}<main class="H${V2 ? ' v2' : ''}"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${V2 ? '' : st}</p><div class="tags">${tagsH}</div></header>
       ${(() => { const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
         if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover" data-rows="1"' : ''}>${rowsBlock(RR)}${F.length ? cap(F, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)) : ''}</div>` : ''; }
         const cv = tidy([V2 && c.overview ? c.overview : c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // v2: the case in thirty seconds, the problem, what I did and the two strongest results
     if (V2) { const G = c.glance || {}, RS = ((c.secs.find(s => s.stats) || {}).stats || []).slice(0, 2);
-      h += WRAP('glance', OFF.glance, `<section class="tx glance">${TOOLS('glance', OFF.glance, false, 'At a glance')}<div><span class="mono">Problem</span><p${E('glance.problem')} data-ph="The problem, in a line">${esc(G.problem || '')}</p></div><div><span class="mono">What I did</span><p${E('glance.did')} data-ph="What you did, in a line">${esc(G.did || '')}</p></div><div><span class="mono">Result</span><div class="nn">${RS.map(([a, b]) => `<div><b>${esc(a)}</b><small>${esc(b)}</small></div>`).join('')}</div></div></section>`); }
+      h += WRAP('glance', OFF.glance, `<section class="tx glance">${TOOLS('glance', OFF.glance, false, 'At a glance')}${metaH}<div><span class="mono">Problem</span><p${E('glance.problem')} data-ph="The problem, in a line">${esc(G.problem || '')}</p></div><div><span class="mono">What I did</span><p${E('glance.did')} data-ph="What you did, in a line">${esc(G.did || '')}</p></div><div><span class="mono">Result</span><div class="nn">${RS.map(([a, b]) => `<div><b>${esc(a)}</b><small>${esc(b)}</small></div>`).join('')}</div></div></section>`); }
     // the backstory: the problem, the goal and my part in it, before any screens (v2 has it in the details row and at a glance)
     if (!V2) h += WRAP('brief', OFF.brief, `<section class="tx ch" data-ix="The brief">${TOOLS('brief', OFF.brief, false, 'The brief')}<span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
       ${c.problem ? `<h4>The problem</h4><p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch"${E('goal')}>${esc(c.goal)}</p>` : ''}
@@ -1665,7 +1667,7 @@ function paint(keep) {
     else { if (el.readyState >= 2) ok(); else { el.addEventListener('loadeddata', ok); el.addEventListener('error', ok); } } });
   // next case: same page, new case (with the tuning transition when it is there)
   app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { if (KM_EDIT) return; const n = CASES.find(x => x.slug === b.dataset.go); snd('pop');
-    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug, replace: true }); else location.replace(PAGE + '#' + n.slug); }));   // the next case takes this one's place, so back still leads where you came from
+    if (window.Tuner) Tuner.go({ from: +(c.fq || 100), to: +(n.fq || 100), name: n.title, href: PAGE + '#' + n.slug }); else location.href = PAGE + '#' + n.slug; }));   // the next case is a new step: back returns to this one   // the next case takes this one's place, so back still leads where you came from
   const backTo = () => (window.KM && KM.trail) ? KM.trail.back('designs.html', 'All designs') : { href: 'designs.html', name: 'All designs' };
   const label = () => { const b = backTo(), a = app.querySelector('a.dback'); if (!a) return; a.href = b.href; a.lastChild.textContent = b.name; a.setAttribute('aria-label', 'Back to ' + b.name); };
   label(); document.addEventListener('km-trail', label, { once: true }); setTimeout(label, 500);
@@ -1879,7 +1881,7 @@ addEventListener('hashchange', show);
 show();
 </script>
 <script src="nav.js?v=c5eab834" defer></script>
-<script src="kit.js?v=7231f72d" defer></script>
+<script src="kit.js?v=774a3f18" defer></script>
 <script src="protips.js?v=489d00bd" defer></script>
 <style id="km-toggles">.km-tg{position:fixed;z-index:150;top:calc(48px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}#themeBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 40px)}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 84px)}#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}@media print{.km-tg{display:none}}</style><button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
 <script>(function(){var sb=document.getElementById("soundBtn"),si=document.getElementById("soundIco"),tb=document.getElementById("themeBtn"),ti=document.getElementById("themeIco");var ON='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',OFF='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',MOON='<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>',SUN='<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>';var on=true;try{on=localStorage.getItem("km-sound")!=="off"}catch(e){}function ps(){si.innerHTML=on?ON:OFF;sb.setAttribute("aria-pressed",on);sb.setAttribute("aria-label",on?"Mute sound":"Turn sound on");if(window.Popkit)Popkit.mute(!on)}sb.addEventListener("click",function(){on=!on;try{localStorage.setItem("km-sound",on?"on":"off")}catch(e){}ps();dispatchEvent(new CustomEvent("km-sound",{detail:on}));if(on&&window.Popkit)Popkit.play("pop")});function pt(){var d=document.documentElement.dataset.theme==="dark";ti.innerHTML=d?SUN:MOON;tb.setAttribute("aria-pressed",d);tb.setAttribute("aria-label",d?"Light mode":"Dark mode")}tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});ps();pt();addEventListener("load",ps)})();</script>
