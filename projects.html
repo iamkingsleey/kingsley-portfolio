@@ -267,7 +267,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.jpg';
+  const HEAD = 'assets/headshot.webp';
   const $ = id => document.getElementById(id);
   const RED = '#fb233b', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
@@ -311,7 +311,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // ---------- 3 · career band ----------
   // [frequency, chapter, role, text, stat, stat label]. Years are for you to fill in.
   const CH = [
-    ['88.1', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace for buying and selling across Africa, designed from its early stage to more than fifty thousand users.', '50,000+', 'users', 'Product · Marketplace', 'kusnap', 'assets/uploads/kusnap-casestudy-cover-2-5.jpg', 'case.html'],
+    ['88.1', 'Kusnap', 'Head of Design', 'A peer-to-peer marketplace for buying and selling across Africa, designed from its early stage to more than fifty thousand users.', '50,000+', 'users', 'Product · Marketplace', 'kusnap', 'assets/uploads/kusnap-casestudy-cover-2-5.webp', 'case.html'],
     ['91.4', 'Bulvds', 'UX Designer', 'Short-lets and rentals made simpler for renters, agents and homeowners. I designed the wallet that holds payments, refunds and commissions.', '', '', 'Product · Proptech', 'bulvds', 'https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400', 'case.html'],
     ['94.7', 'ShareBuddy', 'Founder', 'Social bill-splitting and group wallets for young Nigerians, so paying friends back takes one tap.', '', '', 'Product · Fintech', 'sharebuddy', {'color': '#E8273A', 'word': 'ShareBuddy'}, 'case.html'],
     ['98.0', 'Oghosa', 'Brand designer', 'Brand identity and strategy for a forward-looking investment and management company.', '', '', 'Brand · Investment', 'oghosa', 'https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400', 'brand.html'],
@@ -439,7 +439,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610241443#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202610241348#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
 <script src="nav.js?v=c5eab834" defer></script>

@@ -428,6 +428,8 @@
             for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
           if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path);
+          // "+ Tag" / "+ Skill" on the page: a new chip to type into (clear a chip's text to remove it)
+          if (d.type === 'km-cms-tag' && d.slug === c.slug && (d.key === 'industry' || d.key === 'did')) { c[d.key] = (c[d.key] || []).filter(Boolean); c[d.key].push(d.key === 'did' ? 'New skill' : 'new tag'); touch('cases'); send(); }
           // a section's Hide / Show / Delete on the page. Numbered keys are the chapters; brief, principle and details are the fixed parts
           if (d.type === 'km-cms-sec' && d.slug === c.slug) {
             if (/^\d+$/.test(d.key)) { const i = +d.key, sec = (c.sections || [])[i]; if (!sec) return;
@@ -443,10 +445,11 @@
         // and give its row a grid. A section's pictures become rows the first time you change one: every other row keeps
         // exactly the shape the page drew it in, and only the row you picked changes.
         const same = (m, src) => m && (typeof m === 'string' ? m === src : m.video === src || m.poster === src);
-        const allMedia = () => [c.cover, ...(c.coverRows || []).flatMap(r => r.pics || []), ...(c.sections || []).flatMap(s => [...(s.media || []), ...(s.rows || []).flatMap(r => r.pics || [])]), ...(c.run || []), ...(c.gallery || []).flatMap(g => (g.rows || []).flatMap(r => r.pics || []))].filter(Boolean);
+        const allMedia = () => [c.cover, ...(c.coverRows || []).flatMap(r => r.pics || []), ...(c.briefRows || []).flatMap(r => r.pics || []), ...(c.sections || []).flatMap(s => [...(s.media || []), ...(s.rows || []).flatMap(r => r.pics || [])]), ...(c.run || []), ...(c.gallery || []).flatMap(g => (g.rows || []).flatMap(r => r.pics || []))].filter(Boolean);
         const bySrc = src => allMedia().find(m => same(m, src)) || src;
         const block = path => {
           if (path === 'cover') return { label: 'Cover', get: () => c.coverRows, set: R => { c.coverRows = R; }, base: () => [c.cover].filter(Boolean) };
+          if (path === 'brief') return { label: 'The brief', get: () => c.briefRows, set: R => { if (R && R.length) c.briefRows = R; else delete c.briefRows; }, base: () => [] };
           if (/^sections\.\d+$/.test(path || '')) { const sec = (c.sections || [])[+path.split('.')[1]]; if (!sec) return null;
             return { label: sec.h || 'Section', get: () => sec.rows, set: R => { sec.rows = R; }, base: () => (sec.media || []).filter(Boolean) }; }
           if (/^gallery\.\d+$/.test(path || '')) { const g = (c.gallery || [])[+path.split('.')[1]]; if (!g) return null;
@@ -530,7 +533,7 @@
           const cur = { src: d.src };
           if (d.type === 'km-cms-slot') { const R = inRows(); if (!R || !R[d.r]) return; spot = [d.r, d.j]; where = { rows: true, label: B.label + ' · empty spot', slot: true }; }
           else if (d.type === 'km-cms-add') { if (!B) return; const R = inRows();
-            if (R || d.section.startsWith('gallery.')) { const RR = R || rowsOfBlock(B, null); RR.push({ pics: [''] }); spot = [RR.length - 1, 0]; where = { rows: true, label: B.label + ' · new row', slot: true, newRow: true }; }
+            if (R || d.section.startsWith('gallery.') || d.section === 'brief') { const RR = R || rowsOfBlock(B, null); RR.push({ pics: [''] }); spot = [RR.length - 1, 0]; where = { rows: true, label: B.label + ' · new row', slot: true, newRow: true }; }
             else if (d.section === 'cover') { const RR = rowsOfBlock(B, null); RR.push({ pics: [''] }); spot = [RR.length - 1, 0]; where = { rows: true, label: 'Cover · new row', slot: true, newRow: true }; }
             else { const sec = (c.sections || [])[+d.section.split('.')[1]]; if (!sec) return; sec.media = sec.media || []; where = { arr: sec.media, j: sec.media.length, label: sec.h || 'Section', adding: true }; } }
           else if (inRows() && getSpot()) where = { rows: true, label: B.label };

@@ -514,6 +514,10 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .km-cms .km-add:hover { border-style: solid }
 /* sections on the page view: each one is a block you can hide or delete */
 .km-cms .ksec { display: contents }
+.km-cms .kchip { height: 30px; padding: 0 12px; border: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent); border-radius: 999px; background: none; color: var(--muted); font: 500 12.5px var(--body); cursor: pointer }
+.km-cms .kchip:hover { border-style: solid; color: var(--ink) }
+.km-cms .tags [data-edit]:empty::before, .km-cms .role [data-edit]:empty::before, .km-cms .ch p [data-edit]:empty::before { content: attr(data-ph); opacity: .45 }
+.km-cms .fr.kempty { padding-top: 4px }
 .km-cms .ksec > .ch { position: relative }
 .km-cms .ksec.koff > * { opacity: .32; filter: grayscale(1) }
 .km-cms .ksec.koff > .ch { opacity: 1; filter: none } .km-cms .ksec.koff > .ch > :not(.ktools) { opacity: .32 }
@@ -743,7 +747,7 @@ function spotsRow(r, ri) {
 }
 const rowsBlock = R => `<div class="cl">${R.map(spotsRow).join('')}</div>`;
 const rowsFilled = R => R.flatMap(r => (r.pics || []).filter(Boolean));
-const blockRows = (c, pick) => { const R = pick === 'cover' ? c.coverRows : /^sections\.(\d+)$/.test(pick || '') ? ((c.sections || [])[+pick.split('.')[1]] || {}).rows : null;
+const blockRows = (c, pick) => { const R = pick === 'cover' ? c.coverRows : pick === 'brief' ? c.briefRows : /^sections\.(\d+)$/.test(pick || '') ? ((c.sections || [])[+pick.split('.')[1]] || {}).rows : null;
   return Array.isArray(R) && R.length ? R : null; };
 
 // ---------- picture effects. In the CMS, click a picture → Effect; a case can also set one effect for all its pictures
@@ -1037,14 +1041,17 @@ const R = {
         return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ` data-pick="sections.${si}" data-rows="1"` : ''}>${rowsBlock(RR)}${F.length ? cap(F, 'Fig. ' + pad(++fig), label, cpath) : ''}</div>` : ''; }
       const G = si !== undefined ? gridOf(((c.sections || [])[si] || {}).grid) : null;   // a layout picked in the CMS, else the shape-aware rows
       if (G) { list = uniq(list).filter(m => m && !used.has(key(m))); list.forEach(m => used.add(key(m))); } else list = tidy(list);
+      if (!list.length && KM_EDIT && si !== undefined) return `<div class="fr kempty" data-pick="sections.${si}"></div>`;   // nothing yet: just the add button
       return list.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT && si !== undefined ? ` data-pick="sections.${si}"` : ''}>${G ? gridH(list, G) + cap(list, 'Fig. ' + pad(++fig), cpath ? label : esc(label), cpath) : ROWS(list, 'c', cap(list, 'Fig. ' + pad(++fig), cpath ? label : esc(label), cpath))}</div>` : ''; };
     // results: big numbers that count up as they come into view (or, without numbers, the outcomes set large)
     const bigNums = (stats, si) => `<div class="fr"><div class="bign">${stats.map(([a, b], k) => `<div><b data-n="${esc(a)}"${E(`sections.${si}.stats.${k}.0`)}>${esc(a)}</b><span${E(`sections.${si}.stats.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>${c.impactNote ? `<p class="cap2"${E('impactNote')}>${esc(c.impactNote)}</p>` : ''}</div>`;
     const bigList = (list, base) => `<div class="fr"><div class="bign l">${list.map(([a, b], k) => `<div><i class="mono">${pad(k + 1)}</i><b${base ? E(`${base}.${k}.0`) : ''}>${esc(a)}</b><span${base ? E(`${base}.${k}.1`) : ''}>${esc(b)}</span></div>`).join('')}</div></div>`;
     const same = m => JSON.stringify(m) === JSON.stringify(c.cover);
-    const tags = [...(c.industry || []), ...(c.did || []).slice(0, 2)];
+    // tags: each one can be typed over in the CMS; clear one to remove it. "+ Tag" adds one
+    const chip = (path, v) => (v || KM_EDIT) ? `<span${E(path)} data-ph="Tag">${esc(v || '')}</span>` : '';
+    const tagsH = [...(c.industry || []).map((t, k) => chip(`industry.${k}`, t)), ...(c.did || []).slice(0, 2).map((t, k) => chip(`did.${k}`, t))].join('') + (KM_EDIT ? '<button type="button" class="kchip" data-kadd="industry">+ Tag</button>' : '');
     const st = c.stat && c.stat[0] ? ` <b>${esc(c.stat[0])} ${esc(c.stat[1])}</b>.` : '';
-    let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${st}</p><div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div></header>
+    let h = `${TOP(c)}<main class="H"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${st}</p><div class="tags">${tagsH}</div></header>
       ${(() => { const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
         if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover" data-rows="1"' : ''}>${rowsBlock(RR)}${F.length ? cap(F, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)) : ''}</div>` : ''; }
         const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
@@ -1052,7 +1059,13 @@ const R = {
     const OFF = c.off || {};   // the fixed parts hidden in the CMS: brief, principle, details
     h += WRAP('brief', OFF.brief, `<section class="tx ch" data-ix="The brief">${TOOLS('brief', OFF.brief, false, 'The brief')}<span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
       ${c.problem ? `<h4>The problem</h4><p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch"${E('goal')}>${esc(c.goal)}</p>` : ''}
-      <h4>My role</h4><p>${esc(c.role)}${c.client && c.client !== 'Personal project' ? ', ' + esc(c.client) : ''}${c.year && c.year !== 'Year' ? ', ' + esc(c.year) : ''}.</p><div class="role">${(c.did || []).map(d => `<span>${esc(d)}</span>`).join('')}</div></section>`);
+      <h4>My role</h4><p>${KM_EDIT ? `<span${E('role')} data-ph="Role">${esc(c.role || '')}</span>, <span${E('client')} data-ph="Client">${esc(c.client || '')}</span>, <span${E('year')} data-ph="Year">${esc(c.year && c.year !== 'Year' ? c.year : '')}</span>.`
+        : `${esc(c.role)}${c.client && c.client !== 'Personal project' ? ', ' + esc(c.client) : ''}${c.year && c.year !== 'Year' ? ', ' + esc(c.year) : ''}.`}</p>
+      <div class="role">${(c.did || []).map((d, k) => chip(`did.${k}`, d)).join('')}${KM_EDIT ? '<button type="button" class="kchip" data-kadd="did">+ Skill</button>' : ''}</div></section>${(() => {
+        // pictures in the brief, after My role: add them on the page view
+        const RR = blockRows(c, 'brief');
+        if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="brief" data-rows="1"' : ''}>${rowsBlock(RR)}</div>` : ''; }
+        return KM_EDIT ? '<div class="fr kempty" data-pick="brief" data-rows="1"></div>' : ''; })()}`);
     c.secs.forEach((s, i) => {
       const off = !!s.off, k0 = h.length, T = TOOLS(String(s._i), off, true, `Section ${s._i + 1} · ${s.h || 'Untitled'}`), CP = `sections.${s._i}.cap`;
       const media = s.media.filter(m => !same(m));
@@ -1545,6 +1558,7 @@ function editable(c) {
       row.append(h); }); });
   requestAnimationFrame(placeHandles); setTimeout(placeHandles, 400);
   if (!window._kResOn) { window._kResOn = true; addEventListener('resize', () => window._kPlace && window._kPlace()); } window._kPlace = placeHandles;
+  app.querySelectorAll('[data-kadd]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-tag', slug: c.slug, key: b.dataset.kadd }, '*'); }));
   app.querySelectorAll('[data-kact]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
     parent.postMessage({ type: 'km-cms-sec', slug: c.slug, key: b.dataset.ksec, act: b.dataset.kact }, '*'); }));
   app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
