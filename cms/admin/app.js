@@ -449,16 +449,31 @@
         // text column) or "N:after" (after section N's pictures). A section's old paragraphs become text blocks the first time.
         const FRESH = { text: () => ({ t: 'text', v: '' }), heading: () => ({ t: 'heading', v: '' }), sub: () => ({ t: 'sub', v: '' }), quote: () => ({ t: 'quote', v: '' }),
           picture: () => ({ t: 'picture', m: '', cap: '' }), video: () => ({ t: 'video', m: '', cap: '' }), points: () => ({ t: 'points', items: [['', ''], ['', '']] }),
-          numbers: () => ({ t: 'numbers', items: [['', ''], ['', '']] }), notes: () => ({ t: 'notes', items: [{ p: '', w: '' }, { p: '', w: '' }, { p: '', w: '' }] }) };
+          numbers: () => ({ t: 'numbers', items: [['', ''], ['', '']] }), notes: () => ({ t: 'notes', items: [{ p: '', w: '' }, { p: '', w: '' }, { p: '', w: '' }] }), proto: () => ({ t: 'proto', src: '', h: 760, cap: '' }) };
         const placeOf = w => { if (w === 'brief') { c.briefBlocks = c.briefBlocks || []; return { list: c.briefBlocks, path: 'briefBlocks', si: -1 }; }
           const [n, where] = String(w).split(':'), sec = (c.sections || [])[+n]; if (!sec) return null;
           if (where === 'after') { sec.after = sec.after || []; return { list: sec.after, path: `sections.${n}.after`, si: +n }; }
           if (!sec.blocks) { sec.blocks = (sec.p || []).map(v => ({ t: 'text', v })); delete sec.p; }
           return { list: sec.blocks, path: `sections.${n}.blocks`, si: +n }; };
         const objAt = path => path.split('.').reduce((o, k) => o == null ? o : o[/^\d+$/.test(k) ? +k : k], c);
-        const focusOf = (P, j, b) => !b ? null : b.t === 'points' || b.t === 'numbers' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' ? null : `${P.path}.${j}.v`;
+        const focusOf = (P, j, b) => !b ? null : b.t === 'points' || b.t === 'numbers' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' || b.t === 'proto' ? null : `${P.path}.${j}.v`;
         const tidyList = P => { if (P.si >= 0) { const sec = c.sections[P.si]; if (sec.after && !sec.after.length) delete sec.after; } else if (!c.briefBlocks.length) delete c.briefBlocks; };
-        function blockMedia(path) { const b = objAt(path); if (!b) return;
+        // a prototype block: which interactive page it shows (anything in assets/protos/, or a full link), how tall, and what the bar says
+        const PROTOS = [['assets/protos/kusnap-verification.html', 'Kusnap · account verification']];
+        function blockProto(b) { const done = () => { m.remove(); send(); }, set = (k, v) => { b[k] = v; touch('cases'); };
+          const src = el('input', { type: 'text', value: b.src || '', placeholder: 'assets/protos/your-flow.html', oninput: e => set('src', e.target.value.trim()) });
+          const pick = el('select', { onchange: e => { if (!e.target.value) return; src.value = e.target.value; set('src', e.target.value); const p = PROTOS.find(x => x[0] === e.target.value); if (p && !b.addr) { b.addr = p[1]; addr.value = p[1]; } } },
+            el('option', { value: '', text: 'Choose a prototype…' }), ...PROTOS.map(([v, t]) => el('option', { value: v, text: t, selected: v === b.src })));
+          const addr = el('input', { type: 'text', value: b.addr || '', placeholder: 'Shown in its top bar', oninput: e => set('addr', e.target.value) });
+          const hh = el('input', { type: 'number', min: 360, max: 1400, step: 20, value: b.h || 760, oninput: e => set('h', +e.target.value || 760) });
+          const fld = (t, x, help) => el('div', { class: 'f' }, el('label', { text: t }), x, help ? el('div', { class: 'help', text: help }) : '');
+          const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) done(); } }, el('div', { class: 'sheet', style: 'width:min(560px,100%)' },
+            el('header', {}, el('b', { text: 'Prototype' }), el('button', { class: 'x', type: 'button', text: '×', onclick: done })),
+            el('div', { class: 'mbody form', style: 'gap:14px' }, fld('Prototype', pick), fld('Or its address', src, 'A page in assets/protos/ (put the file there and publish), or a full https:// link.'),
+              fld('Name in its top bar', addr), fld('Height on desktop (px)', hh, 'Phones get up to 78% of the screen.'),
+              el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' }, el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: done })))));
+          document.body.append(m); }
+        function blockMedia(path) { const b = objAt(path); if (!b) return; if (b.t === 'proto') { blockProto(b); return; }
           const done = () => { m.remove(); send(); };
           const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) done(); } }, el('div', { class: 'sheet', style: 'width:min(680px,100%)' },
             el('header', {}, el('b', { text: b.t === 'video' ? 'Video' : 'Picture' }), el('button', { class: 'x', type: 'button', text: '×', onclick: done })),
@@ -475,7 +490,7 @@
           if (d.op === 'insert' || d.op === 'replace') { const b = (FRESH[d.t] || FRESH.text)();
             if (d.op === 'replace' && L[j] && (L[j].t || 'text') === 'text' && !String(L[j].v || '').replace(/^\/\S*/, '').trim()) L.splice(j, 1, b);
             else { if (d.op === 'replace' && L[j]) L[j].v = String(L[j].v || '').replace(/^\/\S*/, '').trim(); L.splice(d.op === 'replace' ? j + 1 : j, 0, b); }
-            const at = L.indexOf(b); touch('cases'); send(focusOf(P, at, b)); if (b.t === 'picture' || b.t === 'video') blockMedia(`${P.path}.${at}`); return; }
+            const at = L.indexOf(b); touch('cases'); send(focusOf(P, at, b)); if (b.t === 'picture' || b.t === 'video' || b.t === 'proto') blockMedia(`${P.path}.${at}`); return; }
           if (!L[j]) return;
           if (d.op === 'turn') { L[j].t = d.t; touch('cases'); send(`${P.path}.${j}.v`); return; }
           if (d.op === 'up' && j > 0) { L.splice(j - 1, 0, L.splice(j, 1)[0]); touch('cases'); send(); return; }
@@ -485,7 +500,7 @@
             const prev = j > 0 && L[j - 1] && TEXTY.includes(L[j - 1].t || 'text') ? `${P.path}.${j - 1}.v` : null; send(d.quiet ? prev : null);
             if (!d.quiet) toast((NAMEB[gone.t || 'text'] || 'Block') + ' deleted'); }
         }
-        const TEXTY = ['text', 'heading', 'sub', 'quote'], NAMEB = { text: 'Text', heading: 'Heading', sub: 'Small heading', quote: 'Pull quote', picture: 'Picture', video: 'Video', points: 'Points', numbers: 'Big numbers', notes: 'Sticky notes' };
+        const TEXTY = ['text', 'heading', 'sub', 'quote'], NAMEB = { text: 'Text', heading: 'Heading', sub: 'Small heading', quote: 'Pull quote', picture: 'Picture', video: 'Video', points: 'Points', numbers: 'Big numbers', notes: 'Sticky notes', proto: 'Prototype' };
         // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet,
         // and give its row a grid. A section's pictures become rows the first time you change one: every other row keeps
         // exactly the shape the page drew it in, and only the row you picked changes.

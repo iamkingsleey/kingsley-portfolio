@@ -221,6 +221,14 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .tx h3.kh { margin: 40px 0 12px; font: 600 clamp(22px, 2.2vw, 28px)/1.2 var(--body); letter-spacing: -.03em; color: var(--ink) }
 .H .tx .pull.kq { margin: 36px 0; font-size: clamp(26px, 3vw, 38px) }
 .H .tx .lead + p, .H .tx p + .lead { margin-top: 16px }
+.H .kproto .pw { position: relative; border-radius: var(--km-r, 14px); overflow: hidden; border: 1px solid var(--edge); background: var(--panel) }
+.H .kproto .pbar { display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 12px; border-bottom: 1px solid var(--edge); font: 500 12px var(--body); color: var(--muted) }
+.H .kproto .pbar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none } .H .kproto .pbar i + i { margin-left: -4px }
+.H .kproto .pbar span { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.H .kproto .pbar button { font: 500 12px var(--body); color: var(--ink); background: var(--pill); border: 0; border-radius: 999px; padding: 5px 11px; cursor: pointer }
+.H .kproto .pbar em { font: 600 10px var(--mono); letter-spacing: .6px; text-transform: uppercase; font-style: normal; color: #fff; background: #ff4a1c; border-radius: 999px; padding: 4px 8px }
+.H .kproto iframe { display: block; width: 100%; height: var(--ph, 760px); max-height: 82vh; border: 0; background: #fff }
+@media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
 .H .kcont { padding-top: 56px } .H .kcont:empty { display: none } .H .kcont > :first-child { margin-top: 0 }
 .H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
 .H .sp { height: 120px }
@@ -1056,7 +1064,7 @@ const R = {
     // blocks; the first time you insert something, the CMS turns them into real blocks. Wide blocks (pictures, numbers,
     // notes) step out of the text column and the text carries on below them.
     const GAP = (w, pos) => KM_EDIT ? `<div class="kgap" data-w="${w}" data-pos="${pos}" role="button" tabindex="0" aria-label="Add a block here"><i>+</i></div>` : '';
-    const WIDE = { picture: 1, video: 1, numbers: 1, notes: 1 };
+    const WIDE = { picture: 1, video: 1, numbers: 1, notes: 1, proto: 1 };
     const blockH = (b, base) => {
       const t = b.t || 'text';
       if (t === 'text') return (b.v || KM_EDIT) ? `<p${E(base + '.v')} data-ph="Type, or press / for blocks">${esc(b.v || '')}</p>` : '';
@@ -1072,6 +1080,13 @@ const R = {
         if (!m) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div></div>` : '';
         used.add(key(m)); const label = b.cap != null ? esc(b.cap) : '';
         return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
+      if (t === 'proto') { const src = String(b.src || '').trim();
+        if (!src) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">Add a prototype<span>Click to choose one</span></div></div>` : '';
+        const url = src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
+        const addr = esc(b.addr || src.replace(/^.*\//, '').replace(/\.html?$/, '').replace(/[-_]/g, ' '));
+        return `<div class="fr kproto" data-kblk="${base}"><div class="pw"><div class="pbar"><i></i><i></i><i></i><span>${addr}</span><em>Try it</em><button type="button" data-kreplay aria-label="Start the prototype again">Restart</button></div>`
+          + `<iframe src="${esc(url)}" title="${addr} prototype" loading="lazy" style="--ph:${h}px"${KM_EDIT ? '' : ' allow="clipboard-read; clipboard-write"'}></iframe></div>`
+          + (KM_EDIT ? `<button type="button" class="kchip" data-kproto="${base}">Change prototype</button>` : '') + cap([], 'Fig. ' + pad(++fig), label, base + '.cap') + `</div>`; }
       return '';
     };
     // blocks inside a text column; the column closes around wide ones and opens again after them
@@ -1497,6 +1512,9 @@ const L = window.KM_L, GRP = L === 'N' ? 'brand' : 'product', PAGE = GRP === 'br
 const casesOf = g => CASES.filter(c => (g === 'brand') === (c.kind === 'Brand'));
 const slugNow = () => decodeURIComponent(location.hash.slice(1)).split('/')[0];
 let C = '';
+// a prototype block's Restart: load it fresh
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-kreplay]'); if (!b) return; e.preventDefault(); e.stopPropagation();
+  const f = b.closest('.kproto').querySelector('iframe'); try { f.contentWindow.location.reload(); } catch (_) { f.src = f.src; } }, true);
 // ---------- the Story index (a vertical ruler with the chapters) ----------
 let ixOff = null;
 function setupIndex() {
@@ -1524,7 +1542,7 @@ function setupIndex() {
     // it steps aside before the footer reaches it, so the two never overlap
     const nx = app.querySelector('.next'), ir = ix.getBoundingClientRect();
     ix.classList.toggle('on', scrollY > innerHeight * .5 && (!nx || nx.getBoundingClientRect().top > ir.bottom + 48));
-    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb, .bad')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
+    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb, .bad, .H .kproto .pw')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
     ix.classList.toggle('dim', under);
     if (!raf) raf = requestAnimationFrame(draw);
   };
@@ -1630,7 +1648,7 @@ function editable(c) {
   if (!window._kResOn) { window._kResOn = true; addEventListener('resize', () => window._kPlace && window._kPlace()); } window._kPlace = placeHandles;
   // ---- blocks: the + between blocks, "/" on an empty line, and the ⋮⋮ handle on each block (Notion-style)
   const KINDS = [['Basic', [['text', 'Text', 'A paragraph', '¶', 'p'], ['heading', 'Heading', 'A title inside the section', 'H', 'h'], ['sub', 'Small heading', 'Like “The problem”', 'h', 'hh'], ['quote', 'Pull quote', 'A line set large', '❝', 'q']]],
-    ['Media', [['picture', 'Picture', 'From your library or a new upload', '▣', 'img'], ['video', 'Video', 'A looping clip', '▶', 'vid']]],
+    ['Media', [['picture', 'Picture', 'From your library or a new upload', '▣', 'img'], ['video', 'Video', 'A looping clip', '▶', 'vid'], ['proto', 'Prototype', 'An interactive flow visitors can click through', '◰', 'proto']]],
     ['Case study', [['points', 'Points', 'A title and a line, one after another', '1.', 'pts'], ['numbers', 'Big numbers', 'Results that count up', '72', 'num'], ['notes', 'Sticky notes', 'Insights visitors can move', '▢', 'note'], ['section', 'New section', 'A chapter with its own label and heading', '§', 'sec']]]];
   const NAME = Object.fromEntries(KINDS.flatMap(g => g[1]).map(k => [k[0], k[1]])), TEXTY = ['text', 'heading', 'sub', 'quote'];
   const tell = o => parent.postMessage({ type: 'km-cms-blk', slug: c.slug, ...o }, '*');
@@ -1665,6 +1683,7 @@ function editable(c) {
   app.querySelectorAll('[data-kop]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); b.closest('.kblk').classList.add('kon');
     if (b.dataset.kop === 'add') kopen(b, { mode: 'insert', w: b.dataset.w, pos: +b.dataset.pos }); else kopen(b, { mode: 'grip', w: b.dataset.w, pos: +b.dataset.pos, t: b.dataset.t }); }));
   app.querySelectorAll('[data-kmore]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tell({ op: 'more', path: b.dataset.kmore }); }));
+  app.querySelectorAll('[data-kproto]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tell({ op: 'media', path: b.dataset.kproto }); }));
   // a picture or video block: click it to choose or change what it shows
   app.querySelectorAll('.kbpic').forEach(f => f.addEventListener('click', e => { if (e.target.closest('[data-edit],.kgut')) return; e.preventDefault(); e.stopPropagation(); tell({ op: 'media', path: f.dataset.kblk }); }, true));
   // typing in a text block: "/" opens the menu, Enter starts a new line under it, Backspace on an empty line removes it
