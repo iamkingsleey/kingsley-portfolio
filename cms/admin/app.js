@@ -884,11 +884,31 @@
       paintDirty(); b.textContent = 'Rebuilding…';
       const r = await api('/api/build', { method: 'POST' });
       if (!r.ok) { openModal('The rebuild stopped', el('div', { class: 'form' }, el('div', { class: 'err', text: 'Your changes are saved, but the pages could not be rebuilt. The message below says why.' }), el('pre', { class: 'log', text: r.log }))); toast('Rebuild stopped', true); }
-      else { toast(`Saved and rebuilt in ${r.seconds}s`); INDEX = (await api('/api/content')).index; }
+      else { toast(`Saved and rebuilt in ${r.seconds}s`); INDEX = (await api('/api/content')).index; if (typeof pubCount === 'function') pubCount(); }
     } catch (e) { toast(e.message, true); }
     b.classList.remove('busy'); b.textContent = 'Save & rebuild';
   }
   $('save').onclick = save;
+  // Publish from anywhere: saves first if there are unsaved changes, then sends what you've saved to the live site.
+  // The Publish page is still there to look through the changes first.
+  const pubCount = async () => { try { const c = await api('/api/changes'); const n = c.total || 0; $('pub').textContent = n ? `Publish · ${n}` : 'Publish'; return c; } catch (_) { return null; } };
+  $('pub').onclick = async () => {
+    const b = $('pub'); if (b.classList.contains('busy')) return;
+    if (dirty.size) { await save(); if (dirty.size) return; }   // the save stopped: nothing goes live until it works
+    b.classList.add('busy'); b.textContent = 'Checking…';
+    const c = await pubCount(); b.classList.remove('busy');
+    if (!c) { toast('Couldn’t check your changes. Is the CMS still running?', true); await pubCount(); return; }
+    if (!c.total && !c.pages) { toast('Nothing new to publish. Your live site already has everything.'); return; }
+    const n = c.total || 0;
+    if (!confirm(n ? `Publish ${n} change${n > 1 ? 's' : ''} to your live site?` : 'Publish your rebuilt pages to your live site?')) { await pubCount(); return; }
+    b.classList.add('busy'); b.textContent = 'Publishing…';
+    try { const r = await api('/api/publish', { method: 'POST', body: JSON.stringify({ message: 'Update content' }) });
+      if (r.ok) toast('Published. GitHub updates the site in a minute or two.');
+      else openModal('Publishing stopped', el('div', { class: 'form' }, el('div', { class: 'err', text: 'Nothing went live. The message below says why.' }), el('pre', { class: 'log', text: r.log }))); }
+    catch (e) { toast(e.message, true); }
+    b.classList.remove('busy'); await pubCount(); if (route === 'publish') render();
+  };
+  pubCount();
 
   // ---------------------------------------------------------------- start
   (async function start() {

@@ -216,7 +216,7 @@ def git_status():
 
 def publish(message):
     msg = (message or '').strip() or 'Update content'
-    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', '*.html', '.gitignore'],
+    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', '*.html', '*.js', '.gitignore'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
              ['git', 'commit', '-m', msg], ['git', 'push']]
     log = []
     for s in steps:
