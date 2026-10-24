@@ -291,7 +291,9 @@ class H(SimpleHTTPRequestHandler):
             name = m.group(1); path = os.path.join(CONTENT, name + '.json')
             # the editor says which copy its changes are based on; if the file changed since (Claude, Git, another tab), don't overwrite it unasked
             base = self.headers.get('X-Base-Version')
-            if base is not None and not self.headers.get('X-Force') and base != version(name):
+            if base is None:   # an editor tab opened before this check existed: it can't tell what it would overwrite
+                return self._json({'error': 'This CMS tab is out of date. Reload the page (your saved work is safe), then make the change again.'}, 409)
+            if not self.headers.get('X-Force') and base != version(name):
                 return self._json({'error': 'changed', 'version': version(name)}, 409)
             os.makedirs(HISTORY, exist_ok=True)
             if os.path.exists(path): shutil.copy(path, os.path.join(HISTORY, f'{name}-{time.strftime("%Y%m%d-%H%M%S")}.json'))
