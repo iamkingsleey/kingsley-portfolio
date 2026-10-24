@@ -20,7 +20,7 @@
   const src = p => !p ? '' : /^(https?:|data:)/.test(p) ? p : '/site/' + p;
 
   // ---------------------------------------------------------------- state
-  let C = {}, SAVED = {}, INDEX = {}, LIB = null, HAS_TOKEN = false, HAS_IKEY = false, INBOX_NEW = 0, route = 'dashboard', sub = null;
+  let C = {}, VER = {}, SAVED = {}, INDEX = {}, LIB = null, HAS_TOKEN = false, HAS_IKEY = false, INBOX_NEW = 0, route = 'dashboard', sub = null;
   const dirty = new Set();
   const touch = file => { dirty.add(file); paintDirty(); };
   function paintDirty() {
@@ -349,11 +349,12 @@
   const PAGEINTRO = [{ title: 'Page', fields: [{ k: 'statement', label: 'Statement', type: 'textarea', rows: 3 }, { k: 'title', label: 'List heading' }, { k: 'sub', label: 'Under the heading' }, { k: 'tag', label: 'Small tag on the right' }] }];
 
   // stored shapes ↔ friendlier shapes for the forms (put back on save)
-  function prep() {
-    for (const c of C.cases.cases || []) { if (c.impact === undefined) c.impact = null; c._imp = (c.impact && c.impact.stats) || []; }
-    for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = im.video || ''; p._ratio = im.ratio; p._more = p.images.slice(1).map(x => x.src); }
-    for (const ch of C.about.chapters || []) { ch.s1 = [ch.stat || '', ch.statLabel || '']; ch.s2 = [ch.stat2 || '', ch.stat2Label || '']; }
-    for (const t of C.engineering.tools || []) t.s = [t.stat || '', t.statLabel || ''];
+  function prep(only) {
+    const on = n => !only || only === n;
+    if (on('cases')) for (const c of C.cases.cases || []) { if (c.impact === undefined) c.impact = null; c._imp = (c.impact && c.impact.stats) || []; }
+    if (on('designs')) for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = im.video || ''; p._ratio = im.ratio; p._more = p.images.slice(1).map(x => x.src); }
+    if (on('about')) for (const ch of C.about.chapters || []) { ch.s1 = [ch.stat || '', ch.statLabel || '']; ch.s2 = [ch.stat2 || '', ch.stat2Label || '']; }
+    if (on('engineering')) for (const t of C.engineering.tools || []) t.s = [t.stat || '', t.statLabel || ''];
   }
   function pack(name) {
     const d = clone(C[name]);
@@ -942,19 +943,73 @@
   }
 
   // ---------------------------------------------------------------- save
-  async function save() {
+  // each file is saved with the fingerprint of the copy it was loaded from; the server refuses if the file changed since
+  async function putFile(name, force) {
+    const h = { 'Content-Type': 'application/json', 'X-Base-Version': VER[name] || '' }; if (force) h['X-Force'] = '1';
+    const r = await fetch('/api/content/' + name, { method: 'PUT', headers: h, body: JSON.stringify(pack(name)) });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 409) return 'changed';
+    if (!r.ok) throw new Error(j.error || r.statusText);
+    VER[name] = j.version || VER[name]; return 'ok';
+  }
+  const FILE_NAME = { cases: 'Case studies', designs: 'Designs', about: 'About', engineering: 'Engineering', projects: 'Projects page', text: 'Page text', media: 'Pictures & videos', site: 'Settings' };
+  const fname = n => FILE_NAME[n] || n;
+  function norm(name, d) {
+    if (name === 'cases') return d && d.cases ? d : { cases: [] };
+    if (name === 'designs') return d && d.projects ? d : { projects: [] };
+    if (name === 'about') { d = d || {}; d.chapters = d.chapters || []; return d; }
+    if (name === 'engineering') { d = d || {}; d.tools = d.tools || []; return d; }
+    return d || {};
+  }
+  // take the newer copy from disk for these files (dropping unsaved edits to them)
+  async function loadNewer(names) {
+    const r = await api('/api/content');
+    for (const n of names) { C[n] = norm(n, r.content[n]); VER[n] = r.versions[n]; prep(n); dirty.delete(n); }
+    INDEX = r.index; paintDirty(); render();
+  }
+  // a file changed on disk while the CMS had it open
+  let asking = false;
+  function changedOutside(names, saving) {
+    if (asking) return; asking = true;
+    const list = names.map(fname).join(', ');
+    const body = el('div', { class: 'form' },
+      el('p', { text: `${list} changed on your Mac after the CMS opened ${names.length > 1 ? 'them' : 'it'}. That happens when Claude, Git or another CMS tab edits the files.` }),
+      el('p', { class: 'help', text: saving ? 'Saving now would put back the older copy and undo those changes.' : 'You have unsaved edits here that are based on the older copy.' }),
+      el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px' },
+        el('button', { class: 'btn small ghost', type: 'button', text: 'Keep editing', onclick: () => { asking = false; closeModal(); } }),
+        el('button', { class: 'btn small ghost', type: 'button', text: 'Save mine anyway', title: 'Overwrites the newer copy on your Mac', onclick: async () => { asking = false; closeModal(); for (const n of names) VER[n] = ''; await save({ force: names }); } }),
+        el('button', { class: 'btn small', type: 'button', text: 'Load the newer copy', title: 'Your unsaved edits to these are dropped', onclick: async () => { asking = false; closeModal(); await loadNewer(names); toast('Loaded the newer copy'); } })));
+    openModal('Changed outside the CMS', body);
+    const x = () => { asking = false; }; $('mclose').addEventListener('click', x, { once: true });
+  }
+  // keep an eye on the files: pick up outside changes quietly when you have nothing unsaved, ask when you do
+  const seen = {};
+  async function watchFiles() {
+    if (document.hidden || asking || $('save').classList.contains('busy')) return;
+    let v; try { v = await api('/api/versions'); } catch (_) { return; }
+    const changed = Object.keys(v).filter(n => VER[n] !== undefined && v[n] !== VER[n]);
+    if (!changed.length) return;
+    const clean = changed.filter(n => !dirty.has(n)), mine = changed.filter(n => dirty.has(n) && seen[n] !== v[n]);
+    if (clean.length) { await loadNewer(clean); toast(`Updated ${clean.map(fname).join(', ')} with changes made outside the CMS`); }
+    if (mine.length) { mine.forEach(n => seen[n] = v[n]); changedOutside(mine, false); }
+  }
+  setInterval(watchFiles, 8000); addEventListener('focus', watchFiles);
+  async function save(opts = {}) {
     const b = $('save'); if (b.classList.contains('busy')) return;
     b.classList.add('busy'); b.textContent = dirty.size ? 'Saving…' : 'Rebuilding…';
     try {
-      for (const name of [...dirty]) { await api('/api/content/' + name, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pack(name)) }); dirty.delete(name); }
-      paintDirty(); b.textContent = 'Rebuilding…';
+      const clash = [];
+      for (const name of [...dirty]) { const r = await putFile(name, opts.force && opts.force.includes(name)); if (r === 'changed') clash.push(name); else dirty.delete(name); }
+      paintDirty();
+      if (clash.length) { b.classList.remove('busy'); b.textContent = 'Save & rebuild'; changedOutside(clash, true); return; }
+      b.textContent = 'Rebuilding…';
       const r = await api('/api/build', { method: 'POST' });
       if (!r.ok) { openModal('The rebuild stopped', el('div', { class: 'form' }, el('div', { class: 'err', text: 'Your changes are saved, but the pages could not be rebuilt. The message below says why.' }), el('pre', { class: 'log', text: r.log }))); toast('Rebuild stopped', true); }
       else { toast(`Saved and rebuilt in ${r.seconds}s`); INDEX = (await api('/api/content')).index; if (typeof pubCount === 'function') pubCount(); }
     } catch (e) { toast(e.message, true); }
     b.classList.remove('busy'); b.textContent = 'Save & rebuild';
   }
-  $('save').onclick = save;
+  $('save').onclick = () => save();
   // Publish from anywhere: saves first if there are unsaved changes, then sends what you've saved to the live site.
   // The Publish page is still there to look through the changes first.
   const pubCount = async () => { try { const c = await api('/api/changes'); const n = c.total || 0; $('pub').textContent = n ? `Publish · ${n}` : 'Publish'; return c; } catch (_) { return null; } };
@@ -980,7 +1035,7 @@
   (async function start() {
     try {
       const r = await api('/api/content');
-      C = r.content; INDEX = r.index; HAS_TOKEN = r.hasToken; HAS_IKEY = !!r.hasInboxKey; inboxPoll();
+      C = r.content; VER = r.versions || {}; INDEX = r.index; HAS_TOKEN = r.hasToken; HAS_IKEY = !!r.hasInboxKey; inboxPoll();
       C.cases = C.cases.cases ? C.cases : { cases: [] }; C.designs = C.designs.projects ? C.designs : { projects: [] };
       C.about.chapters = C.about.chapters || []; C.engineering.tools = C.engineering.tools || [];
       C.text = C.text || {}; C.media = C.media || {}; C.site = C.site || {};

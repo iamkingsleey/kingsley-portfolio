@@ -43,6 +43,14 @@ def build():
         code, out = run([sys.executable, os.path.join(HERE, 'build', 'build.py')])
         return {'ok': code == 0, 'log': out[-4000:], 'seconds': round(time.time() - t, 1)}
 
+def version(name):
+    """A fingerprint of a content file as it is on disk, so the editor can tell when something else changed it."""
+    try:
+        import hashlib
+        with open(os.path.join(CONTENT, name + '.json'), 'rb') as f: return hashlib.md5(f.read()).hexdigest()[:12]
+    except OSError: return ''
+
+
 def protos():
     """The prototypes you can put in a case study: every .html page in the Prototype folder, named by its <title>."""
     out, d = [], os.path.join(REPO, 'Prototype')
@@ -262,8 +270,9 @@ class H(SimpleHTTPRequestHandler):
             if not self._local(): return self._json({'error': 'local only'}, 403)
             if u.path == '/api/content':
                 data = {n: read_json(os.path.join(CONTENT, n + '.json'), {}) for n in EDITABLE}
-                return self._json({'content': data, 'index': read_json(INDEX, {}), 'hasToken': bool(read_json(SECRETS, {}).get('goatcounter_token')), 'hasInboxKey': bool(read_json(SECRETS, {}).get('inbox_key'))})
+                return self._json({'content': data, 'versions': {n: version(n) for n in EDITABLE}, 'index': read_json(INDEX, {}), 'hasToken': bool(read_json(SECRETS, {}).get('goatcounter_token')), 'hasInboxKey': bool(read_json(SECRETS, {}).get('inbox_key'))})
             if u.path == '/api/media': return self._json({'files': media_library()})
+            if u.path == '/api/versions': return self._json({n: version(n) for n in EDITABLE})
             if u.path == '/api/protos': return self._json({'files': protos()})
             if u.path == '/api/analytics': return self._json(analytics(max(1, min(366, int((q.get('days') or ['30'])[0])))))
             if u.path == '/api/inbox': return self._json(inbox_call('/list'))
@@ -280,10 +289,14 @@ class H(SimpleHTTPRequestHandler):
             try: data = json.loads(self._body().decode('utf-8'))
             except Exception as e: return self._json({'error': 'not valid JSON: %s' % e}, 400)
             name = m.group(1); path = os.path.join(CONTENT, name + '.json')
+            # the editor says which copy its changes are based on; if the file changed since (Claude, Git, another tab), don't overwrite it unasked
+            base = self.headers.get('X-Base-Version')
+            if base is not None and not self.headers.get('X-Force') and base != version(name):
+                return self._json({'error': 'changed', 'version': version(name)}, 409)
             os.makedirs(HISTORY, exist_ok=True)
             if os.path.exists(path): shutil.copy(path, os.path.join(HISTORY, f'{name}-{time.strftime("%Y%m%d-%H%M%S")}.json'))
             write_json(path, data)
-            return self._json({'ok': True})
+            return self._json({'ok': True, 'version': version(name)})
         if u.path == '/api/secrets':
             data = json.loads(self._body().decode('utf-8') or '{}'); cur = read_json(SECRETS, {}); cur.update({k: v for k, v in data.items() if k in ('goatcounter_token', 'inbox_key')})
             write_json(SECRETS, cur); return self._json({'ok': True})
