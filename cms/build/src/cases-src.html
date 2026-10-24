@@ -1080,7 +1080,7 @@ const R = {
         if (!m) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div></div>` : '';
         used.add(key(m)); const label = b.cap != null ? esc(b.cap) : '';
         return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
-      if (t === 'proto') { const src = String(b.src || '').trim();
+      if (t === 'proto') { const src = String(b.src || '').trim().replace(/^assets\/protos\//, 'Prototype/');   // prototypes moved to the Prototype folder
         if (!src) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">Add a prototype<span>Click to choose one</span></div></div>` : '';
         const url = b.auto ? src + (src.includes('?') ? '&' : '?') + 'autoplay=1' : src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
         const addr = esc(b.addr || src.replace(/^.*\//, '').replace(/\.html?$/, '').replace(/[-_]/g, ' '));
