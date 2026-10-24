@@ -55,6 +55,8 @@
       wrap.append(el('div', { class: 'color' }, pk, tx));
     } else if (t === 'media') {
       wrap.append(d.rich ? richMedia(get(), v => set(v), { ...d, _file: file }) : mediaField(get(), v => set(v), d));
+    } else if (t === 'blocksnote') {   // a section written as blocks on the page view
+      const n = (get() || []).length; wrap.append(el('div', { class: 'help', text: `${n} block${n === 1 ? '' : 's'}: text, headings, pictures and more. Edit, add, move and remove them on the page view (“On the page”).` }));
     } else if (t === 'rowsnote') {   // a section arranged in a grid on the page view: its rows, read-only here, with a way back to automatic rows
       const R = get();
       if (!Array.isArray(R) || !R.length) wrap.append(el('div', { class: 'help', text: 'Automatic: the page lays the pictures out by their shapes. To give a picture a grid, click it on the page view (“On the page”).' }));
@@ -278,7 +280,8 @@
         { k: 'off', label: 'Hidden from the site', type: 'bool', help: 'Kept here and on the page view (dimmed), but left off the live page. Untick to bring it back.' },
         { k: 'h', label: 'Heading', help: 'e.g. Overview, Pain points, UX strategy, High fidelity, Impact, Logo, Colour and type, Mockups' },
         { k: 'title', label: 'Title on the page (product, optional)', help: 'Leave empty for the default, e.g. Pain points shows as “Listening to users”' },
-        { k: 'p', label: 'Text', type: 'paras', rows: 4, help: 'Leave an empty line between paragraphs' },
+        { k: 'p', label: 'Text', type: 'paras', rows: 4, help: 'Leave an empty line between paragraphs', when: s => !s.blocks },
+        { k: 'blocks', label: 'Text and blocks', type: 'blocksnote', when: s => !!s.blocks },
         { k: 'list', label: 'Points (optional)', type: 'list', itemLabel: 'Point', def: () => ['', ''], title: x => x[0] || 'Point', of: PAIR('Title', 'Text') },
         { k: 'stats', label: 'Big numbers (optional)', type: 'list', itemLabel: 'Number', def: () => ['', ''], title: x => (x[0] + ' ' + x[1]).trim() || 'Number', help: 'Shown large, counting up, e.g. 72% · fewer fraud complaints', of: PAIR('Number', 'What it means') },
         { k: 'view', label: 'Big numbers style (product)', type: 'select', options: [['', 'Count up'], ['dial', 'Before / after dial']], help: 'The dial: drag from before to after. It works for numbers like “72% · fewer fraud complaints” or “40% · more sales”; anything else is listed under it.' },
@@ -421,13 +424,14 @@
           return; }
         const note = el('p', { class: 'help', text: 'Click any words on the page and type. Click a picture to replace or remove it, or “+ Add picture” to add one to that section. Changes are kept as you go; press Save & rebuild when you are done.' });
         const fr = el('iframe', { class: 'pageedit', src: pageUrl, title: 'Edit ' + c.title + ' on the page' });
-        const send = () => { try { fr.contentWindow.postMessage({ type: 'km-cms-data', cases: clone(C.cases.cases) }, '*'); } catch (_) {} };
+        const send = focus => { try { fr.contentWindow.postMessage({ type: 'km-cms-data', cases: clone(C.cases.cases), focus: typeof focus === 'string' ? focus : undefined }, '*'); } catch (_) {} };
         window._kmCmsMsg = e => { if (e.source !== fr.contentWindow) return; const d = e.data || {};
           if (d.type === 'km-cms-ready') send();
           if (d.type === 'km-cms-edit' && d.slug === c.slug) { const keys = d.path.split('.'); let o = c;
             for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
           if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path);
+          if (d.type === 'km-cms-blk' && d.slug === c.slug) blockOp(d);
           // "+ Tag" / "+ Skill" on the page: a new chip to type into (clear a chip's text to remove it)
           if (d.type === 'km-cms-tag' && d.slug === c.slug && (d.key === 'industry' || d.key === 'did')) { c[d.key] = (c[d.key] || []).filter(Boolean); c[d.key].push(d.key === 'did' ? 'New skill' : 'new tag'); touch('cases'); send(); }
           // a section's Hide / Show / Delete on the page. Numbered keys are the chapters; brief, principle and details are the fixed parts
@@ -441,6 +445,47 @@
           if (d.type === 'km-cms-swap' && d.slug === c.slug) swapSpots(d);
           if (d.type === 'km-cms-widths' && d.slug === c.slug) { const B = block(d.section), R = B && B.get(); if (!R || !R[d.r]) return;   // widths dragged on the page
             if (d.w) { R[d.r].w = d.w; R[d.r].ar = d.ar; delete R[d.r].fit; } else { delete R[d.r].w; delete R[d.r].ar; } touch('cases'); send(); } };
+        // ---- blocks added on the page (the + between blocks, "/", the ⋮⋮ handle). A place is "brief", "N:blocks" (section N's
+        // text column) or "N:after" (after section N's pictures). A section's old paragraphs become text blocks the first time.
+        const FRESH = { text: () => ({ t: 'text', v: '' }), heading: () => ({ t: 'heading', v: '' }), sub: () => ({ t: 'sub', v: '' }), quote: () => ({ t: 'quote', v: '' }),
+          picture: () => ({ t: 'picture', m: '', cap: '' }), video: () => ({ t: 'video', m: '', cap: '' }), points: () => ({ t: 'points', items: [['', ''], ['', '']] }),
+          numbers: () => ({ t: 'numbers', items: [['', ''], ['', '']] }), notes: () => ({ t: 'notes', items: [{ p: '', w: '' }, { p: '', w: '' }, { p: '', w: '' }] }) };
+        const placeOf = w => { if (w === 'brief') { c.briefBlocks = c.briefBlocks || []; return { list: c.briefBlocks, path: 'briefBlocks', si: -1 }; }
+          const [n, where] = String(w).split(':'), sec = (c.sections || [])[+n]; if (!sec) return null;
+          if (where === 'after') { sec.after = sec.after || []; return { list: sec.after, path: `sections.${n}.after`, si: +n }; }
+          if (!sec.blocks) { sec.blocks = (sec.p || []).map(v => ({ t: 'text', v })); delete sec.p; }
+          return { list: sec.blocks, path: `sections.${n}.blocks`, si: +n }; };
+        const objAt = path => path.split('.').reduce((o, k) => o == null ? o : o[/^\d+$/.test(k) ? +k : k], c);
+        const focusOf = (P, j, b) => !b ? null : b.t === 'points' || b.t === 'numbers' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' ? null : `${P.path}.${j}.v`;
+        const tidyList = P => { if (P.si >= 0) { const sec = c.sections[P.si]; if (sec.after && !sec.after.length) delete sec.after; } else if (!c.briefBlocks.length) delete c.briefBlocks; };
+        function blockMedia(path) { const b = objAt(path); if (!b) return;
+          const done = () => { m.remove(); send(); };
+          const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) done(); } }, el('div', { class: 'sheet', style: 'width:min(680px,100%)' },
+            el('header', {}, el('b', { text: b.t === 'video' ? 'Video' : 'Picture' }), el('button', { class: 'x', type: 'button', text: '×', onclick: done })),
+            el('div', { class: 'mbody form', style: 'gap:14px' }, richMedia(b.m || '', v => { b.m = v; touch('cases'); send(); }, { rich: true, _file: 'cases' }),
+              el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' }, el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: done })))));
+          document.body.append(m); }
+        function blockOp(d) {
+          if (d.op === 'section') { const at = d.w === 'brief' ? 0 : +String(d.w).split(':')[0] + 1; c.sections = c.sections || [];
+            c.sections.splice(at, 0, { h: 'New section', title: '', blocks: [{ t: 'text', v: '' }], media: [] }); touch('cases'); send(`sections.${at}.title`); toast('Section added'); return; }
+          if (d.op === 'more') { const b = objAt(d.path); if (!b) return; b.items = b.items || []; b.items.push(b.t === 'notes' ? { p: '', w: '' } : ['', '']); touch('cases');
+            send(b.t === 'notes' ? `${d.path}.items.${b.items.length - 1}.p` : `${d.path}.items.${b.items.length - 1}.0`); return; }
+          if (d.op === 'media') { blockMedia(d.path); return; }
+          const P = placeOf(d.w); if (!P) return; const L = P.list, j = d.pos;
+          if (d.op === 'insert' || d.op === 'replace') { const b = (FRESH[d.t] || FRESH.text)();
+            if (d.op === 'replace' && L[j] && (L[j].t || 'text') === 'text' && !String(L[j].v || '').replace(/^\/\S*/, '').trim()) L.splice(j, 1, b);
+            else { if (d.op === 'replace' && L[j]) L[j].v = String(L[j].v || '').replace(/^\/\S*/, '').trim(); L.splice(d.op === 'replace' ? j + 1 : j, 0, b); }
+            const at = L.indexOf(b); touch('cases'); send(focusOf(P, at, b)); if (b.t === 'picture' || b.t === 'video') blockMedia(`${P.path}.${at}`); return; }
+          if (!L[j]) return;
+          if (d.op === 'turn') { L[j].t = d.t; touch('cases'); send(`${P.path}.${j}.v`); return; }
+          if (d.op === 'up' && j > 0) { L.splice(j - 1, 0, L.splice(j, 1)[0]); touch('cases'); send(); return; }
+          if (d.op === 'down' && j < L.length - 1) { L.splice(j + 1, 0, L.splice(j, 1)[0]); touch('cases'); send(); return; }
+          if (d.op === 'dup') { L.splice(j + 1, 0, clone(L[j])); touch('cases'); send(focusOf(P, j + 1, L[j + 1])); toast('Duplicated'); return; }
+          if (d.op === 'del') { const gone = L.splice(j, 1)[0]; tidyList(P); touch('cases');
+            const prev = j > 0 && L[j - 1] && TEXTY.includes(L[j - 1].t || 'text') ? `${P.path}.${j - 1}.v` : null; send(d.quiet ? prev : null);
+            if (!d.quiet) toast((NAMEB[gone.t || 'text'] || 'Block') + ' deleted'); }
+        }
+        const TEXTY = ['text', 'heading', 'sub', 'quote'], NAMEB = { text: 'Text', heading: 'Heading', sub: 'Small heading', quote: 'Pull quote', picture: 'Picture', video: 'Video', points: 'Points', numbers: 'Big numbers', notes: 'Sticky notes' };
         // a picture clicked on the page: find where it lives in the case study, then replace or remove it in a small sheet,
         // and give its row a grid. A section's pictures become rows the first time you change one: every other row keeps
         // exactly the shape the page drew it in, and only the row you picked changes.

@@ -57,19 +57,13 @@
      "off": true
     },
     {
-     "h": "Key feature",
-     "p": [
-      "Verification: identity checks and badges that tell a buyer who they are dealing with before any money moves."
-     ],
-     "media": [],
-     "notes": []
-    },
-    {
      "h": "Pain points",
      "p": [
       "Fast, open listing brought growth and then trust problems. I interviewed buyers and sellers to find where trust broke and what would make them feel safe again."
      ],
-     "media": [],
+     "media": [
+      "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400"
+     ],
      "notes": [],
      "off": true
     },
@@ -79,7 +73,12 @@
      "p": [
       "What buyers and sellers said in interviews, one note each. Move them around."
      ],
-     "media": [],
+     "media": [
+      {
+       "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
+       "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
+      }
+     ],
      "notes": [
       {
        "t": "Buyers",
@@ -131,6 +130,16 @@
      ],
      "media": [
       "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400"
+     ],
+     "notes": []
+    },
+    {
+     "h": "Key feature",
+     "p": [
+      "Verification: identity checks and badges that tell a buyer who they are dealing with before any money moves."
+     ],
+     "media": [
+      "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400"
      ],
      "notes": []
     },
@@ -318,33 +327,6 @@
      ]
     },
     {
-     "h": "Key feature",
-     "p": [
-      "The Bulvds Wallet handles payments, refunds and commissions in one place."
-     ],
-     "list": [
-      [
-       "Fund it any way",
-       "Card, bank transfer or crypto."
-      ],
-      [
-       "Cash out",
-       "Agents and renters withdraw straight to a bank account."
-      ],
-      [
-       "Every transaction",
-       "Payments, commissions, refunds and withdrawals in one history."
-      ],
-      [
-       "Clear balances",
-       "Total, ready to withdraw, and incoming."
-      ]
-     ],
-     "media": [
-      "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400"
-     ]
-    },
-    {
      "h": "Pain points",
      "list": [
       [
@@ -380,6 +362,33 @@
      "media": [
       "https://framerusercontent.com/images/8x6g6Q3OQvJ32Uzj79Qe4WDD0.png?scale-down-to=2400",
       "https://framerusercontent.com/images/zqPSR0NdXGgi8hpLR3MhwxF6M.png?scale-down-to=2400"
+     ]
+    },
+    {
+     "h": "Key feature",
+     "p": [
+      "The Bulvds Wallet handles payments, refunds and commissions in one place."
+     ],
+     "list": [
+      [
+       "Fund it any way",
+       "Card, bank transfer or crypto."
+      ],
+      [
+       "Cash out",
+       "Agents and renters withdraw straight to a bank account."
+      ],
+      [
+       "Every transaction",
+       "Payments, commissions, refunds and withdrawals in one history."
+      ],
+      [
+       "Clear balances",
+       "Total, ready to withdraw, and incoming."
+      ]
+     ],
+     "media": [
+      "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400"
      ]
     },
     {

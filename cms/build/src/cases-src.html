@@ -217,6 +217,11 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H ul.res { list-style: none; display: grid; gap: 0; margin-top: 8px } .H ul.res li { padding: 16px 0; border-top: 1px solid var(--line) } .H ul.res li:last-child { border-bottom: 1px solid var(--line) }
 .H ul.res b { font-weight: 600; color: var(--ink); margin-right: 6px }
 .H .tx .pull { font: 600 clamp(30px, 3.6vw, 48px)/1.08 var(--body); letter-spacing: -.04em; color: var(--ink) }
+/* blocks added in the CMS: headings, quotes, and text that carries on below a picture */
+.H .tx h3.kh { margin: 40px 0 12px; font: 600 clamp(22px, 2.2vw, 28px)/1.2 var(--body); letter-spacing: -.03em; color: var(--ink) }
+.H .tx .pull.kq { margin: 36px 0; font-size: clamp(26px, 3vw, 38px) }
+.H .tx .lead + p, .H .tx p + .lead { margin-top: 16px }
+.H .kcont { padding-top: 56px } .H .kcont:empty { display: none } .H .kcont > :first-child { margin-top: 0 }
 .H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
 .H .sp { height: 120px }
 .H .bign { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line) }
@@ -514,6 +519,30 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .km-cms .km-add:hover { border-style: solid }
 /* sections on the page view: each one is a block you can hide or delete */
 .km-cms .ksec { display: contents }
+.km-cms .kgap { position: relative; height: 18px; margin: 2px 0; cursor: pointer }
+.km-cms .kgap::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; border-radius: 2px; background: #3d7bff; opacity: 0; transition: opacity .15s }
+.km-cms .kgap i { position: absolute; left: -34px; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; display: grid; place-items: center; background: #3d7bff; color: #fff; font: 500 16px/1 var(--body); font-style: normal; opacity: 0; transform: scale(.7); transition: opacity .15s, transform .2s }
+.km-cms .kgap:hover::before, .km-cms .kgap.on::before, .km-cms .kgap:focus-visible::before { opacity: 1 } .km-cms .kgap:hover i, .km-cms .kgap.on i, .km-cms .kgap:focus-visible i { opacity: 1; transform: none }
+.km-cms .kend { padding-top: 10px }
+.km-cms .kblk { position: relative } .km-cms .tx .kblk > p { font-size: 18px; line-height: 1.65 } .km-cms .kblk + .kgap + .kblk > p { margin-top: 0 }
+.km-cms .kgut { position: absolute; right: 100%; top: 4px; margin-right: 8px; display: flex; gap: 1px; opacity: 0; transition: opacity .15s }
+.km-cms .kblk:hover > .kgut, .km-cms .kblk:focus-within > .kgut, .km-cms .kblk.kon > .kgut { opacity: 1 }
+.km-cms .kgut button { width: 24px; height: 26px; border: 0; border-radius: 6px; background: none; color: var(--muted); font: 600 13px/1 var(--body); letter-spacing: -1px; cursor: pointer }
+.km-cms .kgut button:hover { background: var(--pill); color: var(--ink) }
+.km-cms .kblk[data-kt="picture"] > .kgut, .km-cms .kblk[data-kt="video"] > .kgut, .km-cms .kblk[data-kt="numbers"] > .kgut, .km-cms .kblk[data-kt="notes"] > .kgut { right: auto; left: max(8px, calc(50% - min(640px, 50% - var(--gut)) - 60px)); top: 64px }
+.km-cms .kbdrop { display: grid; place-items: center; gap: 6px; aspect-ratio: 16 / 7; border-radius: var(--km-r, 0); border: 1.5px dashed color-mix(in srgb, var(--ink) 25%, transparent); color: var(--ink); font: 500 15px var(--body); cursor: pointer; align-content: center }
+.km-cms .kbdrop span { font-size: 13px; color: var(--muted) } .km-cms .kbdrop:hover { border-style: solid }
+.km-cms .kbpic { cursor: pointer }
+.km-cms [data-edit]:empty::before { content: attr(data-ph); opacity: .4; pointer-events: none }
+@media (max-width: 899px) { .km-cms .kgut { right: auto; left: auto; position: relative; margin: 0 0 4px; top: 0; opacity: .6 } .km-cms .kgap i { left: auto; right: 0 } }
+.kpop { position: absolute; z-index: 100; width: 300px; max-width: calc(100vw - 24px); max-height: 380px; overflow: auto; padding: 6px; border-radius: 12px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 12px 40px rgb(0 0 0 / .14), 0 2px 6px rgb(0 0 0 / .06); font-family: var(--body) }
+.kpop .q { width: 100%; height: 34px; padding: 0 10px; border: 0; border-bottom: 1px solid var(--line); margin-bottom: 4px; background: none; color: var(--ink); font: 400 14px var(--body); outline: none }
+.kpop .hd { padding: 8px 10px 4px; font: 600 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.kpop .it { width: 100%; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border: 0; border-radius: 8px; background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit }
+.kpop .it .ic { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink) }
+.kpop .it b { display: block; font-size: 14px; font-weight: 500 } .kpop .it small { display: block; font-size: 12px; color: var(--muted); margin-top: 1px }
+.kpop .it kbd { font: 500 11px var(--mono); color: var(--muted) } .kpop .it.sel, .kpop .it:hover { background: var(--pill) } .kpop .it.danger b { color: #e5484d }
+.kpop .none { padding: 14px 10px; color: var(--muted); font-size: 13px }
 .km-cms .kchip { height: 30px; padding: 0 12px; border: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent); border-radius: 999px; background: none; color: var(--muted); font: 500 12.5px var(--body); cursor: pointer }
 .km-cms .kchip:hover { border-style: solid; color: var(--ink) }
 .km-cms .tags [data-edit]:empty::before, .km-cms .role [data-edit]:empty::before, .km-cms .ch p [data-edit]:empty::before { content: attr(data-ph); opacity: .45 }
@@ -879,9 +908,10 @@ function setupDials() {
 }
 // sticky notes: one insight each, on a dotted board people can rearrange (any number of notes, set in the CMS)
 const NOTE_C = ['#fff1a8', '#ffd6e0', '#c9f2dc', '#d6e6ff', '#ffe0c2'];
-const NOTES = s => { const N = (s.notes || []).filter(n => n && (n.p || n.t)); if (!N.length) return '';
+const NOTES = (s, base) => { const P = base || `sections.${s._i}.notes`;
+  const N = (s.notes || []).map((n, k) => ({ ...(n || {}), _k: k })).filter(n => n.p || n.t || (base && KM_EDIT)); if (!N.length) return '';
   return `<div class="fr"><div class="kb" data-kb="${N.length}"><button class="kb-tidy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2 2v3h3"/></svg>Tidy up</button><span class="mono kb-hint">Drag the notes</span>
-    ${N.map((n, k) => `<div class="kb-n" tabindex="0" role="note" style="--c:${NOTE_C[k % NOTE_C.length]}" aria-label="${esc((n.t ? n.t + ': ' : '') + (n.p || ''))}">${n.t ? `<span class="tg">${esc(n.t)}</span>` : ''}<p${E(`sections.${s._i}.notes.${k}.p`)}>${esc(n.p || '')}</p>${n.w ? `<span class="who">${esc(n.w)}</span>` : ''}</div>`).join('')}</div></div>`; };
+    ${N.map((n, k) => `<div class="kb-n" tabindex="0" role="note" style="--c:${NOTE_C[k % NOTE_C.length]}" aria-label="${esc((n.t ? n.t + ': ' : '') + (n.p || ''))}">${n.t ? `<span class="tg">${esc(n.t)}</span>` : ''}<p${E(`${P}.${n._k}.p`)} data-ph="What they said">${esc(n.p || '')}</p>${n.w || (base && KM_EDIT) ? `<span class="who"${base ? E(`${P}.${n._k}.w`) : ''} data-ph="Who">${esc(n.w || '')}</span>` : ''}</div>`).join('')}</div></div>`; };
 function setupBoards() {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, snd = n => { if (window.Popkit) Popkit.play(n); };
   document.querySelectorAll('.kb').forEach(board => {
@@ -1015,13 +1045,53 @@ const R = {
     const ph = s => { const m = PH.find(([re]) => re.test(s.h)); return [m ? m[1] : 'Chapter', s.title || (m && m[2]) || s.h]; };
     // and the chapters follow how the work happened: context, research, strategy, the solution, the design, results
     const ORDER = ['Context', 'Research', 'Strategy', 'Roadmap', 'Solution', 'Brand', 'Design', 'Chapter', 'Results'];
-    c = { ...c, secs: c.secs.map((s, k) => ({ s, k })).sort((a, b) => (ORDER.indexOf(ph(a.s)[0]) - ORDER.indexOf(ph(b.s)[0])) || a.k - b.k).map(x => x.s) };
+    // (sections used to be sorted by design phase; they now follow your order in the CMS, so inserting is predictable)
     let fig = 0;
     // the caption sits under the pictures, starting at their left edge (the widest row decides where that is)
     const cap = (list, b, t, path) => { if (path) { const v = t;   // a section's caption: edit it on the page; empty removes it from the live page
         if (!v && !KM_EDIT) return ''; return `<p class="cap2"><b>${b}</b><span${E(path)} data-ph="Add a caption">${v}</span></p>`; }
       return `<p class="cap2"><b>${b}</b>${t}</p>`; };
     const capOf = s => esc(s.cap != null ? s.cap : s.h);
+    // A section's text column is a list of blocks. Sections written before blocks existed use their paragraphs (p) as text
+    // blocks; the first time you insert something, the CMS turns them into real blocks. Wide blocks (pictures, numbers,
+    // notes) step out of the text column and the text carries on below them.
+    const GAP = (w, pos) => KM_EDIT ? `<div class="kgap" data-w="${w}" data-pos="${pos}" role="button" tabindex="0" aria-label="Add a block here"><i>+</i></div>` : '';
+    const WIDE = { picture: 1, video: 1, numbers: 1, notes: 1 };
+    const blockH = (b, base) => {
+      const t = b.t || 'text';
+      if (t === 'text') return (b.v || KM_EDIT) ? `<p${E(base + '.v')} data-ph="Type, or press / for blocks">${esc(b.v || '')}</p>` : '';
+      if (t === 'heading') return (b.v || KM_EDIT) ? `<h3 class="kh"${E(base + '.v')} data-ph="Heading">${esc(b.v || '')}</h3>` : '';
+      if (t === 'sub') return (b.v || KM_EDIT) ? `<h4${E(base + '.v')} data-ph="Small heading">${esc(b.v || '')}</h4>` : '';
+      if (t === 'quote') return (b.v || KM_EDIT) ? `<p class="pull kq"${E(base + '.v')} data-ph="A line worth setting large">${esc(b.v || '')}</p>` : '';
+      if (t === 'points') { const L = (b.items || []).map((x, k) => [x, k]).filter(([x]) => KM_EDIT || (x && (x[0] || x[1])));
+        return L.length ? `<div class="lead">${L.map(([x, k]) => `<div><b${E(`${base}.items.${k}.0`)} data-ph="Point">${esc(x[0] || '')}</b>. <span${E(`${base}.items.${k}.1`)} data-ph="What it means">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Point</button>` : ''}` : ''; }
+      if (t === 'numbers') { const L = (b.items || []).map((x, k) => [x, k]).filter(([x]) => KM_EDIT || (x && x[0]));
+        return L.length ? `<div class="fr"><div class="bign">${L.map(([x, k]) => `<div><b data-n="${esc(x[0] || '')}"${E(`${base}.items.${k}.0`)} data-ph="72%">${esc(x[0] || '')}</b><span${E(`${base}.items.${k}.1`)} data-ph="what it measures">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Number</button>` : ''}</div>` : ''; }
+      if (t === 'notes') return NOTES({ notes: b.items || [] }, base + '.items') + (KM_EDIT ? `<div class="fr"><button type="button" class="kchip" data-kmore="${base}">+ Note</button></div>` : '');
+      if (t === 'picture' || t === 'video') { const m = b.m;
+        if (!m) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div></div>` : '';
+        used.add(key(m)); const label = b.cap != null ? esc(b.cap) : '';
+        return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
+      return '';
+    };
+    // blocks inside a text column; the column closes around wide ones and opens again after them
+    const BLOCKS = (list, baseOf, w) => { let h = '';
+      list.forEach((b, j) => { const base = baseOf(j), inner = blockH(b, base); if (!inner && !KM_EDIT) return;
+        const tools = KM_EDIT ? `<div class="kgut" contenteditable="false"><button type="button" data-kop="add" data-w="${w}" data-pos="${j + 1}" title="Add a block below" aria-label="Add a block below">+</button><button type="button" data-kop="grip" data-w="${w}" data-pos="${j}" data-t="${b.t || 'text'}" title="Turn into, move, copy, delete" aria-label="Block options">⋮⋮</button></div>` : '';
+        const one = KM_EDIT ? `<div class="kblk" data-kt="${b.t || 'text'}">${tools}${inner}</div>` : inner;
+        h += WIDE[b.t] ? `</section>${one}<section class="tx kcont">` : one;
+        h += GAP(w, j + 1); });
+      return h; };
+    const secBlocks = s => s.blocks || (s.p || []).map(v => ({ t: 'text', v }));
+    const secBase = s => j => s.blocks ? `sections.${s._i}.blocks.${j}` : `sections.${s._i}.p.${j}`;
+    const pBlocks = s => { const L = secBlocks(s); const base = s.blocks ? secBase(s) : (j => `sections.${s._i}.p.${j}`);
+      // old-style paragraphs keep their own edit path (sections.N.p.k → .v is not used); new blocks use blocks.N.v
+      return GAP(`${s._i}:blocks`, 0) + (s.blocks ? BLOCKS(L, base, `${s._i}:blocks`) : L.map((b, j) => {
+        const inner = (b.v || KM_EDIT) ? `<p${E(`sections.${s._i}.p.${j}`)} data-ph="Type, or press / for blocks">${esc(b.v || '')}</p>` : '';
+        const tools = KM_EDIT ? `<div class="kgut" contenteditable="false"><button type="button" data-kop="add" data-w="${s._i}:blocks" data-pos="${j + 1}" title="Add a block below" aria-label="Add a block below">+</button><button type="button" data-kop="grip" data-w="${s._i}:blocks" data-pos="${j}" data-t="text" title="Turn into, move, copy, delete" aria-label="Block options">⋮⋮</button></div>` : '';
+        return (KM_EDIT ? `<div class="kblk" data-kt="text">${tools}${inner}</div>` : inner) + GAP(`${s._i}:blocks`, j + 1); }).join('')); };
+    const afterBlocks = s => (s.after && s.after.length ? `<section class="tx kcont">${BLOCKS(s.after, j => `sections.${s._i}.after.${j}`, `${s._i}:after`)}</section>` : '')
+      + (KM_EDIT ? `<section class="tx kcont kend">${GAP(`${s._i}:after`, (s.after || []).length)}</section>` : '');
     // the small label over each chapter ("02 · Research"): yours if you set one on the page, empty hides it
     const ebOf = (s, i) => s.eb != null ? s.eb : `${pad(i + 1)} · ${ph(s)[0]}`;
     const EB = (s, i, auto) => { const t = s.eb != null ? s.eb : auto; return t || KM_EDIT ? `<span class="eb"${E(`sections.${s._i}.eb`)} data-ph="Add a label">${esc(t)}</span>` : ''; };
@@ -1065,17 +1135,17 @@ const R = {
         // pictures in the brief, after My role: add them on the page view
         const RR = blockRows(c, 'brief');
         if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="brief" data-rows="1"' : ''}>${rowsBlock(RR)}</div>` : ''; }
-        return KM_EDIT ? '<div class="fr kempty" data-pick="brief" data-rows="1"></div>' : ''; })()}`);
+        return KM_EDIT ? '<div class="fr kempty" data-pick="brief" data-rows="1"></div>' : ''; })()}${(c.briefBlocks || []).length || KM_EDIT ? `<section class="tx kcont">${GAP('brief', 0)}${BLOCKS(c.briefBlocks || [], j => `briefBlocks.${j}`, 'brief')}</section>` : ''}`);
     c.secs.forEach((s, i) => {
       const off = !!s.off, k0 = h.length, T = TOOLS(String(s._i), off, true, `Section ${s._i + 1} · ${s.h || 'Untitled'}`), CP = `sections.${s._i}.cap`;
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
-        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${s.view === 'dial' ? BADIAL(s) : bigNums(s.stats, s._i)}${pics(media, capOf(s), s._i, CP)}`;
+        h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}</section>${s.view === 'dial' ? BADIAL(s) : bigNums(s.stats, s._i)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`;
         h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); return;
       }
-      if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · Results`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, capOf(s), s._i, CP)}`; h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); return; }
+      if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · Results`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`; h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); return; }
       const lead = s.list ? `<div class="lead">${s.list.map(([a, b], k) => `<div><b${E(`sections.${s._i}.list.${k}.0`)}>${esc(a)}</b>. <span${E(`sections.${s._i}.list.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>` : '';
-      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${lead}</section>${NOTES(s)}${pics(media, capOf(s), s._i, CP)}`;
+      h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}${lead}</section>${NOTES(s)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`;
       h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0));
       if (i === 2 && c.statement) h += WRAP('principle', OFF.principle, `<section class="tx ch">${TOOLS('principle', OFF.principle, false, 'Design principle')}<span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`);
     });
@@ -1558,6 +1628,51 @@ function editable(c) {
       row.append(h); }); });
   requestAnimationFrame(placeHandles); setTimeout(placeHandles, 400);
   if (!window._kResOn) { window._kResOn = true; addEventListener('resize', () => window._kPlace && window._kPlace()); } window._kPlace = placeHandles;
+  // ---- blocks: the + between blocks, "/" on an empty line, and the ⋮⋮ handle on each block (Notion-style)
+  const KINDS = [['Basic', [['text', 'Text', 'A paragraph', '¶', 'p'], ['heading', 'Heading', 'A title inside the section', 'H', 'h'], ['sub', 'Small heading', 'Like “The problem”', 'h', 'hh'], ['quote', 'Pull quote', 'A line set large', '❝', 'q']]],
+    ['Media', [['picture', 'Picture', 'From your library or a new upload', '▣', 'img'], ['video', 'Video', 'A looping clip', '▶', 'vid']]],
+    ['Case study', [['points', 'Points', 'A title and a line, one after another', '1.', 'pts'], ['numbers', 'Big numbers', 'Results that count up', '72', 'num'], ['notes', 'Sticky notes', 'Insights visitors can move', '▢', 'note'], ['section', 'New section', 'A chapter with its own label and heading', '§', 'sec']]]];
+  const NAME = Object.fromEntries(KINDS.flatMap(g => g[1]).map(k => [k[0], k[1]])), TEXTY = ['text', 'heading', 'sub', 'quote'];
+  const tell = o => parent.postMessage({ type: 'km-cms-blk', slug: c.slug, ...o }, '*');
+  let kp = null, kctx = null;
+  const kclose = () => { if (kp) kp.remove(); kp = null; kctx = null; app.querySelectorAll('.kgap.on,.kblk.kon').forEach(x => x.classList.remove('on', 'kon')); };
+  window._kClose && removeEventListener('mousedown', window._kClose); window._kClose = e => { if (kp && !kp.contains(e.target) && !e.target.closest('.kgap,[data-kop]')) kclose(); }; addEventListener('mousedown', window._kClose);
+  const kopen = (anchor, ctx) => { kclose(); kctx = ctx; kp = document.createElement('div'); kp.className = 'kpop'; kp.setAttribute('role', 'menu');
+    kp.innerHTML = (ctx.mode === 'insert' && !ctx.slash ? '<input class="q" placeholder="Search blocks…" aria-label="Search blocks">' : '') + '<div class="ls"></div>'; document.body.append(kp);
+    const r = anchor.getBoundingClientRect(); let x = r.left + scrollX, y = r.bottom + scrollY + 6; x = Math.max(12 + scrollX, Math.min(x, scrollX + innerWidth - 312));
+    kp.style.left = x + 'px'; kp.style.top = y + 'px'; if (r.bottom + 390 > innerHeight && r.top > 400) kp.style.top = (r.top + scrollY - 6 - Math.min(380, kp.offsetHeight + 300)) + 'px';
+    const ls = kp.querySelector('.ls'); let sel = 0, its = [];
+    const it = (a, ic, t, d, kb, cls = '') => `<button type="button" class="it ${cls}" role="menuitem" data-do="${a}"><span class="ic">${ic}</span><span><b>${t}</b>${d ? `<small>${d}</small>` : ''}</span>${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
+    const draw = q => { q = (q || '').toLowerCase();
+      if (ctx.mode === 'grip') ls.innerHTML = (TEXTY.includes(ctx.t) ? '<div class="hd">Turn into</div>' + TEXTY.filter(k => k !== ctx.t).map(k => it('turn:' + k, KINDS[0][1].find(x => x[0] === k)[3], NAME[k], '', '')).join('') : '')
+        + '<div class="hd">This block</div>' + it('up', '↑', 'Move up', '', '') + it('down', '↓', 'Move down', '', '') + it('dup', '⧉', 'Duplicate', '', '') + it('del', '✕', 'Delete', '', '', 'danger');
+      else { ls.innerHTML = ''; KINDS.forEach(([g, ks]) => { const f = ks.filter(k => (!ctx.noSec || k[0] !== 'section') && (!q || (k[1] + ' ' + k[2] + ' ' + k[4]).toLowerCase().includes(q))); if (f.length) ls.insertAdjacentHTML('beforeend', `<div class="hd">${g}</div>` + f.map(k => it('add:' + k[0], k[3], k[1], k[2], '/' + k[4])).join('')); }); }
+      if (!ls.children.length) ls.innerHTML = '<div class="none">No block called that. Try picture, points or section.</div>';
+      its = [...ls.querySelectorAll('.it')]; sel = 0; mark(); };
+    const mark = () => its.forEach((b, k) => b.classList.toggle('sel', k === sel));
+    kp.addEventListener('mousemove', e => { const b = e.target.closest('.it'); if (b) { sel = its.indexOf(b); mark(); } });
+    kp.addEventListener('click', e => { const b = e.target.closest('.it'); if (b) kdo(b.dataset.do); });
+    kp._key = e => { if (e.key === 'ArrowDown') { e.preventDefault(); sel = (sel + 1) % its.length; mark(); its[sel].scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); sel = (sel - 1 + its.length) % its.length; mark(); its[sel].scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (its[sel]) kdo(its[sel].dataset.do); } else if (e.key === 'Escape') { e.preventDefault(); kclose(); } };
+    kp._filter = draw; const qi = kp.querySelector('.q'); if (qi) { qi.addEventListener('input', () => draw(qi.value)); qi.addEventListener('keydown', kp._key); setTimeout(() => qi.focus(), 0); }
+    draw(''); };
+  const kdo = a => { const x = kctx; kclose(); if (!x) return;
+    if (a.startsWith('add:')) { const t = a.slice(4); if (t === 'section') tell({ op: 'section', w: x.w }); else tell({ op: x.slash ? 'replace' : 'insert', w: x.w, pos: x.pos, t }); return; }
+    if (a.startsWith('turn:')) tell({ op: 'turn', w: x.w, pos: x.pos, t: a.slice(5) }); else tell({ op: a, w: x.w, pos: x.pos }); };
+  app.querySelectorAll('.kgap').forEach(g => { const go = e => { e.preventDefault(); e.stopPropagation(); g.classList.add('on'); kopen(g.querySelector('i'), { mode: 'insert', w: g.dataset.w, pos: +g.dataset.pos }); };
+    g.addEventListener('click', go); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(e); }); });
+  app.querySelectorAll('[data-kop]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); b.closest('.kblk').classList.add('kon');
+    if (b.dataset.kop === 'add') kopen(b, { mode: 'insert', w: b.dataset.w, pos: +b.dataset.pos }); else kopen(b, { mode: 'grip', w: b.dataset.w, pos: +b.dataset.pos, t: b.dataset.t }); }));
+  app.querySelectorAll('[data-kmore]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); tell({ op: 'more', path: b.dataset.kmore }); }));
+  // a picture or video block: click it to choose or change what it shows
+  app.querySelectorAll('.kbpic').forEach(f => f.addEventListener('click', e => { if (e.target.closest('[data-edit],.kgut')) return; e.preventDefault(); e.stopPropagation(); tell({ op: 'media', path: f.dataset.kblk }); }, true));
+  // typing in a text block: "/" opens the menu, Enter starts a new line under it, Backspace on an empty line removes it
+  app.querySelectorAll('.kblk[data-kt="text"] [data-edit]').forEach(el => { const g = el.closest('.kblk').querySelector('[data-kop="grip"]'), w = g.dataset.w, pos = +g.dataset.pos;
+    el.addEventListener('input', () => { const v = el.innerText.trim(); if (v.startsWith('/')) { if (!kp || !kctx || !kctx.slash) kopen(el, { mode: 'insert', slash: true, w, pos }); kp && kp._filter(v.slice(1)); } else if (kp && kctx && kctx.slash) kclose(); });
+    el.addEventListener('keydown', e => { if (kp && kctx && kctx.slash && ['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) { e.stopImmediatePropagation(); kp._key(e); return; }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.stopImmediatePropagation(); tell({ op: 'insert', w, pos: pos + 1, t: 'text' }); }
+      else if (e.key === 'Backspace' && !el.innerText.trim()) { e.preventDefault(); tell({ op: 'del', w, pos, quiet: true }); } }, true); });
   app.querySelectorAll('[data-kadd]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-tag', slug: c.slug, key: b.dataset.kadd }, '*'); }));
   app.querySelectorAll('[data-kact]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
     parent.postMessage({ type: 'km-cms-sec', slug: c.slug, key: b.dataset.ksec, act: b.dataset.kact }, '*'); }));
@@ -1567,7 +1682,8 @@ function editable(c) {
 if (KM_EDIT) {
   addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-data' || !Array.isArray(d.cases)) return;
     CASES.splice(0, CASES.length, ...d.cases.filter(x => !x.hidden)); const y = scrollY; const cs = CASES.find(x => x.slug === C) || CASES.find(x => x.slug === slugNow());
-    if (cs) { C = cs.slug; shapes(cs).then(() => { paint(true); scrollTo(0, y); }); } });
+    if (cs) { C = cs.slug; shapes(cs).then(() => { paint(true); scrollTo(0, y);
+      if (d.focus) { const el = app.querySelector(`[data-edit="${d.focus}"]`); if (el) { el.focus({ preventScroll: true }); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); const b = el.getBoundingClientRect(); if (b.top < 80 || b.bottom > innerHeight - 40) scrollBy(0, b.top - innerHeight / 2); } } }); } });
   parent.postMessage({ type: 'km-cms-ready' }, '*');
 }
 // the text sections as statements: the number and heading shrink to a label, and the first paragraph becomes the headline.
