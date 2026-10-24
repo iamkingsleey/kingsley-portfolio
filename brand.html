@@ -226,11 +226,11 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 24px; margin: 28px 0 0; padding-top: 22px; border-top: 1px solid var(--line) }
 .H .meta div { display: grid; gap: 4px; align-content: start; min-width: 0 } .H .meta dd { margin: 0; font-size: 15px; color: var(--ink) }
 .H .glance { position: relative; margin-top: 72px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); --ktop: 0px }
-.H .glance > div { padding: 22px 18px 24px 0; display: grid; gap: 8px; align-content: start; min-width: 0 }
-.H .glance > div + div { padding-left: 18px; border-left: 1px solid var(--line) }
-.H .glance p { font-size: 14.5px; line-height: 1.55; color: var(--text) }
-.H .glance .nn { display: flex; gap: 22px; flex-wrap: wrap } .H .glance .nn b { display: block; font: 600 32px/1 var(--body); letter-spacing: -.04em; color: var(--ink); font-variant-numeric: tabular-nums }
-.H .glance .nn small { display: block; font-size: 12.5px; line-height: 1.4; color: var(--muted); margin-top: 6px; max-width: 16ch }
+.H .glance > div { padding: 26px 24px 28px 0; display: grid; gap: 8px; align-content: start; min-width: 0 }
+.H .glance > div + div { padding-left: 24px; border-left: 1px solid var(--line) }
+.H .glance p { font-size: 17px; line-height: 1.55; color: var(--text) }
+.H .glance .nn { display: flex; gap: 22px; flex-wrap: wrap } .H .glance .nn b { display: block; font: 600 40px/1 var(--body); letter-spacing: -.04em; color: var(--ink); font-variant-numeric: tabular-nums }
+.H .glance .nn small { display: block; font-size: 14.5px; line-height: 1.45; color: var(--muted); margin-top: 8px; max-width: 20ch }
 .H .pairs { display: grid; margin-top: 24px; border-top: 1px solid var(--line) }
 .H .pairs > div { display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); gap: 14px; align-items: start; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; line-height: 1.5 }
 .H .pairs i { font-style: normal; color: var(--red); font-weight: 600; text-align: center }
@@ -283,7 +283,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 @media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
 .H .kcont { padding-top: 56px } .H .kcont:empty { display: none } .H .kcont > :first-child { margin-top: 0 }
 .H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
-.H .sp { height: 120px }
+.H .sp { height: 120px } .H.v2 .sp { height: clamp(120px, 14vw, 180px) }
 .H .bign { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line) }
 .H .bign > div { padding: 32px 32px 36px 0; border-bottom: 1px solid var(--line) } .H .bign > div:nth-child(even) { padding-left: 32px; border-left: 1px solid var(--line) }
 .H .bign b { display: block; font: 600 clamp(40px, 4.4vw, 64px)/1 var(--body); letter-spacing: -.045em; color: var(--ink); font-variant-numeric: tabular-nums }
@@ -1251,7 +1251,8 @@ const R = {
       if (i === 2 && c.statement && !V2) h += WRAP('principle', OFF.principle, `<section class="tx ch">${TOOLS('principle', OFF.principle, false, 'Design principle')}<span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`);
     });
     if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list, 'impact.list')}`;
-    if (!V2) h += WRAP('details', OFF.details, `<section class="tx ch" data-ix="Project details">${TOOLS('details', OFF.details, false, 'Project details')}<span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`) + `<div class="sp"></div>`;
+    if (!V2) h += WRAP('details', OFF.details, `<section class="tx ch" data-ix="Project details">${TOOLS('details', OFF.details, false, 'Project details')}<span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`);
+    h += `<div class="sp"></div>`;   // room before the next case, on every layout
     return h + `${NEXT(c)}</main>`;
   },
   F(c) {
