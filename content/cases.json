@@ -276,7 +276,8 @@
      "src": "Prototype/kusnap-verification.html",
      "h": 780,
      "cap": "User verification",
-     "addr": "Kusnap · account verification"
+     "addr": "Kusnap · account verification",
+     "auto": true
     }
    ]
   },
