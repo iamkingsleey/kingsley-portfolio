@@ -458,19 +458,21 @@
         const objAt = path => path.split('.').reduce((o, k) => o == null ? o : o[/^\d+$/.test(k) ? +k : k], c);
         const focusOf = (P, j, b) => !b ? null : b.t === 'points' || b.t === 'numbers' ? `${P.path}.${j}.items.0.0` : b.t === 'notes' ? `${P.path}.${j}.items.0.p` : b.t === 'picture' || b.t === 'video' || b.t === 'proto' ? null : `${P.path}.${j}.v`;
         const tidyList = P => { if (P.si >= 0) { const sec = c.sections[P.si]; if (sec.after && !sec.after.length) delete sec.after; } else if (!c.briefBlocks.length) delete c.briefBlocks; };
-        // a prototype block: which interactive page it shows (anything in assets/protos/, or a full link), how tall, and what the bar says
-        const PROTOS = [['assets/protos/kusnap-verification.html', 'Kusnap · account verification']];
+        // a prototype block: which interactive page it shows (any .html in the Prototype folder, or a full link), how tall, and what the bar says
         function blockProto(b) { const done = () => { m.remove(); send(); }, set = (k, v) => { b[k] = v; touch('cases'); };
-          const src = el('input', { type: 'text', value: b.src || '', placeholder: 'assets/protos/your-flow.html', oninput: e => set('src', e.target.value.trim()) });
-          const pick = el('select', { onchange: e => { if (!e.target.value) return; src.value = e.target.value; set('src', e.target.value); const p = PROTOS.find(x => x[0] === e.target.value); if (p && !b.addr) { b.addr = p[1]; addr.value = p[1]; } } },
-            el('option', { value: '', text: 'Choose a prototype…' }), ...PROTOS.map(([v, t]) => el('option', { value: v, text: t, selected: v === b.src })));
+          const src = el('input', { type: 'text', value: b.src || '', placeholder: 'Prototype/your-flow.html', oninput: e => set('src', e.target.value.trim()) });
+          let PROTOS = [];
+          const pick = el('select', { onchange: e => { if (!e.target.value) return; src.value = e.target.value; set('src', e.target.value); const p = PROTOS.find(x => x.src === e.target.value); if (p && !b.addr) { b.addr = p.name; addr.value = p.name; } } },
+            el('option', { value: '', text: 'Loading the Prototype folder…' }));
+          api('/api/protos').then(j => { PROTOS = j.files || []; pick.replaceChildren(el('option', { value: '', text: PROTOS.length ? 'Choose a prototype…' : 'No pages in the Prototype folder yet' }),
+            ...PROTOS.map(p => el('option', { value: p.src, text: p.name + '  ·  ' + p.src.replace(/^Prototype\//, ''), selected: p.src === b.src }))); }).catch(() => {});
           const addr = el('input', { type: 'text', value: b.addr || '', placeholder: 'Shown in its top bar', oninput: e => set('addr', e.target.value) });
           const au = el('label', { style: 'display:flex;gap:10px;align-items:center;font-size:13px;cursor:pointer' }, el('input', { type: 'checkbox', checked: !!b.auto, onchange: e => { if (e.target.checked) set('auto', true); else { delete b.auto; touch('cases'); } } }), 'Plays on its own and loops (a cursor clicks through it; visitors can click in to take over)');
           const hh = el('input', { type: 'number', min: 360, max: 1400, step: 20, value: b.h || 760, oninput: e => set('h', +e.target.value || 760) });
           const fld = (t, x, help) => el('div', { class: 'f' }, el('label', { text: t }), x, help ? el('div', { class: 'help', text: help }) : '');
           const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) done(); } }, el('div', { class: 'sheet', style: 'width:min(560px,100%)' },
             el('header', {}, el('b', { text: 'Prototype' }), el('button', { class: 'x', type: 'button', text: '×', onclick: done })),
-            el('div', { class: 'mbody form', style: 'gap:14px' }, fld('Prototype', pick), fld('Or its address', src, 'A page in assets/protos/ (put the file there and publish), or a full https:// link.'),
+            el('div', { class: 'mbody form', style: 'gap:14px' }, fld('Prototype', pick), fld('Or its address', src, 'Drop any .html prototype into the Prototype folder and it shows in the list above. A full https:// link works too.'),
               fld('Name in its top bar', addr), au, fld('Height on desktop (px)', hh, 'Phones get up to 78% of the screen.'),
               el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' }, el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: done })))));
           document.body.append(m); }

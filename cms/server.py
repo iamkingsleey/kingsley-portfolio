@@ -43,6 +43,18 @@ def build():
         code, out = run([sys.executable, os.path.join(HERE, 'build', 'build.py')])
         return {'ok': code == 0, 'log': out[-4000:], 'seconds': round(time.time() - t, 1)}
 
+def protos():
+    """The prototypes you can put in a case study: every .html page in the Prototype folder, named by its <title>."""
+    out, d = [], os.path.join(REPO, 'Prototype')
+    if os.path.isdir(d):
+        for f in sorted(os.listdir(d)):
+            if not f.lower().endswith(('.html', '.htm')): continue
+            try: m = re.search(r'<title>(.*?)</title>', open(os.path.join(d, f), encoding='utf-8', errors='ignore').read(20000), re.S | re.I)
+            except OSError: m = None
+            out.append({'src': 'Prototype/' + f, 'name': (m.group(1).strip() if m else '') or f.rsplit('.', 1)[0].replace('-', ' ')})
+    return out
+
+
 def media_library():
     out = []
     for base in ['assets']:
@@ -216,7 +228,7 @@ def git_status():
 
 def publish(message):
     msg = (message or '').strip() or 'Update content'
-    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', '*.html', '*.js', '.gitignore'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
+    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', '*.html', '*.js', '.gitignore'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
              ['git', 'commit', '-m', msg], ['git', 'push']]
     log = []
     for s in steps:
@@ -252,6 +264,7 @@ class H(SimpleHTTPRequestHandler):
                 data = {n: read_json(os.path.join(CONTENT, n + '.json'), {}) for n in EDITABLE}
                 return self._json({'content': data, 'index': read_json(INDEX, {}), 'hasToken': bool(read_json(SECRETS, {}).get('goatcounter_token')), 'hasInboxKey': bool(read_json(SECRETS, {}).get('inbox_key'))})
             if u.path == '/api/media': return self._json({'files': media_library()})
+            if u.path == '/api/protos': return self._json({'files': protos()})
             if u.path == '/api/analytics': return self._json(analytics(max(1, min(366, int((q.get('days') or ['30'])[0])))))
             if u.path == '/api/inbox': return self._json(inbox_call('/list'))
             if u.path == '/api/status': return self._json(git_status())

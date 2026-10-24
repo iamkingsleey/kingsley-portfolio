@@ -273,7 +273,7 @@
    "briefBlocks": [
     {
      "t": "proto",
-     "src": "assets/protos/kusnap-verification.html",
+     "src": "Prototype/kusnap-verification.html",
      "h": 780,
      "cap": "User verification",
      "addr": "Kusnap · account verification"
