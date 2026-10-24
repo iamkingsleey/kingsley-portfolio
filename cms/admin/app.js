@@ -213,17 +213,17 @@
       im.onerror = () => res({}); im.src = src(p);
     });
   }
-  // pictures are made web-ready before they're uploaded: at most 2000px on the long side, and a JPEG unless they have
+  // pictures are made web-ready before they're uploaded: at most 2800px on the long side (sharp on retina screens), and a JPEG unless they have
   // see-through parts (then PNG), so a 3 MB render becomes a few hundred KB and the site stays quick
   async function webReady(f) {
     if (!/^image\/(png|jpe?g|webp)$/.test(f.type)) return f;
     const bmp = await createImageBitmap(f).catch(() => null); if (!bmp) return f;
-    const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height)), w = Math.round(bmp.width * k), h = Math.round(bmp.height * k);
+    const k = Math.min(1, 2800 / Math.max(bmp.width, bmp.height)), w = Math.round(bmp.width * k), h = Math.round(bmp.height * k);
     const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, w, h);
     let alpha = false;
     if (f.type !== 'image/jpeg') { const d = cx.getImageData(0, 0, w, h).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] < 250) { alpha = true; break; } }
     const type = alpha ? 'image/png' : 'image/jpeg';
-    const blob = await new Promise(r => cv.toBlob(r, type, .86));
+    const blob = await new Promise(r => cv.toBlob(r, type, .9));
     if (!blob || (k === 1 && blob.size >= f.size)) return f;   // already small: keep the original
     return new File([blob], f.name.replace(/\.[^.]+$/, '') + (alpha ? '.png' : '.jpg'), { type });
   }
