@@ -434,7 +434,7 @@ const V = {
   idDone() {
     app.innerHTML = `<section class="view narrow"><div class="card centre">
       <div class="msg"><div>${I.bigcheck}<p class="ttl">Verification Successful</p></div><p class="txt">Your identity has been verified successfully!</p></div>
-      <div class="wide-btn"><button class="flat" id="cd">Continue to Dashboard</button></div></div></section>`;
+      <button class="btn dark" id="cd">Continue to Dashboard</button></div></section>`;
     document.getElementById('cd').onclick = () => go('dash');
   }
 };
