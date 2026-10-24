@@ -217,6 +217,12 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H figcaption, .H .cap2 { margin-top: 12px; font: 400 13px/1.5 var(--body); color: var(--muted) }
 .H .cap2 b { font: 600 11px var(--mono); letter-spacing: .6px; text-transform: uppercase; margin-right: 8px; color: var(--muted) }
 .H .ch { padding-top: 120px }
+/* a picture still to come: a plain block with its description on it */
+.H .kph { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; max-width: 100%; padding: clamp(20px, 3.4vw, 40px); border-radius: var(--km-r, 16px); background: var(--panel); overflow: hidden }
+.H .kph .mono { position: absolute; top: clamp(16px, 2.4vw, 28px); left: clamp(20px, 3.4vw, 40px) }
+.H .kph p { max-width: 52ch; font: 500 clamp(15px, 1.5vw, 19px)/1.45 var(--body); letter-spacing: -.01em; color: var(--ink) }
+.km-cms .H .kph.kbdrop { display: flex; place-items: initial; border: 0; text-align: left; align-content: initial } .km-cms .H .kph .kadd { font: 500 13px var(--body); color: var(--muted) }
+@media (max-width: 560px) { .H .kph { aspect-ratio: 4 / 3 !important } }
 /* v2, the case study structure: a details row under the intro, an at-a-glance strip, a smaller centred text column with
    pictures stepping out to 90% width, and decisions shown one at a time */
 .H.v2 { --tx: 840px; --fr: 1170px }
@@ -1145,7 +1151,12 @@ const R = {
         return L.length ? `<div class="fr nums"><div class="bign">${L.map(([x, k]) => `<div><b data-n="${esc(x[0] || '')}"${E(`${base}.items.${k}.0`)} data-ph="72%">${esc(x[0] || '')}</b><span${E(`${base}.items.${k}.1`)} data-ph="what it measures">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Number</button>` : ''}</div>` : ''; }
       if (t === 'notes') return NOTES({ notes: b.items || [] }, base + '.items') + (KM_EDIT ? `<div class="fr"><button type="button" class="kchip" data-kmore="${base}">+ Note</button></div>` : '');
       if (t === 'picture' || t === 'video') { const m = b.m;
-        if (!m) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}${b.hint ? `<em>${esc(b.hint)}</em>` : ''}<span>Click to choose one</span></div></div>` : '';
+        // no picture yet: a plain placeholder that says what belongs here (on the site too, while it has a description)
+        if (!m) { const hint = String(b.hint || ''), ar = /(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)/.exec(hint), kind = (/^(\w+)/.exec(hint) || [])[1] || (t === 'video' ? 'Video' : 'Image');
+          const text = hint.replace(/^\w+,\s*(\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?)?[^.]*\.\s*/, '');
+          const ph = `<div class="kph" style="aspect-ratio:${ar ? ar[1] + ' / ' + ar[2] : '16 / 9'}"><span class="mono">${esc(kind)}${ar ? ' · ' + esc(ar[1] + ':' + ar[2]) : ''}</span><p>${esc(text || hint)}</p></div>`;
+          if (KM_EDIT) return `<div class="fr kbpic" data-kblk="${base}">${hint ? ph.replace('class="kph"', 'class="kph kbdrop"').replace('</p></div>', `</p><b class="kadd">${t === 'video' ? 'Add a video' : 'Add a picture'}</b></div>`) : `<div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div>`}</div>`;
+          return hint ? `<div class="fr">${ph}</div>` : ''; }
         used.add(key(m)); const label = b.cap != null ? esc(b.cap) : '';
         return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
       // findings and what each one changed in the design
@@ -1630,7 +1641,7 @@ function setupIndex() {
     // it steps aside before the footer reaches it, so the two never overlap
     const nx = app.querySelector('.next'), ir = ix.getBoundingClientRect();
     ix.classList.toggle('on', scrollY > innerHeight * .5 && (!nx || nx.getBoundingClientRect().top > ir.bottom + 48));
-    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb, .bad, .H .kproto .pw, .H .kbdrop')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
+    const under = [...app.querySelectorAll('.H .rows, .covers, .H .bign, .kb, .bad, .H .kproto .pw, .H .kbdrop, .H .kph')].some(g => { const q = g.getBoundingClientRect(); return q.left < ir.right + 24 && q.bottom > ir.top - 24 && q.top < ir.bottom + 24; });
     ix.classList.toggle('dim', under);
     if (!raf) raf = requestAnimationFrame(draw);
   };
