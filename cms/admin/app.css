@@ -162,6 +162,17 @@ pre.log { max-height: 280px; overflow: auto; padding: 14px; border-radius: 10px;
 .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--pill); margin-right: 8px }
 .seg-b { height: 30px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--muted, #888); font: inherit; font-size: 13px; cursor: pointer }
 .seg-b.on { background: var(--ink, #111); color: var(--bg, #fff) }
+.pagewrap { margin-top: 12px } .pagewrap .pageedit { margin-top: 0 }
+.pbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px } .pbar .grow { flex: 1 } .pbar .seg { margin-right: 0 }
+.pbar .fp-only { display: none } .pbar .fp-t { font-size: 14px; font-weight: 600; margin-right: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw }
+.pbar .fp-dirty { font-size: 12.5px; color: var(--muted) }
+/* full page: the page fills the window, with the bar on top; the CMS's own sheets still open above it */
+.pagewrap.full { position: fixed; inset: 0; z-index: 30; margin: 0; display: flex; flex-direction: column; background: var(--bg) }
+.pagewrap.full .pbar { margin: 0; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--bar); backdrop-filter: blur(10px) }
+.pagewrap.full .fp-only { display: inline-flex } .pagewrap.full .fp-t { display: block }
+html:not(.dirty) .pagewrap.full .fp-dirty { display: none }
+.pagewrap.full .pageedit { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0 }
+html.fullpage, html.fullpage body { overflow: hidden }
 .pageedit { display: block; width: 100%; height: calc(100vh - 210px); min-height: 560px; border: 1px solid var(--line, #e5e5e5); border-radius: 12px; background: var(--surface); margin-top: 12px }
 .list .item.flash { box-shadow: 0 0 0 2px #3d7bff; transition: box-shadow .3s }
 

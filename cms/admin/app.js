@@ -25,6 +25,7 @@
   const touch = file => { dirty.add(file); paintDirty(); };
   function paintDirty() {
     $('dirty').hidden = !dirty.size;
+    document.documentElement.classList.toggle('dirty', !!dirty.size);
     document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('d', (b.dataset.files || '').split(',').some(f => dirty.has(f))));
   }
   addEventListener('beforeunload', e => { if (dirty.size) { e.preventDefault(); e.returnValue = ''; } });
@@ -248,7 +249,7 @@
   function openModal(t, body) { $('mtitle').textContent = t; $('mbody').innerHTML = ''; $('mbody').append(body); $('modal').hidden = false; }
   function closeModal() { $('modal').hidden = true; }
   $('mclose').onclick = closeModal; $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
-  addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save(); } });
+  addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('modal').hidden && window._kmFull && window._kmSetFull) window._kmSetFull(false); closeModal(); } if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save(); } });
 
   // ---------------------------------------------------------------- schemas
   const mname = p => !p ? 'empty' : typeof p === 'object' ? (p.color ? 'Colour · ' + (p.word || p.color) : 'Video · ' + String(p.video || '').split('/').pop()) : String(p).split('/').pop().split('?')[0];
@@ -401,6 +402,7 @@
   function go(r, s = null) { route = r; sub = s; nav(); render(); scrollTo(0, 0); try { history.replaceState(null, '', '#' + r + (s != null ? '/' + s : '')); } catch (_) {} }
   const head = (crumb, title) => { $('crumb').textContent = crumb; $('title').textContent = title; };
   function render() {
+    document.documentElement.classList.remove('fullpage');   // only a case study's page view goes full page; it turns it back on
     const v = $('view-root'); v.innerHTML = '';
     ({ dashboard: vDash, publish: vPublish, cases: vCases, designs: vDesigns, about: vAbout, engineering: vEng, projects: vProjects, text: vText, media: vMedia, settings: vSettings, inbox: vInbox }[route] || vDash)(v);
   }
@@ -425,9 +427,22 @@
           return; }
         const note = el('p', { class: 'help', text: 'Click any words on the page and type. Click a picture to replace or remove it, or “+ Add picture” to add one to that section. Changes are kept as you go; press Save & rebuild when you are done.' });
         const fr = el('iframe', { class: 'pageedit', src: pageUrl, title: 'Edit ' + c.title + ' on the page' });
+        // a bar over the page: Edit or Live preview (the page as visitors see it, unsaved changes included), and full page
+        let pvEdit = window._kmPvEdit !== false;
+        const sendMode = () => { try { fr.contentWindow.postMessage({ type: 'km-cms-mode', edit: pvEdit }, '*'); } catch (_) {} };
+        const segPv = el('div', { class: 'seg' }, ...[['edit', 'Edit'], ['preview', 'Live preview']].map(([k, n]) => el('button', { type: 'button', class: 'seg-b' + ((k === 'edit') === pvEdit ? ' on' : ''), 'data-k': k, text: n,
+          onclick: () => { pvEdit = k === 'edit'; window._kmPvEdit = pvEdit; segPv.querySelectorAll('.seg-b').forEach(b => b.classList.toggle('on', b.dataset.k === k)); wrap.classList.toggle('pv', !pvEdit); sendMode(); } })));
+        const fullBtn = el('button', { class: 'btn ghost small', type: 'button', onclick: () => setFull(!window._kmFull) });
+        const bar = el('div', { class: 'pbar' }, el('b', { class: 'fp-only fp-t', text: c.title }), segPv, el('span', { class: 'grow' }),
+          el('span', { class: 'fp-only fp-dirty', text: 'Unsaved changes' }), el('button', { class: 'btn small fp-only', type: 'button', text: 'Save & rebuild', onclick: () => save() }), fullBtn);
+        const wrap = el('div', { class: 'pagewrap' }, bar, fr);
+        const setFull = on => { window._kmFull = on; wrap.classList.toggle('full', on); document.documentElement.classList.toggle('fullpage', on);
+          fullBtn.textContent = on ? 'Exit full page' : 'Full page'; fullBtn.title = on ? 'Back to the CMS (Esc)' : 'Edit with the whole screen'; };
+        window._kmSetFull = setFull; setFull(!!window._kmFull); wrap.classList.toggle('pv', !pvEdit);
         const send = focus => { try { fr.contentWindow.postMessage({ type: 'km-cms-data', cases: clone(C.cases.cases), focus: typeof focus === 'string' ? focus : undefined }, '*'); } catch (_) {} };
         window._kmCmsMsg = e => { if (e.source !== fr.contentWindow) return; const d = e.data || {};
-          if (d.type === 'km-cms-ready') send();
+          if (d.type === 'km-cms-ready') { send(); sendMode(); }
+          if (d.type === 'km-cms-esc' && window._kmFull) setFull(false);
           if (d.type === 'km-cms-edit' && d.slug === c.slug) { const keys = d.path.split('.'); let o = c;
             for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
@@ -629,7 +644,7 @@
           document.body.append(m);
         }
         addEventListener('message', window._kmCmsMsg);
-        body.append(note, fr);
+        body.append(note, wrap);
       }
       v.append(el('button', { class: 'back', type: 'button', text: '← All case studies', onclick: () => go('cases') }),
         el('div', { class: 'headrow' }, el('h2', { text: c.title }), el('div', { class: 'acts' }, tabs,

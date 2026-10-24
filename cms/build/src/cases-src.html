@@ -710,7 +710,8 @@ const nl = s => String(s ?? '').replace(/<br\s*\/?>/g, ' ');      // headlines c
 const hl = s => esc(s).replace(/&lt;br&gt;/g, '<br>');
 const pad = n => String(n).padStart(2, '0');
 // editing in the CMS: the page opens as case.html?cms=1 inside the CMS; words marked with E(path) can be typed on directly
-const KM_EDIT = /[?&]cms=1/.test(location.search);
+const KM_CMS = /[?&]cms=1/.test(location.search);   // opened inside the CMS
+let KM_EDIT = KM_CMS;   // editing (the CMS can switch it off to show a live preview)
 const E = (path, br) => KM_EDIT ? ` data-edit="${path}"${br ? ' data-br' : ''}` : '';
 // sound: the ruler's detent tick, as on About. Browsers only allow sound after the first tap or key on the page.
 let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} addEventListener('km-sound', e => { soundOn = e.detail; });
@@ -1702,7 +1703,25 @@ function editable(c) {
   app.querySelectorAll('[data-pick]').forEach(el => { const b = document.createElement('button'); b.type = 'button'; b.className = 'km-add'; b.textContent = '+ Add picture';
     b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); parent.postMessage({ type: 'km-cms-add', slug: c.slug, section: el.dataset.pick }, '*'); }); el.append(b); });
 }
-if (KM_EDIT) {
+if (KM_CMS) {
+  // Edit ↔ Live preview: the same page and the same unsaved data, drawn with or without the editing tools.
+  // Switching modes or going full page changes what's above you, so the page keeps the heading you were reading in place.
+  const hs = () => [...app.querySelectorAll('h1, h2, h3, h4')];   // headings only: labels like "08 · Results" renumber when hidden parts drop out
+  let anchor = null, settling = 0;
+  const grab = () => { if (settling) return; const t = hs().map(h => ({ h, t: h.getBoundingClientRect().top })).filter(x => x.t > -400 && x.t < innerHeight)
+      .sort((a, b) => (a.h.tagName === 'H2' ? 0 : 1) - (b.h.tagName === 'H2' ? 0 : 1) || Math.abs(a.t - 80) - Math.abs(b.t - 80))[0];
+    anchor = t && { tag: t.h.tagName, txt: t.h.textContent.trim().slice(0, 60), t: t.t }; };
+  let gq = 0; addEventListener('scroll', () => { if (!gq) gq = requestAnimationFrame(() => { gq = 0; grab(); }); }, { passive: true });
+  const settle = () => { if (!anchor) return; const key = anchor; let moved = false; settling++;
+    const stop = () => { moved = true; }; addEventListener('wheel', stop, { once: true, passive: true }); addEventListener('touchstart', stop, { once: true, passive: true });
+    const align = () => { if (moved) return; const back = hs().find(h => h.tagName === key.tag && h.textContent.trim().slice(0, 60) === key.txt); if (back) scrollTo({ top: scrollY + back.getBoundingClientRect().top - key.t, behavior: 'instant' }); };
+    align(); requestAnimationFrame(align); [120, 300, 600, 1000, 1600].forEach(ms => setTimeout(align, ms)); setTimeout(() => { settling--; grab(); }, 1700); };
+  setTimeout(grab, 800);
+  let rq = 0; addEventListener('resize', () => { clearTimeout(rq); rq = setTimeout(settle, 60); });
+  addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-mode' || KM_EDIT === !!d.edit) return;
+    grab(); KM_EDIT = !!d.edit; document.documentElement.classList.toggle('km-cms', KM_EDIT);
+    document.querySelectorAll('.kpop').forEach(x => x.remove()); paint(true); settle(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('.kpop')) parent.postMessage({ type: 'km-cms-esc' }, '*'); });
   addEventListener('message', e => { const d = e.data || {}; if (d.type !== 'km-cms-data' || !Array.isArray(d.cases)) return;
     CASES.splice(0, CASES.length, ...d.cases.filter(x => !x.hidden)); const y = scrollY; const cs = CASES.find(x => x.slug === C) || CASES.find(x => x.slug === slugNow());
     if (cs) { C = cs.slug; shapes(cs).then(() => { paint(true); scrollTo(0, y);
