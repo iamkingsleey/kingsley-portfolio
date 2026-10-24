@@ -269,7 +269,16 @@
    "impactNote": "Measured over the three months after verification launched. Sales figures compare verified sellers with unverified ones.",
    "ver": "mix",
    "page": "case.html",
-   "fq": "88.1"
+   "fq": "88.1",
+   "briefBlocks": [
+    {
+     "t": "proto",
+     "src": "assets/protos/kusnap-verification.html",
+     "h": 780,
+     "cap": "User verification",
+     "addr": "Kusnap · account verification"
+    }
+   ]
   },
   {
    "slug": "bulvds",
