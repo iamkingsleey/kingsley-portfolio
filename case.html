@@ -665,6 +665,9 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
   .cnav .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0 } .cnav .now { min-width: 0 } .cnav .fq { font-size: 22px }
   .cnav::before { height: calc(84px + env(safe-area-inset-top, 0px)) }
   .H .hd { padding-top: 104px !important } .N .nh { padding-top: 96px !important } .K .gr { padding-top: 104px } }
+/* v2: more room under the case bar before the headline */
+.H.v2 .hd { padding-top: 236px !important }
+@media (max-width: 900px) { .H.v2 .hd { padding-top: 136px !important } }
 
 .top { position: relative; z-index: 31 }   /* above the nav's frosted band, so the way back to Designs stays readable */
 @media (max-width: 900px) { .top .mono { display: none } }
