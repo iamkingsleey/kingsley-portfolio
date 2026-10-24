@@ -264,7 +264,7 @@ const V = {
           <span class="badge lock">${I.lock}Locked</span></div>
           <div class="btnwrap"><button class="flat off" disabled title="Verify your phone number first">Start ID Verification</button></div></div>
       </div>${help}</section>`;
-    document.getElementById('go').onclick = () => go('code');
+    document.getElementById('go').onclick = () => go('checkPhone');
   },
 
   // 2 · step 1 of 2: the six digit code
@@ -401,20 +401,15 @@ const V = {
 
   // 6 · checking, then success
   checking() {
-    const steps = [['Checking your details', 'Reading what you entered'], [`Matching your ${S.idType} records`, `Comparing it with your ${IDS[S.idType]}`], ['Securing your account', 'Almost there']];
-    app.innerHTML = `<section class="view narrow"><div class="card centre vload" aria-live="polite">
-      <div class="ring" id="ring"><svg viewBox="0 0 76 76"><circle class="trk" cx="38" cy="38" r="33"/><circle class="glint" cx="38" cy="38" r="33"/><circle class="bar" id="bar" cx="38" cy="38" r="33"/></svg>
-        <div class="mid" id="mid">${I.contact}<span class="scan"></span></div></div>
-      <div class="vtitle"><p class="ttl">Verifying your identity</p><p class="txt" id="vsub">Please wait...</p></div>
-      <ul class="checks">${steps.map(x => `<li><span class="st"></span>${x[0]}</li>`).join('')}</ul></div></section>`;
-    const li = [...app.querySelectorAll('.checks li')], bar = document.getElementById('bar'), sub = document.getElementById('vsub'), C = 207.3;
-    const say = t => { sub.classList.add('swap'); later(() => { sub.textContent = t; sub.classList.remove('swap'); }, 200); };
-    const at = (k, p) => { li.forEach((x, j) => { x.classList.toggle('ok', j < k); x.classList.toggle('on', j === k); }); bar.style.strokeDashoffset = C * (1 - p); if (steps[k]) say(steps[k][1]); };
-    requestAnimationFrame(() => at(0, .14));
-    later(() => at(1, .45), 1200);
-    later(() => at(2, .78), 2500);
-    later(() => { at(3, 1); document.getElementById('ring').classList.add('done'); document.getElementById('mid').innerHTML = I.check; say('Identity confirmed'); }, 3500);
-    later(() => { S.id = true; go('idDone'); }, 4300);
+    loader({ icon: I.contact, title: 'Verifying your identity', done: 'Identity confirmed',
+      steps: [['Checking your details', 'Reading what you entered'], [`Matching your ${S.idType} records`, `Comparing it with your ${IDS[S.idType]}`], ['Securing your account', 'Almost there']],
+      next: () => { S.id = true; go('idDone'); } });
+  },
+  // 1b · before the code is sent: is this number free to use?
+  checkPhone() {
+    loader({ icon: I.call, title: 'Checking your phone number', done: 'Number is available', narrow: true,
+      steps: [['Checking the number', PHONE], ['Making sure it isn’t on another account', 'Each number can only verify one Kusnap account'], ['Sending your 6-digit code', 'It should arrive in a few seconds']],
+      next: () => go('code') });
   },
   idDone() {
     app.innerHTML = `<section class="view narrow"><div class="card centre">
@@ -423,6 +418,22 @@ const V = {
     document.getElementById('cd').onclick = () => go('dash');
   }
 };
+// a loader that walks through its checks: a ring fills as each one ticks, then it moves on
+function loader({ icon, title, steps, done, next }) {
+  app.innerHTML = `<section class="view narrow"><div class="card centre vload" aria-live="polite">
+    <div class="ring" id="ring"><svg viewBox="0 0 76 76"><circle class="trk" cx="38" cy="38" r="33"/><circle class="glint" cx="38" cy="38" r="33"/><circle class="bar" id="bar" cx="38" cy="38" r="33"/></svg>
+      <div class="mid" id="mid">${icon}<span class="scan"></span></div></div>
+    <div class="vtitle"><p class="ttl">${title}</p><p class="txt" id="vsub">Please wait...</p></div>
+    <ul class="checks">${steps.map(x => `<li><span class="st"></span>${x[0]}</li>`).join('')}</ul></div></section>`;
+  const li = [...app.querySelectorAll('.checks li')], bar = document.getElementById('bar'), sub = document.getElementById('vsub'), C = 207.3;
+  const say = t => { sub.classList.add('swap'); later(() => { sub.textContent = t; sub.classList.remove('swap'); }, 200); };
+  const at = (k, p) => { li.forEach((x, j) => { x.classList.toggle('ok', j < k); x.classList.toggle('on', j === k); }); bar.style.strokeDashoffset = C * (1 - p); if (steps[k]) say(steps[k][1]); };
+  requestAnimationFrame(() => at(0, .14));
+  later(() => at(1, .45), 1200);
+  later(() => at(2, .78), 2500);
+  later(() => { at(3, 1); document.getElementById('ring').classList.add('done'); document.getElementById('mid').innerHTML = I.check; say(done); }, 3500);
+  later(next, 4300);
+}
 function restart() { Object.assign(S, { phone: false, id: false, idType: 'BVN', num: '467849058372345' }); go('start'); }
 document.getElementById('home').onclick = restart;
 go('start');
