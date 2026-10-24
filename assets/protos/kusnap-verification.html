@@ -197,6 +197,18 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
   .btnwrap { display: block }
   .me b { display: none }
 }
+/* autoplay: a cursor walks through the flow on its own */
+.cur { position: fixed; z-index: 20; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; opacity: 0; transform: translate(var(--x, 50vw), var(--y, 60vh)); transition: transform .9s cubic-bezier(.45, .05, .2, 1), opacity .3s; filter: drop-shadow(0 2px 3px rgba(16, 24, 40, .25)) }
+.cur.on { opacity: 1 }
+.cur svg { width: 26px; height: 26px; transform-origin: 6px 4px; transition: transform .12s }
+.cur.down svg { transform: scale(.82) }
+.cur i { position: absolute; left: 6px; top: 4px; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: rgba(7, 118, 216, .22); transform: scale(0); opacity: 0 }
+.cur.tap i { animation: tap .5s ease-out }
+@keyframes tap { 0% { transform: scale(.2); opacity: 1 } 100% { transform: scale(1.4); opacity: 0 } }
+.demo-chip { position: fixed; left: 50%; bottom: 16px; z-index: 21; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(16, 24, 40, .86); color: #fff; font-size: 12.5px; line-height: 1.3; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none }
+.demo-chip.on { opacity: 1; transform: none }
+.demo-chip b { width: 7px; height: 7px; border-radius: 50%; background: #32d583; box-shadow: 0 0 0 0 rgba(50, 213, 131, .6); animation: live 1.6s infinite }
+@keyframes live { 70% { box-shadow: 0 0 0 7px rgba(50, 213, 131, 0) } 100% { box-shadow: 0 0 0 0 rgba(50, 213, 131, 0) } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
 </style>
 </head>
@@ -414,6 +426,52 @@ const V = {
 function restart() { Object.assign(S, { phone: false, id: false, idType: 'BVN', num: '467849058372345' }); go('start'); }
 document.getElementById('home').onclick = restart;
 go('start');
+
+// ---- autoplay (?autoplay=1): a cursor clicks through the whole flow and starts over, forever.
+// The moment a visitor clicks, taps or types, the demo stops and the prototype is theirs.
+(function autoplay() {
+  if (!/[?&]autoplay=(1|true|yes)/.test(location.search)) return;
+  const cur = document.createElement('div'); cur.className = 'cur'; cur.setAttribute('aria-hidden', 'true');
+  cur.innerHTML = '<i></i><svg viewBox="0 0 26 26"><path d="M6 3.5v17.2l4.6-4.3 2.9 6.6 3-1.3-2.9-6.5h6.3z" fill="#101828" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const chip = document.createElement('div'); chip.className = 'demo-chip'; chip.innerHTML = '<b></b>Playing on its own · click anywhere to try it';
+  document.body.append(cur, chip);
+  let live = true, x = innerWidth * .62, y = innerHeight * .7;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const place = (nx, ny) => { x = nx; y = ny; cur.style.setProperty('--x', (x - 6) + 'px'); cur.style.setProperty('--y', (y - 4) + 'px'); };
+  const q = sel => document.querySelector(sel);
+  const ready = (sel, test) => { const e = q(sel); return e && !e.disabled && (!test || test(e)) ? e : null; };
+  const until = async (sel, test, ms = 20000) => { const t0 = Date.now(); while (live && Date.now() - t0 < ms) { const e = ready(sel, test); if (e) return e; await sleep(120); } return null; };
+  async function press(sel, { test, pause = 900 } = {}) {
+    let e = await until(sel, test); if (!e || !live) return false;
+    await sleep(pause); if (!live) return false;
+    let r = e.getBoundingClientRect();
+    if (r.top < 70 || r.bottom > innerHeight - 20) { scrollBy({ top: r.top + r.height / 2 - innerHeight / 2, behavior: 'smooth' }); await sleep(700); r = e.getBoundingClientRect(); }   // scroll this page only, never the case study around it
+    cur.classList.add('on'); place(r.left + Math.min(r.width * .55, r.width - 10), r.top + r.height * .55); await sleep(950); if (!live) return false;
+    e = ready(sel, test); if (!e) return false;
+    cur.classList.add('down'); await sleep(110); cur.classList.remove('down', 'tap'); void cur.offsetWidth; cur.classList.add('tap');
+    e.click(); return true;
+  }
+  const typed = () => { const b = q('#vi'); return b && !b.disabled; };
+  async function loop() {
+    place(x, y); await sleep(500); chip.classList.add('on'); setTimeout(() => chip.classList.remove('on'), 4200);
+    while (live) {
+      if (!q('#go')) { restart(); await sleep(400); }
+      await press('#go', { pause: 1400 });                                   // dashboard → step 1
+      await press('#sms', { test: e => e.classList.contains('show'), pause: 700 });   // the text message fills the code
+      await press('#vf', { pause: 900 });                                    // verify the phone
+      await press('#nx', { pause: 1100 });                                   // ID verification next
+      await press('#sid', { pause: 1200 });                                  // start ID verification
+      await until('#vi', typed); await press('#vi', { pause: 700 });          // the form types itself, then verify
+      await press('#cd', { pause: 1300 });                                   // continue to the dashboard
+      await press('#again', { pause: 2600 });                                // and round again
+      await sleep(300);
+    }
+  }
+  const stop = e => { if (!e.isTrusted || !live) return; live = false; cur.classList.remove('on'); chip.innerHTML = '<b style="background:#0776d8;animation:none"></b>Your turn · Restart to watch again';
+    chip.classList.add('on'); setTimeout(() => chip.classList.remove('on'), 2600); };
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(t => addEventListener(t, stop, { capture: true, passive: true }));
+  loop();
+})();
 </script>
 </body>
 </html>

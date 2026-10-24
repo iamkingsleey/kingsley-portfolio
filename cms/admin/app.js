@@ -465,12 +465,13 @@
           const pick = el('select', { onchange: e => { if (!e.target.value) return; src.value = e.target.value; set('src', e.target.value); const p = PROTOS.find(x => x[0] === e.target.value); if (p && !b.addr) { b.addr = p[1]; addr.value = p[1]; } } },
             el('option', { value: '', text: 'Choose a prototype…' }), ...PROTOS.map(([v, t]) => el('option', { value: v, text: t, selected: v === b.src })));
           const addr = el('input', { type: 'text', value: b.addr || '', placeholder: 'Shown in its top bar', oninput: e => set('addr', e.target.value) });
+          const au = el('label', { style: 'display:flex;gap:10px;align-items:center;font-size:13px;cursor:pointer' }, el('input', { type: 'checkbox', checked: !!b.auto, onchange: e => { if (e.target.checked) set('auto', true); else { delete b.auto; touch('cases'); } } }), 'Plays on its own and loops (a cursor clicks through it; visitors can click in to take over)');
           const hh = el('input', { type: 'number', min: 360, max: 1400, step: 20, value: b.h || 760, oninput: e => set('h', +e.target.value || 760) });
           const fld = (t, x, help) => el('div', { class: 'f' }, el('label', { text: t }), x, help ? el('div', { class: 'help', text: help }) : '');
           const m = el('div', { class: 'modal', onclick: e => { if (e.target === m) done(); } }, el('div', { class: 'sheet', style: 'width:min(560px,100%)' },
             el('header', {}, el('b', { text: 'Prototype' }), el('button', { class: 'x', type: 'button', text: '×', onclick: done })),
             el('div', { class: 'mbody form', style: 'gap:14px' }, fld('Prototype', pick), fld('Or its address', src, 'A page in assets/protos/ (put the file there and publish), or a full https:// link.'),
-              fld('Name in its top bar', addr), fld('Height on desktop (px)', hh, 'Phones get up to 78% of the screen.'),
+              fld('Name in its top bar', addr), au, fld('Height on desktop (px)', hh, 'Phones get up to 78% of the screen.'),
               el('div', { class: 'acts', style: 'display:flex;gap:8px;justify-content:flex-end' }, el('button', { class: 'btn small', type: 'button', text: 'Done', onclick: done })))));
           document.body.append(m); }
         function blockMedia(path) { const b = objAt(path); if (!b) return; if (b.t === 'proto') { blockProto(b); return; }

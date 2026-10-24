@@ -1082,9 +1082,9 @@ const R = {
         return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
       if (t === 'proto') { const src = String(b.src || '').trim();
         if (!src) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">Add a prototype<span>Click to choose one</span></div></div>` : '';
-        const url = src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
+        const url = b.auto ? src + (src.includes('?') ? '&' : '?') + 'autoplay=1' : src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
         const addr = esc(b.addr || src.replace(/^.*\//, '').replace(/\.html?$/, '').replace(/[-_]/g, ' '));
-        return `<div class="fr kproto" data-kblk="${base}"><div class="pw"><div class="pbar"><i></i><i></i><i></i><span>${addr}</span><em>Try it</em><button type="button" data-kreplay aria-label="Start the prototype again">Restart</button></div>`
+        return `<div class="fr kproto" data-kblk="${base}"><div class="pw"><div class="pbar"><i></i><i></i><i></i><span>${addr}</span><em>${b.auto ? 'Demo' : 'Try it'}</em><button type="button" data-kreplay aria-label="Start the prototype again">Restart</button></div>`
           + `<iframe src="${esc(url)}" title="${addr} prototype" loading="lazy" style="--ph:${h}px"${KM_EDIT ? '' : ' allow="clipboard-read; clipboard-write"'}></iframe></div>`
           + (KM_EDIT ? `<button type="button" class="kchip" data-kproto="${base}">Change prototype</button>` : '') + cap([], 'Fig. ' + pad(++fig), label, base + '.cap') + `</div>`; }
       return '';
