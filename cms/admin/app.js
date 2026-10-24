@@ -274,7 +274,8 @@
       { k: 'problem', label: 'The brief · Problem', type: 'textarea' }, { k: 'goal', label: 'The brief · Goal', type: 'textarea' },
       { k: 'statement', label: 'Statement', type: 'textarea', rows: 2, help: 'One line set large mid-page (product: the design principle; brand: the scrolling ticker)' } ] },
     { title: 'Sections', help: 'The chapters of the case study, in order. Add, remove, reorder or duplicate them. Each can have text, points, numbers and pictures; leave a part empty to skip it.', fields: [
-      { k: 'sections', label: '', type: 'list', itemLabel: 'Section', def: () => ({ h: '', p: [], media: [] }), title: (s, i) => `${i + 1} · ${s.h || 'Untitled section'}`, of: { type: 'object', fields: [
+      { k: 'sections', label: '', type: 'list', itemLabel: 'Section', def: () => ({ h: '', p: [], media: [] }), title: (s, i) => `${i + 1} · ${s.h || 'Untitled section'}${s.off ? ' (hidden)' : ''}`, of: { type: 'object', fields: [
+        { k: 'off', label: 'Hidden from the site', type: 'bool', help: 'Kept here and on the page view (dimmed), but left off the live page. Untick to bring it back.' },
         { k: 'h', label: 'Heading', help: 'e.g. Overview, Pain points, UX strategy, High fidelity, Impact, Logo, Colour and type, Mockups' },
         { k: 'title', label: 'Title on the page (product, optional)', help: 'Leave empty for the default, e.g. Pain points shows as “Listening to users”' },
         { k: 'p', label: 'Text', type: 'paras', rows: 4, help: 'Leave an empty line between paragraphs' },
@@ -427,6 +428,13 @@
             for (let k = 0; k < keys.length - 1; k++) { const nk = keys[k + 1], key = /^\d+$/.test(keys[k]) ? +keys[k] : keys[k]; if (o[key] == null) o[key] = /^\d+$/.test(nk) ? [] : {}; o = o[key]; }
             const last = keys[keys.length - 1]; o[/^\d+$/.test(last) ? +last : last] = d.value; touch('cases'); }
           if (d.type === 'km-cms-pick' && d.slug === c.slug) setMode('form', d.path);
+          // a section's Hide / Show / Delete on the page. Numbered keys are the chapters; brief, principle and details are the fixed parts
+          if (d.type === 'km-cms-sec' && d.slug === c.slug) {
+            if (/^\d+$/.test(d.key)) { const i = +d.key, sec = (c.sections || [])[i]; if (!sec) return;
+              if (d.act === 'hide') sec.off = true; else if (d.act === 'show') delete sec.off;
+              else if (d.act === 'delete') { if (!confirm(`Delete the section “${sec.h || 'Untitled'}” for good? Its text and pictures go with it. (To keep it for later, use Hide instead.)`)) return; c.sections.splice(i, 1); } }
+            else { c.off = c.off || {}; if (d.act === 'hide') c.off[d.key] = true; else delete c.off[d.key]; if (!Object.keys(c.off).length) delete c.off; }
+            touch('cases'); send(); toast(d.act === 'hide' ? 'Hidden from the site. Save & rebuild to publish.' : d.act === 'show' ? 'Back on the site.' : 'Section deleted.'); }
           if ((d.type === 'km-cms-media' || d.type === 'km-cms-add' || d.type === 'km-cms-slot') && d.slug === c.slug) pictureSheet(d);
           if (d.type === 'km-cms-swap' && d.slug === c.slug) swapSpots(d);
           if (d.type === 'km-cms-widths' && d.slug === c.slug) { const B = block(d.section), R = B && B.get(); if (!R || !R[d.r]) return;   // widths dragged on the page
