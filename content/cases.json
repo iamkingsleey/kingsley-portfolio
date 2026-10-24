@@ -34,7 +34,6 @@
    ],
    "run": [
     "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
-    "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400",
     "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400",
     {
      "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
@@ -133,9 +132,7 @@
      "p": [
       "Verification: identity checks and badges that tell a buyer who they are dealing with before any money moves."
      ],
-     "media": [
-      "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400"
-     ],
+     "media": [],
      "notes": []
     },
     {
@@ -144,7 +141,6 @@
       "Phone verification by one-time code, then identity with a government-issued ID. Secure, without adding friction."
      ],
      "media": [
-      "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
       "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400"
      ],
      "notes": []
@@ -155,12 +151,7 @@
       "Responsive screens for verifying business-owned stores, so a shop can show buyers it is the real thing."
      ],
      "media": [
-      {
-       "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
-       "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
-      },
-      "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400",
-      "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400"
+      "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
      ],
      "notes": []
     },
@@ -268,11 +259,10 @@
    "briefBlocks": [
     {
      "t": "proto",
-     "src": "Prototype/kusnap-verification.html",
+     "src": "assets/protos/kusnap-verification.html",
      "h": 780,
      "cap": "User verification",
-     "addr": "Kusnap · account verification",
-     "auto": true
+     "addr": "Kusnap · account verification"
     }
    ]
   },
