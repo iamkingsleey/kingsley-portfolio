@@ -527,8 +527,9 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .km-cms .ksec > .ch { position: relative }
 .km-cms .ksec.koff > * { opacity: .32; filter: grayscale(1) }
 .km-cms .ksec.koff > .ch { opacity: 1; filter: none } .km-cms .ksec.koff > .ch > :not(.ktools) { opacity: .32 }
-.km-cms .ktools { position: absolute; right: 0; top: calc(var(--ktop, 120px) - 46px); z-index: 6; display: flex; gap: 6px; align-items: center; opacity: .35; transition: opacity .15s }
-.km-cms .ch:hover > .ktools, .km-cms .ksec.koff .ktools, .km-cms .ktools:focus-within { opacity: 1 }
+.km-cms .ktools { position: absolute; left: 0; right: 0; top: calc(var(--ktop, 120px) - 46px); z-index: 6; display: flex; gap: 6px; align-items: center }
+.km-cms .ktools button { opacity: .35; transition: opacity .15s } .km-cms .ch:hover > .ktools button, .km-cms .ksec.koff .ktools button, .km-cms .ktools:focus-within button { opacity: 1 }
+.km-cms .ktools .ktag { margin-right: auto; font: 600 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #3d7bff; background: color-mix(in srgb, #3d7bff 12%, transparent); padding: 5px 9px; border-radius: 999px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60% }
 .km-cms .ktools button { height: 28px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 999px; background: var(--bg); color: var(--ink); font: 600 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer }
 .km-cms .ktools button:hover { border-color: var(--ink) } .km-cms .ktools button.del:hover { border-color: #e5484d; color: #e5484d }
 .km-cms .ktools .kbadge { font: 600 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #fff; background: #8a8a8f; padding: 5px 9px; border-radius: 999px }
@@ -1041,7 +1042,8 @@ const R = {
     // the small label over each chapter ("02 · Research"): yours if you set one on the page, empty hides it
     const ebOf = (s, i) => s.eb != null ? s.eb : `${pad(i + 1)} · ${ph(s)[0]}`;
     const EB = (s, i, auto) => { const t = s.eb != null ? s.eb : auto; return t || KM_EDIT ? `<span class="eb"${E(`sections.${s._i}.eb`)} data-ph="Add a label">${esc(t)}</span>` : ''; };
-    const TOOLS = (key, off, canDel) => KM_EDIT ? `<div class="ktools" contenteditable="false">${off ? '<span class="kbadge">Hidden from the site</span>' : ''}<button type="button" data-kact="${off ? 'show' : 'hide'}" data-ksec="${key}">${off ? 'Show' : 'Hide'}</button>${canDel ? `<button type="button" class="del" data-kact="delete" data-ksec="${key}">Delete</button>` : ''}</div>` : '';
+    // the tag names the block the way the Form does ("Section 3 · Pain points"), so the page view and the Form line up
+    const TOOLS = (key, off, canDel, name) => KM_EDIT ? `<div class="ktools" contenteditable="false"><span class="ktag">${esc(name || key)}</span>${off ? '<span class="kbadge">Hidden from the site</span>' : ''}<button type="button" data-kact="${off ? 'show' : 'hide'}" data-ksec="${key}">${off ? 'Show' : 'Hide'}</button>${canDel ? `<button type="button" class="del" data-kact="delete" data-ksec="${key}">Delete</button>` : ''}</div>` : '';
     const WRAP = (key, off, html) => KM_EDIT ? `<div class="ksec${off ? ' koff' : ''}" data-ksec="${key}">${html}</div>` : (off ? '' : html);
     // every set of pictures fills the column edge to edge: a picture that would sit alone at part width gets a partner from the case's
     // other pictures, and is left out if there is none. No picture shows twice.
@@ -1069,11 +1071,11 @@ const R = {
         const cv = tidy([c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // the backstory: the problem, the goal and my part in it, before any screens
     const OFF = c.off || {};   // the fixed parts hidden in the CMS: brief, principle, details
-    h += WRAP('brief', OFF.brief, `<section class="tx ch" data-ix="The brief">${TOOLS('brief', OFF.brief)}<span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
+    h += WRAP('brief', OFF.brief, `<section class="tx ch" data-ix="The brief">${TOOLS('brief', OFF.brief, false, 'The brief')}<span class="eb">The brief</span><h2${c.story ? E('story.0') : ''}>${esc(c.story ? c.story[0] : c.title)}</h2>${(c.story ? c.story[1] : []).map((p, k) => `<p${E('story.1.' + k)}>${esc(p)}</p>`).join('')}
       ${c.problem ? `<h4>The problem</h4><p${E('problem')}>${esc(c.problem)}</p>` : ''}${c.goal ? `<h4>The goal</h4><p class="punch"${E('goal')}>${esc(c.goal)}</p>` : ''}
       <h4>My role</h4><p>${esc(c.role)}${c.client && c.client !== 'Personal project' ? ', ' + esc(c.client) : ''}${c.year && c.year !== 'Year' ? ', ' + esc(c.year) : ''}.</p><div class="role">${(c.did || []).map(d => `<span>${esc(d)}</span>`).join('')}</div></section>`);
     c.secs.forEach((s, i) => {
-      const off = !!s.off, k0 = h.length, T = TOOLS(String(s._i), off, true), CP = `sections.${s._i}.cap`;
+      const off = !!s.off, k0 = h.length, T = TOOLS(String(s._i), off, true, `Section ${s._i + 1} · ${s.h || 'Untitled'}`), CP = `sections.${s._i}.cap`;
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
         h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}</section>${s.view === 'dial' ? BADIAL(s) : bigNums(s.stats, s._i)}${pics(media, capOf(s), s._i, CP)}`;
@@ -1083,10 +1085,10 @@ const R = {
       const lead = s.list ? `<div class="lead">${s.list.map(([a, b], k) => `<div><b${E(`sections.${s._i}.list.${k}.0`)}>${esc(a)}</b>. <span${E(`sections.${s._i}.list.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>` : '';
       h += `<section class="tx ch" data-ix="${esc(ph(s)[1])}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${(s.p || []).map((p, k) => `<p${E(`sections.${s._i}.p.${k}`)}>${esc(p)}</p>`).join('')}${lead}</section>${NOTES(s)}${pics(media, capOf(s), s._i, CP)}`;
       h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0));
-      if (i === 2 && c.statement) h += WRAP('principle', OFF.principle, `<section class="tx ch">${TOOLS('principle', OFF.principle)}<span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`);
+      if (i === 2 && c.statement) h += WRAP('principle', OFF.principle, `<section class="tx ch">${TOOLS('principle', OFF.principle, false, 'Design principle')}<span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`);
     });
     if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list, 'impact.list')}`;
-    h += WRAP('details', OFF.details, `<section class="tx ch" data-ix="Project details">${TOOLS('details', OFF.details)}<span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`) + `<div class="sp"></div>`;
+    h += WRAP('details', OFF.details, `<section class="tx ch" data-ix="Project details">${TOOLS('details', OFF.details, false, 'Project details')}<span class="eb">Project details</span><dl class="cred">${c.meta.map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`) + `<div class="sp"></div>`;
     return h + `${NEXT(c)}</main>`;
   },
   F(c) {
