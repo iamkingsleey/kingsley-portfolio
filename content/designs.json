@@ -959,9 +959,15 @@
       ],
       "bg": "#f2f5f7",
       "dark": false,
-      "desc": "Onboarding for a food ordering app’s spring menu: big type over food photography, then straight into signing in and ordering.",
+      "desc": "A UI study: replicating an existing food brand’s spring menu onboarding, with big type over food photography leading into sign-in and ordering. Not my original design.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "eBay, home and categories",
@@ -974,9 +980,15 @@
       ],
       "bg": "#f2f5f7",
       "dark": false,
-      "desc": "A UI study: eBay’s app home rebuilt from scratch, with live shopping, curated categories and story-led promos on one feed.",
+      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "eBay, price history and reporting",
@@ -989,9 +1001,15 @@
       ],
       "bg": "#f2f5f7",
       "dark": false,
-      "desc": "A UI study: eBay’s item details rebuilt from scratch, with the sold-price chart, its time filters and the flow for reporting a message.",
+      "desc": "A UI study: replicating eBay’s item details, with the sold-price chart, its time filters and the flow for reporting a message. Not my original design.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "Discord, servers and messages",
@@ -1004,9 +1022,15 @@
       ],
       "bg": "#ffffff",
       "dark": false,
-      "desc": "A UI study: Discord on mobile rebuilt from scratch, with a server home, the join-a-server empty state and the new message sheet.",
+      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "Search, recent and related",
