@@ -299,7 +299,7 @@ pj = json.load(open(f'{REPO}/content/designs.json', encoding='utf-8'))['projects
 LAYOUT_PAGE = {'logo': 'logo.html', 'product-panels': 'product.html', 'product-story': 'product.html', 'illustration': 'showcase.html', '3d': 'showcase.html'}
 slugify = lambda t: re.sub(r'^-|-$', '', re.sub(r'[^a-z0-9]+', '-', t.lower()))
 # the pieces, by category, in the order they are listed in content/designs.json
-A = {k: [] for k in ['3d', 'brand', 'motion', 'product']}
+A = {k: [] for k in ['3d', 'illustration', 'poster', 'brand', 'motion', 'product', 'ui']}
 for p in pj:
     if p.get('hidden'): continue
     im = p['images'][0]

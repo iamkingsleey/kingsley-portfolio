@@ -10,8 +10,8 @@
 KM = """<script>
   // Which piece this page shows (logo.html#badge) and its neighbours on the dial. Same order as project.html.
   (function () {
-    var A = __ITEMS__, CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product' }, all = [];
-    ['3d', 'illustration', 'poster', 'product', 'brand', 'motion'].forEach(function (k) { (A[k] || []).forEach(function (it) { all.push(Object.assign({}, it, { src: it.src || it.poster, cat: CAT[k] })); }); });
+    var A = __ITEMS__, CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product', ui: 'UI' }, all = [];
+    ['3d', 'illustration', 'poster', 'product', 'brand', 'motion', 'ui'].forEach(function (k) { (A[k] || []).forEach(function (it) { all.push(Object.assign({}, it, { src: it.src || it.poster, cat: CAT[k] })); }); });
     var slug = function (t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); };
     var h = decodeURIComponent(location.hash.slice(1)), file = location.pathname.split('/').pop() || 'index.html';
     var i = all.findIndex(function (x) { return slug(x.t) === h; });

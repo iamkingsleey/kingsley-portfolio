@@ -469,7 +469,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     { k: 'poster', name: 'Poster', tools: 'Figma' },
     { k: 'product', name: 'Case study', tools: 'Figma · Code', back: 'Case studies' },
     { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
-    { k: 'motion', name: 'Motion', tools: 'Blender' }
+    { k: 'motion', name: 'Motion', tools: 'Blender' },
+    { k: 'ui', name: 'UI', tools: 'Figma' }
   ];
   // ---------- Real project details ----------
   // One entry per piece, keyed by title. Every field is optional: anything left empty is simply not shown.
@@ -489,7 +490,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const slugOf = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   // the newer kinds (illustrations, posters) are mixed through the rest instead of sitting in a block of their own:
   // spread evenly, in a fixed shuffled order so the page looks the same on every visit
-  const MIX = ['Illustration', 'Poster'];
+  const MIX = ['Illustration', 'Poster', 'UI'];
   const mixIn = list => {
     const isX = x => MIX.includes(x.cat) || x.mix, base = list.filter(x => !isX(x)), extra = list.filter(isX);   // (a piece can also ask to be mixed in: "mix": true)
     let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -1155,6 +1156,12 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       p: ['I started from the identity system, its colours, marks and tone, and asked where it could live as a physical thing.',
           'Each object was modelled and dressed in the brand’s language so it works as merch, campaign imagery or a hero visual on its own.'],
       steps: [['Identity', 'Colours, marks and tone of voice.'], ['Objects', 'Where the brand lives in real life.'], ['Model', 'Built and dressed in 3D.'], ['Details', 'Stickers, stitching and texture.'], ['Assets', 'Crops for web, social and print.']] },
+    'UI': { type: 'UI design', role: 'Product design, UI, interaction',
+      sum: 'Screens for a real product flow, designed to be clear at a glance and easy to act on.',
+      state: t => `${t} started with one question: what does someone need to see first on this screen?`,
+      p: ['I start from the task, not the layout: what the person came to do, and what could stop them.',
+          'Hierarchy, spacing and type are tuned until the main action is obvious and everything else steps back.'],
+      steps: [['Task', 'What the person came to do.'], ['Flow', 'Screens and states in order.'], ['Layout', 'Hierarchy, spacing and type.'], ['Detail', 'Icons, copy and edge cases.'], ['Polish', 'Final screens and mockups.']] },
     'Motion': { type: 'Motion study', role: 'Animation, 3D, art direction',
       sum: 'A study in speed and weight, rendered as stills that still feel like they are moving.',
       state: t => `${t} explores how blur, timing and camera can make a single frame feel fast.`,

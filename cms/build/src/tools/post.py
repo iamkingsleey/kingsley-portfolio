@@ -265,6 +265,11 @@ try:
                     if not os.path.exists(_sm) or os.path.getmtime(_sm) < os.path.getmtime(_src):
                         os.makedirs(os.path.dirname(_sm), exist_ok=True)
                         _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((640, 640 * 4)); _m.save(_sm, 'WEBP', quality=78, method=6)
+                    # "thumbs" (fits 300px) for the All view, the strip buttons and the trail; made here so new pieces get one too
+                    _th = f'{REPO}/assets/designs/thumbs/' + os.path.basename(_out)
+                    if not os.path.exists(_th) or os.path.getmtime(_th) < os.path.getmtime(_src):
+                        os.makedirs(os.path.dirname(_th), exist_ok=True)
+                        _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((300, 300)); _m.save(_th, 'WEBP', quality=80, method=6)
             except Exception as _e: print('webp skipped', _rel, _e)
     # WebPs uploaded as-is (no JPG/PNG beside them) can be huge lossless files: one 360 KB picture held the Shop back
     # past 2 s on a phone. Over 250 KB they're re-saved lossy once; the smaller copy is kept only if it saves 40%+, so a

@@ -248,8 +248,8 @@ __POPKIT__<script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const A = __ITEMS__, TOOL_SRC = __TOOLS__;   // pieces by category (as on Designs) and the tool icons
-  const CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product' };
-  const all = []; for (const k of ['3d', 'illustration', 'poster', 'product', 'brand', 'motion']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
+  const CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product', ui: 'UI' };
+  const all = []; for (const k of ['3d', 'illustration', 'poster', 'product', 'brand', 'motion', 'ui']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
   const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const idx = t => all.findIndex(x => x.t === t);
   const pad = i => String(i + 1).padStart(2, '0');
@@ -277,6 +277,11 @@ __POPKIT__<script>
           'Each object was modelled and dressed in the brand’s language, down to the stickers, stitching and texture, so it works as merch, campaign imagery or a hero visual on its own.'],
       statement: 'A brand you can hold is a brand people remember.',
       side: ['Details', 'Small things carry the identity', 'Stickers, stitching and surface texture do most of the talking. Each one was drawn in the brand’s own shapes before it was modelled.'] },
+    UI: { lead: 'Screens that make the next step obvious', did: ['UI design', 'Product design', 'Interaction'], tools: ['figma'],
+      p: ['Each screen starts from the task: what the person came to do, and what could get in their way.',
+          'Hierarchy, spacing and type do the work, so the main action is clear and everything else steps back.'],
+      statement: 'A clear screen is a fast screen.',
+      side: ['Process', 'Task, flow, layout', 'The flow is settled first. Visual detail comes once every screen has one clear job.'] },
     Motion: { lead: 'A single frame that still feels fast', did: ['Animation', '3D', 'Art direction', 'Lighting'], tools: ['blender', 'aftereffects'],
       p: ['I animated the full move first, then hunted for the frame where the motion reads best: the moment just before or after the peak.',
           'Motion blur, camera angle and colour were pushed together so each still carries the energy of the loop it came from.'],

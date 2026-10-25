@@ -323,7 +323,7 @@
   const DESIGN = [
     { title: 'The piece', cols: 2, fields: [
       { k: 'title', label: 'Title' },
-      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Case study']] },
+      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['ui', 'UI'], ['product', 'Case study']] },
       { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a collection or case study', type: 'select', options: CASE_SLUGS, help: 'A collection (e.g. 3D collection): its pieces share arrows and a grid on Designs. A product or brand case study: adds “Read case study”.' },
       { k: 'desc', label: 'Project info', type: 'textarea', full: true },
       { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
