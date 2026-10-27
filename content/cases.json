@@ -67,6 +67,12 @@
          "Listing had to stay fast, because speed is the product. Every step had to be simple enough for a shop owner to finish without help."
         ]
        ]
+      },
+      {
+       "t": "picture",
+       "m": "assets/uploads/kusnap-groceries.jpg",
+       "cap": "",
+       "mm": "assets/uploads/kusnap-groceries-m.jpg"
       }
      ]
     },
@@ -224,6 +230,12 @@
          "cost": "Some listings still go live below 80%."
         }
        ]
+      },
+      {
+       "t": "picture",
+       "m": "assets/uploads/kusnap-clothes.jpg",
+       "cap": "",
+       "mm": "assets/uploads/kusnap-clothes-m.jpg"
       }
      ]
     },

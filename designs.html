@@ -143,7 +143,8 @@ body.open .px { opacity: 0; pointer-events: none }
   .station { left: max(16px, env(safe-area-inset-left, 0px)); top: calc(18px + env(safe-area-inset-top, 0px)) }
   .now .fq { font-size: 22px }
   .top { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: calc(66px + env(safe-area-inset-top, 0px)); justify-content: space-between; transform: none }
-  .chips { overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 18px }   /* fades at the edge: more filters this way */
+  .chips { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); padding-right: 32px }   /* runs to the right edge, in line with the menu button, and fades there: more filters this way */
+  .top .count { display: none }   /* the count has no room on a phone; it held the filters short of the edge */
   .chips button { padding: 10px 11px; font-size: 12.5px; white-space: nowrap; flex: none }   /* taller, for thumbs */
   .chips button sup { display: none }
   .hint span { display: none }

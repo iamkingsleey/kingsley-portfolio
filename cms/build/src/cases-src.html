@@ -286,6 +286,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 @media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
 /* an animated figure: a self-playing page in a fixed shape (3:2 unless the block says otherwise), framed like a picture */
 .H .kframe .fw { position: relative; aspect-ratio: var(--far, 3 / 2); border-radius: var(--km-r, 14px); overflow: hidden; background: var(--fbg, #f1f3f6); isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black) }
+.pmb { display: none } @media (max-width: 720px) { .pdk { display: none } .pmb { display: block } }
 .H .kframe iframe { position: absolute; left: -1px; top: -1px; display: block; width: calc(100% + 2px); height: calc(100% + 2px); border: 0; background: var(--fbg, #f1f3f6) }
 [data-theme="dark"] .kframe .fw[data-dk] { --fbg: #16181b }
 @media (max-width: 720px) { .kframe .fw[data-mr] { aspect-ratio: var(--fmr) } }
@@ -1153,7 +1154,11 @@ const R = {
           if (KM_EDIT) return `<div class="fr kbpic" data-kblk="${base}">${hint ? ph.replace('class="kph"', 'class="kph kbdrop"').replace('</p></div>', `</p><b class="kadd">${t === 'video' ? 'Add a video' : 'Add a picture'}</b></div>`) : `<div class="kbdrop">${t === 'video' ? 'Add a video' : 'Add a picture'}<span>Click to choose one</span></div>`}</div>`;
           return hint ? `<div class="fr">${ph}</div>` : ''; }
         used.add(key(m)); const label = b.cap != null ? esc(b.cap) : '';
-        return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cap([m], 'Fig. ' + pad(++fig), label, base + '.cap'))}</div>`; }
+        // a picture with no caption is there for the look: no caption, and it doesn't take a figure number
+        const cp = label || KM_EDIT ? cap([m], 'Fig. ' + pad(++fig), label, base + '.cap') : '';
+        // a picture can carry its own shot for phones (mm): the page shows one or the other, never both
+        if (b.mm && !KM_EDIT) { used.add(key(b.mm)); return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}"><div class="pdk">${ROWS([m], 'c', '')}</div><div class="pmb">${ROWS([b.mm], 'c', '')}</div>${cp}</div>`; }
+        return `<div class="fr kbpic" style="--pmh:300vh" data-kblk="${base}">${ROWS([m], 'c', cp)}</div>`; }
       // findings and what each one changed in the design
       if (t === 'pairs') { const L = (b.items || []).map((x, k) => [x, k]).filter(([x]) => KM_EDIT || (x && (x[0] || x[1])));
         return L.length ? `<div class="pairs"><div class="h"><span${E(base + '.a')} data-ph="We heard">${esc(b.a != null ? b.a : 'We heard')}</span><span></span><span${E(base + '.b')} data-ph="So the design">${esc(b.b != null ? b.b : 'So the design')}</span></div>${L.map(([x, k]) => `<div><span${E(`${base}.items.${k}.0`)} data-ph="What you found">${esc(x[0] || '')}</span><i>→</i><span${E(`${base}.items.${k}.1`)} data-ph="What the design does about it">${esc(x[1] || '')}</span></div>`).join('')}</div>${KM_EDIT ? `<button type="button" class="kchip" data-kmore="${base}">+ Finding</button>` : ''}` : ''; }
