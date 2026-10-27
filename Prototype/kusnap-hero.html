@@ -178,7 +178,7 @@ async function typeLoop(run) {
 // the shoe tile carousel, over its patch of the picture (Figma 841,228 · 436×312, at 4x)
 const crl = document.createElement('div'); crl.className = 'crl';
 Object.assign(crl.style, { left: 3363 / 5220 * 100 + '%', top: 911 / 3480 * 100 + '%', width: 1748 / 5220 * 100 + '%', height: 1250 / 3480 * 100 + '%' });
-const slides = ['kusnap-car/c1.webp', 'kusnap-car/c2.webp', 'kusnap-car/c5.webp', 'kusnap-car/c3.webp', 'kusnap-car/c4.webp'];   // the two headphones kept apart
+const slides = ['kusnap-car/c1.webp', 'kusnap-car/c2.webp', 'kusnap-car/c5.webp', 'kusnap-car/c3.webp', 'kusnap-car/c4.webp', 'kusnap-car/c6.webp'];   // the two headphones kept apart, the two grocery shots too
 crl.innerHTML = slides.map((u, i) => '<img alt="' + (i ? '' : 'Shop with Kusnap') + '" src="' + u + '"' + (i ? '' : ' class="top"') + '>').join('');
 b.insertBefore(crl, full.nextSibling);
 const imgs = [...crl.querySelectorAll('img')];
