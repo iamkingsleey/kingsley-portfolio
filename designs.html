@@ -1454,6 +1454,22 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     location.href = items[i].link;
     setTimeout(() => { f.remove(); cov.remove(); busy = false; }, 1500);
   }
+  // A case study: the cover ripples from the click, then the page tunes to the case study. Nothing is carried across,
+  // so the cover never sits over the case study page while it opens.
+  // case covers load ahead, so the first click can ripple straight away
+  addEventListener('load', () => setTimeout(() => items.forEach(it => { if (it.cs) texImg(mdOf(still(it))); }), 600));
+  async function goCase(i, x, y, from, dest) {
+    if (busy) return; busy = true; tap();
+    try { sessionStorage.setItem('km-return', items[i].t); sessionStorage.removeItem('km-keep'); } catch (_) {}
+    if (x == null) { x = from.left + from.width / 2; y = from.top + from.height / 2; }
+    const im = texImg(mdOf(still(items[i])));                // the cover has to be loaded to ripple; give it a moment if it isn't
+    if (!reduce && !(im.complete && im.naturalWidth)) await Promise.race([im.decode().catch(() => {}), wait(300)]);
+    const rp = makeRipple(still(items[i]), from.width, from.height, x - from.left, y - from.top);
+    const f = rp ? flyEl(from, rp.cv, still(items[i])) : null;
+    await wait(rp && !reduce ? 320 : 0);                      // let the ripple read on the cover
+    Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest });
+    setTimeout(() => { if (f) f.remove(); busy = false; }, 1600);
+  }
   if (PROJECT_PAGE) setTimeout(() => { [PROJECT_PAGE, 'logo.html', 'product.html', 'showcase.html'].forEach(h => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; document.head.appendChild(l); }); }, 1500);
   addEventListener('pageshow', e => { if (e.persisted) { document.querySelectorAll('.pagecover, .fly, .km-keep').forEach(c => c.remove()); busy = false; flyIdx = -1; leaving = false; } });   // back button: nothing left over
   async function openDetail(i, x, y, fr, quiet) {      // fr: the box it flies from (a tile in the All view), else the piece on the dial; quiet: opened from the address
@@ -1941,7 +1957,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     // open the piece in the middle the way a tile opens: a case study or a link goes there, anything else opens in the small view
     const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + H * .46 - front.h / 2, width: front.w, height: front.h };
       const dest = items[i].link || (items[i].cs && items[i].page);
-      if (dest && window.Tuner) { tap(); try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {} if (window.KM && KM.keep && !reduce) KM.keep(mdOf(still(items[i])), r); Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest }); return; }
+      if (dest && window.Tuner) { if (items[i].cs) goCase(i, cx, cy, r, dest); else { tap(); try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {} if (window.KM && KM.keep && !reduce) KM.keep(mdOf(still(items[i])), r); Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest }); } return; }
       window._kmReelRect = r; openDetail(i, cx, cy, r); };
     const span = () => geo().ch * .7 + geo().gap;
     cv.addEventListener('pointerdown', e => { if (e.button > 0) return; drag = { x: e.clientX, p0: pos, p: pos, t: performance.now(), v: 0 }; moved = 0; try { cv.setPointerCapture(e.pointerId); } catch (_) {} rv.classList.add('drag'); });
@@ -2166,6 +2182,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const t = e.target.closest('.ov-t'); if (!t) return;
     const i = +t.dataset.i;
     const dest = items[i].link || (items[i].cs && items[i].page);   // a case study goes straight to it; "link" points a piece anywhere
+    if (dest && window.Tuner && items[i].cs) { goCase(i, e.clientX, e.clientY, t.querySelector('.ov-im').getBoundingClientRect(), dest); return; }
     if (dest && window.Tuner) { tap();
       try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {}
       // keep the picture: it lifts off its tile and stays sharp above the tuning screen; the case study lands it on the same picture (kit.js)
