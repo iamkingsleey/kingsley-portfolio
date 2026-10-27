@@ -678,7 +678,9 @@
        "src": "Prototype/bulvds-wallet.html?flow=home",
        "ratio": "3 / 2",
        "cap": "The wallet home: three balances, and a plain explanation for each.",
-       "title": "The wallet home, then View Breakdown opens the wallet overview and an explanation of each balance"
+       "title": "The wallet home, then View Breakdown opens the wallet overview and an explanation of each balance",
+       "mratio": "3 / 4",
+       "dark": true
       },
       {
        "t": "heading",
@@ -693,7 +695,9 @@
        "src": "Prototype/bulvds-wallet.html?flow=fund",
        "ratio": "3 / 2",
        "cap": "Top up with Paystack or crypto: USDT converts to Naira as you type, and the new balance shows straight away.",
-       "title": "Fund wallet, choose crypto, enter an amount in USDT, see the Naira value, confirm, and the balance updates"
+       "title": "Fund wallet, choose crypto, enter an amount in USDT, see the Naira value, confirm, and the balance updates",
+       "mratio": "3 / 4",
+       "dark": true
       },
       {
        "t": "heading",
@@ -708,7 +712,9 @@
        "src": "Prototype/bulvds-wallet.html?flow=withdraw",
        "ratio": "3 / 2",
        "cap": "Withdraw to a saved bank account, confirmed with a 4-digit code.",
-       "title": "Withdraw, choose bank transfer, enter the amount and a note, confirm with a code, funds sent"
+       "title": "Withdraw, choose bank transfer, enter the amount and a note, confirm with a code, funds sent",
+       "mratio": "3 / 4",
+       "dark": true
       },
       {
        "t": "heading",
@@ -723,7 +729,9 @@
        "src": "Prototype/bulvds-wallet.html?flow=checkout",
        "ratio": "3 / 2",
        "cap": "Add extras, then pay from the wallet, with Paystack, or split between the two.",
-       "title": "Review the booking, add a PS5 as an extra, open the payment summary, compare payment methods and pay from the wallet"
+       "title": "Review the booking, add a PS5 as an extra, open the payment summary, compare payment methods and pay from the wallet",
+       "mratio": "3 / 4",
+       "dark": true
       },
       {
        "t": "heading",
@@ -738,7 +746,9 @@
        "src": "Prototype/bulvds-wallet.html?flow=history",
        "ratio": "3 / 2",
        "cap": "Every transaction, with a receipt for each, and a clear failed state.",
-       "title": "Recent transactions, then a caution fee refund and a failed withdrawal opened as receipts"
+       "title": "Recent transactions, then a caution fee refund and a failed withdrawal opened as receipts",
+       "mratio": "3 / 4",
+       "dark": true
       }
      ]
     },
@@ -761,7 +771,9 @@
        "src": "Prototype/bulvds-onboarding.html?flow=explorer",
        "ratio": "3 / 2",
        "cap": "Splash, three slides with the isometric illustrations, sign-up by email, then the feed.",
-       "title": "The splash screen, three onboarding slides with isometric illustrations, the welcome screen, an email that is new to Bulvds leading to Create your account, then the home feed scrolling"
+       "title": "The splash screen, three onboarding slides with isometric illustrations, the welcome screen, an email that is new to Bulvds leading to Create your account, then the home feed scrolling",
+       "mratio": "3 / 4",
+       "dark": true
       },
       {
        "t": "heading",

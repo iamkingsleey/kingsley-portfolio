@@ -74,6 +74,15 @@ body { font: 400 14px/1.4 Inter, system-ui, -apple-system, sans-serif; color: va
   box-shadow: 0 4px 12px rgba(0, 0, 0, .18); opacity: 0; pointer-events: none; transform: translate(var(--x, 190px), var(--y, 700px)) scale(var(--s, 1)); transition: transform .5s cubic-bezier(.33, 0, .67, 1), opacity .25s }
 .touch.on { opacity: 1 } .touch.dn { --s: .78; transition: transform .12s }
 .touch::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid rgba(53, 152, 23, .7); opacity: 0 } .touch.tap::after { animation: rip .5s ease-out } @keyframes rip { 0% { transform: scale(.6); opacity: 1 } 100% { transform: scale(1.9); opacity: 0 } }
+/* phones and narrow frames: a vertical stage, the title and the current step on top, the phone below */
+#st.v { width: 600px }
+#st.v .side { left: 44px; top: 40px; translate: none; width: 512px }
+#st.v .side h2 { margin: 10px 0 6px; font-size: 32px }
+#st.v .dial { padding-left: 0 } #st.v .dial .tk, #st.v .dial .nd { display: none }
+#st.v .dial li { display: none; height: 40px } #st.v .dial li.on { display: flex; transform: none; color: var(--ink) }
+#st.v .dial li.on::before { content: attr(data-n); font: 600 12px/1 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; color: #ff4a1c; margin-right: 12px }
+[data-theme="dark"] #st.v .dial li.on { color: #f2f5ef }
+#st.v .dev { left: 157px; top: 172px; transform: scale(.76) }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .touch { display: none } }
 /* dark mode darkens only the stage around the phone: the app itself always stays light */
 html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
@@ -123,9 +132,10 @@ const FLOWS = {
   host: { t: 'A way in for hosts', s: ['Continue as Host', 'See what hosts get', 'Create a host account'] },
 };
 const flow = (new URLSearchParams(location.search).get('flow') || 'explorer').replace(/[^a-z]/g, ''), F = FLOWS[flow] || FLOWS.explorer;
-document.getElementById('ttl').textContent = F.t; document.getElementById('steps').innerHTML = F.s.map(s => `<li>${s}</li>`).join('');
+document.getElementById('ttl').textContent = F.t; document.getElementById('steps').innerHTML = F.s.map((s, i, a) => `<li data-n="${String(i + 1).padStart(2, '0')} / ${String(a.length).padStart(2, '0')}">${s}</li>`).join('');
 const st = document.getElementById('st'), app = document.getElementById('app'), steps = [...document.querySelectorAll('#steps li')];
-const fit = () => { const k = Math.min(innerWidth / 1200, innerHeight / 800); st.style.transform = `translate(${(innerWidth - 1200 * k) / 2}px, ${(innerHeight - 800 * k) / 2}px) scale(${k})`; };
+const fit = () => { const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200; st.classList.toggle('v', v);   // portrait frame: the vertical stage
+  const k = Math.min(innerWidth / W, innerHeight / 800); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - 800 * k) / 2}px) scale(${k})`; };
 fit(); addEventListener('resize', fit);
 const sleep = ms => new Promise(r => setTimeout(r, ms * .66)), $ = s => app.querySelector(s);   // everything plays about a third faster
 let touch;
