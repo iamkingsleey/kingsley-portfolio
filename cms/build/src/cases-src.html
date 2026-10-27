@@ -986,7 +986,7 @@ const NOTE_C = ['#fff1a8', '#ffd6e0', '#c9f2dc', '#d6e6ff', '#ffe0c2'];
 const NOTES = (s, base) => { const P = base || `sections.${s._i}.notes`;
   const N = (s.notes || []).map((n, k) => ({ ...(n || {}), _k: k })).filter(n => n.p || n.t || (base && KM_EDIT)); if (!N.length) return '';
   return `<div class="fr"><div class="kb" data-kb="${N.length}"><button class="kb-tidy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.8-4.1"/><path d="M2 2v3h3"/></svg>Tidy up</button><span class="mono kb-hint">Drag the notes</span>
-    ${N.map((n, k) => `<div class="kb-n" tabindex="0" role="note" style="--c:${NOTE_C[k % NOTE_C.length]}" aria-label="${esc((n.t ? n.t + ': ' : '') + (n.p || ''))}">${n.t ? `<span class="tg">${esc(n.t)}</span>` : ''}<p${E(`${P}.${n._k}.p`)} data-ph="What they said">${esc(n.p || '')}</p>${n.w || (base && KM_EDIT) ? `<span class="who"${base ? E(`${P}.${n._k}.w`) : ''} data-ph="Who">${esc(n.w || '')}</span>` : ''}</div>`).join('')}</div></div>`; };
+    ${N.map((n, k) => `<div class="kb-n" tabindex="0" role="note" style="--c:${/^#[0-9a-f]{3,8}$/i.test(n.c || '') ? n.c : NOTE_C[k % NOTE_C.length]}" aria-label="${esc((n.t ? n.t + ': ' : '') + (n.p || ''))}">${n.t ? `<span class="tg">${esc(n.t)}</span>` : ''}<p${E(`${P}.${n._k}.p`)} data-ph="What they said">${esc(n.p || '')}</p>${n.w || (base && KM_EDIT) ? `<span class="who"${base ? E(`${P}.${n._k}.w`) : ''} data-ph="Who">${esc(n.w || '')}</span>` : ''}</div>`).join('')}</div></div>`; };
 function setupBoards() {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, snd = n => { if (window.Popkit) Popkit.play(n); };
   document.querySelectorAll('.kb').forEach(board => {

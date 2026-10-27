@@ -97,40 +97,54 @@
      "media": [],
      "notes": [
       {
-       "t": "Buyers",
-       "p": "Couldn’t tell who they were paying until the money had already gone.",
-       "w": "Buyer interviews"
+       "t": "Buyers fear",
+       "p": "Scams",
+       "c": "#c1f1c8"
       },
       {
-       "t": "Sellers",
-       "p": "Honest sellers lost sales because buyers assumed anyone could be a scammer.",
-       "w": "Seller interviews"
+       "t": "Buyers fear",
+       "p": "Fake listings",
+       "c": "#c1f1c8"
       },
       {
-       "t": "Buyers",
-       "p": "Wanted a sign they could see at a glance before trusting a seller.",
-       "w": "Buyer interviews"
+       "t": "Buyers fear",
+       "p": "Unreliable sellers",
+       "c": "#c1f1c8"
       },
       {
-       "t": "Sellers",
-       "p": "Happy to verify, as long as it took minutes, not days.",
-       "w": "Seller interviews"
+       "t": "Buyers fear",
+       "p": "Poor support after a sale, when issues come up",
+       "c": "#c1f1c8"
       },
       {
-       "t": "Support",
-       "p": "Most scam reports began with a seller who had no way to prove they were real.",
-       "w": "Support team"
+       "t": "Sellers fear",
+       "p": "Hard to build trust",
+       "c": "#f4b4b3"
       },
       {
-       "t": "Businesses",
-       "p": "Shops wanted to look official, not like one more personal account.",
-       "w": "Business owners"
+       "t": "Sellers fear",
+       "p": "Credibility issues",
+       "c": "#f4b4b3"
+      },
+      {
+       "t": "Sellers fear",
+       "p": "Frequent complaints",
+       "c": "#f4b4b3"
+      },
+      {
+       "t": "Sellers fear",
+       "p": "Lost sales because buyers hesitate",
+       "c": "#f4b4b3"
       }
      ],
      "blocks": [
       {
        "t": "text",
        "v": "I interviewed buyers and sellers, reviewed support tickets and spoke with business owners about where trust broke down."
+      },
+      {
+       "t": "heading",
+       "v": "Why Kusnap needed verification"
       }
      ],
      "after": [
@@ -142,12 +156,20 @@
        "t": "pairs",
        "items": [
         [
-         "Buyers need a sign they can read at a glance",
-         "A verified tick on the seller card and profile"
+         "Buyers fear scams and unreliable sellers",
+         "BVN or NIN ties every verified seller to a real, traceable person"
         ],
         [
-         "Sellers drop off if verifying feels long",
-         "Two short steps: confirm a phone number with a one-time code, then add BVN or NIN"
+         "Buyers fear fake listings",
+         "Specification fields that fit the category, and a listing-quality meter, so listings show real detail"
+        ],
+        [
+         "Sellers find it hard to build trust and look credible",
+         "A verified tick buyers can see on the seller card and profile"
+        ],
+        [
+         "Sellers lose sales when buyers hesitate",
+         "The tick answers “is this seller real?” before anyone pays"
         ]
        ]
       }
