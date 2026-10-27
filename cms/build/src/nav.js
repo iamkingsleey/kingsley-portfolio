@@ -80,6 +80,14 @@
     .kmn-menu button:active { color: var(--ink, #111) }
     .kmn-menu small { font: 400 13px "Geist Mono", ui-monospace, monospace; letter-spacing: 0; color: var(--muted, #888); font-variant-numeric: tabular-nums }
     html.kmn-open .shuf, html.kmn-open .pt-rec, html.kmn-open .pt-card, html.kmn-open .vsw { visibility: hidden }
+    /* sound and theme live in the menu on phones, so the top bar only carries the page title and the menu button */
+    html.kmn-set #soundBtn, html.kmn-set #themeBtn { display: none !important }
+    .kmn-menu .kmn-opts { display: flex; gap: 10px; margin-top: 28px; opacity: 0; transform: translateY(14px); transition: opacity .3s, transform .45s cubic-bezier(.2,.8,.2,1) }
+    html.kmn-open .kmn-menu .kmn-opts { opacity: 1; transform: none; transition-delay: 320ms }
+    .kmn-menu .kmn-opts button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; height: 48px; padding: 0 16px; border: 0; border-radius: 999px;
+      background: var(--pill, rgb(127 127 127 / .12)); color: var(--ink, #111); font: 500 15px Geist, system-ui, sans-serif; letter-spacing: -.1px; opacity: 1; transform: none; transition: background .2s }
+    .kmn-menu .kmn-opts button:active { background: color-mix(in srgb, var(--ink, #111) 14%, var(--bg, #fff)) }
+    .kmn-menu .kmn-opts svg { width: 16px; height: 16px; flex: none }
     @media (prefers-reduced-motion: reduce) { .kmn-menu, .kmn-menu button, .kmn-mb i { transition: none } }
   }`;
   const start = () => {
@@ -123,6 +131,23 @@
     addEventListener('keydown', e => { if (e.key === 'Escape' && document.documentElement.classList.contains('kmn-open')) { menu(false); mb.focus(); } });
     addEventListener('pageshow', e => { if (e.persisted) menu(false); });
     document.body.append(M, mb);
+    // phones: the page's sound and theme buttons move into the menu (the menu's buttons press the page's own, so each page keeps its logic)
+    const sB = document.getElementById('soundBtn'), tB = document.getElementById('themeBtn');
+    if (sB || tB) {
+      document.documentElement.classList.add('kmn-set');
+      const O = document.createElement('div'); O.className = 'kmn-opts';
+      const I = { on: '<path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6M12.8 3.4a6 6 0 0 1 0 9.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+        off: '<path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/><path d="M11 6l3.5 3.5M14.5 6L11 9.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+        moon: '<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+        sun: '<circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>' };
+      const svg = d => `<svg viewBox="0 0 16 16" aria-hidden="true">${d}</svg>`;
+      const mk = (src, paint) => { if (!src) return; const b = document.createElement('button'); b.type = 'button';
+        b.addEventListener('click', () => { src.click(); setTimeout(paint.bind(null, b), 30); }); paint(b); O.append(b); };
+      const soundOn = () => { try { return localStorage.getItem('km-sound') !== 'off'; } catch (_) { return true; } };
+      mk(sB, b => { const on = soundOn(); b.innerHTML = svg(on ? I.on : I.off) + (on ? 'Sound on' : 'Sound off'); b.setAttribute('aria-pressed', String(on)); });
+      mk(tB, b => { const dk = document.documentElement.dataset.theme === 'dark'; b.innerHTML = svg(dk ? I.sun : I.moon) + (dk ? 'Light mode' : 'Dark mode'); });
+      M.append(O);
+    }
     if (file !== 'index.html') { const top = document.createElement('div'); top.className = 'kmn-top'; top.setAttribute('aria-hidden', 'true'); document.body.append(top); }
     // a page that opens on a dark hero whatever the theme (About's signal) keeps it clear of the page-colour fade until it scrolls past
     const hero = document.querySelector('.sig');

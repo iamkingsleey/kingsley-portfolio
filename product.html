@@ -712,7 +712,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610272251';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202610272313';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
@@ -726,7 +726,7 @@ h1 .w.in > span { translate: 0 0 }
   addEventListener('hashchange', function () { location.reload(); });   // next piece with the same layout: same file, new address
 })();
 </script>
-<script src="nav.js?v=c5eab834" defer></script>
+<script src="nav.js?v=c828b8dd" defer></script>
 <script src="kit.js?v=774a3f18" defer></script>
 <script src="protips.js?v=fcf40aaf" defer></script>
 <style id="km-toggles">.km-tg{position:fixed;z-index:150;top:calc(48px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}#themeBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 40px)}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 84px)}#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}@media print{.km-tg{display:none}}</style><button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
