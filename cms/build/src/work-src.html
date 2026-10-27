@@ -292,6 +292,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 .ov-t.m-in .ov-im { animation: flyin var(--fd, 1.8s) cubic-bezier(.16, 1, .3, 1) var(--fdl, 0s) both }
 @keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(var(--fs, 1.5)) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
 @media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
+@media (max-width: 899px) { body.cs1 .ov-grid { grid-template-columns: 1fr !important } }   /* case studies: one column on phones */
 @media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
 .ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
 .ov-c b { font: 600 12px var(--mono); color: var(--muted); margin-right: 4px }
@@ -559,6 +560,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   function setFilter(name, quiet) {
     if (filt === name) return; const was = filt; filt = name;
     document.body.classList.toggle('filt', !!name); if (typeof dbackLabel === 'function') dbackLabel();
+    document.body.classList.toggle('cs1', name === 'Case study');   // phones: case studies stack in one column
     try { if (!quiet && openIdx < 0) {
       if (!was && name) history.pushState(stateOf({ km: 'f' }), '', hashFor(name, -1));    // All → a category: a step you can go back from
       else history.replaceState(stateOf(), '', hashFor(name, -1));                          // one category to another, or back to All
@@ -568,7 +570,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     ovEl.classList.add('refilt');
     setTimeout(() => {
       ovEl.querySelectorAll('.ov-t').forEach(t => { t.hidden = !!name && !inCat(items[+t.dataset.i], name); });
-      ovEl.scrollTop = 0; ovEl.classList.remove('refilt');
+      ovEl.scrollTop = 0; ovEl.classList.remove('refilt'); try { mSpans(); } catch (_) {}
     }, 160);
   }
 
@@ -1730,7 +1732,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const mGap = () => innerWidth < 900 ? 12 : 22;
   // every piece is sized from the column width, not its own: a piece hidden by a filter has no width, and sizing it from
   // that cut its slot to a sliver, so pieces piled on top of each other when they came back
-  const mSpans = () => { const cols = innerWidth < 900 ? 2 : 4, gw = ovGrid.clientWidth; if (!gw) return;
+  const mSpans = () => { const cols = innerWidth < 900 ? (document.body.classList.contains('cs1') ? 1 : 2) : 4, gw = ovGrid.clientWidth; if (!gw) return;
     const w = (gw - mGap() * (cols - 1)) / cols;
     ovTiles.forEach(o => { const r = parseFloat(o.t.style.getPropertyValue('--r')) || .8; o.t.style.setProperty('--sp', Math.round(w / r + mGap())); }); };
   if ('ResizeObserver' in window) new ResizeObserver(() => mSpans()).observe(ovGrid);

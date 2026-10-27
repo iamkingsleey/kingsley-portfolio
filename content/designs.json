@@ -1106,6 +1106,84 @@
       "desc": "A campaign poster for Bromuno’s Design Build Share, in green: orange-slice glasses and the same tile system.",
       "tools": "Figma",
       "mix": true
+    },
+    {
+      "title": "Bulvds, wallet home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-wallet-home.jpg",
+          "ratio": 1.5267
+        }
+      ],
+      "bg": "#ebebeb",
+      "dark": false,
+      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
+      "title": "Bulvds, add-ons at checkout",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-add-on.jpg",
+          "ratio": 1.5267
+        }
+      ],
+      "bg": "#a7a7a7",
+      "dark": false,
+      "desc": "Adding an extra to a stay at checkout, from the Bulvds booking flow.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
+      "title": "Bulvds, choosing how to pay",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-payment-method.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#f0f0f0",
+      "dark": false,
+      "desc": "The payment summary, with Bulvds Wallet, Paystack or Split Payment.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
+      "title": "Cend, search home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-search-home.jpg",
+          "ratio": 1.4995
+        }
+      ],
+      "bg": "#7f8287",
+      "dark": false,
+      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Cend, incoming requests",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-requests.jpg",
+          "ratio": 1.4981
+        }
+      ],
+      "bg": "#7f8287",
+      "dark": false,
+      "desc": "Incoming requests stacked as cards, each with its price, pickup and drop-off.",
+      "tools": "Figma",
+      "mix": true
     }
   ]
 }
