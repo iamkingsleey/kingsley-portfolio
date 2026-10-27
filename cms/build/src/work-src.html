@@ -1880,7 +1880,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const fit = () => { const r = rv.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); };
     addEventListener('resize', () => { if (on) fit(); });
     const geo = () => { const mob = W < 700, ch = Math.min(H * (mob ? .56 : .7), mob ? W * .95 : 640); return { ch, sh: ch * (mob ? .62 : .58), gap: mob ? 18 : 40 }; };
-    const ratio = i => { if (!items[i]) return 1; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(1.35, r)); };
+    const ratio = i => { if (!items[i]) return 1; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(items[i].cs ? 1.6 : 1.35, r)); };   // case-study covers show whole, never cropped
     const rLayout = function () { if (!L.length) return []; const { ch, sh, gap } = geo(), cx = W / 2, ci = Math.max(0, Math.min(L.length - 1, Math.round(pos))), f = pos - ci, out = [];
       const hAt = d => { const a = Math.min(1, Math.abs(d)), e = a * a * (3 - 2 * a); return ch + (sh - ch) * e; }, wOf = (k, d) => ratio(L[k]) * hAt(d);
       const xs = {}; const nb = f > 0 ? ci + 1 : ci - 1; xs[ci] = cx - f * (wOf(ci, f) / 2 + gap + (L[nb] != null ? wOf(nb, f > 0 ? 1 - f : -1 - f) : wOf(ci, f)) / 2);
