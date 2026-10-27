@@ -308,7 +308,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(var(--fs, 1.5)) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
 @media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
 @media (max-width: 899px) { body.cs1 .ov-grid { grid-template-columns: 1fr !important } }   /* case studies: one column on phones */
-@media (max-width: 900px) { body.cs1 .vtog { display: none !important } body.cs1 .shuf { left: calc(50% - 20px) } }   /* and no reel view to switch to */
+@media (max-width: 900px) { body.cs1 .vtog { display: none !important } body.cs1 .shuf { display: none !important } }   /* and no reel view to switch to */
 @media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
 .ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
 .ov-c b { font: 600 12px var(--mono); color: var(--muted); margin-right: 4px }
