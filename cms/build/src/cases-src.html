@@ -284,6 +284,9 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .kproto .pbar em { font: 600 10px var(--mono); letter-spacing: .6px; text-transform: uppercase; font-style: normal; color: #fff; background: #ff4a1c; border-radius: 999px; padding: 4px 8px }
 .H .kproto iframe { display: block; width: 100%; height: var(--ph, 760px); max-height: 82vh; border: 0; background: #fff }
 @media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
+/* an animated figure: a self-playing page in a fixed shape (3:2 unless the block says otherwise), framed like a picture */
+.H .kframe .fw { position: relative; aspect-ratio: var(--far, 3 / 2); border-radius: var(--km-r, 14px); overflow: hidden; background: #f1f3f6 }
+.H .kframe iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0 }
 .H .kcont { padding-top: 56px } .H .kcont:empty { display: none } .H .kcont > :first-child { margin-top: 0 }
 .H .cred { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 32px; margin-top: 8px } .H .cred dd { margin-top: 4px; color: var(--ink); font-size: 16px }
 .H .sp { height: 120px } .H.v2 .sp { height: clamp(120px, 14vw, 180px) }
@@ -1128,7 +1131,7 @@ const R = {
     // blocks; the first time you insert something, the CMS turns them into real blocks. Wide blocks (pictures, numbers,
     // notes) step out of the text column and the text carries on below them.
     const GAP = (w, pos) => KM_EDIT ? `<div class="kgap" data-w="${w}" data-pos="${pos}" role="button" tabindex="0" aria-label="Add a block here"><i>+</i></div>` : '';
-    const WIDE = { picture: 1, video: 1, numbers: 1, notes: 1, proto: 1 };
+    const WIDE = { picture: 1, video: 1, numbers: 1, notes: 1, proto: 1, frame: 1 };
     const blockH = (b, base) => {
       const t = b.t || 'text';
       if (t === 'text') return (b.v || KM_EDIT) ? `<p${E(base + '.v')} data-ph="Type, or press / for blocks">${esc(b.v || '')}</p>` : '';
@@ -1160,6 +1163,9 @@ const R = {
           return `<article><h3${E(P + '.t')} data-ph="The decision, in a few words">${esc(x.t || '')}</h3><dl>${row('Dropped', P + '.no', x.no, 'The option you didn’t take')}${row('Chose', P + '.yes', x.yes, 'What you chose')}${row('Why', P + '.why', x.why, 'Why it won')}${row('Trade-off', P + '.cost', x.cost, 'What it cost')}</dl></article>`; }).join('')}</div><button type="button" class="kchip" data-kmore="${base}">+ Decision</button>`;
         const low = v => v ? v.charAt(0).toLowerCase() + v.slice(1) : '';
         return `<div class="dtabs" data-kdec><nav role="tablist" aria-label="Decisions">${L.map(([x], i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-i="${i}">${esc(x.t)}</button>`).join('')}</nav>${L.map(([x], i) => `<div class="pane" role="tabpanel"${i ? ' hidden' : ''}><h3>${esc(x.t)}</h3><dl>${x.no || x.yes ? `<dt>Options</dt><dd>${esc(x.no && x.yes ? x.no + ', or ' + low(x.yes) : (x.no || x.yes))}.</dd>` : ''}${x.yes || x.why ? `<dt>Chose</dt><dd>${esc(x.yes ? x.yes + '. ' : '')}${esc(x.why || '')}</dd>` : ''}${x.cost ? `<dt>Trade-off</dt><dd>${esc(x.cost)}</dd>` : ''}</dl></div>`).join('')}</div>`; }
+      // an animated figure: a page that plays on its own (no browser bar, no Restart), in a fixed shape
+      if (t === 'frame') { const src = String(b.src || '').trim(); if (!src) return ''; const label = b.cap != null ? esc(b.cap) : '';
+        return `<div class="fr kframe" data-kblk="${base}"><div class="fw" style="--far:${esc(b.ratio || '3 / 2')}"><iframe src="${esc(src)}" title="${esc(b.title || b.cap || '')}" loading="lazy"></iframe></div>${cap([], 'Fig. ' + pad(++fig), label, base + '.cap')}</div>`; }
       if (t === 'proto') { const src = String(b.src || '').trim().replace(/^assets\/protos\//, 'Prototype/');   // prototypes moved to the Prototype folder
         if (!src) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">Add a prototype<span>Click to choose one</span></div></div>` : '';
         const url = b.auto ? src + (src.includes('?') ? '&' : '?') + 'autoplay=1' : src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
@@ -1220,7 +1226,9 @@ const R = {
     // v2: role, team, timeline and platforms in one row under the tags (each one editable on the page)
     const metaH = V2 ? `<dl class="meta">${[['My role', 'role'], ['Team', 'team'], ['Timeline', 'timeline'], ['Platforms', 'platforms']].map(([l, k]) => (c[k] || KM_EDIT) ? `<div><dt class="mono">${l}</dt><dd${E(k)} data-ph="${l}">${esc(c[k] || '')}</dd></div>` : '').join('')}</dl>` : '';
     let h = `${TOP(c)}<main class="H${V2 ? ' v2' : ''}"><header class="tx hd"><h1${E('headline', 1)}>${hl(c.headline)}</h1><p class="lede"><span${E('blurb')}>${esc(c.lede)}</span>${V2 ? '' : st}</p><div class="tags">${tagsH}</div></header>
-      ${(() => { const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
+      ${(() => { if (V2 && c.coverFrame && c.coverFrame.src) { const F = c.coverFrame;   // an animated cover: a page that plays on its own
+          return `<div class="fr kframe"><div class="fw" style="--far:${esc(F.ratio || '3 / 2')}"><iframe src="${esc(F.src)}" title="${esc(F.title || c.title)}"></iframe></div>${cap([], esc(c.title), esc(F.cap || c.kind + ' · ' + c.tag))}</div>`; }
+        const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
         if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover" data-rows="1"' : ''}>${rowsBlock(RR)}${F.length ? cap(F, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)) : ''}</div>` : ''; }
         const cv = tidy([V2 && c.overview ? c.overview : c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // v2: the case in thirty seconds, the problem, what I did and the two strongest results

@@ -10,7 +10,7 @@ def _local2(o):   # Framer links -> assets/cases/<file> once tools/fetch-case-im
         n = o.split('?')[0].rsplit('/', 1)[1]
         return f'assets/cases/{n}' if os.path.exists(f'{REPO}/assets/cases/{n}') else o
     return o
-_KEEP = ('flow', 'team', 'timeline', 'platforms', 'overview', 'glance', 'fx', 'fxDefault', 'gallery', 'coverRows', 'coverMore', 'coverGrid', 'slug', 'title', 'kind', 'tag', 'fq', 'role', 'year', 'client', 'industry', 'did', 'headline', 'blurb', 'stat', 'cover', 'story', 'sections',
+_KEEP = ('flow', 'coverFrame', 'team', 'timeline', 'platforms', 'overview', 'glance', 'fx', 'fxDefault', 'gallery', 'coverRows', 'coverMore', 'coverGrid', 'slug', 'title', 'kind', 'tag', 'fq', 'role', 'year', 'client', 'industry', 'did', 'headline', 'blurb', 'stat', 'cover', 'story', 'sections',
          'statement', 'exp', 'impact', 'impactNote', 'goal', 'problem', 'type', 'colors', 'run', 'typeView', 'off', 'briefRows', 'briefBlocks')   # off: parts hidden in the CMS
 _data = json.dumps([{k: c[k] for k in _KEEP if k in c} for c in _local2(CS2)], ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 _tpl = open(f'{KFM}/cases-src.html', encoding='utf-8').read()

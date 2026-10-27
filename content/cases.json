@@ -20,7 +20,7 @@
     "Prototyping"
    ],
    "headline": "Making a marketplace<br>people can trust",
-   "blurb": "Kusnap let anyone list in seconds, with no checks, and scams grew with it. I designed verification for people and for shops, so buyers see who they are paying before any money moves.",
+   "blurb": "Kusnap made it easy to sign up and sell in seconds, and fraudsters used that. Of the many features I designed as Head of Design, two had a big impact on usage and transactions: seller verification and a new way to list products. Together they let buyers trust who they’re buying from and what they’re buying, without slowing honest sellers down.",
    "stat": [
     "50,000+",
     "users"
@@ -44,27 +44,27 @@
     {
      "h": "Context",
      "eb": "01 · Context",
-     "title": "A marketplace that grew faster than trust",
+     "title": "A marketplace built for speed",
      "media": [],
      "blocks": [
       {
        "t": "text",
-       "v": "Kusnap is a peer-to-peer marketplace for buying and selling across Africa: phones, fashion, food, property, jobs. Listing was open and instant, which helped growth. It also meant a buyer had no way to know who was on the other side."
+       "v": "Kusnap is a peer-to-peer marketplace for buying and selling across Nigeria, from brand-new to fairly used and second-hand items. It started with one simple goal: get people signed up and listing their products as fast as possible. That speed is the “snap” in Kusnap, and it worked in the early days."
+      },
+      {
+       "t": "text",
+       "v": "Over time, fraudsters exploited it. They signed up with fake accounts, listed fake products and defrauded a lot of users. The fix was obvious: verify people. But fast listing was the product, and most of Kusnap’s users are local shop owners who aren’t very tech-savvy. The whole idea had been to spare them the hassle of a verification flow."
       },
       {
        "t": "points",
        "items": [
         [
          "My part",
-         "I led design end to end: research, the verification strategy, every screen for mobile and web, and the prototype used to sell the idea internally."
-        ],
-        [
-         "The team",
-         ""
+         "As Head of Design I worked across the whole product. For the two features here, I designed the verification and listing flows on web, and supervised the mobile app versions, which another designer built."
         ],
         [
          "Constraints",
-         "Verification couldn’t slow down sign-up. ID checks had to work with Nigerian IDs (BVN and NIN). Many users are on low-end Android phones and pay for data."
+         "Listing had to stay fast, because speed is the product. Every step had to be simple enough for a shop owner to finish without help."
         ]
        ]
       }
@@ -78,20 +78,7 @@
      "blocks": [
       {
        "t": "text",
-       "v": "Anyone could list in seconds. As the marketplace grew, so did fraud reports and calls from worried buyers and sellers. Honest sellers paid for it too: buyers assumed anyone could be a scammer."
-      },
-      {
-       "t": "numbers",
-       "items": [
-        [
-         "",
-         "fraud reports a month before verification"
-        ],
-        [
-         "",
-         "of support calls were about scams"
-        ]
-       ]
+       "v": "Anyone could sign up and list in seconds, with no checks at all. Fraudsters used that to open fake accounts, list fake products and take buyers’ money, and support tickets piled up. Honest sellers paid for it too: buyers started assuming anyone could be a scammer."
       },
       {
        "t": "heading",
@@ -99,7 +86,7 @@
       },
       {
        "t": "text",
-       "v": "Make buyers and sellers trust each other, without making signing up any slower."
+       "v": "Make buyers and sellers trust each other, without slowing down listing or losing shop owners who aren’t comfortable with tech."
       }
      ]
     },
@@ -111,7 +98,7 @@
      "notes": [
       {
        "t": "Buyers",
-       "p": "Couldn't tell who they were paying until the money had already gone.",
+       "p": "Couldn’t tell who they were paying until the money had already gone.",
        "w": "Buyer interviews"
       },
       {
@@ -156,15 +143,11 @@
        "items": [
         [
          "Buyers need a sign they can read at a glance",
-         "shows a verified badge on profiles, listings and chats"
+         "A verified tick on the seller card and profile"
         ],
         [
-         "Sellers will verify if it takes minutes",
-         "starts with an instant phone check and saves the ID step for second"
-        ],
-        [
-         "Shops want to look official",
-         "gives business stores their own check and badge"
+         "Sellers drop off if verifying feels long",
+         "Two short steps: confirm a phone number with a one-time code, then add BVN or NIN"
         ]
        ]
       }
@@ -173,12 +156,12 @@
     {
      "h": "Strategy",
      "eb": "04 · Strategy",
-     "title": "The decisions that shaped it",
+     "title": "Trust without the wait",
      "media": [],
      "blocks": [
       {
        "t": "text",
-       "v": "Three principles guided every choice: simple, so verifying is quick; visible, so trust shows as badges; scalable, so it grows with the user base."
+       "v": "Before paying, a buyer asks two things: who am I buying from, and is this item what it says? Verification answers the first. Better listings answer the second: a Listing Quality meter on the seller’s side shows how complete a listing is and nudges sellers to add the details buyers need to decide with confidence. Three principles guided both: simple, so it’s quick; visible, so trust shows; scalable, so it grows with the user base."
       },
       {
        "t": "decisions",
@@ -193,124 +176,124 @@
         {
          "t": "Earn a badge, don’t block sign-up",
          "no": "Verify before using Kusnap",
-         "yes": "Open sign-up, with badges and unlocks for the verified",
-         "why": "Sign-up stays fast. Verified sellers get a visible badge, and product uploads and withdrawals unlock after verifying.",
-         "cost": "Unverified sellers still exist, so the badge has to be clear enough for buyers to choose verified ones."
+         "yes": "Open sign-up, with unlocks for the verified",
+         "why": "Sign-up stays fast. Verified sellers get a visible badge, and product uploads unlock after verifying.",
+         "cost": "Unverified accounts still exist, so the badge has to be clear enough for buyers to choose verified sellers."
         },
         {
-         "t": "One phone number, one account",
-         "no": "Send a code to any number",
-         "yes": "Check the number first",
-         "why": "It stops one person running many seller accounts, and the check is shown to the user so the wait makes sense.",
-         "cost": "A few seconds’ wait before the code is sent."
+         "t": "Verify with BVN or NIN",
+         "no": "Accept one ID type only",
+         "yes": "Let people enter their BVN or NIN",
+         "why": "Both are government-verifiable, unique to one person and linked to the holder’s bank account, so one number can’t back two sellers. Offering either means people can verify with whichever they have.",
+         "cost": "Two ID checks to connect and maintain instead of one."
         },
         {
-         "t": "Let people pick their ID",
-         "no": "One ID type only",
-         "yes": "BVN or NIN",
-         "why": "Most people have at least one. Offering both raised the number who could finish without leaving the app to find a document.",
-         "cost": "Two checks to maintain instead of one."
+         "t": "Give sellers their speed back",
+         "no": "Ask for every detail on every listing",
+         "yes": "Quick list from a past listing",
+         "why": "Many sellers restock the same items. Reusing a sold-out listing fills the form in one tap.",
+         "cost": "Old details can be out of date, so every field stays editable and the preview shows the result before posting."
+        },
+        {
+         "t": "Coach, don’t block",
+         "no": "Reject incomplete listings",
+         "yes": "A listing-quality meter",
+         "why": "A live score and preview show sellers what buyers will see, and nudge them toward 80% without stopping them posting.",
+         "cost": "Some listings still go live below 80%."
         }
        ]
-      },
-      {
-       "t": "picture",
-       "m": "",
-       "cap": "",
-       "hint": "Diagram, 21:9. The verification flow on one line: Dashboard → Number check → Code → Phone verified → ID details → Checking → Identity verified → Dashboard with badges. Small screen thumbnails above each step; mark the two places people can stop and come back later."
       }
      ]
     },
     {
-     "h": "Design",
-     "eb": "05 · Design",
-     "title": "From wireframes to the final flow",
-     "media": [],
-     "blocks": [
-      {
-       "t": "text",
-       "v": "I sketched the dashboard as a checklist people could come back to. Early versions showed both steps at once; testing showed people tried to start with the ID, so the ID step now stays locked until the phone is verified."
-      },
-      {
-       "t": "picture",
-       "m": "",
-       "cap": "",
-       "hint": "Image, 16:9. Before and after testing: the first ID step on the left, the final “Locked until your phone is verified” card on the right, with one short label under each half saying what testing showed."
-      }
-     ]
-    },
-    {
-     "h": "Solution",
-     "eb": "06 · Solution",
+     "h": "Verification",
+     "eb": "05 · Verification",
      "title": "Verification people actually finish",
      "media": [],
      "blocks": [
       {
        "t": "text",
-       "v": "A one-time code confirms the phone. A government-issued ID confirms the person. Each step ends with a clear success state, and the dashboard shows what’s done and what’s next."
+       "v": "A one-time code confirms the phone. Then an ID number confirms the person: people choose either their Bank Verification Number (BVN) or their National Identification Number (NIN), and enter their name as it appears on it. Both are government-verifiable, no two people share a number, and both are linked to the holder’s bank account, so a verified seller is tied to a real, traceable person. Verified sellers get a tick everyone can see, and product uploads unlock."
       },
       {
        "t": "proto",
        "src": "Prototype/kusnap-verification.html",
        "h": 780,
-       "cap": "User verification",
+       "cap": "The verification flow. It plays on its own; click inside to take over.",
        "addr": "Kusnap · account verification",
        "auto": true
       },
       {
-       "t": "picture",
-       "m": "",
-       "cap": "",
-       "hint": "Image, 16:9. The verified badge in use: two phones side by side on brand blue, a seller profile on the left and a listing card on the right, each with the green verified badge next to the name."
+       "t": "frame",
+       "src": "Prototype/kusnap-badge.html",
+       "ratio": "3 / 2",
+       "cap": "Where buyers see it: the verified tick on the seller card, on desktop and on mobile.",
+       "title": "The verified tick on the seller card, on the desktop product page, then the same page reshaping into mobile"
       },
       {
        "t": "heading",
-       "v": "When things go wrong"
+       "v": "Shops get verified too"
       },
       {
        "t": "text",
-       "v": "Most people only see the happy path. These states make sure nobody gets stuck."
+       "v": "Business owners start from their dashboard. Under Manage › Shops, a single prompt invites them to verify their store, so a shop can show buyers it is the real thing."
       },
       {
-       "t": "points",
-       "items": [
-        [
-         "Wrong code",
-         "The boxes shake and clear, and a resend timer counts down."
-        ],
-        [
-         "Number already in use",
-         "Explains why and offers to sign in to that account instead."
-        ],
-        [
-         "ID details don’t match",
-         "Shows which field to check against the ID card."
-        ],
-        [
-         "Check service is down",
-         "Saves progress and promises a message when it’s done."
-        ]
-       ]
+       "t": "frame",
+       "src": "Prototype/kusnap-shop.html",
+       "ratio": "3 / 2",
+       "cap": "Store verification starts from the seller dashboard, then checks the shop is ready.",
+       "title": "Store verification from the seller dashboard: Get Verified Now opens the verification intro, Start Application opens the eligibility check"
+      }
+     ]
+    },
+    {
+     "h": "Listing",
+     "eb": "06 · Listing",
+     "title": "Listing fast, and listing well",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Verification added a step, so listing had to give sellers their speed back. I rebuilt Add New Product as two short steps, with a live preview and a listing-quality meter that turns from red to gold to green as the listing improves."
       },
       {
-       "t": "picture",
-       "m": "",
-       "cap": "",
-       "hint": "Image, 21:9. Error states in one wide frame: wrong code, number already in use, ID mismatch, service unavailable."
+       "t": "proto",
+       "src": "Prototype/kusnap-listing.html",
+       "h": 780,
+       "cap": "Listing a new product from scratch. It plays on its own; click inside to take over.",
+       "addr": "Kusnap · add new product",
+       "auto": true
       },
       {
        "t": "heading",
-       "v": "Business shops"
+       "v": "Reuse what you’ve sold before"
       },
       {
        "t": "text",
-       "v": "Business-owned stores go through their own check on web and mobile, so a shop can show buyers it is the real thing."
+       "v": "Quick List shows a seller’s out-of-stock listings. One tap fills the name, category, photos and price, and every field stays editable."
       },
       {
-       "t": "video",
-       "m": "",
-       "cap": "",
-       "hint": "Video, 16:9, loop, no sound. A business shop going from “Unverified” to “Verified business”, on desktop then shrinking to mobile. Under 20 seconds."
+       "t": "frame",
+       "src": "Prototype/kusnap-quicklist.html",
+       "ratio": "3 / 2",
+       "cap": "Pick a past listing and its details fill the new product form.",
+       "title": "Quick List opens, a past listing is picked, and its name, category, price and photos fill the Add New Product form"
+      },
+      {
+       "t": "heading",
+       "v": "Details that fit, delivery set once"
+      },
+      {
+       "t": "text",
+       "v": "Sellers only see the specification fields that fit what they’re selling: a phone asks for storage, RAM and battery, while shoes ask for size and material. Every phone listing then shows the same set of details, so buyers can compare two phones side by side. Delivery works the same way, set once: the seller enters one fee for buyers in their city and one for buyers elsewhere, ticks “Save as default”, and every product they list carries those fees from then on. The default is a starting point: a seller can still set a different delivery price on any single product, say for something bulky."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/kusnap-details.html",
+       "ratio": "3 / 2",
+       "cap": "Specifications that follow the category, and a default delivery cost that every product starts with.",
+       "title": "Specifications fill in for a phone, then swap to shoe fields when the category changes; delivery costs are set once, saved as default, and appear on every product"
       }
      ]
     },
@@ -321,7 +304,7 @@
      "media": [],
      "stats": [
       [
-       "72%",
+       "80%",
        "fewer fraud complaints in three months"
       ],
       [
@@ -337,21 +320,11 @@
        "fewer scam-related support calls"
       ]
      ],
-     "blocks": []
-    },
-    {
-     "h": "Reflection",
-     "eb": "08 · Reflection",
-     "title": "What I’d do differently",
-     "media": [],
-     "blocks": [
+     "blocks": [],
+     "after": [
       {
        "t": "text",
-       "v": ""
-      },
-      {
-       "t": "text",
-       "v": "Next, verified status will feed into seller ratings and delivery options, so trust keeps paying off after the badge."
+       "v": "Beyond the numbers, the marketing team reported more products being listed and more engagement across the platform after the verification and listing updates shipped."
       }
      ]
     }
@@ -408,7 +381,7 @@
    "impact": {
     "stats": [
      [
-      "72%",
+      "80%",
       "fewer fraud complaints in three months"
      ],
      [
@@ -425,8 +398,8 @@
      ]
     ]
    },
-   "problem": "Anyone could list in seconds, with no checks at all. As the marketplace grew, so did fraud reports and calls from worried buyers and sellers.",
-   "goal": "Make buyers and sellers trust each other, without making signing up any slower.",
+   "problem": "Anyone could sign up and list in seconds, with no checks at all. Fraudsters used that to open fake accounts, list fake products and take buyers’ money.",
+   "goal": "Make buyers and sellers trust each other, without slowing down listing or losing shop owners who aren’t comfortable with tech.",
    "impactNote": "Measured over the three months after verification launched. Sales figures compare verified sellers with unverified ones.",
    "ver": "mix",
    "page": "case.html",
@@ -434,11 +407,17 @@
    "flow": "v2",
    "team": "",
    "timeline": "",
-   "platforms": "Android, iOS and web",
+   "platforms": "Web, Android and iOS",
    "overview": "assets/uploads/product-details-page-2.jpg",
    "glance": {
-    "problem": "No checks at sign-up. Fraud reports and worried calls to support rose as listings grew.",
-    "did": "Led research with buyers, sellers and support, then designed phone and ID verification, visible badges and business-shop checks."
+    "problem": "No checks at sign-up. Fake accounts listed fake products, and support tickets went through the roof.",
+    "did": "Designed verification and the Add New Product flow on web, and supervised the mobile app versions."
+   },
+   "coverFrame": {
+    "src": "Prototype/kusnap-hero.html",
+    "ratio": "3 / 2",
+    "cap": "at a glance: shoppers, categories, verified sellers and delivery.",
+    "title": "Kusnap at a glance: a bento of shoppers, categories, seller cards with verified ticks, delivery and contact details, assembling tile by tile"
    }
   },
   {

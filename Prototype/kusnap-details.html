@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specifications and default delivery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Two ideas, played on a loop. Left: specifications follow the category (a phone asks for storage and RAM; switch to fashion and the
+   fields become size and material). Right: delivery costs are set once, saved as default, and show up on every product.
+   Drawn on a 1200×800 stage that scales to the 3:2 frame. */
+:root {
+  --bg: #f1f3f6; --card: #fff; --line: #eaecf0; --field: #d0d5dd; --ph: #98a2b3; --ink: #101828; --text: #344054; --muted: #667085;
+  --blue: #0b6fd6; --blue-soft: #eef5fd; --ok: #3ba800; --ok-soft: #ecfbe6; --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0 }
+html, body { height: 100%; overflow: hidden; background: var(--bg) }
+body { font: 400 14px/1.45 Inter, system-ui, -apple-system, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased }
+#st { position: absolute; left: 0; top: 0; width: 1200px; height: 800px; transform-origin: 0 0; display: flex; justify-content: center; align-items: center; gap: 36px }
+.rcol { position: relative; width: 520px; align-self: center }
+.card { position: relative; background: var(--card); border-radius: 14px; border: 1px solid #edf0f3; box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 18px 40px -22px rgba(16, 24, 40, .22); padding: 24px }
+h2 { font-size: 16px; font-weight: 600; color: var(--ink) }
+.sub { font-size: 12.5px; color: var(--muted); margin-top: 2px }
+label, .lb { display: block; font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 6px }
+.in { position: relative; height: 42px; border: 1px solid var(--field); border-radius: 8px; background: #fff; padding: 0 12px; font-size: 13.5px; color: var(--ink);
+  display: flex; align-items: center; white-space: nowrap; overflow: hidden; transition: border-color .2s, box-shadow .2s }
+.in.foc { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(11, 111, 214, .12) }
+.in .ph { color: var(--ph) }
+.in.sel::after { content: ''; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border: solid #344054; border-width: 0 1.6px 1.6px 0; transform: translateY(-70%) rotate(45deg) }
+.in .car { display: inline-block; width: 1.5px; height: 17px; background: var(--ink); margin-left: 1px; opacity: 0 } .in.foc .car { opacity: 1; animation: blink 1s steps(1) infinite } @keyframes blink { 50% { opacity: 0 } }
+.money b { font-weight: 600; margin-right: 8px; color: var(--ink) }
+.kg { margin-left: auto; font-weight: 600; color: var(--ink) }
+/* specifications */
+#spec { width: 520px; padding-bottom: 28px }
+.cat { margin-top: 18px; position: relative }
+.menu { position: absolute; left: 0; right: 0; top: 74px; z-index: 3; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px; box-shadow: 0 16px 32px -12px rgba(16, 24, 40, .25);
+  opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .25s var(--ease); pointer-events: none }
+.menu.on { opacity: 1; transform: none }
+.menu div { padding: 9px 10px; border-radius: 7px; font-size: 13.5px; color: var(--ink); transition: background .15s } .menu div.hov { background: var(--blue-soft) } .menu div.cur { color: var(--blue); font-weight: 500 }
+.tag { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12px; font-weight: 500; color: var(--blue); background: var(--blue-soft); padding: 4px 10px; border-radius: 999px; transition: opacity .3s }
+.tag.flash { animation: flash .6s var(--ease) } @keyframes flash { 40% { transform: scale(1.06) } }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 14px; margin-top: 18px }
+.grid .f { transition: opacity .25s, transform .4s var(--ease) }
+.grid .f.out { opacity: 0; transform: translateY(6px) }
+/* delivery */
+#dlv { width: 520px; transition: opacity .35s, transform .5s var(--ease) }
+#dlv.gone { opacity: 0; transform: translateY(10px) scale(.98) }
+.dh { display: flex; justify-content: space-between; align-items: center } .dh i { width: 14px; height: 14px; position: relative } .dh i::before, .dh i::after { content: ''; position: absolute; left: 6px; top: -1px; width: 1.6px; height: 16px; background: #667085; transform: rotate(45deg) } .dh i::after { transform: rotate(-45deg) }
+.tip { display: flex; gap: 10px; background: #f6f8fa; border-radius: 10px; padding: 12px 14px; font-size: 12.5px; margin: 16px 0; color: var(--text) } .tip svg { flex: none; color: var(--blue) }
+.dlv .f + .f { margin-top: 12px }
+.acc { border: 1px solid var(--line); border-radius: 10px; background: #f9fafb; padding: 11px 12px; margin-top: 10px; overflow: hidden }
+.acc .hd { display: flex; justify-content: space-between; align-items: center } .acc b { display: block; color: var(--ink); font-weight: 500; font-size: 13px } .acc small { color: var(--muted); font-size: 11.5px }
+.acc .chev { width: 7px; height: 7px; border: solid #344054; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg); transition: transform .3s } .acc.open .chev { transform: rotate(-135deg) }
+.acc .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 0; opacity: 0; transition: max-height .4s var(--ease), opacity .3s, margin .4s } .acc.open .two { max-height: 90px; opacity: 1; margin-top: 10px }
+.acc .two label { font-size: 12px; font-weight: 500 }
+.chk { display: flex; align-items: center; gap: 8px; margin: 14px 0; font-size: 13px; color: var(--text) } .chk span { width: 16px; height: 16px; border-radius: 4px; background: var(--blue); display: grid; place-items: center }
+.btn { height: 44px; border-radius: 9px; background: var(--blue); color: #fff; font-weight: 500; font-size: 14px; display: grid; place-items: center; box-shadow: inset 0 -2px 0 #0657ae; transition: transform .12s, filter .15s }
+.btn.hov { filter: brightness(1.06) } .btn.prs { transform: scale(.98) }
+/* the result: the same fees on every product */
+#res { position: absolute; left: 0; top: 0; bottom: 0; margin: auto 0; height: fit-content; width: 520px; padding: 24px; opacity: 0; transform: translateY(12px); transition: opacity .45s .1s, transform .6s var(--ease) .1s }
+#res.on { opacity: 1; transform: none }
+.ok { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #1f7a05; background: var(--ok-soft); padding: 4px 10px; border-radius: 999px; margin-top: 10px }
+.prod { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 14px; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .5s var(--ease) }
+#res.on .prod { opacity: 1; transform: none } #res.on .prod:nth-of-type(2) { transition-delay: .45s } #res.on .prod:nth-of-type(3) { transition-delay: .75s }
+.prod .th { width: 64px; height: 64px; border-radius: 9px; flex: none; object-fit: cover; display: block }
+.prod h4 { font-size: 13.5px; font-weight: 600; color: var(--ink) } .prod p { font-size: 12.5px; color: var(--text); display: flex; align-items: center; gap: 7px; margin-top: 5px }
+.prod p i { width: 14px; height: 14px; border-radius: 4px; flex: none }
+/* cursor */
+.cu { position: absolute; left: 0; top: 0; width: 26px; height: 26px; z-index: 9; pointer-events: none; opacity: 0;
+  transform: translate(var(--x, 600px), var(--y, 760px)); transition: transform .85s cubic-bezier(.45, .05, .2, 1), opacity .3s; filter: drop-shadow(0 2px 3px rgba(16, 24, 40, .25)) }
+.cu.on { opacity: 1 }
+.cu svg { position: absolute; inset: 0; width: 26px; height: 26px; transform-origin: 6px 4px; transition: transform .12s, opacity .15s }
+.cu .hd { opacity: 0 } .cu.hand .hd { opacity: 1 } .cu.hand .ar { opacity: 0 } .cu.down svg { transform: scale(.84) }
+.cu i { position: absolute; left: 6px; top: 4px; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: rgba(11, 111, 214, .22); transform: scale(0); opacity: 0 }
+.cu.tap i { animation: tap .5s ease-out } @keyframes tap { 0% { transform: scale(.2); opacity: 1 } 100% { transform: scale(1.4); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .cu { display: none } }
+</style>
+</head>
+<body>
+<div id="st">
+  <section class="card" id="spec" aria-label="Specifications">
+    <h2>Specifications</h2><p class="sub">The fields follow the product’s category.</p>
+    <div class="cat"><span class="lb">Category</span><div class="in sel" id="cat"><span id="catv">Phones &amp; Tablets › Mobile phones</span></div>
+      <div class="menu" id="menu"><div class="cur" data-k="phone">Phones &amp; Tablets › Mobile phones</div><div data-k="audio">Electronics › Audio &amp; Headphones</div><div data-k="fashion">Fashion › Women’s shoes</div></div>
+      <span class="tag" id="tag">10 fields for mobile phones</span></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="rcol"><section class="card dlv" id="dlv" aria-label="Default Delivery Cost">
+    <div class="dh"><h2>Default Delivery Cost</h2><i></i></div>
+    <div class="tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg>Competitive rates attract more buyers. Consider distance and local market standards.</div>
+    <div class="f"><span class="lb">Ship from</span><div class="in sel" id="sf"><span class="ph">Select state</span></div></div>
+    <div class="f"><span class="lb">Maximum weight</span><div class="in" id="mw"><span class="v"></span><span class="car"></span><span class="kg">kg</span></div></div>
+    <div class="acc open" id="a1"><div class="hd"><div><b>Delivery within my city</b><small>Same state as you</small></div><span class="chev"></span></div>
+      <div class="two"><div><label>Flat delivery cost</label><div class="in money" id="d1"><b>₦</b><span class="v"></span><span class="car"></span></div></div><div><label>Price per kg over max</label><div class="in money" id="d2"><b>₦</b><span class="v"></span><span class="car"></span></div></div></div></div>
+    <div class="acc" id="a2"><div class="hd"><div><b>Delivery outside my city</b><small>Anywhere else in Nigeria</small></div><span class="chev"></span></div>
+      <div class="two"><div><label>Flat delivery cost</label><div class="in money" id="d3"><b>₦</b><span class="v"></span><span class="car"></span></div></div><div><label>Price per kg over max</label><div class="in money" id="d4"><b>₦</b><span class="v"></span><span class="car"></span></div></div></div></div>
+    <div class="chk"><span><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2 5 8.6l4.6-5"/></svg></span>Save as default</div>
+    <div class="btn" id="add">Add</div>
+  </section>
+
+  <section class="card" id="res" aria-label="Delivery saved">
+    <h2>Delivery set once, on every product</h2>
+    <span class="ok"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2 5 8.6l4.6-5"/></svg>Saved as default</span>
+    <div class="prod"><img class="th" alt="" src="data:image/webp;base64,UklGRmAFAABXRUJQVlA4IFQFAABwHwCdASqAAIAAPlEij0WjoaETSKYcOAUEtIRIE/aXgdQBHIK+Lgn2p/8Zj2eLr/I1vs1HyQ/WnsGFYf1ocu73nFiFzx9v0EG5Z46yr9u2vanMIoSuMpv5XQeZ2R1T01AdHh/Y3FJYty0//6GX/37rE01XNKGo4qC7s3QxtwdEf/+RA1xbrDCldC8aJrLa9K19WJGHabh5e5yo2hnqWuEnSICN9gVF4XODwRwTACCvg1j77Iw2XtImBZ1hrBEz7dkYu8EKPm2QNocn2QN8M6MFyyBxwUUzQ47lN1Ggf2Vto3S1Dlq10CxW+emnoA9T6p4dOemAON+35IdnA2AIfW/OodP/AAD+/Xzk39dj4p44g+AEzFVC1Xnzynj+lWpzSvYICUIewJKaRDNVeYC46c1cI4R/8nJriAF0ZR3NhlnFwz9zykStVvtsRSSuJZ13fIxV/ztQFfRY10S6J3uegIp9X6vlUy8firQAfnYYUKskKLRWCT+Zm4ey5YJj2/+upSKZ8HPxBhZtV8p0hjxpUDOOhfAwTmk2ylmBfYKhuYJU2SweKYwNUH/EALYARvbwP3+9cxo7CwpfOdJoVlAKxqr/eXZ60+5LKy6THR6q0bQMjBC7Bz+Y/OEZF153VZuZcu1tVuBPyPhlPDvUwl4DphYdZfOE60CgRM639gkQpFf4B1b2OM2v6JQSFALCBKqUk+2hmx5PZNaFrjMGqazju831ngcPN8RhXQ9ErB/6hvBjmNoNcSUegK3CPEiWQADSvLHcboaJDkjHe8i1ENB4psMSTyBWR5ueLj+rx0HEb1u1/rXXRuX2SChiSIA0TZ/5So+Z+rMlHT85EIYViaA12Y1Zepj/dOKeh3WrQZTocuq4p1q068SX2+Nc8/ZvH9HD+R5gEFExnF1kieZwuM34R2tgaazF46DEay5bcFWCso9cKed7peDICEDvoS+RNZqgWxE1QqlqS4mLXv3ocHWzkSuwTdQbEhM0auCz5CJ3GHM9g4nrgfI8dM30qPFAN0sI/zlWxrUqbJuNK8gjfMQzCoVDjLlZ6u8yvxB9WfEHbTYwpfLOpYhKwNzLF1pktEH5um0UKWVRkBtukco2YpFFCPRCdoCDkBJTiv732Ty2P+j/uDydIk7GthVze70OAXmEbpu6sMnmScCFwfyYp4PFqDod2EKIcGt6vNcBu/UTftCvyR/B/ciNP/Iakhw/ras/2HwJJ9BDoisIfbgDX+nL3jj4mEvU7nSUs8m5Sw2tzBXaDp9qE6L7aeKeHOJFl6ZEwKzUu00qcT+aqZkuk2VmNO4cXT+6yBfLuRd/5LuimcLPZSXoWNslKLriQdnE6hwykXQzJcByJXsP4R7+vKjFmqYt/jvqBb+YNv/gtiYxvyV8Gn/yf7xHrUn8avesdjxrHenRpCaGbvjNunT5Wc0ern0u037rTjfiHW3HOMmAfzEiUXzWUeGNnrFsGESz1H1idnd0Qr630XkgjtrFeFF7eK8gwZSUv3nHhZ0Bl+uhOjVoLsB7PRPCLLEEzmtMqSyhX+62PicaTDgZNc0si8/8f9Zu/W33/OiucYTXAJO/sWf+4l9nYaZKg37ryQ00FMHsP4qb8BWip2MMCv6OHUVMQFsbSx4U3OD8Ec0FuIXeH+zGhJHf06cvurvX29bUHVvjxeeQr1RKxz7Wce7eKI7Pzrvn4M6tQzngBmJaEZPmCWvlvxL7CcGIGp4s4yOB+S5tNLaGBRIQcGIEkP/xPxDs3j2tCl/UMI/nsfyHGj5mV3bbgjFIuPip4qaU4Y0AJkAe4Y7E++opyiYhqPiSA1KUp/ZKvo4AAA=="><div><h4>Google Pixel 10 Pro</h4><p><i style="background:#14b8a6"></i>₦8,000.00 for delivery within Lagos</p><p><i style="background:#f97316"></i>₦15,000.00 for delivery outside Lagos</p></div></div>
+    <div class="prod"><img class="th" alt="" src="data:image/webp;base64,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"><div><h4>Women’s running shoes</h4><p><i style="background:#14b8a6"></i>₦8,000.00 for delivery within Lagos</p><p><i style="background:#f97316"></i>₦15,000.00 for delivery outside Lagos</p></div></div>
+    <div class="prod"><img class="th" alt="" src="data:image/webp;base64,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"><div><h4>Wireless headphones</h4><p><i style="background:#14b8a6"></i>₦8,000.00 for delivery within Lagos</p><p><i style="background:#f97316"></i>₦15,000.00 for delivery outside Lagos</p></div></div>
+  </section></div>
+
+  <span class="cu" id="cu" aria-hidden="true"><i></i><svg class="ar" viewBox="0 0 26 26"><path d="M6 3.5v17.2l4.6-4.3 2.9 6.6 3-1.3-2.9-6.5h6.3z" fill="#101828" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg><svg class="hd" viewBox="0 0 26 26"><path d="M9.2 12.4V5.6a1.7 1.7 0 0 1 3.4 0v5.3l.1-1.2a1.6 1.6 0 0 1 3.2.2v1.3a1.6 1.6 0 0 1 3.1.4v1.1a1.5 1.5 0 0 1 3 .3v4.4c0 3.5-2.6 6.1-6.1 6.1h-1.6c-2 0-3.4-.8-4.6-2.4l-3.6-4.8a1.6 1.6 0 0 1 2.4-2.1z" fill="#fff" stroke="#101828" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+</div>
+<script>
+const $ = s => document.querySelector(s), st = $('#st'), cu = $('#cu'), grid = $('#grid');
+const fit = () => { const k = Math.min(innerWidth / 1200, innerHeight / 800); st.style.transform = `translate(${(innerWidth - 1200 * k) / 2}px, ${(innerHeight - 800 * k) / 2}px) scale(${k})`; };
+fit(); addEventListener('resize', fit);
+// the specifications card matches the delivery dialog's height
+const match = () => { $('#spec').style.height = $('#dlv').offsetHeight + 'px'; }; match(); document.fonts.ready.then(match);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const SPECS = {
+  phone: { n: 'mobile phones', f: [['Condition', 'sel', 'New'], ['Brand', '', 'Google'], ['Model', '', 'Pixel 10 Pro'], ['Storage', 'sel', '256 GB'], ['RAM', 'sel', '16 GB'], ['Colour', '', 'Obsidian'], ['Screen size', 'sel', '6.3 in'], ['Battery', '', '4,870 mAh'], ['Network', 'sel', '5G'], ['SIM', 'sel', 'Dual SIM']] },
+  fashion: { n: 'women’s shoes', f: [['Condition', 'sel', ''], ['Brand', '', ''], ['Shoe size (EU)', 'sel', ''], ['Material', 'sel', ''], ['Colour', '', ''], ['Fit', 'sel', ''], ['Heel height', 'sel', ''], ['Sole', 'sel', ''], ['Occasion', 'sel', ''], ['Width', 'sel', '']] },
+};
+const ph = (l, t) => t ? 'Select' : 'Enter ' + l.toLowerCase().replace(' (eu)', '');
+const build = k => { grid.innerHTML = SPECS[k].f.map(([l, t]) => `<div class="f"><span class="lb">${l}</span><div class="in ${t}"><span class="v ph">${ph(l, t)}</span><span class="car"></span></div></div>`).join(''); $('#tag').textContent = SPECS[k].f.length + ' fields for ' + SPECS[k].n; };
+// stage coordinates of an element's point
+const pt = (el, fx = .5, fy = .55) => { const r = el.getBoundingClientRect(), s = st.getBoundingClientRect(), k = s.width / 1200; return [(r.left - s.left + r.width * fx) / k, (r.top - s.top + r.height * fy) / k]; };
+const at = (x, y) => { cu.style.setProperty('--x', x - 6 + 'px'); cu.style.setProperty('--y', y - 4 + 'px'); };
+const go = async (el, fx, fy, ms = 800) => { const [x, y] = pt(el, fx, fy); at(x, y); await sleep(ms); };
+const tap = async () => { cu.classList.add('down'); await sleep(110); cu.classList.remove('down', 'tap'); void cu.offsetWidth; cu.classList.add('tap'); await sleep(140); };
+const type = async (inp, text) => { const v = inp.querySelector('.v'); inp.classList.add('foc'); v.classList.remove('ph'); v.textContent = ''; for (const c of text) { v.textContent += c; await sleep(55 + Math.random() * 35); } await sleep(150); inp.classList.remove('foc'); };
+const pick = async (inp, text) => { inp.classList.add('foc'); await sleep(260); const v = inp.querySelector('.v') || inp.querySelector('span'); v.classList.remove('ph'); v.textContent = text; await sleep(200); inp.classList.remove('foc'); };
+function reset() {
+  build('phone'); $('#catv').textContent = 'Phones & Tablets › Mobile phones'; [...$('#menu').children].forEach((d, i) => d.className = i ? '' : 'cur');
+  $('#sf').innerHTML = '<span class="ph">Select state</span>'; ['#mw', '#d1', '#d2', '#d3', '#d4'].forEach(s => { const v = $(s + ' .v'); v.textContent = s === '#mw' ? '' : ''; });
+  $('#mw .v').innerHTML = '<span class="ph">0</span>'; ['#d1', '#d2', '#d3', '#d4'].forEach(s => $(s + ' .v').innerHTML = '<span class="ph">0</span>');
+  $('#a1').classList.add('open'); $('#a2').classList.remove('open'); $('#dlv').classList.remove('gone'); $('#res').classList.remove('on');
+}
+let visible = true; new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(document.body);
+async function loop() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { reset(); return; }
+  while (true) {
+    while (!visible) await sleep(300);
+    reset(); cu.classList.remove('on'); cu.style.transition = 'none'; at(600, 790); void cu.offsetWidth; cu.style.transition = ''; await sleep(700);
+    cu.classList.add('on');
+    // 1 · a phone: the specification fields fill in
+    const fs = [...grid.querySelectorAll('.in')], vals = SPECS.phone.f;
+    for (let i = 0; i < fs.length; i++) { await go(fs[i], .3, .55, i ? 420 : 800); await tap(); if (vals[i][1]) await pick(fs[i], vals[i][2]); else await type(fs[i], vals[i][2]); }
+    await sleep(500);
+    // 2 · switch the category: the fields swap to suit shoes
+    await go($('#cat'), .55); cu.classList.add('hand'); await tap(); $('#menu').classList.add('on'); await sleep(450);
+    const opt = $('#menu').children[2]; await go(opt, .4, .55, 600); opt.classList.add('hov'); await sleep(300); await tap();
+    $('#menu').classList.remove('on'); opt.classList.remove('hov'); cu.classList.remove('hand'); $('#catv').textContent = 'Fashion › Women’s shoes';
+    grid.querySelectorAll('.f').forEach(f => f.classList.add('out')); await sleep(280); build('fashion');
+    grid.querySelectorAll('.f').forEach((f, i) => { f.classList.add('out'); setTimeout(() => f.classList.remove('out'), 40 + i * 70); });
+    $('#tag').classList.remove('flash'); void $('#tag').offsetWidth; $('#tag').classList.add('flash'); await sleep(1600);
+    // 3 · delivery, set once
+    await go($('#sf'), .4, .55, 900); await tap(); await pick($('#sf'), 'Lagos');
+    await go($('#mw'), .3); await tap(); await type($('#mw'), '2');
+    await go($('#d1'), .4); await tap(); await type($('#d1'), '8,000');
+    await go($('#d2'), .4, .55, 500); await tap(); await type($('#d2'), '500');
+    await go($('#a2').querySelector('.hd'), .5, .5, 650); cu.classList.add('hand'); await tap(); $('#a1').classList.remove('open'); $('#a2').classList.add('open'); cu.classList.remove('hand'); await sleep(500);
+    await go($('#d3'), .4, .55, 600); await tap(); await type($('#d3'), '15,000');
+    await go($('#d4'), .4, .55, 500); await tap(); await type($('#d4'), '800');
+    const add = $('#add'); await go(add, .5, .55, 750); cu.classList.add('hand'); add.classList.add('hov'); await sleep(350); add.classList.add('prs'); await tap(); add.classList.remove('prs', 'hov'); cu.classList.remove('hand');
+    // 4 · the same fees appear on every product
+    await sleep(150); $('#dlv').classList.add('gone'); at(1100, 790); await sleep(250); $('#res').classList.add('on'); await sleep(900); cu.classList.remove('on');
+    await sleep(3400);
+  }
+}
+addEventListener('load', loop);
+</script>
+</body>
+</html>
