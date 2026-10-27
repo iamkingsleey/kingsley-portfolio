@@ -440,7 +440,8 @@
     "ratio": "3 / 2",
     "cap": "at a glance: shoppers, categories, verified sellers and delivery.",
     "title": "Kusnap at a glance: a bento of shoppers, categories, seller cards with verified ticks, delivery and contact details, assembling tile by tile"
-   }
+   },
+   "preview": "assets/uploads/kusnap-preview.jpg"
   },
   {
    "slug": "bulvds",
@@ -451,8 +452,9 @@
    "year": "2025",
    "client": "Bulvds, Lagos",
    "industry": [
-    "Proptech",
-    "Short-lets"
+    "PropTech",
+    "Short-let",
+    "Payments"
    ],
    "did": [
     "Product design",
@@ -460,13 +462,13 @@
     "Wallet design",
     "Prototyping"
    ],
-   "headline": "One wallet for every<br>part of a booking",
-   "blurb": "Short-lets and rentals made simpler for renters, agents and homeowners. I designed the wallet that holds payments, refunds and commissions.",
+   "headline": "A wallet that makes<br>short-let payments trustworthy",
+   "blurb": "Bulvds makes short-let and rental stays simple for everyone: explorers looking for a place, managers who run listings, and homeowners who own them. Money was where trust broke down, so I designed the Bulvds Wallet: one place to fund bookings, get refunds, receive payouts and see exactly where every naira is.",
    "stat": [
     "",
     ""
    ],
-   "cover": "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
+   "cover": "assets/uploads/bulvds-casestudy-cover.jpg",
    "story": [
     "Money you can see, from booking to payout",
     [
@@ -489,125 +491,324 @@
    ],
    "sections": [
     {
-     "h": "Overview",
-     "p": [
-      "Bulvds simplifies short-let and rental stays for renters, agents and homeowners, with transparency, trust and convenience at every step."
-     ],
-     "media": [
-      "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400"
-     ]
-    },
-    {
-     "h": "Pain points",
-     "list": [
-      [
-       "Payouts",
-       "Managers never knew when they’d be paid."
-      ],
-      [
-       "Refunds",
-       "Renters worried about getting deposits back."
-      ],
-      [
-       "Trust",
-       "Too little transparency broke it."
-      ],
-      [
-       "Payments",
-       "Clunky, and often off the platform."
-      ],
-      [
-       "Guests",
-       "International visitors couldn’t pay easily."
-      ]
-     ],
-     "media": [
-      "https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400"
-     ]
-    },
-    {
-     "h": "UX strategy",
-     "p": [
-      "The goal: clarity, trust and accessibility. Four principles: transparency first, flows without dead ends, payment options that fit local and international guests, and features that build trust."
-     ],
-     "media": [
-      "https://framerusercontent.com/images/8x6g6Q3OQvJ32Uzj79Qe4WDD0.png?scale-down-to=2400",
-      "https://framerusercontent.com/images/zqPSR0NdXGgi8hpLR3MhwxF6M.png?scale-down-to=2400"
-     ]
-    },
-    {
-     "h": "Key feature",
-     "p": [
-      "The Bulvds Wallet handles payments, refunds and commissions in one place."
-     ],
-     "list": [
-      [
-       "Fund it any way",
-       "Card, bank transfer or crypto."
-      ],
-      [
-       "Cash out",
-       "Agents and renters withdraw straight to a bank account."
-      ],
-      [
-       "Every transaction",
-       "Payments, commissions, refunds and withdrawals in one history."
-      ],
-      [
-       "Clear balances",
-       "Total, ready to withdraw, and incoming."
-      ]
-     ],
-     "media": [
-      "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400"
-     ]
-    },
-    {
-     "h": "High fidelity",
-     "p": [
-      "Wallet home, funding, checkout with wallet pay, pending transactions, withdrawals and the transaction timeline."
-     ],
-     "media": [
+     "h": "Context",
+     "eb": "01 · Context",
+     "title": "Short-lets, made simple for everyone",
+     "media": [],
+     "blocks": [
       {
-       "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
-       "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"
+       "t": "text",
+       "v": "Bulvds redefines modern living by simplifying short-let and rental experiences. It serves three kinds of people: explorers (renters) looking for a stay, managers (agents) running listings, and homeowners overseeing their spaces."
       },
-      "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400",
-      "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400"
+      {
+       "t": "text",
+       "v": "The platform brings discovering, booking and managing properties into one place, built on transparency, trust and convenience. Every one of those journeys ends in money changing hands, and that is where the experience fell short."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "Explorers",
+         "Renters who discover, book and pay for stays, and wait for their caution fee to come back."
+        ],
+        [
+         "Managers",
+         "Agents who list properties, take bookings and earn commissions."
+        ],
+        [
+         "Homeowners",
+         "Owners who oversee their spaces and get paid for them."
+        ]
+       ]
+      }
      ]
     },
     {
-     "h": "More screens",
-     "p": [
-      "Coupons, property add-ons and rebooking."
+     "h": "Problem",
+     "eb": "02 · Problem",
+     "title": "Money was where trust broke",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Users faced real friction managing payments. Managers were frustrated by unclear payout timelines, while renters worried about getting their caution fee back. International users were blocked by limited payment options. Together, these led to a lack of trust, frequent disputes and a fragmented experience that stopped people rebooking inside the app."
+      },
+      {
+       "t": "heading",
+       "v": "The goal"
+      },
+      {
+       "t": "text",
+       "v": "Design a wallet that delivers clarity, trust and accessibility, by making transactions transparent, refunds predictable and payments inclusive for local and international users."
+      }
+     ]
+    },
+    {
+     "h": "Research",
+     "eb": "03 · Research",
+     "title": "Where payments let people down",
+     "media": [],
+     "notes": [
+      {
+       "t": "Uncertain payouts",
+       "p": "Managers don’t know when they’ll get paid, so cash flow is unpredictable.",
+       "c": "#ffe2c4"
+      },
+      {
+       "t": "Refund stress",
+       "p": "Renters are anxious about when they’ll get their security deposit back.",
+       "c": "#dce9ff"
+      },
+      {
+       "t": "Broken trust",
+       "p": "Without transparency, disputes are nearly impossible to resolve, and confidence erodes.",
+       "c": "#ffd6de"
+      },
+      {
+       "t": "Clunky payments",
+       "p": "Paying means leaving the app, so rebooking feels disconnected.",
+       "c": "#d5f2dc"
+      },
+      {
+       "t": "Excluded users",
+       "p": "International guests can’t book without payment options that work for them.",
+       "c": "#fff1a8"
+      }
      ],
-     "media": [
-      "https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400",
-      "https://framerusercontent.com/images/pCnh0sRjFaGRPSzTnWdKjNiY3DY.png?scale-down-to=2400",
-      "https://framerusercontent.com/images/Rb90O37OWKkoeQYKIwAQ9SLPg.png?scale-down-to=2400"
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Five pain points came up across renters, managers and international guests."
+      }
+     ],
+     "after": [
+      {
+       "t": "heading",
+       "v": "What it meant for the design"
+      },
+      {
+       "t": "pairs",
+       "items": [
+        [
+         "Managers can’t predict payouts",
+         "A withdrawal balance that shows what’s ready to cash out, and incoming funds that show what’s on the way"
+        ],
+        [
+         "Renters worry about their deposit",
+         "Refunds show as incoming funds, with a notification when they land"
+        ],
+        [
+         "Disputes are hard to resolve",
+         "A full transaction history with clear receipts and escrow notes"
+        ],
+        [
+         "Paying means leaving the app",
+         "Fund the wallet, pay for bookings and withdraw without leaving Bulvds"
+        ],
+        [
+         "International guests can’t pay",
+         "Top up by card, bank transfer or cryptocurrency"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Strategy",
+     "eb": "04 · Strategy",
+     "title": "Clarity before anything else",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Four principles shaped every screen of the wallet."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "Transparency first",
+         "Clear wallet breakdowns (total, withdrawal and incoming funds), with a short explanation for every balance."
+        ],
+        [
+         "Seamless flows",
+         "Fund the wallet and withdraw inside the app, so people don’t depend on outside payment systems."
+        ],
+        [
+         "Inclusive by default",
+         "Several ways to fund the wallet, so everyone can book without friction, at home or abroad."
+        ],
+        [
+         "Built for trust",
+         "Real-time notifications, a detailed transaction history and an easy way to raise a dispute."
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "h": "The wallet",
+     "eb": "05 · The wallet",
+     "title": "Every naira, accounted for",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "The Bulvds Wallet handles payments, refunds and commissions in one place. It replaces the guesswork with three balances anyone can read at a glance."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "Total balance",
+         "All the funds in the wallet."
+        ],
+        [
+         "Withdrawal balance",
+         "Funds that are ready to cash out."
+        ],
+        [
+         "Incoming funds",
+         "Payments or refunds that are pending and will be credited soon."
+        ]
+       ]
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-wallet.html?flow=home",
+       "ratio": "3 / 2",
+       "cap": "The wallet home: three balances, and a plain explanation for each.",
+       "title": "The wallet home, then View Breakdown opens the wallet overview and an explanation of each balance"
+      },
+      {
+       "t": "heading",
+       "v": "Fund it any way you like"
+      },
+      {
+       "t": "text",
+       "v": "Users top up the wallet with Paystack (card, USSD or bank transfer) or with cryptocurrency. International guests can book without a local bank card, and everyone can pre-fund before checkout."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-wallet.html?flow=fund",
+       "ratio": "3 / 2",
+       "cap": "Top up with Paystack or crypto: USDT converts to Naira as you type, and the new balance shows straight away.",
+       "title": "Fund wallet, choose crypto, enter an amount in USDT, see the Naira value, confirm, and the balance updates"
+      },
+      {
+       "t": "heading",
+       "v": "Cash out in a few taps"
+      },
+      {
+       "t": "text",
+       "v": "Agents and renters withdraw straight to their bank account. The withdrawal balance shows exactly what can go out today, so nobody is surprised by what can’t."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-wallet.html?flow=withdraw",
+       "ratio": "3 / 2",
+       "cap": "Withdraw to a saved bank account, confirmed with a 4-digit code.",
+       "title": "Withdraw, choose bank transfer, enter the amount and a note, confirm with a code, funds sent"
+      },
+      {
+       "t": "heading",
+       "v": "Pay for a stay your way"
+      },
+      {
+       "t": "text",
+       "v": "At checkout, renters can add extras like a chef, a driver or a PS5, then choose how to pay: from the Bulvds Wallet, with Paystack by card or bank transfer, or with Split Payment, which uses the wallet balance and pays the rest with Paystack. Paying from the wallet keeps the whole booking inside the app."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-wallet.html?flow=checkout",
+       "ratio": "3 / 2",
+       "cap": "Add extras, then pay from the wallet, with Paystack, or split between the two.",
+       "title": "Review the booking, add a PS5 as an extra, open the payment summary, compare payment methods and pay from the wallet"
+      },
+      {
+       "t": "heading",
+       "v": "See where your money is"
+      },
+      {
+       "t": "text",
+       "v": "A full history of every transaction, from payments and commissions to refunds and withdrawals. Each one opens a clear receipt, and escrow notes explain any money that is being held and why."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-wallet.html?flow=history",
+       "ratio": "3 / 2",
+       "cap": "Every transaction, with a receipt for each, and a clear failed state.",
+       "title": "Recent transactions, then a caution fee refund and a failed withdrawal opened as receipts"
+      }
+     ]
+    },
+    {
+     "h": "Onboarding",
+     "eb": "06 · Onboarding",
+     "title": "A way in for renters and hosts",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "I also redesigned onboarding. Three slides speak to the people Bulvds serves: finding a verified space, getting a feel for the lifestyle around it, and managing properties. Each one carries an isometric illustration I made for the app."
+      },
+      {
+       "t": "text",
+       "v": "Sign-up starts with just an email. Bulvds checks whether an account already exists and, if not, goes straight to creating one, so nobody has to choose between “log in” and “sign up” before they’ve started. Once the account is made, people land on their feed."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/bulvds-onboarding.html?flow=explorer",
+       "ratio": "3 / 2",
+       "cap": "Splash, three slides with the isometric illustrations, sign-up by email, then the feed.",
+       "title": "The splash screen, three onboarding slides with isometric illustrations, the welcome screen, an email that is new to Bulvds leading to Create your account, then the home feed scrolling"
+      },
+      {
+       "t": "heading",
+       "v": "Hosts get their own path"
+      },
+      {
+       "t": "text",
+       "v": "Agents, landlords and property managers tap Continue as Host. A short page explains what listing on Bulvds gives them before they create a host account."
+      }
      ]
     },
     {
      "h": "Impact",
-     "list": [
-      [
-       "Fewer disputes",
-       "Clear balances and timelines settled arguments before they started."
-      ],
-      [
-       "Better checkout",
-       "Paying from the wallet removed steps."
-      ],
-      [
-       "Confident payouts",
-       "People trusted withdrawals."
-      ],
-      [
-       "Loyal agents",
-       "Commissions arrived where agents could see them."
-      ]
-     ],
-     "media": []
+     "eb": "07 · Results",
+     "title": "Tested with the people who use it",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Before the wallet and the new onboarding shipped, we ran usability tests with existing Bulvds users: renters, agents and homeowners who already book and list on the app. They worked through the same journeys shown above."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "Reading the wallet",
+         "The three balances, and what each one means."
+        ],
+        [
+         "Money in and out",
+         "Funding the wallet, then withdrawing to a bank account."
+        ],
+        [
+         "Paying for a stay",
+         "Checkout with extras, paying from the wallet, with Paystack or split between the two."
+        ],
+        [
+         "Getting started",
+         "Onboarding, and signing up with just an email."
+        ]
+       ]
+      },
+      {
+       "t": "text",
+       "v": "The feedback came back positive. Users found the wallet clear and the flows easy to follow, which gave the team the confidence to build it as designed."
+      }
+     ]
     }
    ],
    "statement": "When people can see their money, they stop worrying about it.",
@@ -659,32 +860,22 @@
      ]
     ]
    ],
-   "impact": {
-    "list": [
-     [
-      "Fewer disputes",
-      "Clear balances and timelines settled arguments before they started."
-     ],
-     [
-      "Better checkout",
-      "Paying from the wallet removed steps."
-     ],
-     [
-      "Confident payouts",
-      "People trusted withdrawals."
-     ],
-     [
-      "Loyal agents",
-      "Commissions arrived where agents could see them."
-     ]
-    ]
-   },
-   "problem": "Managers didn’t know when they’d be paid, renters worried about getting deposits back, and payments kept drifting off the platform.",
-   "goal": "One place where every payment, refund and commission is visible, for local and international guests alike.",
+   "impact": null,
+   "problem": "Managers couldn’t predict payouts, renters worried about getting their caution fee back, and international guests were blocked by limited payment options.",
+   "goal": "A wallet that delivers clarity, trust and accessibility: transparent transactions, predictable refunds and payments that work for local and international users.",
    "impactNote": "",
    "ver": "mix",
    "page": "case.html",
-   "fq": "91.4"
+   "fq": "91.4",
+   "flow": "v2",
+   "platforms": "Mobile app",
+   "team": "",
+   "timeline": "",
+   "glance": {
+    "problem": "Managers couldn’t predict payouts, renters worried about deposits, and international guests couldn’t pay at all.",
+    "did": "Designed the wallet: balances, multi-source funding, withdrawals and a full transaction history, plus a new onboarding flow.",
+    "result": "Usability tests with existing Bulvds users came back positive."
+   }
   },
   {
    "slug": "sharebuddy",

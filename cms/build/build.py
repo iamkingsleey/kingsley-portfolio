@@ -333,7 +333,7 @@ def case_cover(c):
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000"><rect width="1500" height="1000" fill="{m["color"]}"/><text x="750" y="560" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="600" font-size="190" letter-spacing="-9" fill="#fff">{m["word"]}</text></svg>'
     return 'data:image/svg+xml,' + urllib.parse.quote(svg)
 for kind, k in [('Brand', 'brand'), ('Product', 'product')]:
-    A[k] = [{'t': c['title'], 'bg': '#111111', 'dark': True, 'r': 1.5, 'src': case_cover(c), 'cs': True, 'fq': c['fq'], 'page': c.get('page', 'case.html') + '#' + c['slug'], 'desc': c['blurb'], 'client': c['client'] if c['client'] != 'Personal project' else '', 'year': c['year'] if c['year'][:1].isdigit() else '', 'tools': 'Figma' if kind == 'Product' else 'Illustrator · Figma'} for c in CASES if c['kind'] == kind] + A[k]
+    A[k] = [{'t': c['title'], 'bg': '#111111', 'dark': True, 'r': 1.5, 'src': c.get('preview') or case_cover(c), 'cs': True, 'fq': c['fq'], 'page': c.get('page', 'case.html') + '#' + c['slug'], 'desc': c['blurb'], 'client': c['client'] if c['client'] != 'Personal project' else '', 'year': c['year'] if c['year'][:1].isdigit() else '', 'tools': 'Figma' if kind == 'Product' else 'Illustrator · Figma'} for c in CASES if c['kind'] == kind] + A[k]
 
 d = rep(d, '<meta charset="utf-8">\n<title>Designs Dial</title>',
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Designs · Kingsley M.</title>')
