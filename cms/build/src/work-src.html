@@ -294,6 +294,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(var(--fs, 1.5)) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
 @media (max-width: 899px) { .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px !important } }
 @media (max-width: 899px) { body.cs1 .ov-grid { grid-template-columns: 1fr !important } }   /* case studies: one column on phones */
+@media (max-width: 900px) { body.cs1 .vtog { display: none !important } body.cs1 .shuf { left: calc(50% - 20px) } }   /* and no reel view to switch to */
 @media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
 .ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
 .ov-c b { font: 600 12px var(--mono); color: var(--muted); margin-right: 4px }
@@ -562,6 +563,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     if (filt === name) return; const was = filt; filt = name;
     document.body.classList.toggle('filt', !!name); if (typeof dbackLabel === 'function') dbackLabel();
     document.body.classList.toggle('cs1', name === 'Case study');   // phones: case studies stack in one column
+    if (window._kmCsGrid) window._kmCsGrid();   // and no reel view there
     try { if (!quiet && openIdx < 0) {
       if (!was && name) history.pushState(stateOf({ km: 'f' }), '', hashFor(name, -1));    // All → a category: a step you can go back from
       else history.replaceState(stateOf(), '', hashFor(name, -1));                          // one category to another, or back to All
@@ -1952,7 +1954,10 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       try { localStorage.setItem('km-dview', v); } catch (_) {} if (on) { fit(); list(); if (!quiet) { const first = [...ovGrid.children].find(t => !t.hidden && t.getBoundingClientRect().bottom > 160); const k = first ? L.indexOf(+first.dataset.i) : 0; pos = tgt = Math.max(0, k); } if (!raf) raf = requestAnimationFrame(loop); setTimeout(() => rv.focus({ preventScroll: true }), 60); } };
     vt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if ((b.dataset.v === 'reel') !== on) { tap(); set(b.dataset.v); } }));
     window._kmReel = () => on;
-    let v0 = 'grid'; try { v0 = localStorage.getItem('km-dview') || 'grid'; } catch (_) {} if (v0 === 'reel') requestAnimationFrame(() => set('reel', true));
+    // phones, case studies: grid only (the visitor's saved choice is kept for the other filters)
+    const csPhone = () => innerWidth < 900 && document.body.classList.contains('cs1');
+    window._kmCsGrid = () => { if (!on || !csPhone()) return; let k = 'reel'; try { k = localStorage.getItem('km-dview') || 'reel'; } catch (_) {} set('grid', true); try { localStorage.setItem('km-dview', k); } catch (_) {} };
+    let v0 = 'grid'; try { v0 = localStorage.getItem('km-dview') || 'grid'; } catch (_) {} if (v0 === 'reel') requestAnimationFrame(() => { if (!csPhone()) set('reel', true); });
   }
   addEventListener('km-role', e => applyRole(e.detail, true));
   applyRole(roleNow, false);
