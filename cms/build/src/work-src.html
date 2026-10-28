@@ -522,9 +522,9 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
   const row = $('row');
   const slots = items.map((it, i) => {
-    const s = document.createElement('div'); s.className = 'slot' + (it.video ? ' white' : '') + (it.cs ? ' cs' : '');
+    const s = document.createElement('div'); s.className = 'slot' + (it.video && !it.dark ? ' white' : '') + (it.cs ? ' cs' : '');
     s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
-    if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; s.appendChild(v); }
+    if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; v.autoplay = !reduce; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); s.appendChild(v); }
     else { const im = xo(new Image(), it.src); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
     row.appendChild(s);
     return s;
@@ -645,7 +645,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     slots.forEach((s, j) => {
       s.classList.toggle('active', j === i);
       const v = s.querySelector('video'); if (!v) return;
-      v.pause();                          // videos rest on their first frame; hovering the piece on the needle plays them
+      if (reduce || Math.abs(j - i) > 6) { v.pause(); return; }   // motion pieces near the needle keep playing; far-off ones rest
+      const pr = v.play(); if (pr) pr.catch(() => {});
     });
   }
 
@@ -1202,7 +1203,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         for (let r = 0; r < k; r++) { const c = base + (r < extra ? 1 : 0); out.push(list.slice(n, n + c).map((x, j) => [x, n + j])); n += c; } return out.filter(r => r.length); };
       dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
-        <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
+        <div class="d-cols"><div class="d-mcol"><div class="d-frame m${it.video && !it.dark ? ' white' : ''}" id="dmedia" style="aspect-ratio:${it.r};--r:${it.r}">
           <div class="d-pic" id="dpic"${!it.video ? ' data-light' : ''}>${media}</div>
           ${SET ? `<button type="button" class="d-ar l" id="dprev" aria-label="Previous picture"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button><button type="button" class="d-ar r" id="dnx" aria-label="Next picture"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button><span class="d-cnt" id="dcnt">${pad(at)} / ${String(SET.length).padStart(2, '0')}</span>` : ''}
         </div></div>
@@ -1249,7 +1250,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     dwrap.classList.remove('d-mini');
     dwrap.innerHTML = `
       <section class="d-sec d-top" data-s="0">
-        <div class="d-frame${it.video ? ' white' : ''}" id="dmedia">
+        <div class="d-frame${it.video && !it.dark ? ' white' : ''}" id="dmedia">
           <div class="d-pic" id="dpic"${!it.video ? ' data-light' : ''}>${media}</div>
           <i class="notch l" id="nL"></i><i class="notch r" id="nR"></i>
           <div class="d-over" id="dover" style="color:${it.dark ? '#fff' : '#0b0b0b'}"><div class="d-label"><i></i>${pad(i)} · ${it.cat}</div><h1>${it.t}</h1></div>
@@ -1606,7 +1607,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     if (on === hovering) return;
     hovering = on;
     const s = slots[active], v = s && s.querySelector('video');
-    if (v) { if (on) { const pr = v.play(); if (pr) pr.catch(() => {}); } else v.pause(); }
+    if (v && on) { const pr = v.play(); if (pr) pr.catch(() => {}); }   // motion pieces already loop; leaving no longer stops them
   }
   slots.forEach(s => s.addEventListener('pointerleave', () => setHover(false)));
 
@@ -1700,7 +1701,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // ---------- See everything ----------
   // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
   const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
-  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${smOf(it.video ? it.poster : it.src)}"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
+  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video && !it.dark ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${smOf(it.video ? it.poster : it.src)}"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
   document.body.appendChild(ov);
   let ovOpen = false;
   function openOverview() {
@@ -2061,7 +2062,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
           if (!pc) { pc = document.createElement('canvas'); pc.width = tw; pc.height = thh; { const g2 = pc.getContext('2d'); g2.imageSmoothingEnabled = true; g2.imageSmoothingQuality = 'high'; g2.drawImage(src, cx0, cy0, cw, ch, 0, 0, tw, thh); } tileCache.set(ck, pc); if (tileCache.size > 120) tileCache.delete(tileCache.keys().next().value); }
           oc.drawImage(pc, r.left, r.top, r.width, r.height);
         }
-        if (it.video) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
+        if (it.video && !it.dark) { oc.strokeStyle = THEME.edge; oc.lineWidth = 1; oc.strokeRect(r.left + .5, r.top + .5, r.width - 1, r.height - 1); }   // white UI pieces get a hairline
       }
       if (ogl) {
         // pictures from another origin can't be read into WebGL (it throws); then the grid shows flat, with the plain pictures

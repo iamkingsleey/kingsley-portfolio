@@ -1199,6 +1199,48 @@
       "dark": true,
       "desc": "The ShareBuddy logo animation: two dots bounce in and become Buddy, the mascot, before the wordmark settles underneath.",
       "case": "sharebuddy"
+    },
+    {
+      "title": "AI icons and laptop",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/ai-icons-and-laptop-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/ai-icons-and-laptop-motion.mp4"
+        }
+      ],
+      "bg": "#040404",
+      "dark": true,
+      "desc": "An isometric laptop with AI icons circling its screen on a turning ring."
+    },
+    {
+      "title": "POS and search",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/pos-and-search-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/pos-and-search-motion.mp4"
+        }
+      ],
+      "bg": "#040404",
+      "dark": true,
+      "desc": "An isometric POS terminal drops in, prints a receipt and gets a magnifier over its keys."
+    },
+    {
+      "title": "Wrap of money and wallet",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/wrap-of-money-and-wallet-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/wrap-of-money-and-wallet-motion.mp4"
+        }
+      ],
+      "bg": "#040404",
+      "dark": true,
+      "desc": "An isometric wallet with a wrap of notes, coins and bills floating above it."
     }
   ]
 }
