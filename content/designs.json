@@ -1184,6 +1184,21 @@
       "desc": "Incoming requests stacked as cards, each with its price, pickup and drop-off.",
       "tools": "Figma",
       "mix": true
+    },
+    {
+      "title": "ShareBuddy, logo in motion",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-logo-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/sharebuddy-logo-motion.mp4"
+        }
+      ],
+      "bg": "#ff0a3c",
+      "dark": true,
+      "desc": "The ShareBuddy logo animation: two dots bounce in and become Buddy, the mascot, before the wordmark settles underneath.",
+      "case": "sharebuddy"
     }
   ]
 }
