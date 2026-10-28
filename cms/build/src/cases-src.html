@@ -1920,18 +1920,20 @@ addEventListener('hashchange', show);
 show();
 </script>
 <script>
-  // phones: a prototype opens full screen on tap; the small × at the top right brings it back
+  // phones: a prototype with a phone layout opens full screen on tap; the small × at the top right brings it back
   (function () {
     var mq = matchMedia('(max-width: 720px)');
     var X = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
     var O = '<i aria-hidden="true"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 1.5h4v4M5.5 12.5h-4v-4M12.5 1.5L8 6M1.5 12.5L6 8"/></svg></i>';
-    function close() { var f = document.querySelector('.fw.kfs-on'); if (!f) return; f.classList.remove('kfs-on'); document.documentElement.classList.remove('kfs'); }
+    function tell(w, on) { var fr = w.querySelector('iframe'); if (!fr) return; var send = function () { try { fr.contentWindow.postMessage({ fs: on }, '*'); } catch (e) {} };
+      send(); setTimeout(send, 300); setTimeout(send, 1200); if (on) fr.addEventListener('load', function l() { if (w.classList.contains('kfs-on')) send(); else fr.removeEventListener('load', l); }); }   // sent again in case the prototype is still loading   // the prototype shows just the phone, big, while full screen
+    function close() { var f = document.querySelector('.fw.kfs-on'); if (!f) return; f.classList.remove('kfs-on'); document.documentElement.classList.remove('kfs'); tell(f, false); }
     function wire() {
-      document.querySelectorAll('.kframe .fw').forEach(function (w) {
+      document.querySelectorAll('.kframe .fw[data-mr]').forEach(function (w) {   // only prototypes that have a phone layout; landscape-only ones (like the Kusnap bento) stay as they are
         if (w.querySelector('.kfo')) return;
         var o = document.createElement('button'); o.type = 'button'; o.className = 'kfo'; o.setAttribute('aria-label', 'Open the prototype full screen'); o.innerHTML = O;
         var x = document.createElement('button'); x.type = 'button'; x.className = 'kfx'; x.setAttribute('aria-label', 'Close full screen'); x.innerHTML = X;
-        o.addEventListener('click', function (e) { if (!mq.matches) return; e.preventDefault(); e.stopPropagation(); close(); w.classList.add('kfs-on'); document.documentElement.classList.add('kfs'); });
+        o.addEventListener('click', function (e) { if (!mq.matches) return; e.preventDefault(); e.stopPropagation(); close(); w.classList.add('kfs-on'); document.documentElement.classList.add('kfs'); tell(w, true); });
         x.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); close(); });
         w.appendChild(o); w.appendChild(x);
       });

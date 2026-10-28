@@ -1121,8 +1121,25 @@
        "t": "frame",
        "src": "Prototype/sharebuddy.html?flow=start",
        "ratio": "3 / 2",
-       "cap": "Getting started: the splash, sign up, then every split at a glance.",
+       "cap": "Getting started: the splash, sign up, every split at a glance, then a peek at Discover.",
        "title": "Splash, sign up, then the home screen scrolling through active and recent splits",
+       "mratio": "15 / 22",
+       "dark": true
+      },
+      {
+       "t": "heading",
+       "v": "Bring your buddies"
+      },
+      {
+       "t": "text",
+       "v": "Buddies starts empty, with Buddy and one job: add friends. Search your contacts, invite the people you split with, and get a heads-up when they join."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=friends",
+       "ratio": "3 / 2",
+       "cap": "Bring your buddies: search your contacts, invite them, get notified when they join.",
+       "title": "Tap Buddies, add friends, search contacts, invite two of them, then turn on notifications for when they join",
        "mratio": "15 / 22",
        "dark": true
       },

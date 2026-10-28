@@ -103,6 +103,7 @@ html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
 [data-theme="dark"] .side .k { color: #8aa07f } [data-theme="dark"] .side h2 { color: #f2f5ef }
 [data-theme="dark"] .dial .tk i { background: #f2f5ef } [data-theme="dark"] .dial li { color: #5f685c } [data-theme="dark"] .dial li.on { color: #f2f5ef } [data-theme="dark"] .dial li.done { color: #a3ac9f }
 [data-theme="dark"] .dev { box-shadow: 0 0 0 9px #000, 0 0 0 10px #3b3f3a, 0 40px 80px -30px rgba(0, 0, 0, .7) }
+#st.fs .side { display: none }
 </style>
 </head>
 <body>
@@ -148,11 +149,15 @@ const FLOWS = {
 const flow = (new URLSearchParams(location.search).get('flow') || 'explorer').replace(/[^a-z]/g, ''), F = FLOWS[flow] || FLOWS.explorer;
 document.getElementById('ttl').textContent = F.t; document.getElementById('steps').innerHTML = F.s.map((s, i, a) => `<li data-n="${String(i + 1).padStart(2, '0')} / ${String(a.length).padStart(2, '0')}">${s}</li>`).join('');
 const st = document.getElementById('st'), app = document.getElementById('app'), steps = [...document.querySelectorAll('#steps li')];
-const fit = () => { const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);
+let FS = false;   // full screen (the case study page tells us): just the phone, as big as the screen allows
+const fit = () => { if (FS) { const d = st.querySelector('.dev'), W = d.offsetWidth + 40, H = d.offsetHeight + 96; st.classList.add('fs'); st.style.width = W + 'px'; st.style.height = H + 'px'; d.style.transform = 'none'; d.style.left = '20px'; d.style.top = '64px';
+    const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; return; }
+  st.classList.remove('fs'); st.style.width = ''; { const d = st.querySelector('.dev'); if (d) d.style.top = ''; }
+  const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);
   // a tall screen (a phone, or a prototype opened full screen): the stage grows to the screen's shape and the phone grows to fill it, so nothing is cut off
   st.style.height = v ? H + 'px' : ''; { const d = st.querySelector('.dev'); if (d) { if (v && H > 880) { const s = Math.min(1.2, (H - 250) / d.offsetHeight, 560 / d.offsetWidth); d.style.transform = `scale(${s})`; d.style.left = (600 - d.offsetWidth * s) / 2 + 'px'; } else { d.style.transform = ''; d.style.left = ''; } } }   // portrait frame: the vertical stage
   const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; };
-fit(); addEventListener('resize', fit);
+fit(); addEventListener('resize', fit); addEventListener('message', e => { if (e.data && 'fs' in e.data) { FS = !!e.data.fs; fit(); } });
 const sleep = ms => new Promise(r => setTimeout(r, ms * .66)), $ = s => app.querySelector(s);   // everything plays about a third faster
 let touch;
 function build() {

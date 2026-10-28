@@ -302,6 +302,20 @@ html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
 .cxr em.ok { background: #233024; color: #2fe06b } .cxr em.wait { background: #33262a; color: #ff4d6d }
 .cxs { position: absolute; left: 15px; top: 703px; width: 360px; height: 139px; border-radius: 24px; background: #181818; padding: 22px 20px; display: flex; flex-direction: column; justify-content: space-between; font: 600 16px "DM Sans", system-ui, sans-serif; color: #fff }
 .cxs p { display: flex; justify-content: space-between } .cxs p span { color: #9a9a9a; font-weight: 500 }
+
+/* Buddies: the empty My Buddies screen, the Invite Friends sheet with search and results, then the get-notified card */
+.ivs { position: absolute; left: 0; top: 69px; width: 390px; height: 831px; background: linear-gradient(transparent 60px, #181818 60px) }
+.ivs .b2 { opacity: 0; transition: opacity .25s } .ivs.q .b2 { opacity: 1 } .ivs.q .b1 { opacity: 0 }
+.ivq { position: absolute; left: 60px; top: 136px; height: 20px; display: flex; align-items: center; font: 500 14px "DM Sans", system-ui, sans-serif; color: #fff; opacity: 0 } .ivs.q .ivq { opacity: 1 }
+.ivq i { width: 1.5px; height: 16px; background: #fff; margin-left: 1px; animation: blink 1s steps(1) infinite }
+.ivh { position: absolute; left: 14px; top: 218px; font: 600 22px/22px "DM Sans", system-ui, sans-serif; color: #fff; opacity: 0; transform: translateY(8px); transition: all .5s var(--soft) } .ivs.r .ivh { opacity: 1; transform: none }
+.ivr { position: absolute; left: 14px; width: 362px; height: 48px; display: flex; align-items: center; gap: 12px; font-family: "DM Sans", system-ui, sans-serif; color: #fff; opacity: 0; transform: translateY(14px); transition: transform .6s var(--pop) var(--d), opacity .3s var(--d) } .ivs.r .ivr { opacity: 1; transform: none }
+.ivr .ini { width: 48px; height: 48px; border-radius: 16px; background: #232323; display: grid; place-items: center; font: 700 14px "DM Sans", system-ui, sans-serif; flex: none }
+.ivr div { flex: 1 } .ivr b { display: block; font: 600 15px/20px "DM Sans", system-ui, sans-serif } .ivr span { display: block; font: 500 13px/17px "DM Sans", system-ui, sans-serif; color: #6e6e6e }
+.ivr em { flex: none; height: 31px; padding: 0 12px; border-radius: 24px; background: #232323; display: grid; place-items: center; font: 500 13px "DM Sans", system-ui, sans-serif; font-style: normal; transition: background .3s, color .3s, transform .45s var(--pop) }
+.ivr em.on { background: #fff; color: #111; transform: scale(1.04) }
+.ntx { position: absolute; left: 110px; top: 104px; font-family: "DM Sans", system-ui, sans-serif; color: #fff } .ntx b { display: block; font: 600 13.5px/18px "DM Sans", system-ui, sans-serif } .ntx span { display: block; font-size: 12px; color: #8a8a8a; margin-top: 2px }
+#st.fs .side { display: none }
 </style>
 </head>
 <body>
@@ -334,6 +348,8 @@ const SCR = {
   // the splash: the logo animation, sized and placed like the logo on the Figma splash, its edges melting into the same red
   splash: () => L('M/splash_bg', 0, 0, 390, 'full') + BD.splash(),
   onboard: () => L('M/onboard_bg', 0, 0, 390, 'full') + BD.note(),
+  discover: () => full('discover2'),
+  mybud: () => full('buddies_scr') + BD.invite(-80.5, 183, .25),
   home: () => `<div class="long" style="height:1645px">${L('L/home_funds', 17, 150, 356, 'r', .05)}${L('L/home_active', 17, 332, 356, 'r', .14)}${L('L/home_recent', 17, 574, 356, 'r', .22)}${L('L/home_p1', 17, 804, 356, 'r', .3)}${L('L/home_p2', 17, 1192, 356, 'r', .38)}</div>`
     + L('home_top', 0, 0, 390, 'fix') + `<img class="fix r" src="${P}home_nav.png" alt="" style="left:-24px;top:711.5px;width:414px;--d:.3s">`,
   scan: () => full('scan') + `<div class="feed"><i class="glare"></i></div><div class="cam" id="cam"><div class="paper in" id="paper"><h4>EKO HOTEL</h4><div class="d">02 JUL 2025 · 8:15 PM · TABLE 6</div>`
@@ -374,26 +390,34 @@ const OV = {
     <div><div class="okb"><div>${BD.invite(-200, -36, .15)}</div></div><h4>You’re all square! 🎉</h4><p>₦14,750 paid to Kay for<br>Owambe Night Out.</p><span class="ref">REF · SB-28X4-91QK</span></div></div></div>`,
   fab: () => `<div class="ov" id="o-fab">${L('L/fab_bg', 0, 0, 390, 'dim')}` + [0, 1, 2].map(k => `<img class="opt" src="${P}L/fab_${k}.webp" alt="" style="left:150px;top:${460 + 94 * k}px;width:230px;--tx:${337 - 265}px;--ty:${783 - (499 + 94 * k)}px;--d:${(2 - k) * .06}s">`).join('')
     + `<img class="x" src="${P}L/fab_3.webp" alt="" style="left:300px;top:742px;width:80px"></div>`,
+  invite: () => `<div class="ov" id="o-invite"><div class="dim" style="background:rgba(17,17,17,.6)"></div><div class="sheet ivs" id="ivs">${L('L/inv_sheet', 0, 0, 390, 'b1')}${L('L/inv_sheet2', 0, 0, 390, 'b2')}<div class="ivq"><span id="ivq"></span><i></i></div><div class="ivh">Results</div>`
+    + [['AD', 'Adekunle Gold'], ['AB', 'Abeoye H.'], ['AD', 'Adebola'], ['AB', 'Abel'], ['AN', 'Ann'], ['AW', 'Andrew']].map(([i, n], k) => `<div class="ivr" style="top:${264 + 64 * k}px;--d:${.05 + k * .07}s"><span class="ini">${i}</span><div><b>${n}</b><span>From Contacts</span></div><em id="ivp${k}">Invite</em></div>`).join('') + `</div></div>`,
+  notify: () => `<div class="ov" id="o-notify"><div class="dim" style="background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"></div><div class="card" style="position:absolute;left:18px;top:403px;width:354px">${L('L/notify_card', 0, 0, 354)}<div class="ntx"><b>Adekunle Gold joined ShareBuddy</b><span>Say hi and split your next bill</span></div></div></div>`,
   share: () => `<div class="ov" id="o-share">${L('L/share_bg', 0, 0, 390, 'dim')}<div class="sheet" style="position:absolute;left:0;top:410px;width:390px;height:500px;background:linear-gradient(transparent 60px,#1d1d1d 60px);border-radius:24px 24px 0 0">${L('L/share_sheet', 0, 0, 390)}</div></div>`,
   splitby: () => `<div class="ov" id="o-splitby">${L('L/splitby_bg', 0, 0, 390, 'dim')}<div class="sheet" style="position:absolute;left:12px;top:464px;width:366px">${L('L/splitby_sheet', 0, 0, 366)}</div></div>`,
   leave: () => `<div class="ov" id="o-leave">${L('L/leave_bg', 0, 0, 390, 'dim')}<div class="card" style="position:absolute;left:18px;top:111px;width:354px">${L('L/leave_card2', 0, 0, 354)}${BD.leave()}</div></div>`,
 };
 const FLOWS = {
-  start: { t: 'Getting started', s: ['Open the app', 'Sign up', 'See every split at a glance'], scr: ['splash', 'onboard', 'home'], ov: [] },
+  start: { t: 'Getting started', s: ['Open the app', 'Sign up', 'See every split at a glance', 'Peek at Discover'], scr: ['splash', 'onboard', 'home', 'discover'], ov: [] },
   scan: { t: 'Split a receipt in seconds', s: ['Tap +', 'Scan the receipt', 'Check the items', 'Share the link', 'Send it in a chat'], scr: ['home', 'scan', 'receipt', 'chat'], ov: ['fab', 'share'] },
   split: { t: 'Split it your way', s: ['Pick your buddies', 'Choose how to split', 'Share the bill'], scr: ['buddies', 'split'], ov: ['splitby', 'share'] },
   pay: { t: 'Paying your share', s: ['Open the link', 'Pick your items', 'Choose debit card', 'Enter the card', 'Confirm and done'], scr: ['pay'], ov: ['card'] },
+  friends: { t: 'Bring your buddies', s: ['Tap Buddies', 'Add friends', 'Search your contacts', 'Invite them', 'Get notified'], scr: ['home', 'mybud'], ov: ['invite', 'notify'] },
   circle: { t: 'Keep the circle honest', s: ['See who has paid', 'Try to leave', 'Buddy steps in'], scr: ['circle', 'circlex'], ov: ['leave'] },
 };
 const flow = (new URLSearchParams(location.search).get('flow') || 'start').replace(/[^a-z]/g, ''), F = FLOWS[flow] || FLOWS.start;
 document.getElementById('ttl').textContent = F.t;
 document.getElementById('steps').innerHTML = F.s.map((s, i, a) => `<li data-n="${String(i + 1).padStart(2, '0')} / ${String(a.length).padStart(2, '0')}">${s}</li>`).join('');
 const st = document.getElementById('st'), app = document.getElementById('app'), steps = [...document.querySelectorAll('#steps li')];
-const fit = () => { const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);
+let FS = false;   // full screen (the case study page tells us): just the phone, as big as the screen allows
+const fit = () => { if (FS) { const d = st.querySelector('.dev'), W = d.offsetWidth + 40, H = d.offsetHeight + 96; st.classList.add('fs'); st.style.width = W + 'px'; st.style.height = H + 'px'; d.style.transform = 'none'; d.style.left = '20px'; d.style.top = '64px';
+    const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; return; }
+  st.classList.remove('fs'); st.style.width = ''; { const d = st.querySelector('.dev'); if (d) d.style.top = ''; }
+  const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);
   // a tall screen (a phone, or a prototype opened full screen): the stage grows to the screen's shape and the phone grows to fill it, so nothing is cut off
   st.style.height = v ? H + 'px' : ''; { const d = st.querySelector('.dev'); if (d) { if (v && H > 880) { const s = Math.min(1.2, (H - 250) / d.offsetHeight, 560 / d.offsetWidth); d.style.transform = `scale(${s})`; d.style.left = (600 - d.offsetWidth * s) / 2 + 'px'; } else { d.style.transform = ''; d.style.left = ''; } } }
   const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; };
-fit(); addEventListener('resize', fit);
+fit(); addEventListener('resize', fit); addEventListener('message', e => { if (e.data && 'fs' in e.data) { FS = !!e.data.fs; fit(); } });
 const sleep = ms => new Promise(r => setTimeout(r, ms * .72)), $ = s => app.querySelector(s);
 let touch;
 function build() {
@@ -418,7 +442,10 @@ const lift = () => touch.classList.remove('on');
 // screens and overlays
 const show = (n, mode) => { const to = $('#s-' + n);
   app.querySelectorAll('.scr.on').forEach(o => { if (o !== to) { if (mode === 'fade' || mode === 'zoom') { o.classList.remove('on'); } else { o.classList.add('back'); o.classList.remove('on'); } } });
-  to.classList.remove('back', 'fade', 'zoom'); if (mode) to.classList.add(mode); void to.offsetWidth; to.classList.add('on'); };
+  to.classList.remove('back', 'fade', 'zoom'); if (mode) { to.style.transition = 'none'; to.classList.add(mode); void to.offsetWidth; to.style.transition = ''; } void to.offsetWidth; to.classList.add('on'); };
+const xfade = async (n, from) => { const d = $('#s-' + n), f = $('#s-' + from);   // the next tab fades in over the current one, which then steps away
+  d.style.transition = 'none'; d.classList.remove('back'); d.classList.add('fade'); d.style.zIndex = 5; void d.offsetWidth; d.style.transition = ''; d.classList.add('on');
+  await sleep(1000); f.classList.remove('on'); d.style.zIndex = ''; };
 const open = n => { const o = $('#o-' + n); o.classList.remove('out'); void o.offsetWidth; o.classList.add('on'); };
 const close = async n => { const o = $('#o-' + n); o.classList.add('out'); await sleep(420); o.classList.remove('on', 'out'); };
 const swipe = async (n, y, y0 = 640, y1 = 300) => { touch.style.transition = 'none'; touch.style.setProperty('--x', '220px'); touch.style.setProperty('--y', y0 + 'px'); touch.classList.add('on'); void touch.offsetWidth; touch.style.transition = '';
@@ -433,7 +460,8 @@ const PLAY = {
     { const hm = $('#s-home'), ob = $('#s-onboard'); hm.style.setProperty('--cx', '195px'); hm.style.setProperty('--cy', '665px'); hm.classList.add('circ'); void hm.offsetWidth; hm.classList.add('on'); ob.classList.add('sunk'); lift(); step(2);
       await sleep(1450); ob.classList.remove('on', 'sunk'); hm.classList.remove('circ'); }
     await sleep(700);
-    await swipe('home', 420); await sleep(900); await swipe('home', 801); await sleep(1000); await swipe('home', 0, 280, 640); await sleep(1300);
+    await swipe('home', 420); await sleep(900); await swipe('home', 801); await sleep(1000); await swipe('home', 0, 280, 640); await sleep(900);
+    step(3); await press(152, 785); lift(); await xfade('discover', 'home'); await sleep(1800);
   },
   async scan() {
     show('home', 'fade'); step(0); await sleep(1500); await press(337, 783); open('fab'); await sleep(1300);
@@ -483,6 +511,14 @@ const PLAY = {
     for (const [k, d] of [[0, '4'], [1, '8'], [2, '2'], [3, '6']]) { $('#o' + k).classList.add('on'); $('#o' + k).innerHTML = `<b>${d}</b>`; await sleep(260); }
     await sleep(400); await press(...at($('#cver')), 500, $('#cver')); $('#cver').classList.add('busy'); lift(); await sleep(1400);
     $('#okp').classList.add('on'); play($('#okp .bd')); await sleep(3600);
+  },
+  async friends() {
+    show('home', 'fade'); step(0); await sleep(1300); await press(237, 785); lift(); play($('#s-mybud .bd')); await xfade('mybud', 'home'); await sleep(1200);
+    step(1); await press(195, 467); const v = $('#ivs'); v.classList.remove('q', 'r'); $('#ivq').textContent = ''; for (let k = 0; k < 6; k++) { const e = $('#ivp' + k); e.classList.remove('on'); e.textContent = 'Invite'; }
+    open('invite'); lift(); await sleep(1300);
+    step(2); await press(195, 215); v.classList.add('q'); lift(); await sleep(400); for (const c of 'A') { $('#ivq').textContent += c; await sleep(160); } await sleep(250); v.classList.add('r'); await sleep(1300);
+    step(3); for (const k of [0, 3]) { await press(346, 357 + 64 * k, 460); const e = $('#ivp' + k); e.classList.add('on'); e.textContent = 'Invited'; lift(); await sleep(500); } await sleep(500);
+    step(4); await press(354, 114); await close('invite'); lift(); await sleep(250); open('notify'); await sleep(1700); await press(195, 775); await close('notify'); lift(); await sleep(1200);
   },
   async circle() {
     show('circle', 'fade'); step(0); { const b = $('#pgb'), n = $('#pgn'), t0 = performance.now(), D = 1400, E = x => 1 - Math.pow(1 - x, 3);   // the bar fills to 75% and the number counts with it
