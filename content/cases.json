@@ -906,34 +906,32 @@
    "title": "ShareBuddy",
    "kind": "Product",
    "tag": "Fintech",
-   "role": "Founder",
+   "role": "Self-initiated: research, product and brand",
    "year": "Year",
-   "client": "ShareBuddy",
+   "client": "Personal project",
    "industry": [
     "Fintech",
     "Social"
    ],
    "did": [
-    "Product",
-    "Brand identity",
+    "Research",
     "Product design",
-    "Go-to-market"
+    "Brand",
+    "Prototyping"
    ],
-   "headline": "Splitting the bill<br>without the awkward bit",
-   "blurb": "Social bill-splitting and group wallets for young Nigerians, so paying friends back takes one tap.",
+   "headline": "Splitting the bill,<br>without the awkward bit",
+   "blurb": "ShareBuddy is a personal project: an exploration of how young people in Lagos spend together and settle up afterwards. I wanted to understand why splitting a bill between friends still feels awkward, and what an app would look like if it worked the way friends already do. Scan the receipt, pick your buddies, send one link, and let Buddy, the mascot, do the chasing.",
    "stat": [
     "",
     ""
    ],
-   "cover": {
-    "color": "#E8273A",
-    "word": "ShareBuddy"
-   },
+   "cover": "assets/uploads/sharebuddy-cover.webp",
+   "coverM": "assets/uploads/sharebuddy-cover-m.webp",
    "story": [
-    "A group wallet with a friend in it",
+    "Share memories, not bills",
     [
-     "Splitting rent, trips and dinners in Lagos usually ends with screenshots, reminders and someone left out of pocket.",
-     "ShareBuddy gives a group one wallet, splits the bill and keeps track of who has paid. Buddy, the mascot, does the nudging so friends don’t have to."
+     "Splitting a night out, a trip or rent between friends usually ends with receipt maths, account numbers in the group chat and awkward reminders.",
+     "ShareBuddy turns a bill into one link everyone can pay from, keeps track of who has paid, and lets Buddy, the mascot, do the nudging."
     ]
    ],
    "run": [
@@ -974,36 +972,285 @@
    ],
    "sections": [
     {
-     "h": "Overview",
-     "p": [
-      "A social bill-splitting and group wallet app for Nigerians aged 18 to 35, starting in Lagos."
-     ],
-     "media": []
+     "h": "Context",
+     "eb": "01 · Context",
+     "title": "How friends really spend together",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "In Lagos, plans are shared: a night out, a weekend trip, a birthday dinner, rent. The fun part is easy. Settling up isn’t. One person pays, everyone promises to send their share, and the next week is screenshots, bank details in the group chat and gentle reminders that get less gentle."
+      },
+      {
+       "t": "text",
+       "v": "I started by looking at how people aged 18 to 35 around me in Lagos handle this today: who fronts the bill, how the maths gets done, which apps they open, and what makes them put off paying. ShareBuddy is my answer to what I found: a bill becomes a link everyone can pay from, and a group becomes a circle that keeps track of who has paid."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "The organiser",
+         "Usually the one who fronts the bill, and the one left chasing."
+        ],
+        [
+         "The buddies",
+         "Happy to pay, but they need the amount, the account and a nudge."
+        ],
+        [
+         "The guest",
+         "Not on the app yet, and shouldn’t need it to pay a share."
+        ]
+       ]
+      }
+     ]
     },
     {
-     "h": "The plan",
-     "list": [
-      [
-       "Version 1",
-       "Naira wallets for groups, powered by Paystack."
-      ],
-      [
-       "Version 2",
-       "Stablecoins as a way to fund the wallet, which stays in naira."
-      ]
+     "h": "Problem",
+     "eb": "02 · Problem",
+     "title": "What I kept seeing",
+     "media": [],
+     "notes": [
+      {
+       "t": "Fronting the bill",
+       "p": "One person pays for everyone and waits weeks to be paid back.",
+       "c": "#ffd6de"
+      },
+      {
+       "t": "Awkward chasing",
+       "p": "Reminding friends to pay feels petty, so people stop asking.",
+       "c": "#ffe2c4"
+      },
+      {
+       "t": "Receipt maths",
+       "p": "Working out who had what on a long receipt takes ages.",
+       "c": "#dce9ff"
+      },
+      {
+       "t": "Uneven splits",
+       "p": "Not everyone splits equally, and most apps assume they do.",
+       "c": "#fff1a8"
+      },
+      {
+       "t": "Not on the app",
+       "p": "Friends who don’t have the app can’t pay without signing up.",
+       "c": "#d5f2dc"
+      }
      ],
-     "media": []
+     "blocks": [
+      {
+       "t": "text",
+       "v": "The patterns repeated. Splitting a bill means maths on a long receipt, account numbers in the group chat, and chasing people one by one. Chasing feels awkward, so people avoid it, and whoever paid quietly absorbs the loss."
+      }
+     ],
+     "after": [
+      {
+       "t": "heading",
+       "v": "What it meant for the design"
+      },
+      {
+       "t": "pairs",
+       "items": [
+        [
+         "One person fronts the bill",
+         "The organiser shares one link, and every share is tracked until it’s paid"
+        ],
+        [
+         "Chasing is awkward",
+         "Buddy, the mascot, does the nudging, so friends don’t have to"
+        ],
+        [
+         "Long receipts",
+         "Scan the receipt and the items come out as a list to assign"
+        ],
+        [
+         "Uneven splits",
+         "Split equally, by percentage or by custom amounts"
+        ],
+        [
+         "Friends without the app",
+         "The link opens a web page where guests pick their items and pay"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Strategy",
+     "eb": "03 · Strategy",
+     "title": "Share memories, not bills",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "The line on the home screen is the brief. Paying should take seconds and never get in the way of the plan itself."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "One link for everyone",
+         "Every split ends in a link, so it works in any group chat."
+        ],
+        [
+         "Buddy does the chasing",
+         "A character takes on the reminders, so the organiser never has to."
+        ],
+        [
+         "Split it your way",
+         "Equal, percentage or custom, and item by item from a scanned receipt."
+        ],
+        [
+         "Fun first",
+         "Bold type, bright colour and a mascot with opinions keep money light."
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "h": "The app",
+     "eb": "04 · The app",
+     "title": "From a receipt to a paid bill",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Home shows what the group has collected, the splits still open and the ones already settled. Everything else starts from the + button."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=start",
+       "ratio": "3 / 2",
+       "cap": "Getting started: the splash, sign up, then every split at a glance.",
+       "title": "Splash, sign up, then the home screen scrolling through active and recent splits",
+       "mratio": "15 / 22",
+       "dark": true
+      },
+      {
+       "t": "heading",
+       "v": "Scan the receipt"
+      },
+      {
+       "t": "text",
+       "v": "Tap + and choose Scan. Point the camera at the receipt and the items come out as a list, ready to assign or share as one link. The link goes straight into a chat with your friends."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=scan",
+       "ratio": "3 / 2",
+       "cap": "Scan a receipt, check the items, share one link in a chat.",
+       "title": "Tap plus, choose Scan, capture the receipt, check the items, share the link and send it in a chat",
+       "mratio": "15 / 22",
+       "dark": true
+      },
+      {
+       "t": "heading",
+       "v": "Split it your way"
+      },
+      {
+       "t": "text",
+       "v": "Manual Split starts with your buddies. Pick them from your contacts, then split equally, by percentage or by custom amounts, and share the bill."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=split",
+       "ratio": "3 / 2",
+       "cap": "Pick buddies, choose how to split, share the bill.",
+       "title": "Pick three buddies, open Split by and choose percentage, then share the bill",
+       "mratio": "15 / 22",
+       "dark": true
+      },
+      {
+       "t": "heading",
+       "v": "Pay without the app"
+      },
+      {
+       "t": "text",
+       "v": "The link opens a page for guests: who invited them, the items to pick from, their share, and a way to pay by bank transfer, card or later. Paying by card takes a few steps: the card details, a one-time code, and a celebration when it’s done. Downloading the app is an invitation, not a requirement."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=pay",
+       "ratio": "3 / 2",
+       "cap": "Guests pick their items and pay their share by card, straight from the link.",
+       "title": "The guest pay page: the invite, items to pick, the share, then paying by card with a one-time code",
+       "mratio": "15 / 22",
+       "dark": true
+      }
+     ]
+    },
+    {
+     "h": "Circles",
+     "eb": "05 · Circles and Buddy",
+     "title": "Keep the circle honest",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Every plan becomes a circle. It shows how much has come in, who has paid and who hasn’t, so nobody has to ask."
+      },
+      {
+       "t": "text",
+       "v": "And when someone tries to slip out before paying, Buddy steps in: “Oh dear! You thought I won’t notice that?” The circle is told, so friends can change their mind. It’s a joke with a job to do."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/sharebuddy.html?flow=circle",
+       "ratio": "3 / 2",
+       "cap": "A circle: who has paid, and Buddy when someone tries to leave.",
+       "title": "A circle with its progress, the list of who has paid, then Buddy stepping in when someone tries to leave",
+       "mratio": "15 / 22",
+       "dark": true
+      }
+     ]
     },
     {
      "h": "Brand",
-     "p": [
-      "A bright red, #E8273A, and Buddy, a mascot who reminds people to pay so their friends don’t have to."
-     ],
-     "media": []
+     "eb": "06 · Brand",
+     "title": "A friend in the middle",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "A bright red and Buddy, a mascot who reminds people to pay so their friends don’t have to. Buddy shows up wherever money could get awkward: on the receipt, on the pay page, and at the door when someone tries to leave a circle."
+      },
+      {
+       "t": "video",
+       "m": {
+        "video": "assets/designs/sharebuddy-logo-motion.mp4",
+        "poster": "assets/designs/sharebuddy-logo-motion.jpg"
+       },
+       "cap": "The ShareBuddy logo in motion: two dots bounce in and become Buddy."
+      }
+     ]
+    },
+    {
+     "h": "What’s next",
+     "eb": "07 · What’s next",
+     "title": "Still exploring",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "ShareBuddy is a self-initiated project, so it’s still a work in progress. The next things I want to learn are whether a mascot changes how quickly people pay, and how groups would want to fund a shared wallet."
+      },
+      {
+       "t": "points",
+       "items": [
+        [
+         "Group wallets in naira",
+         "A shared pot for trips and rent, so nobody has to front the money."
+        ],
+        [
+         "Stablecoins as a way in",
+         "One more way to fund the wallet, while it stays in naira."
+        ]
+       ]
+      }
+     ]
     }
    ],
    "statement": "Money between friends should feel like a favour, not a debt.",
-   "todo": true,
    "shots": [
     [
      {
@@ -1066,12 +1313,21 @@
     ]
    ],
    "impact": null,
-   "problem": "Splitting rent, trips and dinners between friends ends in screenshots, reminders and someone left out of pocket.",
-   "goal": "A group wallet that splits the bill and keeps track, so nobody has to chase anyone.",
+   "problem": "Splitting a bill between friends means receipt maths, account numbers in the group chat and awkward chasing, so whoever paid often absorbs the loss.",
+   "goal": "One link everyone can pay from, flexible splits, and a mascot that does the nudging so friends don’t have to.",
    "impactNote": "",
    "ver": "mix",
    "page": "case.html",
-   "fq": "94.7"
+   "fq": "94.7",
+   "flow": "v2",
+   "platforms": "Mobile app, with a web page for guests",
+   "team": "",
+   "timeline": "",
+   "glance": {
+    "problem": "Splitting a bill means receipt maths, bank details in the group chat and awkward chasing.",
+    "did": "Explored receipt scanning, flexible splits, a pay link for friends without the app, circles, and a mascot that does the nudging.",
+    "result": "A working prototype of the whole journey. Next: naira group wallets, and later stablecoins as one way to fund them."
+   }
   },
   {
    "slug": "oghosa",

@@ -1259,6 +1259,8 @@ const R = {
           return `<div class="fr kframe"><div class="fw" style="--far:${esc(F.ratio || '3 / 2')}${F.mratio ? ';--fmr:' + esc(F.mratio) : ''}"${F.mratio ? ' data-mr' : ''}${F.dark ? ' data-dk' : ''}><iframe src="${esc(F.src)}" title="${esc(F.title || c.title)}"></iframe></div>${cap([], esc(c.title), esc(F.cap || c.kind + ' · ' + c.tag))}</div>`; }
         const RR = blockRows(c, 'cover');   // the cover: rows set in the CMS, else the cover picture (with a partner if it would sit alone)
         if (RR) { const F = rowsFilled(RR); F.forEach(m => used.add(key(m))); return F.length || KM_EDIT ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover" data-rows="1"' : ''}>${rowsBlock(RR)}${F.length ? cap(F, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)) : ''}</div>` : ''; }
+        // a cover can carry its own shot for phones (coverM): the page shows one or the other, never both
+        if (c.coverM && c.cover && !KM_EDIT && !(V2 && c.overview)) { used.add(key(c.cover)); used.add(key(c.coverM)); return `<div class="fr" style="--pmh:300vh"><div class="pdk">${ROWS([c.cover], 'c', '')}</div><div class="pmb">${ROWS([c.coverM], 'c', '')}</div>${cap([c.cover], esc(c.title), esc(c.kind) + ' · ' + esc(c.tag))}</div>`; }
         const cv = tidy([V2 && c.overview ? c.overview : c.cover]); return cv.length ? `<div class="fr" style="--pmh:300vh"${KM_EDIT ? ' data-pick="cover"' : ''}>${ROWS(cv, 'c', cap(cv, esc(c.title), esc(c.kind) + ' · ' + esc(c.tag)))}</div>` : ''; })()}`;
     // v2: the case in thirty seconds, the problem, what I did and the two strongest results
     if (V2) { const G = c.glance || {}, RS = ((c.secs.find(s => s.stats) || {}).stats || []).slice(0, 2);

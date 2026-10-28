@@ -289,6 +289,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @media (hover: hover) and (pointer: fine) { .ov-t:hover .ov-im { transform: scale(1.015); box-shadow: 0 12px 31px rgb(0 0 0 / .22) } }
 .ov-t:active .ov-im { transform: scale(.97) }
 .ov-t:not(.ok) .ov-im { opacity: 0 }
+.ov-im:has(.ov-v) { position: relative; overflow: hidden } .ov-v { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; border-radius: inherit; pointer-events: none } .ov-v.on { opacity: 1 }   /* the loop fades in over the still once it plays */
 .ov.fx-tilt .ov-t { perspective: 900px }
 .ov-t.m-in .ov-im { animation: flyin var(--fd, 1.8s) cubic-bezier(.16, 1, .3, 1) var(--fdl, 0s) both }
 @keyframes flyin { 0% { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 400px)) scale(var(--fs, 1.5)) } 5% { opacity: 1 } 100% { opacity: 1; transform: none } }
@@ -1790,6 +1791,15 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const later = () => { io0.disconnect(); const io1 = gridIO('100% 0px'); ovTiles.forEach(o => { if (o.im.dataset.bg) io1.observe(o.t); }); };
     if (document.readyState === 'complete') setTimeout(later, 300); else addEventListener('load', () => setTimeout(later, 300)); }
   else ovTiles.forEach(warmTile);
+  // animated pieces play right in the grid: a muted loop over the still, running only while the tile is on screen
+  { const vids = ovTiles.filter(o => items[o.i].video);
+    if (vids.length && !reduce && 'IntersectionObserver' in window) {
+      const vio = new IntersectionObserver(es => es.forEach(e => { const o = vids.find(x => x.t === e.target); if (!o) return;
+        if (e.isIntersecting) { if (!o.v) { const v = document.createElement('video'); v.className = 'ov-v'; v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.preload = 'auto';
+            v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.src = items[o.i].video; v.poster = items[o.i].poster; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); o.im.appendChild(v); o.v = v; }
+          const pr = o.v.play(); if (pr && pr.catch) pr.catch(() => {}); }
+        else if (o.v) o.v.pause(); }), { root: ov, rootMargin: '10% 0px' });
+      vids.forEach(o => vio.observe(o.t)); } }
   addEventListener('resize', () => requestAnimationFrame(mSpans));
   // ---------- pointer effects on the grid. One is picked with PFX (or "km-fx" while comparing); 'none' turns them off.
   //   ripple: moving drops rings that travel outward, pieces rise and settle as each passes

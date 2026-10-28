@@ -83,6 +83,20 @@ body { font: 400 14px/1.4 Inter, system-ui, -apple-system, sans-serif; color: va
 #st.v .dial li.on::before { content: attr(data-n); font: 600 12px/1 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; color: #ff4a1c; margin-right: 12px }
 [data-theme="dark"] #st.v .dial li.on { color: #f2f5ef }
 #st.v .dev { left: 157px; top: 206px; transform: scale(.76) }
+/* motion: screens glide on a spring, sheets and dialogs bounce into place, their contents rise one after another, taps squish */
+:root { --out: cubic-bezier(.22, 1, .36, 1); --pop: cubic-bezier(.34, 1.56, .64, 1) }
+.scr { transition: transform .6s var(--out), filter .6s var(--out) } .scr.back { transform: translateX(-24%) scale(.96) }
+.btn, .cbtn, .opt, .row, .inp { transition: transform .4s var(--pop), filter .2s, border-color .2s, box-shadow .2s }
+.btn.prs, .cbtn.prs, .opt.prs, .row.prs, .inp.prs { transform: scale(.94) !important; transition-duration: .12s }
+@keyframes rise2 { from { opacity: 0; transform: translateY(22px) scale(.97) } to { opacity: 1; transform: none } }
+@keyframes popin { 0% { opacity: 0; transform: scale(.4) } 60% { opacity: 1; transform: scale(1.08) } 80% { transform: scale(.97) } 100% { transform: none } }
+@keyframes bob { 0% { transform: translateY(18px) scale(.9); opacity: 0 } 55% { transform: translateY(-6px) scale(1.03); opacity: 1 } 75% { transform: translateY(2px) } 100% { transform: none } }
+.st1 { --d: .04s } .st2 { --d: .1s } .st3 { --d: .16s } .st4 { --d: .22s } .st5 { --d: .28s } .st6 { --d: .34s } .st7 { --d: .4s } .st8 { --d: .46s }
+
+.scr.on .hd h1 { animation: rise2 .65s var(--pop) .12s both } .scr.on .hd p { animation: rise2 .65s var(--pop) .2s both } .scr.on .bot .btn { animation: rise2 .6s var(--pop) .28s both }
+.scr.on .pad > * { animation: rise2 .6s var(--pop) both } .scr.on .pad > *:nth-child(2) { animation-delay: .05s } .scr.on .pad > *:nth-child(3) { animation-delay: .1s } .scr.on .pad > *:nth-child(4) { animation-delay: .15s } .scr.on .pad > *:nth-child(5) { animation-delay: .2s } .scr.on .pad > *:nth-child(6) { animation-delay: .25s } .scr.on .pad > *:nth-child(n+7) { animation-delay: .3s }
+.splash.on .lg { animation: popin .9s var(--out) .15s both }
+.inp.foc { box-shadow: 0 0 0 4px rgba(164, 254, 34, .35) }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .touch { display: none } }
 /* dark mode darkens only the stage around the phone: the app itself always stays light */
 html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
