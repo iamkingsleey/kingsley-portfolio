@@ -302,7 +302,8 @@ html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
 .cxr em.ok { background: #2f382d; color: #00ff46 } .cxr em.wait { background: #382d30; color: #ff003a }
 .cxs { position: absolute; left: 15px; top: 703px; width: 360px; height: 139px; border-radius: 24px; background: #181818; padding: 28px 18px 0 19px; display: flex; flex-direction: column; gap: 15px; font: 700 16px/18px "DM Sans", system-ui, sans-serif; color: #fff }
 .cxs p { display: flex; justify-content: space-between } .cxs p span { color: #fff }
-.cxbg { position: absolute; left: 15px; top: 438px; width: 360px; height: 242px; background: #181818 }
+.cxbg { position: absolute; left: 15px; top: 247px; width: 360px; height: 444px; border-radius: 24px; background: #181818 }
+.cxtop { border-radius: 24px 24px 0 0; z-index: 1 }
 
 /* Buddies: the empty My Buddies screen, the Invite Friends sheet with search and results, then the get-notified card */
 .scr.blurd { filter: blur(10px) brightness(.5) !important; transition: filter .6s var(--drift) }
@@ -373,10 +374,10 @@ const SCR = {
   split: () => full('split'),
   pay: () => `<div class="long" style="height:1979px">${L('M/invite_bg', 16, 250, 360, 'r', .1)}${BD.invite(16, 250, .35)}${L('L/pay_head', 16, 516, 360, 'rv', 0)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => L('L/item_row' + k, 16, 555 + 85 * k, 360, 'rv', .08 + k * .09)).join('')}${L('L/pay_tot', 16, 1231, 360, 'rv', .8)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<img class="ck" id="pck${k}" src="${P}L/chk.webp" alt="" style="left:34px;top:${555 + 85 * k + 22}px;width:28px">`).join('')}${L('L/pay_methods', 16, 1454, 360, 'r', .3)}</div>` + L('pay_top', 0, 0, 390, 'fix r'),
   circle: () => full('circle') + `<div class="pgn" id="pgn">0%</div><div class="pgb"><i><b id="pgb"></b></i></div><div class="cxs" style="top:414px;height:138px"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>`,
-  circlex: () => `<div class="long" style="height:1069px">${L('L/cx_banner', 17, 143, 356)}${L('L/cx_top', 15, 247, 360)}`
-    + `<div class="pgn">75%</div><div class="pgb"><i><b style="width:75%"></b></i></div><div class="cxt">Payment status</div><div class="cxbg"></div>`
+  circlex: () => `<div class="long" style="height:1069px">${L('L/cx_banner', 17, 143, 356)}<div class="cxbg"></div>${L('L/cx_top', 15, 247, 360, 'cxtop')}`
+    + `<div class="pgn">75%</div><div class="pgb"><i><b style="width:75%"></b></i></div><div class="cxt">Payment status</div>`
     + [['Lomi', 1], ['Hans', 1], ['Jane G.', 1], ['KayB', 0]].map(([n, ok], k) => `<div class="cxr r from-r" style="top:${440 + 60 * k}px;--d:${.08 + k * .08}s"><img src="${P}L/cx_av${k}.webp" alt=""><div><b>${n}</b><span>₦5,000 · 25% share</span></div><em class="${ok ? 'ok' : 'wait'}">${ok ? 'Paid' : 'Pending'}</em></div>`).join('')
-    + L('L/cx_end', 15, 680, 360, 'r', .4) + `<div class="cxs r" style="--d:.45s"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>` + L('L/cx_btns', 0, 876, 390, 'r', .5) + `</div>` + L('L/cx_head', 0, 0, 390, 'fix'),
+    + `<div class="cxs r" style="--d:.45s"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>` + L('L/cx_btns', 0, 876, 390, 'r', .5) + `</div>` + L('L/cx_head', 0, 0, 390, 'fix'),
 };
 // overlays: drawn on top of the screen they belong to
 const OV = {
