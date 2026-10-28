@@ -291,6 +291,17 @@ html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
 .chat .fld { flex: 1; background: #1b1b1b; border-radius: 22px; padding: 9px 14px 10px; font-size: 14.5px; line-height: 1.38; transition: all .45s var(--soft) } .chat .fld .lp { background: #262626 }
 .chat.sent .th { bottom: 84px } .chat .fld.sent { padding-top: 10px } .chat .fld.sent .lp, .chat .fld.sent .tx { display: none } .chat .fld .ph { display: none; color: #6f6f6f } .chat .fld.sent .ph { display: block }
 .chat .snd { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--sb); display: grid; place-items: center }
+
+/* the circle: a progress bar that fills to 75% with its percentage counting up, and who has paid */
+.pgb { position: absolute; left: 33px; top: 367px; width: 324px; height: 10px; background: #181818; z-index: 2 } .pgb i { position: absolute; left: 0; right: 0; top: 2px; height: 6px; border-radius: 3px; background: #050505; overflow: hidden } .pgb b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px; background: var(--sb) }
+.pgn { position: absolute; left: 296px; top: 341px; width: 62px; height: 21px; background: #181818; z-index: 2; text-align: right; font: 500 14.5px/21px "DM Sans", system-ui, sans-serif; color: #fff; font-variant-numeric: tabular-nums }
+.cxt { position: absolute; left: 30px; top: 394px; width: 220px; height: 34px; background: #181818; z-index: 2; font: 700 17.5px/34px "DM Sans", system-ui, sans-serif; color: #fff; letter-spacing: -.2px }
+.cxr { position: absolute; left: 26px; width: 338px; height: 53px; border-radius: 18px; background: #222; display: flex; align-items: center; gap: 12px; padding: 0 11px 0 12px; font-family: "DM Sans", system-ui, sans-serif; color: #fff }
+.cxr img { position: static; width: 40px; height: 40px; border-radius: 12px; object-fit: cover; flex: none } .cxr div { flex: 1; min-width: 0 } .cxr b { display: block; font: 500 15px/1.15 "DM Sans", system-ui, sans-serif } .cxr span { display: block; margin-top: 3px; font-size: 12.5px; color: #7c7c7c }
+.cxr em { flex: none; width: 88px; height: 32px; border-radius: 10px; display: grid; place-items: center; font: 500 13.5px "DM Sans", system-ui, sans-serif; font-style: normal }
+.cxr em.ok { background: #233024; color: #2fe06b } .cxr em.wait { background: #33262a; color: #ff4d6d }
+.cxs { position: absolute; left: 15px; top: 703px; width: 360px; height: 139px; border-radius: 24px; background: #181818; padding: 22px 20px; display: flex; flex-direction: column; justify-content: space-between; font: 600 16px "DM Sans", system-ui, sans-serif; color: #fff }
+.cxs p { display: flex; justify-content: space-between } .cxs p span { color: #9a9a9a; font-weight: 500 }
 </style>
 </head>
 <body>
@@ -316,7 +327,7 @@ const BD = {
     pim('1264_2264', 'note_tile', 12.17, 14, 53.43, `<i class="m1264_2265" style="left:10.61px;top:8.25px">${pt('1264_2266', 25.7, 6.11)}${pt('1264_2267', 0, 0)}${pt('1264_2268', 3.46, 9.69)}${pt('1264_2272', 11.63, 15.58)}</i>`)
     + pim('1264_2278', 'note_title', 75, 18.5, 126) + pim('1264_2280', 'note_text', 75, 47.5, 191) + pim('1264_2281', 'note_now', 269.52, 13.87, 22.7))}</div>`,
   invite: (x, y, md = 0) => `<div class="bd" style="left:${x}px;top:${y}px;--md:${md}s"><i class="m1366_3181" style="left:226.5px;top:46px">${pt('1366_3201', 76.43, 18.17)}${pt('1366_3217', 0, 0)}${pt('1366_3226', 10.28, 28.83)}${pt('1366_3242', 34.59, 46.34)}${pt('1366_3248', 13, 120)}</i>${star('1366_3543', 208.5, 95)}${star('1366_3545', 277.5, 43)}${star('1366_3546', 328.5, 133)}</div>`,
-  leave: () => `<div class="bd" style="--md:.2s"><i class="m1395_6044" style="left:135px;top:69px">${pt('1395_6045', 11.28, 101.02)}${pt('1395_6046', 25.57, 69.49)}${pt('1395_6057', 69.23, 16.46)}${pt('1395_6066', 0, 0)}${pt('1395_6067', 9.31, 26.12)}${pt('1395_6076', 37.78, 49.14)}${pt('1395_6085', 39.85, 49.14)}${pt('1395_6094', 24.51, 49.14)}${pt('1395_6103', 26.35, 49.14)}</i></div>`,
+  leave: () => `<div class="bd" style="--md:.2s"><i class="m1395_6044" style="left:130.88px;top:65px">${pt('1395_6045', 11.28, 101.02)}${pt('1395_6046', 25.57, 69.49)}${pt('1395_6057', 69.23, 16.46)}${pt('1395_6066', 0, 0)}${pt('1395_6067', 9.31, 26.12)}${pt('1395_6076', 37.78, 49.14)}${pt('1395_6085', 39.85, 49.14)}${pt('1395_6094', 24.51, 49.14)}${pt('1395_6103', 26.35, 49.14)}</i></div>`,
 };
 const play = el => { if (!el) return; el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); };
 const SCR = {
@@ -343,9 +354,11 @@ const SCR = {
     + `${L('L/bd_btn', 10, 94, 370)}<span class="pill" id="bpill">1 Buddy</span></div>`,
   split: () => full('split'),
   pay: () => `<div class="long" style="height:1979px">${L('M/invite_bg', 16, 250, 360, 'r', .1)}${BD.invite(16, 250, .35)}${L('L/pay_head', 16, 516, 360, 'rv', 0)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => L('L/item_row' + k, 16, 555 + 85 * k, 360, 'rv', .08 + k * .09)).join('')}${L('L/pay_tot', 16, 1231, 360, 'rv', .8)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<img class="ck" id="pck${k}" src="${P}L/chk.webp" alt="" style="left:34px;top:${555 + 85 * k + 22}px;width:28px">`).join('')}${L('L/pay_methods', 16, 1454, 360, 'r', .3)}</div>` + L('pay_top', 0, 0, 390, 'fix r'),
-  circle: () => full('circle'),
+  circle: () => full('circle') + `<div class="pgn" id="pgn">0%</div><div class="pgb"><i><b id="pgb"></b></i></div><div class="cxs" style="top:414px;height:138px"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>`,
   circlex: () => `<div class="long" style="height:1069px">${L('L/cx_banner', 17, 143, 356)}${L('L/cx_top', 15, 247, 360)}`
-    + [0, 1, 2, 3].map(k => L('L/cx_row' + k, 15, 440 + 60 * k, 360, 'r from-r', .08 + k * .08)).join('') + L('L/cx_end', 15, 680, 360, 'r', .4) + L('L/cx_stats', 15, 703, 360, 'r', .45) + L('L/cx_btns', 0, 876, 390, 'r', .5) + `</div>` + L('L/cx_head', 0, 0, 390, 'fix'),
+    + `<div class="pgn">75%</div><div class="pgb"><i><b style="width:75%"></b></i></div><div class="cxt">Payment status</div>`
+    + [['Lomi', 1], ['Hans', 1], ['Jane G.', 1], ['KayB', 0]].map(([n, ok], k) => `<div class="cxr r from-r" style="top:${440 + 60 * k}px;--d:${.08 + k * .08}s"><img src="${P}L/cx_av${k}.webp" alt=""><div><b>${n}</b><span>₦5,000 · 25% share</span></div><em class="${ok ? 'ok' : 'wait'}">${ok ? 'Paid' : 'Pending'}</em></div>`).join('')
+    + L('L/cx_end', 15, 680, 360, 'r', .4) + `<div class="cxs r" style="--d:.45s"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>` + L('L/cx_btns', 0, 876, 390, 'r', .5) + `</div>` + L('L/cx_head', 0, 0, 390, 'fix'),
 };
 // overlays: drawn on top of the screen they belong to
 const OV = {
@@ -363,7 +376,7 @@ const OV = {
     + `<img class="x" src="${P}L/fab_3.webp" alt="" style="left:300px;top:742px;width:80px"></div>`,
   share: () => `<div class="ov" id="o-share">${L('L/share_bg', 0, 0, 390, 'dim')}<div class="sheet" style="position:absolute;left:0;top:410px;width:390px;height:500px;background:linear-gradient(transparent 60px,#1d1d1d 60px);border-radius:24px 24px 0 0">${L('L/share_sheet', 0, 0, 390)}</div></div>`,
   splitby: () => `<div class="ov" id="o-splitby">${L('L/splitby_bg', 0, 0, 390, 'dim')}<div class="sheet" style="position:absolute;left:12px;top:464px;width:366px">${L('L/splitby_sheet', 0, 0, 366)}</div></div>`,
-  leave: () => `<div class="ov" id="o-leave">${L('L/leave_bg', 0, 0, 390, 'dim')}<div class="card" style="position:absolute;left:14px;top:107px;width:362px">${L('L/leave_card', 0, 0, 362)}${BD.leave()}</div></div>`,
+  leave: () => `<div class="ov" id="o-leave">${L('L/leave_bg', 0, 0, 390, 'dim')}<div class="card" style="position:absolute;left:18px;top:111px;width:354px">${L('L/leave_card2', 0, 0, 354)}${BD.leave()}</div></div>`,
 };
 const FLOWS = {
   start: { t: 'Getting started', s: ['Open the app', 'Sign up', 'See every split at a glance'], scr: ['splash', 'onboard', 'home'], ov: [] },
@@ -472,7 +485,9 @@ const PLAY = {
     $('#okp').classList.add('on'); play($('#okp .bd')); await sleep(3600);
   },
   async circle() {
-    show('circle', 'fade'); step(0); await sleep(1600); await press(336, 286); show('circlex', 'fade'); lift(); await sleep(1700); await swipe('circlex', 225); await sleep(700);
+    show('circle', 'fade'); step(0); { const b = $('#pgb'), n = $('#pgn'), t0 = performance.now(), D = 1400, E = x => 1 - Math.pow(1 - x, 3);   // the bar fills to 75% and the number counts with it
+      b.style.width = '0%'; n.textContent = '0%'; await sleep(450); const s0 = performance.now(); const tick = () => { const x = Math.min(1, (performance.now() - s0) / D), v = 75 * E(x); b.style.width = v + '%'; n.textContent = Math.round(v) + '%'; if (x < 1) requestAnimationFrame(tick); else { b.style.width = '75%'; n.textContent = '75%'; } }; requestAnimationFrame(tick); }
+    await sleep(2300); await press(336, 286); show('circlex', 'fade'); lift(); await sleep(1700); await swipe('circlex', 225); await sleep(700);
     step(1); await press(195, 783); open('leave'); play($('#o-leave .bd')); step(2); lift(); await sleep(3000);
     await press(195, 542); await close('leave'); lift(); await sleep(1300);
   },
