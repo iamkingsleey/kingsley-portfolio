@@ -141,6 +141,28 @@ body { font: 400 14px/1.4 Inter, system-ui, -apple-system, sans-serif; color: va
 #st.v .dial li.on::before { content: attr(data-n); font: 600 12px/1 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; color: #ff4a1c; margin-right: 12px }
 [data-theme="dark"] #st.v .dial li.on { color: #f2f5ef }
 #st.v .dev { left: 157px; top: 206px; transform: scale(.76) }
+#ngn.tick .v { display: inline-block; animation: tick .3s var(--pop, ease) } @keyframes tick { from { transform: translateY(5px); opacity: .4 } }
+/* motion: screens glide on a spring, sheets and dialogs bounce into place, their contents rise one after another, taps squish */
+:root { --out: cubic-bezier(.22, 1, .36, 1); --pop: cubic-bezier(.34, 1.56, .64, 1) }
+.scr { transition: transform .6s var(--out), filter .6s var(--out) } .scr.back { transform: translateX(-24%) scale(.96) }
+.btn, .cbtn, .opt, .row, .inp { transition: transform .4s var(--pop), filter .2s, border-color .2s, box-shadow .2s }
+.btn.prs, .cbtn.prs, .opt.prs, .row.prs, .inp.prs { transform: scale(.94) !important; transition-duration: .12s }
+@keyframes rise2 { from { opacity: 0; transform: translateY(22px) scale(.97) } to { opacity: 1; transform: none } }
+@keyframes popin { 0% { opacity: 0; transform: scale(.4) } 60% { opacity: 1; transform: scale(1.08) } 80% { transform: scale(.97) } 100% { transform: none } }
+@keyframes bob { 0% { transform: translateY(18px) scale(.9); opacity: 0 } 55% { transform: translateY(-6px) scale(1.03); opacity: 1 } 75% { transform: translateY(2px) } 100% { transform: none } }
+.st1 { --d: .04s } .st2 { --d: .1s } .st3 { --d: .16s } .st4 { --d: .22s } .st5 { --d: .28s } .st6 { --d: .34s } .st7 { --d: .4s } .st8 { --d: .46s }
+
+.sheet { transition: transform .62s var(--pop) } .sheet:not(.on) { transition: transform .34s var(--ease) }
+.sheet { bottom: -56px; padding-bottom: 90px }   /* the sheet runs past the bottom edge, so its bounce never shows a gap under it */
+.sheet.on > *:not(.gr) { animation: rise2 .62s var(--pop) both }
+.sheet.on > *:nth-child(2) { animation-delay: .06s } .sheet.on > *:nth-child(3) { animation-delay: .12s } .sheet.on > *:nth-child(4) { animation-delay: .18s } .sheet.on > *:nth-child(5) { animation-delay: .24s } .sheet.on > *:nth-child(6) { animation-delay: .3s } .sheet.on > *:nth-child(n+7) { animation-delay: .36s }
+.modal { transform: scale(.6); transition: opacity .2s, transform .6s var(--pop) } .modal.on { transform: none }
+.modal.on > *:not(.x) { animation: rise2 .6s var(--pop) both } .modal.on > *:nth-child(2) { animation: popin .7s var(--out) .08s both } .modal.on > *:nth-child(3) { animation-delay: .16s } .modal.on > *:nth-child(4) { animation-delay: .22s } .modal.on > *:nth-child(n+5) { animation-delay: .28s }
+/* a screen's rows and options arrive one after another */
+.scr.on .row, .scr.on .opt { animation: rise2 .6s var(--pop) both }
+.scr.on .row:nth-child(2), .scr.on .opt:nth-child(2) { animation-delay: .05s } .scr.on .row:nth-child(3), .scr.on .opt:nth-child(3) { animation-delay: .1s } .scr.on .row:nth-child(4), .scr.on .opt:nth-child(4) { animation-delay: .15s } .scr.on .row:nth-child(n+5), .scr.on .opt:nth-child(n+5) { animation-delay: .2s }
+/* success: the illustration bounces in, the headline follows */
+.scr.ok.on .il { animation: bob .9s var(--out) .1s both } .scr.ok.on h1 { animation: rise2 .6s var(--pop) .25s both } .scr.ok.on p { animation: rise2 .6s var(--pop) .32s both } .scr.ok.on .btn { animation: rise2 .6s var(--pop) .4s both }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .touch { display: none } }
 /* dark mode darkens only the stage around the phone: the app itself always stays light */
 html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
@@ -207,7 +229,7 @@ const crypto = () => `<div class="scr white" id="cry">${sb()}<div class="bk">${I
   <div class="lab">Crypto</div><div class="inp ro">USDT</div>
   <div class="lab">USDT amount</div><div class="inp" id="usdt">$ <span class="v"></span><span class="ph">0</span><span class="car"></span></div>
   <div class="lab">Amount in Naira</div><div class="inp" id="ngn">₦ <span class="v"></span><span class="ph">0</span></div>
-  <div class="hint" style="color:var(--ink)">USDT to ₦1,003.779 rates today.</div>
+  <div class="hint" style="color:var(--ink)">1 USDT = ₦1,000 at today’s rate.</div>
   <div class="lab">Network</div><div class="inp ro">BEP20</div>
   <div class="warn">${I.warn}<span>Send USDT using the BEP20 network only. Transfers made through other networks may result in permanent loss of funds.</span></div>
   <div class="lab">Wallet address</div><div class="inp ro" style="font-size:15px">0×8f3d4e5f6a7b8c9d0e1f2a</div>
@@ -293,7 +315,12 @@ const press = async (el, fx, fy, ms) => { await go(el, fx, fy, ms); await tap(el
 const show = (id, from) => { const n = $('#' + id); if (from) { const o = $('#' + from); o.classList.add('back'); o.classList.remove('on'); } n.classList.add('on'); };
 const sheet = (dim, sh, on) => { $('#' + dim).classList.toggle('on', on); $('#' + sh).classList.toggle('on', on); };
 const type = async (el, text, d = 85) => { const v = el.querySelector('.v'); el.classList.add('foc'); for (const c of text) { v.textContent += c; await sleep(d + Math.random() * 40); } await sleep(160); el.classList.remove('foc'); };
-const count = async (el, a, b, ms = 900, fmt = n => naira(n)) => { const t0 = performance.now(); return new Promise(res => { const f = t => { const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(a + (b - a) * e); if (p < 1) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); }); };
+// counts a number from a to b. Time is read from the clock, never the frame's timestamp (an off-screen frame can hand back a stale one,
+// which sent the balance negative), and it lands on b even if the page was hidden part way through.
+const count = async (el, a, b, ms = 900, fmt = n => naira(n)) => { const t0 = performance.now(); return new Promise(res => {
+  const end = () => { el.textContent = fmt(b); res(); }; const f = () => { const p = Math.max(0, Math.min(1, (performance.now() - t0) / ms)), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(a + (b - a) * e); if (p < 1) requestAnimationFrame(f); else end(); };
+  requestAnimationFrame(f); setTimeout(() => { if (performance.now() - t0 >= ms) end(); }, ms + 120); }); };
 const dec = n => '₦' + n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const PLAY = {
   async home() {
@@ -304,8 +331,10 @@ const PLAY = {
   async fund() {
     step(0); await sleep(800); await press($('#fund')); sheet('hdim', 'sfund', true); step(1); await sleep(1200);
     await go($('#opay'), .4, .5, 700); await sleep(500); await press($('#ocry'), .4, .5); show('cry', 'home'); step(2); await sleep(900);
-    await press($('#usdt'), .4); await type($('#usdt'), '500', 140);
-    const n = $('#ngn .v'); $('#ngn').classList.add('foc'); await count(n, 0, 500000, 700, x => Math.round(x).toLocaleString('en-NG')); $('#ngn').classList.remove('foc');
+    // the rate is fixed: the Naira amount follows each digit typed (1 USDT = ₦1,000)
+    await press($('#usdt'), .4); { const u = $('#usdt'), v = u.querySelector('.v'), n = $('#ngn .v'); u.classList.add('foc');
+      for (const c of '500') { v.textContent += c; n.textContent = (+v.textContent * 1000).toLocaleString('en-NG'); $('#ngn').classList.remove('tick'); void n.offsetWidth; $('#ngn').classList.add('tick'); await sleep(260); }
+      await sleep(200); u.classList.remove('foc'); }
     $('#sent').classList.remove('off'); await sleep(700); await press($('#sent')); step(3);
     touch.classList.remove('on'); $('#conf').classList.add('on'); await sleep(2400); $('#conf').classList.remove('on'); $('#cdim').classList.add('on'); $('#cok').classList.add('on'); await sleep(1600);
     await press($('#vbal')); $('#cok').classList.remove('on'); $('#cdim').classList.remove('on');
