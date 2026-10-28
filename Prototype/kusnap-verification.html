@@ -79,7 +79,8 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 /* inputs */
 .input { height: 40px; border: 1px solid var(--g100); border-radius: 8px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 13px; font-size: 14px; line-height: 1.8; background: #fff; width: 100% }
 .input svg { width: 18px; height: 18px }
-.input .grow { flex: 1; min-width: 0 }
+.input .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }   /* a phone number stays on one line, however narrow the frame */
+.input > svg, .input .link { flex: none }
 .input.muted { color: var(--g300) }
 .input input, .input select { border: 0; outline: 0; background: none; width: 100%; height: 100%; padding: 0; font-size: 14px; color: var(--g800) }
 .input select { appearance: none; -webkit-appearance: none; cursor: pointer }
@@ -209,9 +210,10 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
   .card, .card.d1, .view.narrow .card, .view.narrow .card.id1, .view.narrow .card.id2 { padding: 28px 20px }
   .row { flex-direction: column-reverse; gap: 12px }
   .badge.warn { min-width: 0 }
-  .otp { gap: 8px }
+  .otp { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px } .otp input { width: 100%; max-width: 44px; aspect-ratio: 1; height: auto }   /* six boxes share the width, never spill */
   .resend { gap: 24px; justify-content: space-between }
   .codewrap { max-width: 288px }
+  .input { gap: 8px; padding: 0 10px; font-size: 13px } .input .link { font-size: 13px }   /* room for the whole phone number */
   .btn.dark, .card.locked .flat { width: 100% }
   .btnwrap { display: block }
   .me b { display: none }
@@ -229,6 +231,7 @@ main { padding: clamp(48px, 11vh, 156px) 16px 96px }
 .demo-chip.on { opacity: 1; transform: none }
 .demo-chip b { width: 7px; height: 7px; border-radius: 50%; background: #32d583; box-shadow: 0 0 0 0 rgba(50, 213, 131, .6); animation: live 1.6s infinite }
 @keyframes live { 70% { box-shadow: 0 0 0 7px rgba(50, 213, 131, 0) } 100% { box-shadow: 0 0 0 0 rgba(50, 213, 131, 0) } }
+@media (max-width: 360px) { .card, .card.d1, .view.narrow .card, .view.narrow .card.id1, .view.narrow .card.id2 { padding: 24px 16px } #ph > svg { display: none } }   /* small phones: the number gets the icon's room too */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
 </style>
 </head>

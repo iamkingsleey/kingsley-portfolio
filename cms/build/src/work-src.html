@@ -467,13 +467,13 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     }).join('')}</span>`;
   }
   const CATS = [
+    { k: 'product', name: 'Case study', tools: 'Figma · Code', back: 'Case studies' },   // the filters run in this order, after All
+    { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
+    { k: 'ui', name: 'UI', tools: 'Figma' },
     { k: '3d', name: '3D', tools: 'Blender' },
     { k: 'illustration', name: 'Illustration', tools: 'Illustrator' },
     { k: 'poster', name: 'Poster', tools: 'Figma' },
-    { k: 'product', name: 'Case study', tools: 'Figma · Code', back: 'Case studies' },
-    { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
-    { k: 'motion', name: 'Motion', tools: 'Blender' },
-    { k: 'ui', name: 'UI', tools: 'Figma' }
+    { k: 'motion', name: 'Motion', tools: 'Blender' }
   ];
   // ---------- Real project details ----------
   // One entry per piece, keyed by title. Every field is optional: anything left empty is simply not shown.
@@ -1901,16 +1901,21 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const fit = () => { const r = rv.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); };
     addEventListener('resize', () => { if (on) fit(); });
     const geo = () => { const mob = W < 700, ch = Math.min(H * (mob ? .56 : .7), mob ? W * .95 : 640); return { ch, sh: ch * (mob ? .62 : .58), gap: mob ? 18 : 40 }; };
+    // phones: the piece in focus fills the width (16px gutters) and grows as tall as the screen allows, between its title above
+    // and the controls below; every piece gets its own size from its shape, so tall posters and wide shots both read large
+    const MOB = () => W < 700, RT = 58, RB = 128;
+    const cyOf = () => MOB() ? RT + (H - RT - RB) / 2 : H * .46;
+    const chOf = k => MOB() ? Math.max(120, Math.min(H - RT - RB, (W - 32) / ratio(L[k]))) : geo().ch;
     const ratio = i => { if (!items[i]) return 1; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(items[i].cs ? 1.6 : 1.35, r)); };   // case-study covers show whole, never cropped
     const rLayout = function () { if (!L.length) return []; const { ch, sh, gap } = geo(), cx = W / 2, ci = Math.max(0, Math.min(L.length - 1, Math.round(pos))), f = pos - ci, out = [];
-      const hAt = d => { const a = Math.min(1, Math.abs(d)), e = a * a * (3 - 2 * a); return ch + (sh - ch) * e; }, wOf = (k, d) => ratio(L[k]) * hAt(d);
+      const hAt = (d, k) => { const a = Math.min(1, Math.abs(d)), e = a * a * (3 - 2 * a), c = k == null ? ch : chOf(k), c2 = k == null ? sh : (MOB() ? c * .62 : sh); return c + (c2 - c) * e; }, wOf = (k, d) => ratio(L[k]) * hAt(d, k);
       const xs = {}; const nb = f > 0 ? ci + 1 : ci - 1; xs[ci] = cx - f * (wOf(ci, f) / 2 + gap + (L[nb] != null ? wOf(nb, f > 0 ? 1 - f : -1 - f) : wOf(ci, f)) / 2);
       for (let k = ci + 1; k < L.length; k++) { xs[k] = xs[k - 1] + wOf(k - 1, k - 1 - pos) / 2 + gap + wOf(k, k - pos) / 2; if (xs[k] > W * 2) break; }
       for (let k = ci - 1; k >= 0; k--) { xs[k] = xs[k + 1] - wOf(k + 1, k + 1 - pos) / 2 - gap - wOf(k, k - pos) / 2; if (xs[k] < -W) break; }
-      for (const k in xs) { const d = k - pos, h = hAt(d); out.push({ k: +k, d, x: xs[k], w: ratio(L[k]) * h, h }); } return out; }
+      for (const k in xs) { const d = k - pos, h = hAt(d, +k); out.push({ k: +k, d, x: xs[k], w: ratio(L[k]) * h, h }); } return out; }
     const bend = x => { const u = Math.max(0, Math.abs(x - W / 2) - geo().ch * .55) / (W / 2); return 1 + .42 * Math.pow(u, 1.5); };
     const rDraw = function () { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); front = null; if (!L.length) return;
-      const cy = H * .46, ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+      const cy = cyOf(), ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
       const bt = (performance.now() - land) / 1000, bz = bt < 1.2 ? 1 + .07 * Math.exp(-bt * 5.5) * Math.sin(bt * 17) : 1;   // the landing bounce
       for (const p of ps) { if (Math.abs(p.d) < .5 && bz !== 1) { p.w *= bz; p.h *= bz; } const im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p; if (!im.complete || !im.naturalWidth) continue;
         g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
@@ -1936,7 +1941,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       pos += ((drag ? drag.p : tgt) - pos) * (reduce ? 1 : .14); const r = Math.round(pos); if (r !== last) { if (last >= 0) tick(); last = r; }
       const mv = Math.abs(pos - r) > .04 || !!drag; if (wasMv && !mv && !reduce) land = performance.now(); wasMv = mv; rv.classList.toggle('moving', mv); rDraw(); raf = requestAnimationFrame(loop); };
     // open the piece in the middle the way a tile opens: a case study or a link goes there, anything else opens in the small view
-    const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + H * .46 - front.h / 2, width: front.w, height: front.h };
+    const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + cyOf() - front.h / 2, width: front.w, height: front.h };
       const dest = items[i].link || (items[i].cs && items[i].page);
       if (dest && window.Tuner) { if (items[i].cs) goCase(i, cx, cy, r, dest); else { tap(); try { sessionStorage.setItem('km-return', items[i].t); } catch (_) {} if (window.KM && KM.keep && !reduce) KM.keep(mdOf(still(items[i])), r); Tuner.go({ from: 100, to: +(100 + (i + 1) / 10).toFixed(1), name: items[i].t, href: dest }); } return; }
       window._kmReelRect = r; openDetail(i, cx, cy, r); };
@@ -1949,7 +1954,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       pos = d.p; tgt = Math.round(d.p + d.v * 6); };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     let wt = 0; rv.addEventListener('wheel', e => { const dl = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (Math.abs(dl) < 1) return; e.preventDefault(); tgt = Math.max(0, Math.min(L.length - 1, tgt + dl / 220)); clearTimeout(wt); wt = setTimeout(() => { tgt = Math.round(tgt); }, 140); }, { passive: false });
-    rv.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); tgt = Math.min(L.length - 1, Math.round(tgt) + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); tgt = Math.max(0, Math.round(tgt) - 1); } if (e.key === 'Enter' && front) { const r = cv.getBoundingClientRect(); openAt(front.k, r.left + front.x, r.top + H * .46); } });
+    rv.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); tgt = Math.min(L.length - 1, Math.round(tgt) + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); tgt = Math.max(0, Math.round(tgt) - 1); } if (e.key === 'Enter' && front) { const r = cv.getBoundingClientRect(); openAt(front.k, r.left + front.x, r.top + cyOf()); } });
     const set = (v, quiet) => { on = v === 'reel'; document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
       try { localStorage.setItem('km-dview', v); } catch (_) {} if (on) { fit(); list(); if (!quiet) { const first = [...ovGrid.children].find(t => !t.hidden && t.getBoundingClientRect().bottom > 160); const k = first ? L.indexOf(+first.dataset.i) : 0; pos = tgt = Math.max(0, k); } if (!raf) raf = requestAnimationFrame(loop); setTimeout(() => rv.focus({ preventScroll: true }), 60); } };
     vt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if ((b.dataset.v === 'reel') !== on) { tap(); set(b.dataset.v); } }));
