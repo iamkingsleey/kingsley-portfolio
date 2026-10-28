@@ -831,9 +831,11 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         sx += (scw - nw) * .5; sy += (sch - nh) * .42; scw = nw; sch = nh;
       }
       const L = left + ox, T = cy - h / 2 + oy;
-      const bx = { src, left: L, top: T, w, h, cw: scw, ch: sch, cx0: sx, cy0: sy, white: slots[i].classList.contains('white') };
+      const bx = { i, src, left: L, top: T, w, h, cw: scw, ch: sch, cx0: sx, cy0: sy, white: slots[i].classList.contains('white') };
       boxes.push(bx);
       diffract(i, L, T, w, h, src, sx, sy, scw, sch);
+      // water under the pointer (ripple.js): while it moves, draw the rippled copy of this picture in its place
+      let dsrc = src; { const rs = window.KMRipple && KMRipple.frameFor(src); if (rs) { const k = rs.width / sw; dsrc = rs; sx *= k; sy *= k; scw *= k; sch *= k; } }
       fx.filter = cardFilter(i);
       if (PMODE.tilt) {                                      // card turns toward the cursor (columns get taller on the near side)
         const cols = Math.ceil(w / 4), d = Math.min(1, Math.abs(i - p));
@@ -842,7 +844,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
           const u0 = c / cols, u1 = (c + 1) / cols, um = (u0 + u1) / 2;
           const k = 1 + tx * .09 * (2 * um - 1);
           const ch2 = h * k, top = T + (h - ch2) / 2 + ty * 10 * (2 * um - 1) * 0;
-          fx.drawImage(src, sx + scw * u0, sy, scw * (u1 - u0), sch, L + w * u0 + tx * 6, top + ty * 6, w * (u1 - u0) + .5, ch2);
+          fx.drawImage(dsrc, sx + scw * u0, sy, scw * (u1 - u0), sch, L + w * u0 + tx * 6, top + ty * 6, w * (u1 - u0) + .5, ch2);
         }
       } else if (EDGE === 'fold' && !reduce && W >= 900 && (L < HZ || L + w > W - HZ)) {   // desktop only: phones keep a clean peek
         // edge warp: draw in thin columns; near the side edges each column grows taller around the centre
@@ -856,14 +858,14 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
           if (x1 <= L || x0 >= L + w) continue;
           const c0 = Math.max(L, x0), c1 = Math.min(L + w, x1);
           const k = hg((c0 + c1) / 2), u0 = (c0 - L) / w, u1 = (c1 - L) / w;
-          fx.drawImage(src, sx + scw * u0, sy, Math.max(.01, scw * (u1 - u0)), sch, X, cy + (T - cy) * k, step + .35, h * k);
+          fx.drawImage(dsrc, sx + scw * u0, sy, Math.max(.01, scw * (u1 - u0)), sch, X, cy + (T - cy) * k, step + .35, h * k);
         }
       } else if (EDGE === 'fade' && !reduce) {
         // soft fade: pieces shrink a little and fade out as they near the edges
         const c = L + w / 2, e = Math.max(0, Math.min(1, Math.max(EZ() - c, c - (W - EZ())) / EZ()));
         const k = 1 - .22 * e * e, a = 1 - e * e;
-        if (a > .01) { fx.globalAlpha = a; fx.drawImage(src, sx, sy, scw, sch, c - w * k / 2, cy + (T - cy) * k, w * k, h * k); fx.globalAlpha = 1; }
-      } else fx.drawImage(src, sx, sy, scw, sch, L, T, w, h);
+        if (a > .01) { fx.globalAlpha = a; fx.drawImage(dsrc, sx, sy, scw, sch, c - w * k / 2, cy + (T - cy) * k, w * k, h * k); fx.globalAlpha = 1; }
+      } else fx.drawImage(dsrc, sx, sy, scw, sch, L, T, w, h);
       if (bx.white) {
         if (EDGE === 'fold' && W >= 900 && (L < HZ || L + w > W - HZ)) {
           const a0 = hf(L), a1 = hf(L + w), k0 = hg(L), k1 = hg(L + w);
@@ -894,6 +896,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   }
 
   // ---------- Frame ----------
+  let vidTick = 0;
   function frame() {
     const prev = p;
     p += (target - p) * (reduce ? 1 : .14);
@@ -928,6 +931,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     }
     if (!document.body.classList.contains('all')) { drawField(L0, L1, t); present(); overlaysFX(); }   // the old row view sits hidden behind All: don't paint it
     drawStatic();
+    if (!reduce && !document.body.classList.contains('all') && (++vidTick % 30) === 0) slots.forEach((s, j) => { const v = s.firstChild; if (v && v.tagName === 'VIDEO' && v.paused && Math.abs(j - active) <= 6) { const pr = v.play(); if (pr) pr.catch(() => {}); } });   // motion pieces near the needle stay animated
     // bassFollow(openIdx >= 0 || ovOpen ? 0 : Math.abs(p - prev));   // movement hum: off for now, sound TBD
     // caption tracks the active piece and fades while it is between stops
     const xa = L0.x[a] + (L1.x[a] - L0.x[a]) * t, [w, h] = sizes[a];
@@ -1624,6 +1628,15 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     $('px').appendChild(b);
   });
 
+  // ---------- Water on the reel (ripple.js draws it; the reel paints it in place of the picture) ----------
+  { const at = e => { if (document.body.classList.contains('all') || !window.KMRipple || e.pointerType !== 'mouse') return null;
+      const fr = field.getBoundingClientRect(), x = e.clientX - fr.left, y = e.clientY - fr.top;
+      for (let k = boxes.length - 1; k >= 0; k--) { const b = boxes[k], sw = b.src.videoWidth || b.src.naturalWidth, sh = b.src.videoHeight || b.src.naturalHeight;
+        if (sw && x >= b.left && x <= b.left + b.w && y >= b.top && y <= b.top + b.h) return [b.src, (b.cx0 + (x - b.left) / b.w * b.cw) / sw, (b.cy0 + (y - b.top) / b.h * b.ch) / sh]; }
+      return null; };
+    row.addEventListener('pointermove', e => { const h = at(e); if (h) KMRipple.drive(h[0], h[1], h[2]); else if (window.KMRipple) KMRipple.leave(); }, { passive: true });
+    row.addEventListener('pointerdown', e => { const h = at(e); if (h) KMRipple.splash(h[0], h[1], h[2]); }, { passive: true }); }
+
   // ---------- Hover preview ----------
   const altCache = {};
   function altImg(i) { if (!altCache[i]) { altCache[i] = xo(new Image(), items[i].alt); altCache[i].src = items[i].alt; } return altCache[i]; }
@@ -1933,6 +1946,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     rv.innerHTML = '<canvas></canvas><div class="rcap rt"></div><div class="rcap rm"><span class="rn"></span><span>Category <i></i></span></div>'; document.body.appendChild(rv);
     const cv = rv.querySelector('canvas'), g = cv.getContext('2d'), rt = rv.querySelector('.rt'), rm = rv.querySelector('.rm');
     let land = -1e9, wasMv = false, on = false, L = [], pos = 0, tgt = 0, vel = 0, drag = null, moved = 0, last = -1, W = 0, H = 0, dpr = 1, front = null;
+    const vids = {}; const vidOf = i => { if (reduce || !items[i] || !items[i].video) return null; if (!vids[i]) { const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.src = items[i].video; vids[i] = v; } return vids[i]; };   // motion pieces stay animated in the reel
+    const nW = m => m.videoWidth || m.naturalWidth, nH = m => m.videoHeight || m.naturalHeight;
     const imgs = {}; const imgOf = i => { if (!imgs[i]) { const im = new Image(); im.decoding = 'async'; im.src = mdOf(still(items[i])); imgs[i] = im; } return imgs[i]; };
     const list = () => { const now = [...ovGrid.children].filter(t => !t.hidden).map(t => +t.dataset.i); const cur = L[Math.round(pos)]; L = now; const k = L.indexOf(cur); if (k >= 0) pos = tgt = k; else pos = tgt = Math.min(Math.round(pos), Math.max(0, L.length - 1)); };
     new MutationObserver(() => { if (on) list(); }).observe(ovGrid, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
@@ -1953,11 +1968,16 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       for (const k in xs) { const d = k - pos, h = hAt(d, +k); out.push({ k: +k, d, x: xs[k], w: ratio(L[k]) * h, h }); } return out; }
     const bend = x => { const u = Math.max(0, Math.abs(x - W / 2) - geo().ch * .55) / (W / 2); return 1 + .42 * Math.pow(u, 1.5); };
     const rDraw = function () { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); front = null; if (!L.length) return;
-      const cy = cyOf(), ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+      const cy = cyOf(), ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d)); lastPs = ps.slice().reverse();
       const bt = (performance.now() - land) / 1000, bz = bt < 1.2 ? 1 + .07 * Math.exp(-bt * 5.5) * Math.sin(bt * 17) : 1;   // the landing bounce
-      for (const p of ps) { if (Math.abs(p.d) < .5 && bz !== 1) { p.w *= bz; p.h *= bz; } const im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p; if (!im.complete || !im.naturalWidth) continue;
+      for (const p of ps) { if (Math.abs(p.d) < .5 && bz !== 1) { p.w *= bz; p.h *= bz; } let im = imgOf(L[p.k]); const x0 = p.x - p.w / 2, x1 = p.x + p.w / 2; if (x1 < -40 || x0 > W + 40) continue; if (Math.abs(p.d) < .5) front = p;
+        { const vd = Math.abs(p.d) < 3.5 && vidOf(L[p.k]); if (vd) { if (vd.paused) { const pr = vd.play(); if (pr) pr.catch(() => {}); } if (vd.readyState >= 2) im = vd; } }
+        if (im.tagName === 'IMG' && (!im.complete || !im.naturalWidth)) continue;
+        let ds = im, dk = 1; { const rs = window.KMRipple && KMRipple.frameFor(im); if (rs) { ds = rs; dk = rs.width / nW(im); } }   // water under the pointer (ripple.js)
+        p.im = im;
         g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
-        const ir = im.naturalWidth / im.naturalHeight, cr = p.w / p.h; let sx = 0, sy = 0, sw = im.naturalWidth, sh = im.naturalHeight; if (ir > cr) { sw = sh * cr; sx = (im.naturalWidth - sw) / 2; } else { sh = sw / cr; sy = (im.naturalHeight - sh) / 2; }
+        const ir = nW(im) / nH(im), cr = p.w / p.h; let sx = 0, sy = 0, sw = nW(im), sh = nH(im); if (ir > cr) { sw = sh * cr; sx = (nW(im) - sw) / 2; } else { sh = sw / cr; sy = (nH(im) - sh) / 2; }
+        p.crop = [sx, sy, sw, sh];
         const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
         const rnd = document.documentElement.dataset.corners === 'rounded', rr = 14;   // CMS → Settings → Corners
         if (rnd) { g.save(); g.beginPath(); const k0 = flat ? 1 : bend(Math.max(x0, 0) + 1), k1 = flat ? 1 : bend(Math.min(x1, W) - 1), hh = p.h * Math.max(k0, k1);
@@ -1970,7 +1990,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
             for (let x = x1 - r; x > x0 + r; x -= 6) g.lineTo(x, bt(x));
             g.lineTo(x0 + r, bt(x0 + r)); g.quadraticCurveTo(x0, bt(x0), x0, bt(x0) - r); g.closePath(); }
           g.clip(); }
-        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(im, sx + (x - x0) / p.w * sw, sy, w / p.w * sw, sh, x, cy - h / 2, w, h); }
+        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; g.drawImage(ds, (sx + (x - x0) / p.w * sw) * dk, sy * dk, w / p.w * sw * dk, sh * dk, x, cy - h / 2, w, h); }
         if (rnd) g.restore(); }
       g.globalAlpha = 1;
       if (front) { const it = items[L[front.k]], top = cy - front.h / 2, left = front.x - front.w / 2; rt.textContent = it.t; rt.style.left = left + 'px'; rt.style.top = (top - 40) + 'px';
@@ -1985,6 +2005,11 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       window._kmReelRect = r; openDetail(i, cx, cy, r); };
     const span = () => geo().ch * .7 + geo().gap;
     cv.addEventListener('pointerdown', e => { if (e.button > 0) return; drag = { x: e.clientX, p0: pos, p: pos, t: performance.now(), v: 0 }; moved = 0; try { cv.setPointerCapture(e.pointerId); } catch (_) {} rv.classList.add('drag'); });
+    let lastPs = []; const waterAt = e => { if (!window.KMRipple || e.pointerType !== 'mouse') return null; const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, cy = cyOf();
+      for (const p of lastPs) { if (!p.im || !p.crop || Math.abs(x - p.x) > p.w / 2) continue; const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, h = p.h * (flat ? 1 : bend(x)), top = cy - h / 2; if (y < top || y > top + h) continue;
+        const [sx, sy, sw, sh] = p.crop; return [p.im, (sx + (x - (p.x - p.w / 2)) / p.w * sw) / nW(p.im), (sy + (y - top) / h * sh) / nH(p.im)]; } return null; };
+    cv.addEventListener('pointermove', e => { if (drag) return; const h = waterAt(e); if (h) KMRipple.drive(h[0], h[1], h[2]); else if (window.KMRipple) KMRipple.leave(); }, { passive: true });
+    cv.addEventListener('pointerdown', e => { const h = waterAt(e); if (h) KMRipple.splash(h[0], h[1], h[2]); }, { passive: true });
     cv.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x; moved = Math.max(moved, Math.abs(dx)); const p2 = Math.max(-.4, Math.min(L.length - .6, drag.p0 - dx / span())), t = performance.now(); drag.v = (p2 - drag.p) / Math.max(1, t - drag.t) * 16; drag.p = p2; drag.t = t; });
     const up = e => { if (!drag) return; const d = drag; drag = null; rv.classList.remove('drag');
       if (moved < 6) { const x = e.clientX - cv.getBoundingClientRect().left, hit = rLayout().filter(p => Math.abs(x - p.x) < p.w / 2).sort((a, b) => Math.abs(a.d) - Math.abs(b.d))[0];
@@ -1993,7 +2018,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     let wt = 0; rv.addEventListener('wheel', e => { const dl = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (Math.abs(dl) < 1) return; e.preventDefault(); tgt = Math.max(0, Math.min(L.length - 1, tgt + dl / 220)); clearTimeout(wt); wt = setTimeout(() => { tgt = Math.round(tgt); }, 140); }, { passive: false });
     rv.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); tgt = Math.min(L.length - 1, Math.round(tgt) + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); tgt = Math.max(0, Math.round(tgt) - 1); } if (e.key === 'Enter' && front) { const r = cv.getBoundingClientRect(); openAt(front.k, r.left + front.x, r.top + cyOf()); } });
-    const set = (v, quiet) => { on = v === 'reel'; document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+    const set = (v, quiet) => { on = v === 'reel'; if (!on) Object.values(vids).forEach(x => x.pause()); document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
       try { localStorage.setItem('km-dview', v); } catch (_) {} if (on) { fit(); list(); if (!quiet) { const first = [...ovGrid.children].find(t => !t.hidden && t.getBoundingClientRect().bottom > 160); const k = first ? L.indexOf(+first.dataset.i) : 0; pos = tgt = Math.max(0, k); } if (!raf) raf = requestAnimationFrame(loop); setTimeout(() => rv.focus({ preventScroll: true }), 60); } };
     vt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if ((b.dataset.v === 'reel') !== on) { tap(); set(b.dataset.v); } }));
     window._kmReel = () => on;
@@ -2396,7 +2421,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 </script>
 <script src="nav.js?v=c828b8dd" defer></script>
 <script src="kit.js?v=774a3f18" defer></script>
-<script src="ripple.js?v=038c2710" defer></script>
+<script src="ripple.js?v=2e2214a6" defer></script>
 <script src="protips.js?v=459faa0c" defer></script>
 <script src="feedback.js?v=a8d5892d" defer></script>
 <script src="flow.js?v=6a7e2140" defer></script>
