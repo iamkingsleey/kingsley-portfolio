@@ -1967,7 +1967,6 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       for (let k = ci - 1; k >= 0; k--) { xs[k] = xs[k + 1] - wOf(k + 1, k + 1 - pos) / 2 - gap - wOf(k, k - pos) / 2; if (xs[k] < -W) break; }
       for (const k in xs) { const d = k - pos, h = hAt(d, +k); out.push({ k: +k, d, x: xs[k], w: ratio(L[k]) * h, h }); } return out; }
     const bend = x => { const u = Math.max(0, Math.abs(x - W / 2) - geo().ch * .55) / (W / 2); return 1 + .42 * Math.pow(u, 1.5); };
-    const scr = document.createElement('canvas'), q = scr.getContext('2d');   // scratch for one piece at a time
     const rDraw = function () { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); front = null; if (!L.length) return;
       const cy = cyOf(), ps = rLayout().sort((a, b) => Math.abs(b.d) - Math.abs(a.d)); lastPs = ps.slice().reverse();
       const bt = (performance.now() - land) / 1000, bz = bt < 1.2 ? 1 + .07 * Math.exp(-bt * 5.5) * Math.sin(bt * 17) : 1;   // the landing bounce
@@ -1976,30 +1975,28 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         if (im.tagName === 'IMG' && (!im.complete || !im.naturalWidth)) continue;
         let ds = im, dk = 1; { const rs = window.KMRipple && KMRipple.frameFor(im); if (rs) { ds = rs; dk = rs.width / nW(im); } }   // water under the pointer (ripple.js)
         p.im = im;
-        const pa = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
+        g.globalAlpha = Math.max(0, Math.min(1, 1.6 - Math.abs(p.d) * .32));
         const ir = nW(im) / nH(im), cr = p.w / p.h; let sx = 0, sy = 0, sw = nW(im), sh = nH(im); if (ir > cr) { sw = sh * cr; sx = (nW(im) - sw) / 2; } else { sh = sw / cr; sy = (nH(im) - sh) / 2; }
         p.crop = [sx, sy, sw, sh];
         const flat = Math.abs(p.x - W / 2) + p.w / 2 < geo().ch * .55, step = flat ? p.w : 3;
         const rnd = document.documentElement.dataset.corners === 'rounded', rr = 14;   // CMS → Settings → Corners
-        // each piece is built at full strength on its own small canvas, then laid on the reel once with its fade:
-        // drawn straight onto the reel, the bent columns overlapped and the fade doubled up on every seam, leaving thin vertical lines
-        const bx0 = Math.max(x0, -2), bx1 = Math.min(x1, W + 2), kM = flat ? 1 : Math.max(1, bend(bx0), bend(bx1)), bh = p.h * kM + 4, by0 = cy - bh / 2;
-        const SW = Math.max(1, Math.ceil((bx1 - bx0) * dpr)), SH = Math.max(1, Math.ceil(bh * dpr));
-        if (scr.width < SW) scr.width = SW; if (scr.height < SH) scr.height = SH;
-        q.setTransform(1, 0, 0, 1, 0, 0); q.clearRect(0, 0, SW, SH); q.setTransform(dpr, 0, 0, dpr, -bx0 * dpr, -by0 * dpr); q.imageSmoothingQuality = 'high';
-        if (rnd) { q.save(); q.beginPath(); const k0 = flat ? 1 : bend(Math.max(x0, 0) + 1), k1 = flat ? 1 : bend(Math.min(x1, W) - 1), hh = p.h * Math.max(k0, k1);
-          if (flat || Math.abs(p.d) < 1.5) { if (q.roundRect) q.roundRect(x0, cy - hh / 2, p.w, hh, rr); else q.rect(x0, cy - hh / 2, p.w, hh); }   // the front piece and its two neighbours, as they are
+        if (rnd) { g.save(); g.beginPath(); const k0 = flat ? 1 : bend(Math.max(x0, 0) + 1), k1 = flat ? 1 : bend(Math.min(x1, W) - 1), hh = p.h * Math.max(k0, k1);
+          if (flat || Math.abs(p.d) < 1.5) { if (g.roundRect) g.roundRect(x0, cy - hh / 2, p.w, hh, rr); else g.rect(x0, cy - hh / 2, p.w, hh); }   // the front piece and its two neighbours, as they are
           else { // further out: follow the bent shape, so all four corners round evenly
             const hy = x => p.h * bend(Math.max(0, Math.min(W, x))) / 2, r = Math.min(rr, p.w / 4), tp = x => cy - hy(x), bt = x => cy + hy(x);
-            q.moveTo(x0, tp(x0) + r); q.quadraticCurveTo(x0, tp(x0), x0 + r, tp(x0 + r));
-            for (let x = x0 + r; x < x1 - r; x += 6) q.lineTo(x, tp(x));
-            q.lineTo(x1 - r, tp(x1 - r)); q.quadraticCurveTo(x1, tp(x1), x1, tp(x1) + r); q.lineTo(x1, bt(x1) - r); q.quadraticCurveTo(x1, bt(x1), x1 - r, bt(x1 - r));
-            for (let x = x1 - r; x > x0 + r; x -= 6) q.lineTo(x, bt(x));
-            q.lineTo(x0 + r, bt(x0 + r)); q.quadraticCurveTo(x0, bt(x0), x0, bt(x0) - r); q.closePath(); }
-          q.clip(); }
-        for (let x = Math.max(x0, -2); x < Math.min(x1, W + 2); x += step) { const w = Math.min(step + .6, x1 - x), k = flat ? 1 : bend(x + w / 2), h = p.h * k; q.drawImage(ds, (sx + (x - x0) / p.w * sw) * dk, sy * dk, w / p.w * sw * dk, sh * dk, x, cy - h / 2, w, h); }
-        if (rnd) q.restore();
-        g.globalAlpha = pa; g.drawImage(scr, 0, 0, SW, SH, bx0, by0, SW / dpr, SH / dpr); g.globalAlpha = 1; }
+            g.moveTo(x0, tp(x0) + r); g.quadraticCurveTo(x0, tp(x0), x0 + r, tp(x0 + r));
+            for (let x = x0 + r; x < x1 - r; x += 6) g.lineTo(x, tp(x));
+            g.lineTo(x1 - r, tp(x1 - r)); g.quadraticCurveTo(x1, tp(x1), x1, tp(x1) + r); g.lineTo(x1, bt(x1) - r); g.quadraticCurveTo(x1, bt(x1), x1 - r, bt(x1 - r));
+            for (let x = x1 - r; x > x0 + r; x -= 6) g.lineTo(x, bt(x));
+            g.lineTo(x0 + r, bt(x0 + r)); g.quadraticCurveTo(x0, bt(x0), x0, bt(x0) - r); g.closePath(); }
+          g.clip(); }
+        // the bend is drawn in columns laid edge to edge on whole screen pixels: no overlaps, so a faded piece shows no seams
+        { const X0 = Math.floor(Math.max(x0, -2) * dpr), X1 = Math.ceil(Math.min(x1, W + 2) * dpr), S = flat ? X1 - X0 : Math.max(1, Math.round(3 * dpr));
+          g.setTransform(1, 0, 0, 1, 0, 0);
+          for (let X = X0; X < X1; X += S) { const Xw = Math.min(S, X1 - X), xm = (X + Xw / 2) / dpr, k = flat ? 1 : bend(xm), h = p.h * k, u0 = (X / dpr - x0) / p.w, uw = Xw / dpr / p.w;
+            g.drawImage(ds, (sx + u0 * sw) * dk, sy * dk, uw * sw * dk, sh * dk, X, (cy - h / 2) * dpr, Xw, h * dpr); }
+          g.setTransform(dpr, 0, 0, dpr, 0, 0); }
+        if (rnd) g.restore(); }
       g.globalAlpha = 1;
       if (front) { const it = items[L[front.k]], top = cy - front.h / 2, left = front.x - front.w / 2; rt.textContent = it.t; rt.style.left = left + 'px'; rt.style.top = (top - 40) + 'px';
         rm.style.left = left + 'px'; rm.style.width = front.w + 'px'; rm.style.top = (top + front.h + 14) + 'px'; rm.querySelector('.rn').textContent = String(L[front.k] + 1).padStart(2, '0'); rm.querySelector('i').textContent = it.cat; } }
