@@ -38,6 +38,18 @@
    "linkLabel": "View on GitHub"
   },
   {
+   "fq": "97.9",
+   "name": "Origa",
+   "type": "Blender add-on",
+   "demo": "paper",
+   "what": "Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.",
+   "stat": "",
+   "statLabel": "",
+   "tech": "Python · Blender API",
+   "link": "https://github.com/iamkingsleey/Origa",
+   "linkLabel": "View on GitHub"
+  },
+  {
    "fq": "101.3",
    "name": "This portfolio",
    "type": "Design engineering",

@@ -1,7 +1,7 @@
 <!-- Engineering · the dial: the tools sit on a ruler at their own frequency. Tune the red needle (drag, tap, scroll or arrow
      keys) and it settles on the nearest tool; that tool's small live demo plays on the stage, with its words underneath.
      Between tools the stage fills with static. On phones the ruler runs across the top.
-     The demo comes from the tool's "demo" setting in the CMS (Line, Mesh, Reel, Dial), or a picture if it has one. -->
+     The demo comes from the tool's "demo" setting in the CMS (Line, Mesh, Paper, Reel, Dial), or a picture if it has one. -->
 <style>
 .wbband { display: none !important }
 .wb { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; align-items: stretch; padding: 75px 0 40px }   /* the same room under the heading's line as About has before its first chapter */
@@ -46,7 +46,7 @@
 (() => {
   const TOOLS = __TOOLS__, host = document.getElementById('wb'); if (!host || !TOOLS.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const guess = t => t.demo || (/line/i.test(t.name) ? 'line' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
+  const guess = t => t.demo || (/line/i.test(t.name) ? 'line' : /origa|paper|blender/i.test(t.name + t.type) ? 'paper' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
   const col = () => { const s = getComputedStyle(document.documentElement); return { ink: s.getPropertyValue('--ink').trim() || '#000', muted: s.getPropertyValue('--muted').trim() || '#888', panel: s.getPropertyValue('--panel').trim() || '#eee', red: '#ff4a1c' }; };
   const PT = { on: false, x: .5, y: .5, rot: 0, t0: 0 };   // the visitor's pointer over the stage
   const DEMOS = {
@@ -99,6 +99,28 @@
       const sq = 1 - kick * .2; g.save(); g.translate(cx, cy); g.scale(sq, sq); g.fillStyle = C.ink; g.strokeStyle = C.panel; g.lineWidth = 1.5; g.beginPath(); g.moveTo(0, 0); g.lineTo(11, 13); g.lineTo(5.5, 13); g.lineTo(1, 18); g.closePath(); g.fill(); g.stroke(); g.restore();
       // the take: one thin rounded line
       const ly = fy + fh + 26; g.fillStyle = C.ink; g.globalAlpha = .12; rr(fx, ly, fw, 2, 1); g.fill(); g.globalAlpha = 1; g.fillStyle = C.red; rr(fx, ly, fw * q, 2, 1); g.fill();  g.restore(); },
+    // Origa: a banknote drawn as a wireframe sheet. It lies flat, then its far end rolls up into a tight cylinder of cash,
+    // unrolls and settles with a little flutter. Moving across the stage takes over the roll.
+    paper(g, W, H, t, C) {
+      const D = .46, ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      const cyc = (t * .00016) % 1, auto = cyc < .16 ? 0 : cyc < .5 ? ease((cyc - .16) / .34) : cyc < .66 ? 1 : cyc < .96 ? 1 - ease((cyc - .66) / .3) : 0;
+      const roll = PT.on ? Math.min(1, PT.x * 1.2) : auto, fl = (1 - roll) * .03;
+      // the note's spine: flat up to s0, then curling with a radius that tightens as it wraps (a roll of cash)
+      const N = 240, s0 = 1 - roll * .9, R0 = .09, cx3 = new Float32Array(N + 1), cz3 = new Float32Array(N + 1);
+      { let x = 0, z = 0, th = 0; for (let k = 0; k <= N; k++) { const s = k / N; cx3[k] = x; cz3[k] = z; const ds = 1 / N;
+          if (s >= s0) th += ds / (R0 * Math.max(.35, 1 - (th / (Math.PI * 2)) * .16)); x += Math.cos(th) * ds; z += Math.sin(th) * ds; } }
+      const P3 = (u, v) => { const f = u * N, k = Math.min(N - 1, f | 0), q = f - k; let x = cx3[k] + (cx3[k + 1] - cx3[k]) * q, z = cz3[k] + (cz3[k + 1] - cz3[k]) * q;
+        z += (Math.sin(u * 6 + t * .004) * u + Math.sin(v * 3 + t * .003) * .4) * fl; return [x - .5 + roll * .42, (v - .5) * D, z]; };
+      const sc = Math.min(W / 1.25, H / .8) * .8, cx = W / 2, cy = H * .6, a = -.45 + (PT.on ? (PT.y - .5) * .5 : Math.sin(t * .0004) * .08), ca = Math.cos(a), sa = Math.sin(a);
+      const P = (u, v) => { const [x, y, z] = P3(u, v), X = x * ca - y * sa, Y = x * sa + y * ca; return [cx + (X - Y) * .87 * sc, cy + (X + Y) * .5 * sc - z * sc * 1.15]; };
+      const path = (n, f) => { g.beginPath(); for (let k = 0; k <= n; k++) { const [x, y] = f(k / n); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); };
+      g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = C.ink;
+      g.lineWidth = 1; g.globalAlpha = .26; for (let j = 1; j < 32; j++) path(1, w => P(j / 32, w));   // across the note
+      for (let i = 1; i < 6; i++) path(N, u => P(u, i / 6));                                            // along it
+      g.globalAlpha = 1; g.lineWidth = 1.6; path(N, u => P(u, 0)); path(N, u => P(u, 1)); path(1, w => P(0, w)); path(1, w => P(1, w));   // the edge
+      g.strokeStyle = C.red; const m = .07, mv = .16; path(N, u => P(m + u * (1 - 2 * m), mv)); path(N, u => P(m + u * (1 - 2 * m), 1 - mv)); path(1, w => P(m, mv + w * (1 - 2 * mv))); path(1, w => P(1 - m, mv + w * (1 - 2 * mv)));   // the printed border
+      path(48, q => P(.25 + Math.cos(q * Math.PI * 2) * .075, .5 + Math.sin(q * Math.PI * 2) * .17));   // the portrait oval
+      g.globalAlpha = 1; },
     dial(g, W, H, t, C) { const mid = W / 2, off = PT.on ? PT.x * 260 : (Math.sin(t * .0007) * .5 + .5) * 260,   // move across to tune
       gap = 12, by = H * .66; g.fillStyle = C.ink; for (let i = -10; i < 60; i++) { const x = mid + i * gap - off; if (x < 0 || x > W) continue; g.globalAlpha = Math.max(.1, 1 - Math.abs(x - mid) / mid); const h = i % 10 === 0 ? 30 : i % 5 === 0 ? 18 : 10; g.fillRect(x, by - h, 1.2, h); }
       g.globalAlpha = 1; g.fillStyle = C.red; g.fillRect(mid - 1.5, by - 46, 3, 54); g.fillStyle = C.ink; g.font = '500 ' + Math.round(H * .16) + 'px Geist, ui-sans-serif, sans-serif'; g.textAlign = 'center'; g.fillText((88 + off / 60).toFixed(1), mid, H * .36); g.textAlign = 'left'; }
@@ -128,7 +150,7 @@
   dial.addEventListener('keydown', e => { const dir = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!dir) return; e.preventDefault(); user = true; tgt = FQ[Math.max(0, Math.min(FQ.length - 1, near(tgt) + dir))]; });
   // try it yourself: the drawing answers the pointer, and the stage leans towards it a little
   const hint = stage.querySelector('.hint'), fine = matchMedia('(pointer: fine)').matches; let spin = null;
-  const hintFor = () => { const k = guess(TOOLS[Math.max(0, cur)]); return { line: 'Move across to sharpen the zig zags', mesh: 'Drag to spin it', reel: (fine ? 'Click' : 'Tap') + ' to run it again', dial: 'Move across to tune' }[k] || ''; };
+  const hintFor = () => { const k = guess(TOOLS[Math.max(0, cur)]); return { line: 'Move across to sharpen the zig zags', mesh: 'Drag to spin it', paper: 'Move across to roll the note', reel: (fine ? 'Click' : 'Tap') + ' to run it again', dial: 'Move across to tune' }[k] || ''; };
   window._wbHint = () => { if (stage.classList.contains('play')) hint.textContent = hintFor(); };
   stage.addEventListener('pointerenter', () => { if (TOOLS[Math.max(0, cur)].picture) return; stage.classList.add('play'); hint.textContent = hintFor(); });
   stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
