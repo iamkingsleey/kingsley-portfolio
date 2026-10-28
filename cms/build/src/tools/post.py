@@ -151,6 +151,7 @@ TOGGLES = ('<style id="km-toggles">'
   '#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}'
   '@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}'
   '#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}'
+  '@media (min-width:900px){html:has(.cnav) .km-tg{top:calc(102px + env(safe-area-inset-top,0px))}}'   # case pages: sit level with the All designs row (bottom-aligned)
   '@media print{.km-tg{display:none}}'
   '</style>'
   '<button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button>'
