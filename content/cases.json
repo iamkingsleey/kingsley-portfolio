@@ -1213,14 +1213,6 @@
       {
        "t": "text",
        "v": "A bright red and Buddy, a mascot who reminds people to pay so their friends don’t have to. Buddy shows up wherever money could get awkward: on the receipt, on the pay page, and at the door when someone tries to leave a circle."
-      },
-      {
-       "t": "video",
-       "m": {
-        "video": "assets/designs/sharebuddy-logo-motion.mp4",
-        "poster": "assets/designs/sharebuddy-logo-motion.jpg"
-       },
-       "cap": "The ShareBuddy logo in motion: two dots bounce in and become Buddy."
       }
      ]
     },
