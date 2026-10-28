@@ -295,13 +295,14 @@ html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
 /* the circle: a progress bar that fills to 75% with its percentage counting up, and who has paid */
 .pgb { position: absolute; left: 33px; top: 367px; width: 324px; height: 10px; background: #181818; z-index: 2 } .pgb i { position: absolute; left: 0; right: 0; top: 2px; height: 6px; border-radius: 3px; background: #050505; overflow: hidden } .pgb b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px; background: var(--sb) }
 .pgn { position: absolute; left: 296px; top: 341px; width: 62px; height: 21px; background: #181818; z-index: 2; text-align: right; font: 500 14.5px/21px "DM Sans", system-ui, sans-serif; color: #fff; font-variant-numeric: tabular-nums }
-.cxt { position: absolute; left: 30px; top: 394px; width: 220px; height: 34px; background: #181818; z-index: 2; font: 700 17.5px/34px "DM Sans", system-ui, sans-serif; color: #fff; letter-spacing: -.2px }
-.cxr { position: absolute; left: 26px; width: 338px; height: 53px; border-radius: 18px; background: #222; display: flex; align-items: center; gap: 12px; padding: 0 11px 0 12px; font-family: "DM Sans", system-ui, sans-serif; color: #fff }
-.cxr img { position: static; width: 40px; height: 40px; border-radius: 12px; object-fit: cover; flex: none } .cxr div { flex: 1; min-width: 0 } .cxr b { display: block; font: 500 15px/1.15 "DM Sans", system-ui, sans-serif } .cxr span { display: block; margin-top: 3px; font-size: 12.5px; color: #7c7c7c }
-.cxr em { flex: none; width: 88px; height: 32px; border-radius: 10px; display: grid; place-items: center; font: 500 13.5px "DM Sans", system-ui, sans-serif; font-style: normal }
-.cxr em.ok { background: #233024; color: #2fe06b } .cxr em.wait { background: #33262a; color: #ff4d6d }
-.cxs { position: absolute; left: 15px; top: 703px; width: 360px; height: 139px; border-radius: 24px; background: #181818; padding: 22px 20px; display: flex; flex-direction: column; justify-content: space-between; font: 600 16px "DM Sans", system-ui, sans-serif; color: #fff }
-.cxs p { display: flex; justify-content: space-between } .cxs p span { color: #9a9a9a; font-weight: 500 }
+.cxt { position: absolute; left: 30px; top: 398px; width: 220px; height: 32px; background: #181818; z-index: 2; padding: 6px 0 0 3px; font: 700 18px/22px "DM Sans", system-ui, sans-serif; color: #fff; letter-spacing: -.04em }
+.cxr { position: absolute; left: 26px; width: 337px; height: 58px; border-radius: 18px; background: #222; display: flex; align-items: center; gap: 11px; padding: 0 10px 0 12px; font-family: "DM Sans", system-ui, sans-serif; color: #fff }
+.cxr img { position: static; width: 40px; height: 40px; border-radius: 16px; object-fit: cover; flex: none; background: #ff003a } .cxr div { flex: 1; min-width: 0 } .cxr b { display: block; font: 600 16px/21px "DM Sans", system-ui, sans-serif } .cxr span { display: block; font: 500 14px/18px "DM Sans", system-ui, sans-serif; color: #6e6e6e }
+.cxr em { flex: none; width: 88px; height: 34px; border-radius: 12px; display: grid; place-items: center; font: 500 14px "DM Sans", system-ui, sans-serif; font-style: normal }
+.cxr em.ok { background: #2f382d; color: #00ff46 } .cxr em.wait { background: #382d30; color: #ff003a }
+.cxs { position: absolute; left: 15px; top: 703px; width: 360px; height: 139px; border-radius: 24px; background: #181818; padding: 28px 18px 0 19px; display: flex; flex-direction: column; gap: 15px; font: 700 16px/18px "DM Sans", system-ui, sans-serif; color: #fff }
+.cxs p { display: flex; justify-content: space-between } .cxs p span { color: #fff }
+.cxbg { position: absolute; left: 15px; top: 438px; width: 360px; height: 244px; background: #181818 }
 
 /* Buddies: the empty My Buddies screen, the Invite Friends sheet with search and results, then the get-notified card */
 .ivs { position: absolute; left: 0; top: 69px; width: 390px; height: 831px; background: linear-gradient(transparent 60px, #181818 60px) }
@@ -372,7 +373,7 @@ const SCR = {
   pay: () => `<div class="long" style="height:1979px">${L('M/invite_bg', 16, 250, 360, 'r', .1)}${BD.invite(16, 250, .35)}${L('L/pay_head', 16, 516, 360, 'rv', 0)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => L('L/item_row' + k, 16, 555 + 85 * k, 360, 'rv', .08 + k * .09)).join('')}${L('L/pay_tot', 16, 1231, 360, 'rv', .8)}${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<img class="ck" id="pck${k}" src="${P}L/chk.webp" alt="" style="left:34px;top:${555 + 85 * k + 22}px;width:28px">`).join('')}${L('L/pay_methods', 16, 1454, 360, 'r', .3)}</div>` + L('pay_top', 0, 0, 390, 'fix r'),
   circle: () => full('circle') + `<div class="pgn" id="pgn">0%</div><div class="pgb"><i><b id="pgb"></b></i></div><div class="cxs" style="top:414px;height:138px"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>`,
   circlex: () => `<div class="long" style="height:1069px">${L('L/cx_banner', 17, 143, 356)}${L('L/cx_top', 15, 247, 360)}`
-    + `<div class="pgn">75%</div><div class="pgb"><i><b style="width:75%"></b></i></div><div class="cxt">Payment status</div>`
+    + `<div class="pgn">75%</div><div class="pgb"><i><b style="width:75%"></b></i></div><div class="cxt">Payment status</div><div class="cxbg"></div>`
     + [['Lomi', 1], ['Hans', 1], ['Jane G.', 1], ['KayB', 0]].map(([n, ok], k) => `<div class="cxr r from-r" style="top:${440 + 60 * k}px;--d:${.08 + k * .08}s"><img src="${P}L/cx_av${k}.webp" alt=""><div><b>${n}</b><span>₦5,000 · 25% share</span></div><em class="${ok ? 'ok' : 'wait'}">${ok ? 'Paid' : 'Pending'}</em></div>`).join('')
     + L('L/cx_end', 15, 680, 360, 'r', .4) + `<div class="cxs r" style="--d:.45s"><p>Collected<span>₦15,000</span></p><p>Still to come<span>₦5,000</span></p><p>Total bill<span>₦20,000</span></p></div>` + L('L/cx_btns', 0, 876, 390, 'r', .5) + `</div>` + L('L/cx_head', 0, 0, 390, 'fix'),
 };
