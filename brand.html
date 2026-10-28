@@ -782,6 +782,17 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 .kx-hz > .kx-base { transform-origin: var(--hx, 50%) var(--hy, 50%); transition: transform 1.6s cubic-bezier(.2,.8,.2,1), transform-origin .9s cubic-bezier(.2,.8,.2,1), opacity .5s !important; will-change: transform }
 .kx-hz.on > .kx-base { transform: scale(var(--hz, 1.14)) }
 @media (prefers-reduced-motion: reduce) { .kx-kb > .kx-base { animation: none } .kx-rev > .kx-base { clip-path: none; transform: none } }
+/* phones: tap a prototype to see it full screen, with a small close button at the top right */
+.kfx, .kfo { display: none }
+@media (max-width: 720px) {
+  .kframe .fw .kfo { display: block; position: absolute; inset: 0; z-index: 2; border: 0; padding: 0; background: transparent; cursor: zoom-in; -webkit-tap-highlight-color: transparent }
+  .kframe .fw .kfo i { position: absolute; right: 10px; bottom: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgb(0 0 0 / .55); color: #fff; display: grid; place-items: center; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px) }
+  html.kfs, html.kfs body { overflow: hidden !important }
+  html.kfs *:has(> .fw.kfs-on), html.kfs *:has(.fw.kfs-on) { transform: none !important; filter: none !important; contain: none !important; will-change: auto !important }
+  .kframe .fw.kfs-on { position: fixed !important; inset: 0; z-index: 2147483000; width: 100vw; height: 100dvh; aspect-ratio: auto !important; border-radius: 0 !important; -webkit-mask-image: none; background: var(--fbg, #f1f3f6) }
+  .kframe .fw.kfs-on .kfo { display: none }
+  .kframe .fw.kfs-on .kfx { display: grid; place-items: center; position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; z-index: 3; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgb(0 0 0 / .6); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); cursor: pointer }
+}
 </style>
 </head>
 <body>
@@ -1928,6 +1939,29 @@ function show() {
 }
 addEventListener('hashchange', show);
 show();
+</script>
+<script>
+  // phones: a prototype opens full screen on tap; the small × at the top right brings it back
+  (function () {
+    var mq = matchMedia('(max-width: 720px)');
+    var X = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+    var O = '<i aria-hidden="true"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 1.5h4v4M5.5 12.5h-4v-4M12.5 1.5L8 6M1.5 12.5L6 8"/></svg></i>';
+    function close() { var f = document.querySelector('.fw.kfs-on'); if (!f) return; f.classList.remove('kfs-on'); document.documentElement.classList.remove('kfs'); }
+    function wire() {
+      document.querySelectorAll('.kframe .fw').forEach(function (w) {
+        if (w.querySelector('.kfo')) return;
+        var o = document.createElement('button'); o.type = 'button'; o.className = 'kfo'; o.setAttribute('aria-label', 'Open the prototype full screen'); o.innerHTML = O;
+        var x = document.createElement('button'); x.type = 'button'; x.className = 'kfx'; x.setAttribute('aria-label', 'Close full screen'); x.innerHTML = X;
+        o.addEventListener('click', function (e) { if (!mq.matches) return; e.preventDefault(); e.stopPropagation(); close(); w.classList.add('kfs-on'); document.documentElement.classList.add('kfs'); });
+        x.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); close(); });
+        w.appendChild(o); w.appendChild(x);
+      });
+    }
+    addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    mq.addEventListener('change', function () { if (!mq.matches) close(); });
+    if (document.readyState !== 'loading') wire(); else addEventListener('DOMContentLoaded', wire);
+    new MutationObserver(wire).observe(document.documentElement, { childList: true, subtree: true });
+  })();
 </script>
 <script src="nav.js?v=c828b8dd" defer></script>
 <script src="kit.js?v=774a3f18" defer></script>

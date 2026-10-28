@@ -148,7 +148,9 @@ const FLOWS = {
 const flow = (new URLSearchParams(location.search).get('flow') || 'explorer').replace(/[^a-z]/g, ''), F = FLOWS[flow] || FLOWS.explorer;
 document.getElementById('ttl').textContent = F.t; document.getElementById('steps').innerHTML = F.s.map((s, i, a) => `<li data-n="${String(i + 1).padStart(2, '0')} / ${String(a.length).padStart(2, '0')}">${s}</li>`).join('');
 const st = document.getElementById('st'), app = document.getElementById('app'), steps = [...document.querySelectorAll('#steps li')];
-const fit = () => { const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? 880 : 800; st.classList.toggle('v', v);   // portrait frame: the vertical stage
+const fit = () => { const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);
+  // a tall screen (a phone, or a prototype opened full screen): the stage grows to the screen's shape and the phone grows to fill it, so nothing is cut off
+  st.style.height = v ? H + 'px' : ''; { const d = st.querySelector('.dev'); if (d) { if (v && H > 880) { const s = Math.min(1.2, (H - 250) / d.offsetHeight, 560 / d.offsetWidth); d.style.transform = `scale(${s})`; d.style.left = (600 - d.offsetWidth * s) / 2 + 'px'; } else { d.style.transform = ''; d.style.left = ''; } } }   // portrait frame: the vertical stage
   const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; };
 fit(); addEventListener('resize', fit);
 const sleep = ms => new Promise(r => setTimeout(r, ms * .66)), $ = s => app.querySelector(s);   // everything plays about a third faster
