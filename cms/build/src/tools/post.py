@@ -120,6 +120,7 @@ def _acc(s):
     s = re.sub(r'#ff4a1c', ACCENT, s, flags=re.I)
     s = re.sub(r'rgba?\(\s*255[\s,]+74[\s,]+28\b', lambda m: ('rgba(' if m.group(0).startswith('rgba') else 'rgb(') + (_AR.replace(' ', ', ') if ',' in m.group(0) else _AR), s)
     return s
+_sh.copy(f'{KFM}/ripple.js', f'{REPO}/ripple.js')   # water ripple on pictures under the pointer (cms/build/src/ripple.js)
 _sh.copy(f'{KFM}/tuner.js', f'{REPO}/tuner.js')   # the page-to-page transition (its source now lives with the others)
 for _js in ('nav', 'kit', 'feedback', 'home', 'flow', 'protips', 'tuner'):
     _jf = f'{REPO}/{_js}.js'
@@ -346,6 +347,7 @@ for _p in PAGES:
     if _p == 'index.html' and 'src="homebg.js' not in _s: _s = _s.replace('</body>', HOMEBG + '</body>', 1)
     if 'window.KM_SITE = ' not in _s: _s = _s.replace('<head>', '<head>\n' + SITEJS, 1)
     if 'src="kit.js' not in _s: _s = _s.replace('</body>', '<script src="kit.js" defer></script>\n</body>', 1)   # one feel across the site (cms/build/src/kit.js)
+    if 'src="ripple.js' not in _s: _s = _s.replace('</body>', '<script src="ripple.js" defer></script>\n</body>', 1)   # pictures ripple like water under the pointer
     if 'src="protips.js' not in _s: _s = _s.replace('</body>', '<script src="protips.js" defer></script>\n</body>', 1)
     if _p not in ('index.html', 'designs.html') and 'id="soundBtn"' not in _s and '</body>' in _s: _s = _s.replace('</body>', TOGGLES + '</body>', 1)   # Home's sound and theme buttons, on every page but Designs (its own view controls sit there)
     if 'src="feedback.js' not in _s: _s = _s.replace('</body>', '<script src="feedback.js" defer></script>\n</body>', 1)   # after a few minutes: how easy was it to get around?
@@ -360,7 +362,7 @@ for _p in PAGES:
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
-    _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
+    _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback|ripple)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')
