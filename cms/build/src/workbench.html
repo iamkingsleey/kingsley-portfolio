@@ -9,7 +9,7 @@
 .wb .dial canvas { position: absolute; inset: 0; width: 100%; height: 100% }
 .wb .dial:focus-visible { outline: 2px solid var(--red); outline-offset: 6px }
 .wb .right { display: grid; gap: 30px; align-content: start; min-width: 0 }
-.wb .stage { position: relative; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: color-mix(in srgb, var(--ink) 2%, var(--bg)) }
+.wb .stage { position: relative; align-self: start; width: 100%; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: color-mix(in srgb, var(--ink) 2%, var(--bg)) }
 .wb .stage .live { position: absolute; z-index: 3; left: 24px; top: 24px; display: flex; align-items: center; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
 .wb .stage .fqr { position: absolute; z-index: 3; right: 24px; top: 24px; font: 600 12.5px var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: var(--muted); font-variant-numeric: tabular-nums }
 .wb .live .dot { position: relative; width: 8px; height: 8px; border-radius: 99px; background: var(--red); margin-right: 10px }
@@ -38,6 +38,7 @@
 .wb .arr { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 99px; background: var(--pill); color: var(--ink); text-decoration: none; font-size: 17px; transition: background .2s, color .2s, transform .25s }
 .wb .arr:hover { background: var(--ink); color: var(--bg); transform: rotate(45deg) }
 @media (max-width: 860px) { .wb .stage .hint { left: 18px; bottom: 14px } .wb .stage.chan::after { top: calc(50% + 25px) } .wb { grid-template-columns: 1fr; gap: 24px; padding-top: 75px } .wb .dial { min-height: 96px; height: 96px }
+  .wb .stage { height: calc((100vw - 36px) * .625); max-height: 70vh }   /* Safari on iPhone ignored the 16:10 shape here and folded the card flat */
   /* phones: card first, dial under it so the thumb on the dial never covers the card */ .wb .right { display: contents } .wb .stage { order: 1 } .wb .dial { order: 2 } .wb .tx { order: 3 }
   .wb .stage .live, .wb .stage .fqr { top: 18px; font-size: 11.5px } .wb .stage .live { left: 18px } .wb .stage .fqr { right: 18px } .wb .stage canvas.demo { top: 50px; height: calc(100% - 50px) } .wb .tx h3 { font-size: 26px } }
 @media (prefers-reduced-motion: reduce) { .wb .stage.chan .demo, .wb .stage.chan img, .wb .stage.chan .live, .wb .stage.chan .fqr, .wb .stage.chan::after { animation: none } .wb .live .dot::before, .wb .live .dot::after { animation: none; opacity: 0 } .wb .tx { transition: none } }
