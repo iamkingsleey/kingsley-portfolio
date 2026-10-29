@@ -42,6 +42,20 @@
       "desc": "A star badge on a purple stage, with confetti in the air."
     },
     {
+      "title": "Rolled $100 bill",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/rolled-100-dollar-bill.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#989895",
+      "dark": false,
+      "desc": "A $100 bill rolled tight and held with a rubber band, floating on soft grey.",
+      "case": "3d-collection"
+    },
+    {
       "title": "Safe with coins",
       "category": "3d",
       "images": [
@@ -96,6 +110,20 @@
       "bg": "#8e8674",
       "dark": false,
       "desc": "A ribbon of gold coins trailing after a glass cursor: money that moves with a click. Modelled and lit in Blender."
+    },
+    {
+      "title": "Dollar and naira rolls",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/rolled-dollar-and-naira-notes.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#87958f",
+      "dark": false,
+      "desc": "A rolled $100 bill standing beside a rolled ₦1,000 note, each with its own rubber band.",
+      "case": "3d-collection"
     },
     {
       "title": "Fintech box and paper plane",
@@ -346,6 +374,20 @@
       "bg": "#ccbfc1",
       "dark": false,
       "desc": "A bright orange padlock with a rope, from the same security set."
+    },
+    {
+      "title": "Rolled ₦1,000 note",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/rolled-1000-naira-note.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#122319",
+      "dark": true,
+      "desc": "A ₦1,000 note rolled and banded, lying in a pool of green light.",
+      "case": "3d-collection"
     },
     {
       "title": "White piggy bank",
