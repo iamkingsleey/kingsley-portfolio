@@ -15,6 +15,20 @@
       "case": "3d-collection"
     },
     {
+      "title": "Dollar bills on red stairs",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/dollar-bills-on-red-stairs.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#341411",
+      "dark": true,
+      "desc": "Three $100 bills on deep red stairs: one rolled, one standing tall, one curling over the step.",
+      "case": "3d-collection"
+    },
+    {
       "title": "Drink tumbler",
       "category": "3d",
       "images": [
@@ -151,6 +165,20 @@
       "bg": "#727272",
       "dark": true,
       "desc": "Dark silver coins coiling towards a glass cursor. Modelled and lit in Blender."
+    },
+    {
+      "title": "Naira and dollar on red stairs",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/naira-and-dollar-on-red-stairs.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#31120f",
+      "dark": true,
+      "desc": "A rolled ₦1,000 note with two $100 bills, one standing and one curling, on the same red stairs.",
+      "case": "3d-collection"
     },
     {
       "title": "Stacked coins with cursor",
@@ -505,6 +533,20 @@
       "bg": "#111111",
       "dark": true,
       "desc": "An open vault, a blue piggy bank and a debit card sliding out of the floor."
+    },
+    {
+      "title": "Rolled dollar on red stairs",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/rolled-dollar-on-red-stairs.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#280908",
+      "dark": true,
+      "desc": "A single rolled $100 bill resting on a red step, lit from the side.",
+      "case": "3d-collection"
     },
     {
       "title": "Stitched, figure of eight",
