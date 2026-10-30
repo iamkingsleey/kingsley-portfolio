@@ -158,8 +158,8 @@
         "assets/shop/origa-cover.jpg"
       ],
       "color": "#111111",
-      "link": "https://github.com/iamkingsleey/Origa",
-      "linkLabel": "Get it free on GitHub",
+      "link": "https://extensions.blender.org/add-ons/origa/",
+      "linkLabel": "Get it free on Blender Extensions",
       "status": "free"
     }
   ]
