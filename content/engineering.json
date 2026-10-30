@@ -43,7 +43,7 @@
    "type": "Blender add-on",
    "demo": "paper",
    "what": "Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.",
-   "stat": "28",
+   "stat": "31+",
    "statLabel": "users",
    "tech": "Python · Blender API",
    "link": "https://extensions.blender.org/add-ons/origa/",
