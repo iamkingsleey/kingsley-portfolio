@@ -374,7 +374,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
   }
   function paintBuy() {
     const p = shown[cur], price = lic === 'commercial' ? (p.priceCommercial || p.price) : p.price;
-    if (!p.price && p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Get it free on Figma ↗</a>`;
+    if (!p.price && p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">${p.linkLabel || 'Get it free on Figma'} ↗</a>`;
     else if (p.link) $('buy').innerHTML = `<a class="btn pri wide" href="${p.link}" target="_blank" rel="noopener">Buy for ${money(price)} ↗</a><p class="alt">Checkout on Gumroad. The files arrive by email straight away.</p>`;
     else if ((window.KM_SITE && KM_SITE.inbox || {}).url) { $('buy').innerHTML = `<form class="ntf" novalidate><input type="email" required autocomplete="email" placeholder="Your email" aria-label="Your email"><button class="btn pri" type="submit">Notify me</button></form><p class="alt">Coming soon at ${money(price)}. I'll email you once, the day it's out.</p>`;
       const nf = $('buy').querySelector('.ntf'); nf.addEventListener('submit', async e => { e.preventDefault(); const ip = nf.querySelector('input'), v = ip.value.trim();

@@ -142,6 +142,25 @@
       "color": "#111111",
       "link": "https://www.figma.com/community/plugin/1668399347356779904/meshcraft",
       "status": "free"
+    },
+    {
+      "id": "origa",
+      "name": "Origa",
+      "kind": "Blender add-on",
+      "blurb": "Shape paper from a plane mesh: fold, roll, curl and crumple. Made for money first, with banknote sizes, flying and rolled cash and Money Rain.",
+      "count": "Free",
+      "formats": [
+        "Blender add-on",
+        "Blender 4.2+"
+      ],
+      "price": 0,
+      "images": [
+        "assets/shop/origa-cover.jpg"
+      ],
+      "color": "#111111",
+      "link": "https://github.com/iamkingsleey/Origa",
+      "linkLabel": "Get it free on GitHub",
+      "status": "free"
     }
   ]
 }
