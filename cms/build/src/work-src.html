@@ -2050,6 +2050,28 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   if (!ogl) ov2d = ovc.getContext('2d');      // no WebGL: show the grid flat
   const FLAT = true;   // the bulge is off: plain, sharp pictures in a straight grid (set to false to bring the drum back)
   if (FLAT) { ogl = null; ov2d = null; ovc.style.display = 'none'; ov.classList.add('flat'); }
+  // A subtle bulge for the flat grid: as you scroll, rows tilt away above and below the middle of the screen, like
+  // pictures on the outside of a gentle drum. It bends the real tiles (CSS 3D), so pictures stay sharp, motion pieces keep
+  // playing and the ripple still works. BULGE sets the tilt at the screen's top and bottom edges, in degrees (0 turns it off).
+  const BULGE = 0;   // off for now; 14 was the last tried (9 subtler)
+  if (FLAT && !reduce && BULGE) {
+    let braf = 0;
+    const bulge = () => { braf = 0;
+      if (!document.body.classList.contains('all') || document.body.classList.contains('reelon')) return;
+      const vh = innerHeight, mid = vh / 2, gr = ovGrid.getBoundingClientRect(), small = innerWidth < 900, deg = small ? BULGE * .6 : BULGE;
+      ovGrid.style.perspective = (small ? 1100 : 1600) + 'px'; ovGrid.style.perspectiveOrigin = `50% ${(mid - gr.top).toFixed(1)}px`;
+      for (const o of ovTiles) { if (o.t.hidden) continue;
+        const y = gr.top + o.t.offsetTop + o.t.offsetHeight / 2;   // layout position, so the tilt never feeds back into itself
+        if (y < -vh * .6 || y > vh * 1.6) { if (o.bz) { o.t.style.transform = ''; o.bz = 0; } continue; }
+        const s = Math.max(-1.25, Math.min(1.25, (y - mid) / mid)), k = 1 - .05 * s * s;
+        o.t.style.transform = `rotateX(${(-s * deg).toFixed(2)}deg) scale(${k.toFixed(4)})`; o.bz = 1; } };
+    const kick = () => { if (!braf) braf = requestAnimationFrame(bulge); };
+    ov.addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick);
+    new MutationObserver(kick).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(kick).observe(ovGrid, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    if ('ResizeObserver' in window) new ResizeObserver(kick).observe(ovGrid);   // tiles settling into their shapes move the rows
+    kick();
+  }
   // only redraw the grid when something on it changed (scroll, size, filter, theme, a picture arriving), plus a
   // short settle after each change for the tiles' own fade-in; when nothing moves, the page does no work at all
   let ovKey = '', ovSettle = 0;
