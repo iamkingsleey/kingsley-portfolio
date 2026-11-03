@@ -1818,7 +1818,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   let mT = 0;
   // the shape is read from the tiny thumbnail (same proportions), so the page doesn't wait on 6 MB of grid pictures to lay itself out
   ovTiles.forEach(o => { const u = thOf(still(items[o.i])), i = new Image();
-    i.onload = () => { const r = items[o.i].cs && +items[o.i].r ? +items[o.i].r : i.naturalWidth / i.naturalHeight;   // case-study covers all keep one shape (3:2), whatever size the picture is o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
+    i.onload = () => { const r = items[o.i].cs && +items[o.i].r ? +items[o.i].r : i.naturalWidth / i.naturalHeight; /* case-study covers all keep one shape (3:2), whatever size the picture is */ o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
     i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u; });   // shape known from the CMS: wait until the tile nears the screen
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); mScrollFly(); });
   // each tile's sharp grid picture is fetched as it nears the screen; the 240px thumbnail shows until then.
