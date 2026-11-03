@@ -81,7 +81,7 @@ body { font: 400 14px/1.4 Inter, system-ui, -apple-system, sans-serif; color: va
 #st.v .dial { padding-left: 0 } #st.v .dial .tk, #st.v .dial .nd { display: none }
 #st.v .dial li { display: none; height: 40px } #st.v .dial li.on { display: flex; justify-content: center; transform: none; color: var(--ink) }
 #st.v .dial li.on::before { content: attr(data-n); font: 600 12px/1 "Geist Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em; color: #ff4a1c; margin-right: 12px }
-[data-theme="dark"] #st.v .dial li.on { color: #f2f5ef }
+[data-theme="dark"] #st.v .dial li.on { color: #f5f5f5 }
 #st.v .dev { left: 157px; top: 206px; transform: scale(.76) }
 /* motion: screens glide on a spring, sheets and dialogs bounce into place, their contents rise one after another, taps squish */
 :root { --out: cubic-bezier(.22, 1, .36, 1); --pop: cubic-bezier(.34, 1.56, .64, 1) }
@@ -99,10 +99,10 @@ body { font: 400 14px/1.4 Inter, system-ui, -apple-system, sans-serif; color: va
 .inp.foc { box-shadow: 0 0 0 4px rgba(164, 254, 34, .35) }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .touch { display: none } }
 /* dark mode darkens only the stage around the phone: the app itself always stays light */
-html[data-theme="dark"], html[data-theme="dark"] body { background: #16181b }
-[data-theme="dark"] .side .k { color: #8aa07f } [data-theme="dark"] .side h2 { color: #f2f5ef }
-[data-theme="dark"] .dial .tk i { background: #f2f5ef } [data-theme="dark"] .dial li { color: #5f685c } [data-theme="dark"] .dial li.on { color: #f2f5ef } [data-theme="dark"] .dial li.done { color: #a3ac9f }
-[data-theme="dark"] .dev { box-shadow: 0 0 0 9px #000, 0 0 0 10px #3b3f3a, 0 40px 80px -30px rgba(0, 0, 0, .7) }
+html[data-theme="dark"], html[data-theme="dark"] body { background: #141414 }
+[data-theme="dark"] .side .k { color: #8c8c8c } [data-theme="dark"] .side h2 { color: #f5f5f5 }
+[data-theme="dark"] .dial .tk i { background: #f5f5f5 } [data-theme="dark"] .dial li { color: #6b6b6b } [data-theme="dark"] .dial li.on { color: #f5f5f5 } [data-theme="dark"] .dial li.done { color: #a6a6a6 }
+[data-theme="dark"] .dev { box-shadow: 0 0 0 9px #000, 0 0 0 10px #333333, 0 40px 80px -30px rgba(0, 0, 0, .7) }
 #st.fs .side { display: none }
 </style>
 </head>
