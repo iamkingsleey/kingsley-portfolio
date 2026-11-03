@@ -1794,7 +1794,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   let mT = 0;
   // the shape is read from the tiny thumbnail (same proportions), so the page doesn't wait on 6 MB of grid pictures to lay itself out
   ovTiles.forEach(o => { const u = thOf(still(items[o.i])), i = new Image();
-    i.onload = () => { const r = i.naturalWidth / i.naturalHeight; o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
+    i.onload = () => { const r = items[o.i].cs && +items[o.i].r ? +items[o.i].r : i.naturalWidth / i.naturalHeight;   // case-study covers all keep one shape (3:2), whatever size the picture is o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
     i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u; });   // shape known from the CMS: wait until the tile nears the screen
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); mScrollFly(); });
   // each tile's sharp grid picture is fetched as it nears the screen; the 240px thumbnail shows until then.
@@ -1935,7 +1935,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const MOB = () => W < 700, RT = 58, RB = 128;
     const cyOf = () => MOB() ? RT + (H - RT - RB) / 2 : H * .46;
     const chOf = k => MOB() ? Math.max(120, Math.min(H - RT - RB, (W - 32) / ratio(L[k]))) : geo().ch;
-    const ratio = i => { if (!items[i]) return 1; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(items[i].cs ? 1.6 : 1.35, r)); };   // case-study covers show whole, never cropped
+    const ratio = i => { if (!items[i]) return 1; if (items[i].cs && +items[i].r) return +items[i].r; const im = imgs[i], r = im && im.naturalWidth ? im.naturalWidth / im.naturalHeight : (+items[i].r || .8); return Math.max(.72, Math.min(items[i].cs ? 1.6 : 1.35, r)); };   // case-study covers show whole, never cropped
     const rLayout = function () { if (!L.length) return []; const { ch, sh, gap } = geo(), cx = W / 2, ci = Math.max(0, Math.min(L.length - 1, Math.round(pos))), f = pos - ci, out = [];
       const hAt = (d, k) => { const a = Math.min(1, Math.abs(d)), e = a * a * (3 - 2 * a), c = k == null ? ch : chOf(k), c2 = k == null ? sh : (MOB() ? c * .62 : sh); return c + (c2 - c) * e; }, wOf = (k, d) => ratio(L[k]) * hAt(d, k);
       const xs = {}; const nb = f > 0 ? ci + 1 : ci - 1; xs[ci] = cx - f * (wOf(ci, f) / 2 + gap + (L[nb] != null ? wOf(nb, f > 0 ? 1 - f : -1 - f) : wOf(ci, f)) / 2);
