@@ -1569,6 +1569,11 @@
         "height": 640,
         "gap": 22,
         "pos": "type"
+      },
+      "fx": {
+        "assets/uploads/oghosa/icons.jpg": {
+          "k": "none"
+        }
       }
     },
     {

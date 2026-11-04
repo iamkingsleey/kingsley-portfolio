@@ -506,7 +506,7 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 .H { --ng: 22px } @media (max-width: 899px) { .H { --ng: 12px } }
 :is(.N, .H) .cl { display: grid; gap: var(--ng) }
 :is(.N, .H) .clp { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: var(--ng) }
-:is(.N, .H) .cl .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 1 } :is(.N, .H) .cl .fill.clw { aspect-ratio: 16 / 9 }
+:is(.N, .H) .cl .fill { position: relative; overflow: hidden; background: transparent; border-radius: var(--km-r, 0); aspect-ratio: 1 }   /* the box behind a picture carries no colour and the same corners, so nothing shows outside a rounded picture */ :is(.N, .H) .cl .fill.clw { aspect-ratio: 16 / 9 }
 :is(.N, .H) .cl .m { position: absolute; inset: 0 } :is(.N, .H) .cl .m img, :is(.N, .H) .cl .m video { width: 100%; height: 100%; object-fit: cover }
 :is(.N, .H) .cl .clt { --fo: 50% 64% }
 :is(.N, .H) .clp.asy { grid-template-columns: var(--cols); aspect-ratio: 2 / 1 } :is(.N, .H) .clp.asy .fill { aspect-ratio: auto; height: 100% }
