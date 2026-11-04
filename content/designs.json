@@ -224,17 +224,17 @@
       "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
     },
     {
-      "title": "Ivieomas tote bag",
+      "title": "Tote bag design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/ivieomas-tote-bag.jpg",
+          "src": "assets/designs/tote-bag-design.jpg",
           "ratio": 1.0
         }
       ],
       "bg": "#dedede",
       "dark": false,
-      "desc": "The Ivieomas mark on a tote, with stickers and bold shapes."
+      "desc": "The mark on a tote, with stickers and bold shapes."
     },
     {
       "title": "Casa Verde signage",
@@ -277,11 +277,11 @@
       "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
     },
     {
-      "title": "Ivieomas varsity jacket",
+      "title": "Varsity jacket design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/ivieomas-varsity-jacket.jpg",
+          "src": "assets/designs/varsity-jacket-design.jpg",
           "ratio": 1.61
         }
       ],
@@ -1053,11 +1053,11 @@
       "desc": "A hospitality brand: the roof-and-leaf mark across cups, cards and signage."
     },
     {
-      "title": "Ivieomas wordmark",
+      "title": "Wordmark design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/ivieomas-wordmark.jpg",
+          "src": "assets/designs/fashion-wordmark-design.jpg",
           "ratio": 1.6
         }
       ],
@@ -1079,11 +1079,11 @@
       "desc": "A shot from the Ẹdorẹ brand project, a community-first events platform for African cultural organisers."
     },
     {
-      "title": "Ivieomas bottle",
+      "title": "Bottle design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/ivieomas-bottle.jpg",
+          "src": "assets/designs/bottle-design.jpg",
           "ratio": 1.0
         }
       ],
