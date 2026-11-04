@@ -187,7 +187,7 @@ SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('avai
   # kmSend: every form on the site sends through this. With an inbox set up (CMS → Settings → Inbox) the message goes there;
   # it resolves true once it is stored, false when there is no inbox or it could not be reached (the form then falls back to email)
   + 'window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);'
-  + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html")+location.hash},o);'
+  + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html")+location.hash},o);'
   + 'return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};'
   + '</script>\n' + CORNERS)   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
@@ -336,6 +336,11 @@ def _base():
 open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())))
 SWREG = "<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>\n"
 INDEX = {}
+# clean addresses: the site's own links drop ".html" (Cloudflare serves /designs for designs.html and redirects the
+# .html form; the CMS preview does the same, see cms/server.py). Links into folders (Prototype/…) keep their names.
+def _clean_links(h):
+    h = re.sub(r'href="index\.html(["#?])', r'href="./\1', h)
+    return re.sub(r'href="([a-z0-9-]+)\.html(["#?])', r'href="\1\2', h)
 for _p in PAGES:
     _f = f'{REPO}/{_p}'
     if not os.path.exists(_f): continue
@@ -363,6 +368,7 @@ for _p in PAGES:
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
     _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback|ripple)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
+    _s = _clean_links(_s)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')

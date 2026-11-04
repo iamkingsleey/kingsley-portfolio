@@ -155,7 +155,7 @@
     const btn = card.querySelector('[data-send]'), err = card.querySelector('[data-err]');
     const liked = skip ? [] : picked('liked'), stuck = skip ? [] : picked('stuck'), note = skip ? '' : card.querySelector('[data-note]').value.trim();
     btn.disabled = true; btn.textContent = 'Sending…'; err.hidden = true; snd('pop');
-    const page = (location.pathname.split('/').pop() || 'index.html') + location.hash;
+    const page = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')) + location.hash;
     const body = { _subject: `Site feedback: ${val}/5 · ${WORD[val]}`, _template: 'table', _captcha: 'false',
       Score: `${val} / 5 (${WORD[val]})`, 'Liked most': liked.join(', ') || '—', 'Got in the way': stuck.join(', ') || '—', Note: note || '—',
       Page: page, 'Time on site': Math.round(spent / 60000) + ' min', Screen: `${innerWidth}×${innerHeight}${mobile() ? ' · phone' : ''}`, Theme: isDark() ? 'dark' : 'light' };

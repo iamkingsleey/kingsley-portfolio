@@ -12,7 +12,7 @@
     { fq: 102.0, name: 'Shop', href: 'shop.html', gate: 'shop' }   // shown once the shop is switched on (content/site.json "shop": true)
     // { fq: 102.0, name: 'Projects', href: 'projects.html' },   // Projects is off for now: remove the // to bring it back
   ].filter(s => !s.gate || (window.KM_SITE || {})[s.gate]);
-  const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')).toLowerCase();
   // pages that live under a station: a case study under Projects, a design's own page under Designs
   const PARENT = { 'case.html': 'Designs', 'brand.html': 'Designs',   // case studies sit under Designs while Projects is off
     'logo.html': 'Designs', 'product.html': 'Designs', 'project.html': 'Designs', 'showcase.html': 'Designs' };
@@ -21,7 +21,8 @@
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
   const go = s => {
     if (s === cur && !PARENT[file]) { scrollTo({ top: 0, behavior: 'smooth' }); return; }   // already here: back to the top
-    if (window.Tuner) Tuner.go({ from: cur.fq, to: s.fq, name: s.name, href: s.href }); else location.href = s.href;
+    const to = s.href === 'index.html' ? './' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
+    if (window.Tuner) Tuner.go({ from: cur.fq, to: s.fq, name: s.name, href: to }); else location.href = to;
   };
   const css = `
   .station .back, .sdial, #dialLayer, .side-nav { display: none !important }   /* the old ways of moving around */

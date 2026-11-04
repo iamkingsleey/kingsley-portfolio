@@ -6,4 +6,4 @@ compatibility_date = "2026-10-01"
 [assets]
 directory = "./"
 not_found_handling = "404-page"   # 404.html, as on GitHub Pages
-html_handling = "none"   # addresses stay exactly as on GitHub Pages (designs.html, brand.html?case=…)
+html_handling = "drop-trailing-slash"   # /designs serves designs.html; /designs.html and /index.html redirect to the clean address

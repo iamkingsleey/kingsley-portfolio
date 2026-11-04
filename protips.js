@@ -4,7 +4,7 @@
 //  4 · Home: "For recruiters" opens a three-line card (who, availability, where to look).
 //  A small "?" next to sound and theme replays the tip.
 (function () {
-  const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase(), home = file === 'index.html';
+  const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')).toLowerCase(), home = file === 'index.html';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const get = k => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set = k => { try { localStorage.setItem(k, '1'); } catch (_) {} };
   const st = document.createElement('style');

@@ -146,7 +146,7 @@
   // except on the case study pages, where each case is its own place: Kusnap → next → Bulvds, and back returns to Kusnap.
   const TR = 'km-trail', fileOf = u => u.split('#')[0].split('?')[0] || 'index.html';
   const placeOf = u => /^(case|brand)\.html$/.test(fileOf(u)) ? fileOf(u) + '#' + (u.split('#')[1] || '') : fileOf(u);
-  const here = () => (location.pathname.split('/').pop() || 'index.html') + location.hash;
+  const here = () => ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')) + location.hash;
   const readT = () => { try { return JSON.parse(sessionStorage.getItem(TR)) || []; } catch (_) { return []; } };
   const writeT = a => { try { sessionStorage.setItem(TR, JSON.stringify(a.slice(-30))); } catch (_) {} };
   const nameHere = () => ((document.querySelector('.cnav .nm, [data-readout] .nm, .station .nm, .now .nm') || {}).textContent || document.title.split(' · ')[0]).trim();
