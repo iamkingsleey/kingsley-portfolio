@@ -1265,6 +1265,24 @@
       "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
     },
     {
+      "title": "Solana, market card",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/solana-market-card.jpg",
+          "ratio": 1.5,
+          "live": "live/sol-bars.html",
+          "srcm": "assets/designs/solana-market-card-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A live market card: the volume bars slide in as new ones arrive, the price counts up and down, and each badge turns red when its change dips below zero.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
       "title": "Smart Cards landing page",
       "category": "ui",
       "images": [
@@ -1451,6 +1469,24 @@
       "tools": "Figma",
       "mix": true,
       "case": "bulvds"
+    },
+    {
+      "title": "Solana, wallet card",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/solana-wallet-card.jpg",
+          "ratio": 1.5,
+          "live": "live/sol-line.html",
+          "srcm": "assets/designs/solana-wallet-card-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A live wallet card: the price line keeps moving with a pulse on the newest point, and the badge compares it with where the chart began.",
+      "tools": "Figma · Code",
+      "mix": true
     },
     {
       "title": "AI writing assistant",

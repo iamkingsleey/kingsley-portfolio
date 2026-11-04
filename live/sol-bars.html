@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Solana market card</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Inter;font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/inter-latin-400.woff2) format("woff2")}@font-face{font-family:Inter;font-style:normal;font-weight:500;font-display:swap;src:url(../assets/fonts/inter-latin-500.woff2) format("woff2")}</style>
+<style>
+/* the Figma frame is 1305 × 870; 1rem is one Figma pixel at any size, so the card scales as one piece */
+:root { --bg: #111111; --card: #171717; --line: #272727; --ink: #ffffff; --muted: #8a8a8a; --sub: #7d7d7d;
+  --purple: #a35dff; --ghost: #282828; --up: #34da62; --upbg: #1a2a1f; --down: #ff6161; --downbg: #2c1a1a; color-scheme: dark }
+html { font-size: calc(100vw / 1305) }
+* { box-sizing: border-box; margin: 0 }
+html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden }
+body { font-family: Inter, -apple-system, "Segoe UI", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" 1 }
+.card { position: absolute; left: 146rem; top: 236rem; width: 1014rem; height: 397rem; background: var(--card); border-radius: 26rem }
+.abs { position: absolute }
+.logo { left: 64rem; top: 72rem; width: 28rem; height: 24rem }
+.name { left: 101rem; top: 66rem; font-size: 29rem; line-height: 36rem; font-weight: 400; letter-spacing: -.2rem }
+.name small { font-size: 24rem; color: var(--sub); margin-left: 9rem; letter-spacing: 0 }
+.price { left: 63rem; top: 108rem; font-size: 41rem; line-height: 52rem; font-weight: 500; letter-spacing: -.3rem }
+.rule { left: 62rem; right: 62rem; top: 205rem; height: 2rem; background: var(--line) }
+.stat { top: 248rem }
+.stat .k { font-size: 24rem; line-height: 30rem; color: var(--muted); letter-spacing: -.1rem }
+.stat .v { display: flex; align-items: center; gap: 19rem; margin-top: 18rem }
+.stat .v b { font-size: 33rem; line-height: 40rem; font-weight: 500; letter-spacing: -.3rem }
+.chip { font-size: 19rem; line-height: 36rem; height: 36rem; padding: 0 10rem; border-radius: 7rem; background: var(--upbg); color: var(--up); transition: background .4s, color .4s; letter-spacing: .2rem }
+.chip.dn { background: var(--downbg); color: var(--down) }
+/* the bars: a floating grey range over each purple volume bar, read right to left as time */
+.bars { left: 589rem; top: 60rem; width: 352rem; height: 105rem }
+.col { position: absolute; bottom: 0; width: 10rem; height: 100% }
+.col i { position: absolute; left: 0; width: 100%; border-radius: 5rem; transition: height .55s cubic-bezier(.3,.7,.2,1), bottom .55s cubic-bezier(.3,.7,.2,1), background .3s }
+.col .v { bottom: 0; background: var(--purple) }
+.col .g { background: var(--ghost) }
+.col.hi .v { background: #c08fff }
+.col.hi .g { background: #3a3a3a }
+.tip { position: absolute; top: -46rem; transform: translateX(-50%); padding: 6rem 10rem; font-size: 16rem; line-height: 20rem; border-radius: 8rem; background: #2a2a2a; color: #fff; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none }
+.tip.on { opacity: 1 }
+/* phones: a portrait tile (4:5). The same card restacked on a 1080 × 1350 frame: price on top, the bars full width, the three stats as rows */
+@media (max-aspect-ratio: 6/5) {
+  html { font-size: calc(100vw / 1080) }
+  .card { left: 60rem; top: 165rem; width: 960rem; height: 1020rem; border-radius: 44rem }
+  .logo { left: 72rem; top: 86rem; width: 42rem; height: 36rem }
+  .name { left: 128rem; top: 76rem; font-size: 44rem; line-height: 56rem }
+  .name small { font-size: 36rem; margin-left: 14rem }
+  .price { left: 70rem; top: 146rem; font-size: 76rem; line-height: 92rem; letter-spacing: -.8rem }
+  .bars { left: 72rem; top: 345rem; transform: scale(2.3); transform-origin: 0 0 }
+  .rule { left: 72rem; right: 72rem; top: 640rem; height: 3rem }
+  .stat { left: 72rem !important; right: 72rem; display: flex; align-items: center; justify-content: space-between }
+  .s1 { top: 682rem } .s2 { top: 782rem } .s3 { top: 882rem }
+  .stat .k { font-size: 36rem; line-height: 44rem }
+  .stat .v { margin-top: 0; gap: 22rem }
+  .stat .v b { font-size: 50rem; line-height: 60rem; letter-spacing: -.5rem }
+  .chip { font-size: 30rem; line-height: 54rem; height: 54rem; padding: 0 15rem; border-radius: 11rem }
+  .tip { font-size: 12rem; padding: 4rem 7rem }
+}
+@media (prefers-reduced-motion: reduce) { .col i { transition: none } }
+</style>
+</head>
+<body>
+<div class="card">
+  <svg class="abs logo" viewBox="0 0 28 24" aria-hidden="true"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#35d8b6"/><stop offset=".5" stop-color="#7a88c5"/><stop offset="1" stop-color="#a35dff"/></linearGradient></defs>
+    <path fill="url(#sg)" d="M5 0h23l-5 5H0zM0 9.5h23l5 5H5zM5 19h23l-5 5H0z"/></svg>
+  <div class="abs name">Solana<small>SOL</small></div>
+  <div class="abs price" id="price">$58.568,444</div>
+  <div class="abs bars" id="bars"><div class="tip" id="tip"></div></div>
+  <div class="abs rule"></div>
+  <div class="abs stat s1" style="left:63rem"><div class="k">Market Cap</div><div class="v"><b data-s="0">$200.54</b><span class="chip" data-c="0">+5.28%</span></div></div>
+  <div class="abs stat s2" style="left:381rem"><div class="k">Fully Diluted</div><div class="v"><b data-s="1">$200.54</b><span class="chip" data-c="1">+5.28%</span></div></div>
+  <div class="abs stat s3" style="left:699rem"><div class="k">24 hr Volume</div><div class="v"><b data-s="2">$200.54</b><span class="chip" data-c="2">+5.28%</span></div></div>
+</div>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the 16 columns sit in pairs, as drawn in Figma
+  const X = [0, 21, 46, 67, 91, 112, 137, 158, 183, 204, 228, 249, 270, 295, 319, 340];
+  const bars = document.getElementById('bars'), tip = document.getElementById('tip');
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  let vol = X.map(() => rnd(26, 52)), rng = X.map(() => rnd(20, 58)), price = 58568.444, tick = 0;
+  const cols = X.map((x, i) => { const c = document.createElement('div'); c.className = 'col'; c.style.left = x + 'rem';
+    c.innerHTML = '<i class="g"></i><i class="v"></i>'; bars.appendChild(c); return c; });
+  const draw = () => cols.forEach((c, i) => { const v = c.lastChild, g = c.firstChild;
+    v.style.height = vol[i] + 'rem'; g.style.bottom = (vol[i] + 9) + 'rem'; g.style.height = Math.min(rng[i], 96 - vol[i]) + 'rem'; });
+  // the price, written the way the card shows it (58.568,444), counting smoothly to each new value
+  const fmt = n => '$' + Math.floor(n / 1000) + '.' + String(Math.floor(n % 1000)).padStart(3, '0') + ',' + String(Math.round((n % 1) * 1000)).padStart(3, '0');
+  const priceEl = document.getElementById('price');
+  const tween = (from, to, ms, out) => { const t0 = performance.now(); const f = now => { const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3); out(from + (to - from) * e); if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); };
+  const stats = [...document.querySelectorAll('[data-s]')], chips = [...document.querySelectorAll('[data-c]')];
+  let sv = [200.54, 200.54, 200.54], pct = [5.28, 5.28, 5.28];
+  function step() {
+    // time moves left: every column takes its neighbour's values, a new one arrives on the right
+    vol.shift(); rng.shift();
+    const last = vol[vol.length - 1]; vol.push(Math.max(24, Math.min(60, last + rnd(-16, 16) + (38 - last) * .25))); rng.push(rnd(18, 60));
+    draw();
+    const np = price + rnd(-38, 44); tween(price, np, 650, n => priceEl.textContent = fmt(n)); price = np;
+    if (tick++ % 2 === 0) stats.forEach((el, i) => { if (Math.random() < .6) { const to = Math.max(190, Math.min(212, sv[i] + rnd(-1.6, 1.8)));
+      tween(sv[i], to, 600, n => el.textContent = '$' + n.toFixed(2)); sv[i] = to;
+      pct[i] = Math.max(-2.5, Math.min(8.5, pct[i] + rnd(-.6, .7))); chips[i].textContent = (pct[i] >= 0 ? '+' : '−') + Math.abs(pct[i]).toFixed(2) + '%'; chips[i].classList.toggle('dn', pct[i] < 0); } });
+  }
+  draw();
+  // only moves while it can be seen (a page or a tile scrolled away costs nothing)
+  let timer = 0, visible = true;
+  const run = () => { clearInterval(timer); if (!reduce && visible && !document.hidden) timer = setInterval(step, 900); };
+  document.addEventListener('visibilitychange', run);
+  addEventListener('message', e => { if (e.data && typeof e.data.km_play === 'boolean') { visible = e.data.km_play; run(); } });
+  run();
+  // pointing at a column lights it and shows its volume
+  bars.addEventListener('pointermove', e => { const r = bars.getBoundingClientRect(), u = r.width / 352, x = (e.clientX - r.left) / u;
+    let k = 0; X.forEach((cx, i) => { if (Math.abs(cx + 5 - x) < Math.abs(X[k] + 5 - x)) k = i; });
+    cols.forEach((c, i) => c.classList.toggle('hi', i === k)); tip.style.left = (X[k] + 5) + 'rem'; tip.textContent = (vol[k] * 0.42).toFixed(1) + 'M SOL'; tip.classList.add('on'); });
+  bars.addEventListener('pointerleave', () => { cols.forEach(c => c.classList.remove('hi')); tip.classList.remove('on'); });
+})();
+</script>
+</body>
+</html>

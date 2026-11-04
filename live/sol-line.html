@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Solana wallet card</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Inter;font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/inter-latin-400.woff2) format("woff2")}@font-face{font-family:Inter;font-style:normal;font-weight:500;font-display:swap;src:url(../assets/fonts/inter-latin-500.woff2) format("woff2")}</style>
+<style>
+/* the Figma frame is 1305 × 870; 1rem is one Figma pixel at any size, so the card scales as one piece */
+:root { --bg: #111111; --card: #171717; --ink: #ffffff; --muted: #8a8a8a; --sub: #7d7d7d;
+  --up: #34da62; --upbg: #1a2a1f; --down: #ff6161; --downbg: #2c1a1a; color-scheme: dark }
+html { font-size: calc(100vw / 1305) }
+* { box-sizing: border-box; margin: 0 }
+html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden }
+body { font-family: Inter, -apple-system, "Segoe UI", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" 1 }
+.card { position: absolute; left: 146rem; top: 251rem; width: 1014rem; height: 369rem; background: var(--card); border-radius: 26rem; overflow: hidden }
+.abs { position: absolute }
+.ava { left: 58rem; top: 74rem; width: 68rem; height: 68rem; border-radius: 50%; background: #d4c4f5 url(avatar.webp) center / cover }
+.who { left: 151rem; top: 70rem }
+.who b { display: block; font-size: 32rem; line-height: 40rem; font-weight: 500; letter-spacing: -.3rem }
+.who span { display: block; font-size: 26rem; line-height: 34rem; color: var(--muted); margin-top: 2rem }
+.logo { left: 59rem; top: 230rem; width: 28rem; height: 24rem }
+.name { left: 96rem; top: 224rem; font-size: 29rem; line-height: 36rem; letter-spacing: -.2rem }
+.name small { font-size: 24rem; color: var(--sub); margin-left: 9rem; letter-spacing: 0 }
+.row { left: 58rem; top: 264rem; display: flex; align-items: center; gap: 16rem }
+.row b { font-size: 39rem; line-height: 48rem; font-weight: 500; letter-spacing: -.4rem }
+.chip { font-size: 19rem; line-height: 36rem; height: 36rem; padding: 0 10rem; border-radius: 7rem; background: var(--upbg); color: var(--up); transition: background .4s, color .4s; letter-spacing: .2rem }
+.chip.dn { background: var(--downbg); color: var(--down) }
+/* the line: drawn fresh every frame and sliding left, so the newest price is always at the right */
+svg.chart { left: 560rem; top: 50rem; width: 380rem; height: 270rem; overflow: visible; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 36rem); mask-image: linear-gradient(90deg, transparent 0, #000 36rem) }
+.chart path { fill: none; stroke: var(--up); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgb(52 218 98 / .45)) }
+.chart circle.dot { fill: var(--up) }
+.chart circle.ring { fill: none; stroke: var(--up); opacity: .5 }
+/* phones: a portrait tile (4:5). The same card restacked on a 1080 × 1350 frame: who it is, the line large in the middle, the price underneath */
+@media (max-aspect-ratio: 6/5) {
+  html { font-size: calc(100vw / 1080) }
+  .card { left: 60rem; top: 135rem; width: 960rem; height: 1080rem; border-radius: 44rem }
+  .ava { left: 72rem; top: 76rem; width: 104rem; height: 104rem }
+  .who { left: 204rem; top: 76rem }
+  .who b { font-size: 46rem; line-height: 56rem }
+  .who span { font-size: 36rem; line-height: 46rem }
+  svg.chart { left: 72rem; top: 250rem; width: 816rem; height: 580rem }
+  .logo { left: 74rem; top: 868rem; width: 42rem; height: 36rem }
+  .name { left: 130rem; top: 858rem; font-size: 44rem; line-height: 56rem }
+  .name small { font-size: 36rem; margin-left: 14rem }
+  .row { left: 72rem; top: 924rem; gap: 22rem }
+  .row b { font-size: 76rem; line-height: 92rem; letter-spacing: -.8rem }
+  .chip { font-size: 30rem; line-height: 54rem; height: 54rem; padding: 0 15rem; border-radius: 11rem }
+  .chart path { stroke-width: 2.6 }
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="abs ava" role="img" aria-label="Janet Doe"></div>
+  <div class="abs who"><b>Janet Doe</b><span>janetdoe@gmail.com</span></div>
+  <svg class="abs logo" viewBox="0 0 28 24" aria-hidden="true"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#35d8b6"/><stop offset=".5" stop-color="#7a88c5"/><stop offset="1" stop-color="#a35dff"/></linearGradient></defs>
+    <path fill="url(#sg)" d="M5 0h23l-5 5H0zM0 9.5h23l5 5H5zM5 19h23l-5 5H0z"/></svg>
+  <div class="abs name">Solana<small>SOL</small></div>
+  <div class="abs row"><b id="price">$200.54</b><span class="chip" id="chip">+5.28%</span></div>
+  <svg class="abs chart" id="chart" viewBox="0 0 380 270" aria-hidden="true"><path id="ln"/><circle class="ring" id="ring" r="6"/><circle class="dot" id="dot" r="5"/></svg>
+</div>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const W = 362, H = 230, Y0 = 20, N = 40, STEP = W / (N - 1);   // 40 prices across the chart, a new one every SPEED ms
+  const SPEED = 520;
+  // prices wander around a level, with the odd spike like the drawn chart; kept mostly above where the window started
+  let v = 0.45, vel = 0, pts = [];
+  // a calm wander with now and then a sharp climb or drop that eases back, as in the drawing; it bounces off the edges instead of flattening there
+  let lift = 0;
+  const next = () => { if (Math.random() < .045 && Math.abs(lift) < .05) lift = (Math.random() < .62 ? 1 : -1) * (.25 + Math.random() * .2);
+    lift *= .93; vel = vel * .5 + (Math.random() - .5) * .16 + (.38 + lift - v) * .12; v += vel;
+    if (v > .97) { v = 1.94 - v; vel = -Math.abs(vel) * .5; } if (v < .03) { v = .06 - v; vel = Math.abs(vel) * .5; } return v; };
+  for (let i = 0; i < N + 1; i++) pts.push(next());
+  const ln = document.getElementById('ln'), dot = document.getElementById('dot'), ring = document.getElementById('ring');
+  const priceEl = document.getElementById('price'), chip = document.getElementById('chip');
+  const y = p => Y0 + (1 - p) * H;
+  // a smooth line through the points (Catmull-Rom as cubic Béziers)
+  function path(xy) { let d = `M${xy[0][0].toFixed(1)},${xy[0][1].toFixed(1)}`;
+    for (let i = 0; i < xy.length - 1; i++) { const p0 = xy[i - 1] || xy[i], p1 = xy[i], p2 = xy[i + 1], p3 = xy[i + 2] || p2;
+      d += `C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`; }
+    return d; }
+  const money = p => 188 + p * 26;        // the line's height as a price, around $200
+  let shown = money(pts[N]), t0 = performance.now(), playing = true, raf = 0;
+  function frame(now) {
+    let k = (now - t0) / SPEED;
+    while (k >= 1) { pts.shift(); pts.push(next()); t0 += SPEED; k -= 1; }
+    const e = k, off = e * STEP;
+    // the newest point grows in from the last one, so the end of the line moves smoothly
+    const xy = pts.map((p, i) => [i * STEP - off, y(p)]);
+    const a = pts[N - 1], b = pts[N]; xy[N] = [ (N - 1) * STEP - off + STEP * e, y(a + (b - a) * e) ];
+    ln.setAttribute('d', path(xy.slice(0, N + 1)));
+    const [ex, ey] = xy[N]; dot.setAttribute('cx', ex); dot.setAttribute('cy', ey); ring.setAttribute('cx', ex); ring.setAttribute('cy', ey);
+    const ph = (now % 1600) / 1600; ring.setAttribute('r', 5 + ph * 12); ring.style.opacity = (.55 * (1 - ph)).toFixed(3);
+    // the price follows the end of the line; the badge compares it with the left edge of the chart
+    const target = money(a + (b - a) * e); shown += (target - shown) * .12; priceEl.textContent = '$' + shown.toFixed(2);
+    const start = money(pts[0]), pct = (shown - start) / start * 100 + 3.2;
+    chip.textContent = (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(2) + '%'; chip.classList.toggle('dn', pct < 0);
+    if (playing) raf = requestAnimationFrame(frame);
+  }
+  const run = () => { cancelAnimationFrame(raf); playing = !reduce && !document.hidden && vis; if (playing) { t0 = performance.now() - ((performance.now() - t0) % SPEED); raf = requestAnimationFrame(frame); } };
+  let vis = true;
+  document.addEventListener('visibilitychange', run);
+  addEventListener('message', e => { if (e.data && typeof e.data.km_play === 'boolean') { vis = e.data.km_play; run(); } });
+  frame(performance.now()); run();
+})();
+</script>
+</body>
+</html>

@@ -312,6 +312,9 @@ for p in pj:
         e['video'] = im['video']; e['poster'] = im['src']
     else:
         e['src'] = im['src']
+    if im.get('live'):   # a piece that runs as a small live page (live/…): the picture is its still; phones get a portrait layout and still
+        e['live'] = im['live']
+        if im.get('srcm'): e['srcm'] = im['srcm']; e['rm'] = im.get('ratiom', 0.8)
     lay = p.get('layout')   # optional: logo · product-panels · product-story · illustration · 3d (opens that page)
     if lay:
         e['layout'] = lay
