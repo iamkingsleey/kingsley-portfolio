@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Stock watchlist</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* a stock watchlist: prices tick, flash green or red, and each sparkline draws the new point in */
+.live { display: inline-flex; align-items: center; gap: 9rem; font-size: 18rem; color: var(--muted) }
+.live i { width: 9rem; height: 9rem; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 0 rgb(52 218 98 / .5); animation: pulse 1.8s infinite }
+@keyframes pulse { 70% { box-shadow: 0 0 0 9rem rgb(52 218 98 / 0) } 100% { box-shadow: 0 0 0 0 rgb(52 218 98 / 0) } }
+.list { margin-top: 24rem }
+.st { display: grid; grid-template-columns: 48rem 1fr 190rem 140rem 104rem; gap: 20rem; align-items: center; padding: 15rem 0; border-top: 1px solid var(--line) }
+.st:first-child { border-top: 0 }
+.lt { width: 48rem; height: 48rem; border-radius: 12rem; display: grid; place-items: center; font-size: 19rem; font-weight: 500 }
+.nm b { display: block; font-size: 23rem; font-weight: 500 } .nm span { font-size: 17rem; color: var(--muted) }
+.sp { height: 46rem } .sp svg { width: 100%; height: 100% }
+.pr { font-size: 23rem; font-weight: 500; text-align: right; padding: 4rem 6rem; border-radius: 6rem }
+.st .chip { justify-self: end }
+@media (max-aspect-ratio: 6/5) { .st { grid-template-columns: 48rem 1fr 110rem 128rem; gap: 16rem } .st .chip { display: none } .pr { font-size: 22rem } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="col" style="gap:6rem"><div class="mid">Watchlist</div><span class="small">US stocks · NASDAQ</span></div>
+    <span class="live"><i></i>Market open</span>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const S = [['AAPL', 'Apple', 228.42, '#111111', '#fff'], ['NVDA', 'NVIDIA', 142.18, '#76b900', '#0b0b0b'], ['TSLA', 'Tesla', 251.07, '#e82127', '#fff'], ['MSFT', 'Microsoft', 418.96, '#00a4ef', '#fff'], ['AMZN', 'Amazon', 187.33, '#ff9900', '#111']];
+  const list = document.getElementById('list');
+  list.innerHTML = S.map(s => `<div class="st"><div class="lt" style="background:${s[3]};color:${s[4]}">${s[0][0]}</div><div class="nm"><b>${s[0]}</b><span>${s[1]}</span></div><div class="sp"><svg preserveAspectRatio="none"><path fill="none" stroke-width="2.4" stroke-linejoin="round"/></svg></div><div class="pr"></div><span class="chip"></span></div>`).join('');
+  const rows = [...list.children].map((el, i) => { const w = KM.walker(S[i][2], S[i][2] * .0016), pts = []; for (let k = 0; k < 32; k++) pts.push(w());
+    return { el, w, pts, open: pts[0] * (1 - KM.rnd(-.02, .025)), shown: pts[31], pr: el.querySelector('.pr'), ch: el.querySelector('.chip'), path: el.querySelector('path'), svg: el.querySelector('svg'), box: el.querySelector('.sp'), grow: 1 }; });
+  KM.every(650, () => {                                    // one or two prices tick
+    for (let n = 0; n < (Math.random() < .4 ? 2 : 1); n++) { const r = rows[Math.floor(Math.random() * rows.length)], prev = r.pts[r.pts.length - 1], v = r.w();
+      r.pts.shift(); r.pts.push(v); r.grow = 0; r.pr.classList.remove('flash-up', 'flash-dn'); void r.pr.offsetWidth; r.pr.classList.add(v >= prev ? 'flash-up' : 'flash-dn'); } });
+  KM.frame((now, dt) => rows.forEach(r => {
+    r.grow = Math.min(1, r.grow + dt / .5); const [W, H] = KM.size(r.box), n = r.pts.length, mn = Math.min(...r.pts), mx = Math.max(...r.pts);
+    const xy = r.pts.map((v, i) => [(i - 1 + r.grow) / (n - 2) * W, 3 + (1 - (v - mn) / (mx - mn || 1)) * (H - 6)]).filter(p => p[0] >= -1);
+    r.svg.setAttribute('viewBox', `0 0 ${W} ${H}`); r.path.setAttribute('d', KM.smooth(xy));
+    const last = r.pts[n - 1], up = last >= r.open; r.path.style.stroke = up ? 'var(--up)' : 'var(--down)';
+    r.shown += (last - r.shown) * .2; r.pr.textContent = '$' + KM.money(r.shown); KM.setChip(r.ch, (r.shown - r.open) / r.open * 100); }));
+})();
+</script>
+</body>
+</html>

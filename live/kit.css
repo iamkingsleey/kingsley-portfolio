@@ -1,0 +1,39 @@
+/* Shared look for the live chart cards (one small page each, shown inside a Designs tile).
+   Wide tiles use a 1305 × 870 frame with a 1014-wide card, as in the Figma file. Portrait tiles (phones) zoom in:
+   1rem gets bigger and the card narrows to 665rem, so every card restacks itself instead of shrinking. */
+@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url(../assets/fonts/inter-latin-400.woff2) format("woff2") }
+@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url(../assets/fonts/inter-latin-500.woff2) format("woff2") }
+:root { --bg: #111111; --card: #171717; --raise: #1f1f1f; --line: #262626; --ink: #ffffff; --text: #d6d6d6; --muted: #8a8a8a; --dim: #5c5c5c;
+  --up: #34da62; --upbg: #1a2a1f; --down: #ff5d5d; --downbg: #2c1a1a; --purple: #a35dff; --blue: #627eea; --amber: #f5a524; --cw: 1014rem;
+  --segon: #303030; --tip: #262626; --field: #2c2c2c; --grid: #222222; --hair: #4a4a4a; --line-c: #8ea2ff; color-scheme: dark }
+/* light cards: the same layout on white (a page opts in with <html class="light">) */
+:root.light { --bg: #f2f2f2; --card: #ffffff; --raise: #f3f3f3; --line: #ececec; --ink: #111111; --text: #2b2b2b; --muted: #7a7a7a; --dim: #a3a3a3;
+  --up: #17a34a; --upbg: #e3f6ea; --down: #e03b3b; --downbg: #fde8e8; --segon: #ffffff; --tip: #111111; --field: #e6e6e6; --grid: #efefef; --hair: #c9c9c9; --line-c: #4f6cf0; color-scheme: light }
+:root.light .card { box-shadow: 0 1rem 2rem rgb(0 0 0 / .04), 0 18rem 50rem rgb(0 0 0 / .06) }
+:root.light .seg span.on { box-shadow: 0 1rem 3rem rgb(0 0 0 / .12) }
+:root.light .chip { font-weight: 500 }
+html { font-size: calc(100vw / 1305) }
+@media (max-aspect-ratio: 6/5) { html { font-size: calc(100vw / 745) } :root { --cw: 665rem } .wide-only { display: none !important } }
+@media (min-aspect-ratio: 6/5) { .tall-only { display: none !important } }
+* { box-sizing: border-box; margin: 0 }
+html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden }
+body { font-family: Inter, -apple-system, "Segoe UI", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" 1; line-height: 1.25 }
+.card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: var(--cw); background: var(--card); border-radius: 26rem; padding: 54rem 58rem; overflow: hidden }
+.row { display: flex; align-items: center } .col { display: flex; flex-direction: column } .grow { flex: 1; min-width: 0 } .between { justify-content: space-between }
+.coin { width: 40rem; height: 40rem; border-radius: 50%; display: grid; place-items: center; font-size: 19rem; font-weight: 500; color: #fff; flex: none }
+.name { font-size: 29rem; letter-spacing: -.2rem } .name small { font-size: 23rem; color: var(--muted); margin-left: 9rem; letter-spacing: 0 }
+.big { font-size: 46rem; font-weight: 500; letter-spacing: -.5rem; line-height: 1.1 }
+.mid { font-size: 30rem; font-weight: 500; letter-spacing: -.3rem }
+.label { font-size: 21rem; color: var(--muted); letter-spacing: -.1rem }
+.small { font-size: 18rem; color: var(--muted) }
+.chip { display: inline-flex; align-items: center; font-size: 19rem; height: 36rem; padding: 0 10rem; border-radius: 7rem; background: var(--upbg); color: var(--up); letter-spacing: .2rem; transition: background .4s, color .4s; white-space: nowrap }
+.chip.dn { background: var(--downbg); color: var(--down) }
+.seg { display: inline-flex; gap: 4rem; padding: 4rem; border-radius: 12rem; background: var(--raise) }
+.seg span { font-size: 18rem; padding: 8rem 14rem; border-radius: 9rem; color: var(--muted); transition: background .35s, color .35s }
+.seg span.on { background: var(--segon); color: var(--ink) }
+.up { color: var(--up) } .dn-t { color: var(--down) }
+svg { display: block; overflow: visible }
+.flash-up { animation: fu .9s ease-out } .flash-dn { animation: fd .9s ease-out }
+@keyframes fu { 0% { background: rgb(52 218 98 / .22) } 100% { background: transparent } }
+@keyframes fd { 0% { background: rgb(255 93 93 / .22) } 100% { background: transparent } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }

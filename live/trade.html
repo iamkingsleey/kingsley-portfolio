@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Buy ticket</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* a buy ticket that plays itself: an amount is typed, the slider moves, the order goes through, trades stream beside it */
+.body { display: grid; grid-template-columns: 500rem 1fr; gap: 48rem; margin-top: 28rem }
+.tog { display: grid; grid-template-columns: 1fr 1fr; padding: 5rem; border-radius: 14rem; background: var(--raise) }
+.tog span { text-align: center; padding: 12rem; font-size: 20rem; border-radius: 10rem; color: var(--muted) }
+.tog span.on { background: var(--up); color: #fff; font-weight: 500 }
+.fld { margin-top: 16rem; background: var(--raise); border-radius: 14rem; padding: 16rem 20rem; display: flex; justify-content: space-between; align-items: flex-end }
+.fld .col { gap: 8rem }
+.fld .amt { font-size: 34rem; font-weight: 500; letter-spacing: -.4rem; min-height: 42rem }
+.amt .caret { display: inline-block; width: 2rem; height: 32rem; background: var(--up); margin-left: 3rem; vertical-align: -4rem; animation: blink 1s steps(1) infinite }
+@keyframes blink { 50% { opacity: 0 } }
+.cur { font-size: 20rem; font-weight: 500; padding: 9rem 14rem; border-radius: 10rem; background: var(--card) }
+.sl { position: relative; height: 34rem; margin-top: 22rem }
+.sl .tr { position: absolute; left: 0; right: 0; top: 15rem; height: 4rem; border-radius: 2rem; background: var(--field) }
+.sl .fi { position: absolute; left: 0; top: 15rem; height: 4rem; border-radius: 2rem; background: var(--up) }
+.sl .kn { position: absolute; top: 6rem; width: 22rem; height: 22rem; margin-left: -11rem; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5rem rgb(23 163 74 / .2), 0 2rem 6rem rgb(0 0 0 / .25) }
+.sl .tk { position: absolute; top: 12rem; width: 10rem; height: 10rem; margin-left: -5rem; border-radius: 50%; background: var(--field) }
+.marks { display: flex; justify-content: space-between; margin-top: 6rem }
+.btn { margin-top: 22rem; height: 64rem; border-radius: 14rem; background: var(--up); color: #fff; font-size: 22rem; font-weight: 500; display: grid; place-items: center; transition: transform .15s, filter .2s }
+.btn.press { transform: scale(.97); filter: brightness(.9) }
+.spin { width: 24rem; height: 24rem; border-radius: 50%; border: 3rem solid rgb(255 255 255 / .35); border-top-color: #fff; animation: sp .7s linear infinite }
+@keyframes sp { to { transform: rotate(360deg) } }
+.toast { position: absolute; left: 50%; bottom: 34rem; transform: translate(-50%, 260%); opacity: 0; background: var(--tip); color: #fff; border-radius: 14rem; padding: 14rem 20rem; display: flex; gap: 12rem; align-items: center; font-size: 19rem; transition: transform .5s cubic-bezier(.2,.9,.3,1.2), opacity .3s; white-space: nowrap; box-shadow: 0 12rem 40rem rgb(0 0 0 / .45) }
+.toast.on { transform: translate(-50%, 0); opacity: 1 }
+.toast i { width: 26rem; height: 26rem; border-radius: 50%; background: var(--up); color: #fff; display: grid; place-items: center; font-style: normal; font-size: 16rem }
+.tr-h, .trd { display: grid; grid-template-columns: 1fr 1fr 70rem; font-size: 18rem; padding: 9rem 0 }
+.tr-h { color: var(--dim); font-size: 16rem; border-bottom: 1px solid var(--line) }
+.trd span:nth-child(2) { color: var(--text) } .trd span:last-child { text-align: right; color: var(--muted) }
+.trd { animation: in .5s cubic-bezier(.2,.8,.2,1) }
+@keyframes in { from { opacity: 0; transform: translateY(-14rem) } }
+@media (max-aspect-ratio: 6/5) { .body { grid-template-columns: 1fr } .trades { display: none } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="row" style="gap:16rem"><div class="coin" style="background:#f7931a">B</div><div class="name">Buy Bitcoin<small>BTC</small></div></div>
+    <span class="small" id="rate">1 BTC = $67,240.12</span>
+  </div>
+  <div class="body">
+    <div>
+      <div class="tog"><span class="on">Buy</span><span>Sell</span></div>
+      <div class="fld"><div class="col"><span class="small">You pay</span><div class="amt" id="pay"></div></div><span class="cur">USD</span></div>
+      <div class="fld"><div class="col"><span class="small">You get</span><div class="amt" id="get" style="color:var(--text)">0.00000 </div></div><span class="cur">BTC</span></div>
+      <div class="sl" id="sl"><div class="tr"></div><i class="tk" style="left:25%"></i><i class="tk" style="left:50%"></i><i class="tk" style="left:75%"></i><div class="fi" id="fi"></div><div class="kn" id="kn"></div></div>
+      <div class="marks small"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>Max</span></div>
+      <div class="row between small" style="margin-top:14rem"><span>Available</span><span style="color:var(--text)">$5,000.00</span></div>
+      <div class="btn" id="btn">Buy BTC</div>
+    </div>
+    <div class="trades"><div class="tr-h"><span>Price (USD)</span><span>Amount</span><span>Time</span></div><div id="trs"></div></div>
+  </div>
+  <div class="toast" id="toast"><i>✓</i><span id="tmsg">Order filled · 0.01859 BTC</span></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const pay = document.getElementById('pay'), get = document.getElementById('get'), fi = document.getElementById('fi'), kn = document.getElementById('kn'), btn = document.getElementById('btn'), toast = document.getElementById('toast'), tmsg = document.getElementById('tmsg'), rateEl = document.getElementById('rate'), trs = document.getElementById('trs');
+  let rate = 67240.12, slide = 0, slideTo = 0, amount = 0;
+  const setPay = (txt, caret) => { pay.innerHTML = (txt || '<span style="color:var(--dim)">0.00</span>') + (caret ? '<span class="caret"></span>' : ''); };
+  const showGet = () => { get.textContent = (amount / rate).toFixed(5); };
+  setPay('', true);
+  // the script of one loop: pick a share with the slider, type an amount, press buy, see it filled, start again
+  const steps = [];
+  const at = (ms, f) => steps.push([ms, f]);
+  const PICK = [.25, .5, .75][Math.floor(Math.random() * 3)];
+  const type = (str, t0) => { for (let i = 1; i <= str.length; i++) at(t0 + i * 110, () => { setPay('$' + str.slice(0, i), true); amount = parseFloat(str.slice(0, i).replace(/,/g, '')) || 0; showGet(); slideTo = Math.min(1, amount / 5000); }); };
+  at(600, () => { slideTo = .25; amount = 1250; setPay('$1,250.00', false); showGet(); });
+  at(1500, () => { slideTo = .5; amount = 2500; setPay('$2,500.00', false); showGet(); });
+  at(2400, () => { setPay('', true); amount = 0; showGet(); slideTo = 0; });
+  type('1,840.50', 2600);
+  at(4200, () => setPay('$1,840.50', false));
+  at(4700, () => btn.classList.add('press'));
+  at(4850, () => { btn.classList.remove('press'); btn.innerHTML = '<span class="spin"></span>'; });
+  at(5800, () => { btn.textContent = 'Buy BTC'; tmsg.textContent = 'Order filled · ' + (amount / rate).toFixed(5) + ' BTC'; toast.classList.add('on'); addTrade(rate, amount / rate, true); });
+  at(7600, () => toast.classList.remove('on'));
+  at(8200, () => { setPay('', true); amount = 0; showGet(); slideTo = 0; });
+  let t = 0, si = 0;
+  KM.every(50, () => { t += 50; while (si < steps.length && steps[si][0] <= t) steps[si++][1](); if (t > 8800) { t = 0; si = 0; } });
+  // the trades column: other people's trades stream in at the top
+  const addTrade = (p, a, mine) => { const d = document.createElement('div'); d.className = 'trd'; const now = new Date();
+    d.innerHTML = `<span class="${mine || Math.random() < .55 ? 'up' : 'dn-t'}">${KM.money(p)}</span><span>${a.toFixed(5)}</span><span>${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</span>`;
+    trs.prepend(d); while (trs.children.length > 9) trs.lastChild.remove(); };
+  for (let i = 0; i < 9; i++) addTrade(rate + KM.rnd(-8, 8), KM.rnd(.001, .4));
+  KM.every(900, () => { rate += KM.rnd(-6, 6.5); rateEl.textContent = '1 BTC = $' + KM.money(rate); addTrade(rate + KM.rnd(-2, 2), KM.rnd(.0005, .35)); });
+  KM.frame((now, dt) => { slide += (slideTo - slide) * Math.min(1, dt * 9); fi.style.width = slide * 100 + '%'; kn.style.left = slide * 100 + '%'; });
+})();
+</script>
+</body>
+</html>

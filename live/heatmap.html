@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Crypto heatmap</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* a market heatmap: each tile is a coin sized by market cap, coloured by its move; moves update tile by tile */
+.map { display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6rem; height: 430rem; margin-top: 28rem }
+.t { position: relative; border-radius: 10rem; padding: 14rem 16rem; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transition: background-color .8s ease }
+.t b { font-size: 21rem; font-weight: 500 } .t .v { font-size: 17rem; opacity: .85 } .t .p { font-size: 19rem; font-weight: 500 }
+.t.l b { font-size: 34rem } .t.l .p { font-size: 28rem } .t.l .v { font-size: 21rem }
+.t.s { padding: 10rem 11rem } .t.s b { font-size: 17rem } .t.s .p { font-size: 15rem } .t.s .v { display: none }
+.t::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2rem rgb(255 255 255 / .55); opacity: 0; transition: opacity .7s }
+.t.ping::after { opacity: 1; transition: opacity .05s }
+.legend { display: flex; align-items: center; gap: 12rem; margin-top: 18rem }
+.legend i { width: 170rem; height: 8rem; border-radius: 4rem; background: linear-gradient(90deg, #b8283a, #3a2226, #262626, #1f3a28, #1f9a4a) }
+@media (max-aspect-ratio: 6/5) { .map { height: 640rem } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="col" style="gap:6rem"><div class="mid">Crypto heatmap</div><span class="small">Sized by market cap</span></div>
+    <div class="seg"><span>1h</span><span class="on">24h</span><span>7d</span></div>
+  </div>
+  <div class="map" id="map"></div>
+  <div class="legend small"><span>−6%</span><i></i><span>+6%</span></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const tall = matchMedia('(max-aspect-ratio: 6/5)').matches;
+  // [symbol, price, start move, wide grid area, tall grid area, size]
+  const C = [['BTC', 67240, 2.1, '1/1/7/6', '1/1/4/13', 'l'], ['ETH', 3482, 3.4, '1/6/5/10', '4/1/6/8', ''], ['SOL', 172.4, 5.6, '1/10/4/13', '4/8/6/13', ''], ['BNB', 584.2, -.8, '5/6/7/8', '6/1/7/5', ''],
+             ['XRP', .5412, -2.4, '5/8/7/10', '6/5/7/9', ''], ['DOGE', .1612, 7.8, '4/10/6/12', '6/9/7/13', 's'], ['ADA', .3521, -4.1, '4/12/6/13', '7/1/9/5', 's'], ['AVAX', 27.84, 1.2, '6/10/7/12', '7/5/9/9', 's'], ['LINK', 11.92, -1.1, '6/12/7/13', '7/9/9/13', 's']];
+  const map = document.getElementById('map');
+  if (tall) map.style.gridTemplateRows = 'repeat(8, 1fr)';
+  const col = p => { const k = KM.clamp(p / 6, -1, 1), a = Math.abs(k), mix = (x, y, t) => Math.round(x + (y - x) * t);
+    const [r, g, b] = k >= 0 ? [mix(38, 31, a), mix(38, 154, a), mix(38, 74, a)] : [mix(38, 184, a), mix(38, 40, a), mix(38, 58, a)]; return `rgb(${r},${g},${b})`; };
+  const fmt = v => '$' + (v >= 100 ? KM.money(v, 0) : v >= 1 ? KM.money(v, 2) : v.toFixed(4));
+  const T = C.map(c => { const el = document.createElement('div'); el.className = 't ' + (tall && ['BNB', 'XRP', 'DOGE'].includes(c[0]) ? 's' : c[5]); el.style.gridArea = tall ? c[4] : c[3];
+    el.innerHTML = `<div><b>${c[0]}</b><div class="v"></div></div><div class="p"></div>`; map.appendChild(el); return { el, sym: c[0], price: c[1], pct: c[2], v: el.querySelector('.v'), p: el.querySelector('.p') }; });
+  const paint = t => { t.el.style.backgroundColor = col(t.pct); t.v.textContent = fmt(t.price); t.p.textContent = KM.pct(t.pct); };
+  T.forEach(paint);
+  KM.every(700, () => {                                    // a couple of coins move
+    for (let n = 0; n < 2; n++) { const t = T[Math.floor(Math.random() * T.length)], d = KM.rnd(-.9, .95);
+      t.pct = KM.clamp(t.pct + d, -8, 9); t.price *= 1 + d / 100; paint(t); t.el.classList.add('ping'); setTimeout(() => t.el.classList.remove('ping'), 120); } });
+})();
+</script>
+</body>
+</html>

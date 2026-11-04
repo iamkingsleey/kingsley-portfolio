@@ -1180,121 +1180,21 @@
       "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
     },
     {
-      "title": "Bulvds, wallet home",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/bulvds-wallet-home.jpg",
-          "ratio": 1.5267
-        }
-      ],
-      "bg": "#ebebeb",
-      "dark": false,
-      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
-      "tools": "Figma",
-      "mix": true,
-      "case": "bulvds"
-    },
-    {
-      "title": "Pricing plans, light",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/pricing-plans-light.jpg",
-          "ratio": 1.218
-        }
-      ],
-      "bg": "#ffffff",
-      "dark": false,
-      "desc": "The same pricing page in light mode."
-    },
-    {
-      "title": "Search, recent and related",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/search-recent-and-related.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A search panel that keeps recent searches one tap away and suggests related ones as chips.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Top destinations, travel site",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/travel-destinations-on-a-laptop.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#3d3b3a",
-      "dark": true,
-      "desc": "A travel site’s top destinations: Kyoto, London, Barcelona and more, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Team members modal",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/team-members-modal.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#f8f8f8",
-      "dark": false,
-      "desc": "A workspace members modal: search, invite and per-person roles."
-    },
-    {
-      "title": "Pricing plans, dark",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/pricing-plans-dark.jpg",
-          "ratio": 1.218
-        }
-      ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
-    },
-    {
       "title": "Solana, market card",
       "category": "ui",
       "images": [
         {
           "src": "assets/designs/solana-market-card.jpg",
           "ratio": 1.5,
-          "live": "live/sol-bars.html",
+          "live": "live/sol-bars",
           "srcm": "assets/designs/solana-market-card-phone.jpg",
           "ratiom": 0.8
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "A live market card: the volume bars slide in as new ones arrive, the price counts up and down, and each badge turns red when its change dips below zero.",
+      "desc": "Market UI exploration: a live Solana market card. The volume bars slide in as new ones arrive, the price counts up and down, and each badge turns red when its change dips below zero.",
       "tools": "Figma · Code",
-      "mix": true
-    },
-    {
-      "title": "Smart Cards landing page",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/smart-cards-on-a-laptop.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#3e3c3b",
-      "dark": true,
-      "desc": "A landing page for smart business cards, shown on a laptop.",
-      "tools": "Figma",
       "mix": true
     },
     {
@@ -1313,6 +1213,101 @@
       "mix": true
     },
     {
+      "title": "Smart Cards landing page",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/smart-cards-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3e3c3b",
+      "dark": true,
+      "desc": "A landing page for smart business cards, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "eBay, home and categories",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#f2f5f7",
+      "dark": false,
+      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
+      "title": "Cend, search home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-search-home.jpg",
+          "ratio": 1.5002
+        }
+      ],
+      "bg": "#7f8287",
+      "dark": false,
+      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Pricing plans, dark",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-dark.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
+    },
+    {
+      "title": "Top destinations, travel site",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/travel-destinations-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3d3b3a",
+      "dark": true,
+      "desc": "A travel site’s top destinations: Kyoto, London, Barcelona and more, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Bulvds, wallet home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-wallet-home.jpg",
+          "ratio": 1.5267
+        }
+      ],
+      "bg": "#ebebeb",
+      "dark": false,
+      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
       "title": "Dashboard on a laptop",
       "category": "ui",
       "images": [
@@ -1328,19 +1323,53 @@
       "mix": true
     },
     {
-      "title": "AI assistant card",
+      "title": "Crypto heatmap",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/ai-assistant-card.jpg",
-          "ratio": 1.3333
+          "src": "assets/designs/market-crypto-heatmap.jpg",
+          "ratio": 1.5,
+          "live": "live/heatmap",
+          "srcm": "assets/designs/market-crypto-heatmap-phone.jpg",
+          "ratiom": 0.8
         }
       ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A feature card for an AI assistant that answers questions in seconds, showing the chat it opens into.",
-      "tools": "Figma",
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a crypto heatmap. Each coin’s tile is sized by market cap and coloured by its 24h move, updating tile by tile.",
+      "tools": "Figma · Code",
       "mix": true
+    },
+    {
+      "title": "Order book and depth",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-order-book.jpg",
+          "ratio": 1.5,
+          "live": "live/order-book",
+          "srcm": "assets/designs/market-order-book-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a Bitcoin order book beside its depth chart. Orders come and go and flash green or red, and the buy and sell walls rise and fall with them.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Pricing plans, light",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-light.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "The same pricing page in light mode."
     },
     {
       "title": "Bulvds, choosing how to pay",
@@ -1359,6 +1388,42 @@
       "case": "bulvds"
     },
     {
+      "title": "Travel Explore, flight search",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/flight-search-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3c3b3c",
+      "dark": true,
+      "desc": "A flight booking home with the search right under the hero, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Discord, servers and messages",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
       "title": "DIGIM, footer",
       "category": "ui",
       "images": [
@@ -1374,18 +1439,72 @@
       "mix": true
     },
     {
-      "title": "Cend, search home",
+      "title": "Fear & Greed gauge",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/cend-search-home.jpg",
-          "ratio": 1.5002
+          "src": "assets/designs/market-fear-greed.jpg",
+          "ratio": 1.5,
+          "live": "live/fear-greed",
+          "srcm": "assets/designs/market-fear-greed-phone.jpg",
+          "ratiom": 0.8
         }
       ],
-      "bg": "#7f8287",
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a sentiment gauge. The needle swings to each new reading and settles, with yesterday, last week and last month beside it.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Buy ticket",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-buy-ticket.jpg",
+          "ratio": 1.5,
+          "live": "live/trade",
+          "srcm": "assets/designs/market-buy-ticket-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
       "dark": false,
-      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "desc": "Market UI exploration: a buy ticket that runs on its own. The slider moves, an amount is typed, the order goes through and is filled, while live trades stream beside it.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Cend, home in hand",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-home-in-hand.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#2e3642",
+      "dark": true,
+      "desc": "The Cend home, with quick sends, riders nearby and recent orders, in hand.",
       "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Solana, wallet card",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/solana-wallet-card.jpg",
+          "ratio": 1.5,
+          "live": "live/sol-line",
+          "srcm": "assets/designs/solana-wallet-card-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a live Solana wallet card. The price line keeps moving with a pulse on its newest point, and the badge compares it with where the chart began.",
+      "tools": "Figma · Code",
       "mix": true
     },
     {
@@ -1408,21 +1527,6 @@
           "Kingsley Mkpandiok"
         ]
       ]
-    },
-    {
-      "title": "DIGIM, agency home",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/digim-agency-home.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#403d3c",
-      "dark": true,
-      "desc": "The DIGIM digital marketing agency home page, bold type and client logos, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
     },
     {
       "title": "Design Build Share, orange",
@@ -1455,6 +1559,39 @@
       "mix": true
     },
     {
+      "title": "Stock watchlist",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-stock-watchlist.jpg",
+          "ratio": 1.5,
+          "live": "live/watchlist",
+          "srcm": "assets/designs/market-stock-watchlist-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
+      "dark": false,
+      "desc": "Market UI exploration: a stock watchlist. Prices tick and flash green or red, and each sparkline draws in its newest point.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "AI assistant card",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ai-assistant-card.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#e4eaef",
+      "dark": false,
+      "desc": "A feature card for an AI assistant that answers questions in seconds, showing the chat it opens into.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
       "title": "Bulvds, add-ons at checkout",
       "category": "ui",
       "images": [
@@ -1471,58 +1608,68 @@
       "case": "bulvds"
     },
     {
-      "title": "Solana, wallet card",
+      "title": "Ethereum, area chart",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/solana-wallet-card.jpg",
+          "src": "assets/designs/market-ethereum-area.jpg",
           "ratio": 1.5,
-          "live": "live/sol-line.html",
-          "srcm": "assets/designs/solana-wallet-card-phone.jpg",
+          "live": "live/eth-area",
+          "srcm": "assets/designs/market-ethereum-area-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
+      "dark": false,
+      "desc": "Market UI exploration: an Ethereum area chart that switches through its time ranges, 1H to 1Y, reshaping the line each time, while a crosshair reads prices off it.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Bitcoin, candlesticks",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-bitcoin-candles.jpg",
+          "ratio": 1.5,
+          "live": "live/btc-candles",
+          "srcm": "assets/designs/market-bitcoin-candles-phone.jpg",
           "ratiom": 0.8
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "A live wallet card: the price line keeps moving with a pulse on the newest point, and the badge compares it with where the chart began.",
+      "desc": "Market UI exploration: a live Bitcoin candlestick chart. The last candle keeps trading and a new one opens every few seconds, with volume underneath, a live price tag and the 24h high and low.",
       "tools": "Figma · Code",
       "mix": true
     },
     {
-      "title": "AI writing assistant",
+      "title": "Search, recent and related",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/ai-writing-assistant.jpg",
+          "src": "assets/designs/search-recent-and-related.jpg",
           "ratio": 1.3333
         }
       ],
       "bg": "#e4eaef",
       "dark": false,
-      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
+      "desc": "A search panel that keeps recent searches one tap away and suggests related ones as chips.",
       "tools": "Figma",
       "mix": true
     },
     {
-      "title": "Discord, servers and messages",
+      "title": "Team members modal",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
-          "ratio": 1.3333
+          "src": "assets/designs/team-members-modal.jpg",
+          "ratio": 1.0
         }
       ],
-      "bg": "#ffffff",
+      "bg": "#f8f8f8",
       "dark": false,
-      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
+      "desc": "A workspace members modal: search, invite and per-person roles."
     },
     {
       "title": "Cend, incoming requests",
@@ -1536,57 +1683,6 @@
       "bg": "#7f8287",
       "dark": false,
       "desc": "Incoming requests stacked as cards, each with its price, pickup and drop-off.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "eBay, home and categories",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#f2f5f7",
-      "dark": false,
-      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
-    },
-    {
-      "title": "Travel Explore, flight search",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/flight-search-on-a-laptop.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#3c3b3c",
-      "dark": true,
-      "desc": "A flight booking home with the search right under the hero, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Cend, home in hand",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/cend-home-in-hand.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#2e3642",
-      "dark": true,
-      "desc": "The Cend home, with quick sends, riders nearby and recent orders, in hand.",
       "tools": "Figma",
       "mix": true
     },
@@ -1610,6 +1706,54 @@
           "Kingsley Mkpandiok"
         ]
       ]
+    },
+    {
+      "title": "AI writing assistant",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ai-writing-assistant.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#e4eaef",
+      "dark": false,
+      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Portfolio allocation",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-portfolio.jpg",
+          "ratio": 1.5,
+          "live": "live/portfolio",
+          "srcm": "assets/designs/market-portfolio-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
+      "dark": false,
+      "desc": "Market UI exploration: a portfolio ring. Each holding’s share shifts as prices move, one holding is spotlighted at a time, and the total balance follows.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "DIGIM, agency home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-agency-home.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#403d3c",
+      "dark": true,
+      "desc": "The DIGIM digital marketing agency home page, bold type and client logos, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
     },
     {
       "title": "ShareBuddy, logo in motion",

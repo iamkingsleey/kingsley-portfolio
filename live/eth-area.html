@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ethereum area chart</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* an area chart that flips through its time ranges on its own, with a crosshair reading prices off the line */
+.chart { position: relative; height: 300rem; margin-top: 34rem }
+.xs { display: flex; justify-content: space-between; margin-top: 14rem }
+.tip { position: absolute; top: 0; transform: translate(-50%, -112%); background: var(--tip); color: #fff; border-radius: 10rem; padding: 9rem 13rem; white-space: nowrap; pointer-events: none }
+.tip b { display: block; font-size: 19rem; font-weight: 500 } .tip span { font-size: 15rem; color: #9a9a9a }
+@media (max-aspect-ratio: 6/5) { .chart { height: 400rem } .seg span { padding: 8rem 11rem } }
+.chart > svg { position: absolute; left: 0; top: 0 }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="row" style="gap:16rem"><div class="coin" style="background:#627eea">E</div><div class="name">Ethereum<small>ETH</small></div></div>
+    <div class="seg" id="seg"><span>1H</span><span class="on">1D</span><span>1W</span><span>1M</span><span class="wide-only">1Y</span></div>
+  </div>
+  <div class="row" style="gap:16rem;margin-top:22rem"><div class="big" id="px">$3,482.20</div><span class="chip" id="ch">+3.12%</span><span class="small wide-only" id="per" style="margin-left:6rem">past day</span></div>
+  <div class="chart" id="chart"><svg id="svg"><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#627eea" stop-opacity=".28"/><stop offset="1" stop-color="#627eea" stop-opacity="0"/></linearGradient></defs><path id="area" fill="url(#fill)"/><path id="line" fill="none" stroke="var(--line-c)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><line id="cx" stroke="var(--hair)" stroke-width="1.4" stroke-dasharray="4 5"/><circle id="dot" r="7" fill="var(--line-c)" stroke="var(--card)" stroke-width="3"/></svg><div class="tip" id="tip"><b id="tv">$3,480.00</b><span id="tt">14:20</span></div></div>
+  <div class="xs small" id="xs"></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const P = [['1H', 'past hour', ['14:00', '14:15', '14:30', '14:45', '15:00'], 1.1], ['1D', 'past day', ['00:00', '06:00', '12:00', '18:00', 'Now'], 3.1], ['1W', 'past week', ['Mon', 'Wed', 'Fri', 'Sun', 'Now'], 6.4],
+             ['1M', 'past month', ['Oct 5', 'Oct 12', 'Oct 19', 'Oct 26', 'Now'], -2.6], ['1Y', 'past year', ['Dec', 'Mar', 'Jun', 'Sep', 'Now'], 48.2]];
+  const N = 60, wide = () => matchMedia('(min-aspect-ratio: 6/5)').matches;
+  const make = drift => { const w = KM.walker(0, .018); const a = []; for (let i = 0; i < N; i++) a.push(w() + drift / 100 * i / N * 2.2); const m = Math.min(...a), M = Math.max(...a); return a.map(v => (v - m) / (M - m || 1)); };
+  let at = 1, from = make(3.1), to = from.slice(), mix = 1, cur = from.slice();
+  const seg = [...document.querySelectorAll('#seg span')], xs = document.getElementById('xs'), per = document.getElementById('per'), ch = document.getElementById('ch'), px = document.getElementById('px');
+  const setLabels = () => { xs.innerHTML = P[at][2].map(t => `<span>${t}</span>`).join(''); per.textContent = P[at][1]; KM.setChip(ch, P[at][3]); };
+  setLabels();
+  KM.every(4600, () => {                                   // the next range: the line morphs into it
+    const n = wide() ? 5 : 4; at = (at + 1) % n; seg.forEach((s, i) => s.classList.toggle('on', i === at));
+    from = cur.slice(); to = make(P[at][3]); mix = 0; setLabels(); });
+  KM.every(700, () => { to[N - 1] = KM.clamp(to[N - 1] + KM.rnd(-.05, .05), 0, 1); });   // the newest price keeps moving
+  const area = document.getElementById('area'), line = document.getElementById('line'), cx = document.getElementById('cx'), dot = document.getElementById('dot'), svg = document.getElementById('svg');
+  const tip = document.getElementById('tip'), tv = document.getElementById('tv'), tt = document.getElementById('tt'), box = document.getElementById('chart');
+  let shown = 3482.2;
+  KM.frame((now, dt) => {
+    mix = Math.min(1, mix + dt / .8); const e = mix < .5 ? 4 * mix ** 3 : 1 - Math.pow(-2 * mix + 2, 3) / 2;
+    cur = from.map((v, i) => v + (to[i] - v) * e);
+    const [W, H] = KM.size(box), top = 30, ph = H - top - 6;
+    const pts = cur.map((v, i) => [i / (N - 1) * W, top + (1 - v) * ph]);
+    const d = KM.smooth(pts); line.setAttribute('d', d); area.setAttribute('d', `${d}L${W},${H}L0,${H}Z`);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'rem'; svg.style.height = H + 'rem';
+    // the crosshair glides back and forth across the chart, reading the price where it is
+    const f = (Math.sin(now / 2600) * .46 + .5), fi = f * (N - 1), i0 = Math.floor(fi), k = fi - i0, v = cur[i0] + ((cur[i0 + 1] ?? cur[i0]) - cur[i0]) * k;
+    const x = f * W, yy = top + (1 - v) * ph;
+    cx.setAttribute('x1', x); cx.setAttribute('x2', x); cx.setAttribute('y1', 0); cx.setAttribute('y2', H); dot.setAttribute('cx', x); dot.setAttribute('cy', yy);
+    tip.style.left = KM.clamp(x, 80, W - 80) + 'rem'; tip.style.top = Math.max(60, yy - 14) + 'rem';
+    const base = 3482.2 / (1 + P[at][3] / 100), price = base + (3482.2 - base) * (v / Math.max(.01, cur[N - 1]));
+    tv.textContent = '$' + KM.money(price); const L = P[at][2]; tt.textContent = L[Math.min(L.length - 2, Math.floor(f * (L.length - 1)))];
+    shown += (3482.2 + (cur[N - 1] - .8) * 60 - shown) * .1; px.textContent = '$' + KM.money(shown);
+  });
+})();
+</script>
+</body>
+</html>

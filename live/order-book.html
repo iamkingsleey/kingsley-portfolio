@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Order book</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* an order book beside its depth chart: sizes change as orders come and go, the depth walls breathe with them */
+.body { display: grid; grid-template-columns: 380rem 1fr; gap: 46rem; margin-top: 30rem; align-items: stretch }
+.book .hd { display: flex; justify-content: space-between; padding: 0 10rem 10rem; font-size: 16rem; color: var(--dim) }
+.r { position: relative; display: flex; justify-content: space-between; height: 33rem; align-items: center; padding: 0 10rem; font-size: 18rem; border-radius: 5rem }
+.r i { position: absolute; right: 0; top: 3rem; bottom: 3rem; border-radius: 5rem; transition: width .5s cubic-bezier(.3,.7,.2,1) }
+.r span { position: relative } .r .q { color: var(--text) }
+.ask { color: var(--down) } .ask i { background: rgb(255 93 93 / .12) }
+.bid { color: var(--up) } .bid i { background: rgb(52 218 98 / .12) }
+.midp { display: flex; align-items: center; gap: 12rem; padding: 12rem 10rem; font-size: 26rem; font-weight: 500 }
+.midp small { font-size: 16rem; color: var(--muted); font-weight: 400 }
+.depth { position: relative; min-height: 300rem } .depth > svg { position: absolute; inset: 0 }   /* the chart never sizes its own box */
+.dl { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between }
+.spread { position: absolute; left: 50%; top: 4rem; transform: translateX(-50%); text-align: center }
+@media (max-aspect-ratio: 6/5) { .body { grid-template-columns: 1fr; gap: 26rem } .depth { order: -1; min-height: 250rem; height: 250rem } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="row" style="gap:16rem"><div class="coin" style="background:#f7931a">B</div><div class="name">Order book<small>BTC / USDT</small></div></div>
+    <div class="seg"><span class="on">Depth</span><span>Trades</span></div>
+  </div>
+  <div class="body">
+    <div class="book">
+      <div class="hd"><span>Price (USDT)</span><span>Amount (BTC)</span></div>
+      <div id="asks"></div>
+      <div class="midp"><span id="mid">67,240.5</span><span id="arr" class="up">↑</span><small>Mark 67,238.9</small></div>
+      <div id="bids"></div>
+    </div>
+    <div class="depth" id="depth"><svg id="svg"></svg>
+      <div class="spread"><div class="small">Spread</div><div class="label" style="color:var(--text)" id="spr">0.8 · 0.001%</div></div>
+      <div class="dl small" id="dl"></div></div>
+  </div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const R = matchMedia('(max-aspect-ratio: 6/5)').matches ? 5 : 6;
+  let mid = 67240.5, last = mid;
+  const row = cls => { const d = document.createElement('div'); d.className = 'r ' + cls; d.innerHTML = '<i></i><span class="p"></span><span class="q"></span>'; return d; };
+  const asks = [...Array(R)].map(() => row('ask')), bids = [...Array(R)].map(() => row('bid'));
+  asks.forEach(r => document.getElementById('asks').appendChild(r)); bids.forEach(r => document.getElementById('bids').appendChild(r));
+  let qa = asks.map(() => KM.rnd(.2, 2.4)), qb = bids.map(() => KM.rnd(.2, 2.4));
+  const paint = (flash) => {
+    const mx = Math.max(...qa, ...qb);
+    asks.forEach((r, i) => { const k = R - 1 - i; r.querySelector('.p').textContent = KM.money(mid + .5 + k * 1.5, 1); r.querySelector('.q').textContent = qa[k].toFixed(4); r.querySelector('i').style.width = (qa[k] / mx * 100) + '%'; });
+    bids.forEach((r, i) => { r.querySelector('.p').textContent = KM.money(mid - .3 - i * 1.5, 1); r.querySelector('.q').textContent = qb[i].toFixed(4); r.querySelector('i').style.width = (qb[i] / mx * 100) + '%'; });
+    if (flash) { const [el, up] = flash; el.classList.remove('flash-up', 'flash-dn'); void el.offsetWidth; el.classList.add(up ? 'flash-up' : 'flash-dn'); }
+    document.getElementById('mid').textContent = KM.money(mid, 1); const a = document.getElementById('arr'); a.textContent = mid >= last ? '↑' : '↓'; a.className = mid >= last ? 'up' : 'dn-t';
+  };
+  paint();
+  KM.every(380, () => {                                    // orders come and go
+    const side = Math.random() < .5, i = Math.floor(Math.random() * R), arr = side ? qa : qb, old = arr[i];
+    arr[i] = KM.clamp(old + KM.rnd(-.9, .9), .05, 3.2);
+    if (Math.random() < .25) { last = mid; mid += KM.rnd(-1.5, 1.6); }
+    const el = side ? asks[R - 1 - i] : bids[i]; paint([el, arr[i] > old]);
+  });
+  // the depth chart: how much sits at each price, added up outwards from the middle
+  const svg = document.getElementById('svg'), box = document.getElementById('depth'), dl = document.getElementById('dl');
+  const M = 24; let ba = [...Array(M)].map(() => KM.rnd(.2, 1)), bb = [...Array(M)].map(() => KM.rnd(.2, 1)), sa = ba.slice(), sb = bb.slice();
+  KM.every(500, () => { const k = Math.floor(Math.random() * M); (Math.random() < .5 ? ba : bb)[k] = KM.rnd(.1, 1.3); });
+  KM.frame(() => {
+    sa = sa.map((v, i) => v + (ba[i] - v) * .06); sb = sb.map((v, i) => v + (bb[i] - v) * .06);
+    const [W, H] = KM.size(box), top = 64, bot = H - 34, h = bot - top, half = W / 2 - 6;
+    const ca = [], cb = []; let s = 0; sa.forEach(v => { s += v; ca.push(s); }); s = 0; sb.forEach(v => { s += v; cb.push(s); });
+    const mx = Math.max(ca[M - 1], cb[M - 1]) * 1.08, y = v => bot - v / mx * h;
+    const step = (cum, dir) => { let d = `M${W / 2 + dir * 6},${bot}`; cum.forEach((v, i) => { const x0 = W / 2 + dir * (6 + i / M * half), x1 = W / 2 + dir * (6 + (i + 1) / M * half); d += `L${x0.toFixed(1)},${y(v).toFixed(1)}L${x1.toFixed(1)},${y(v).toFixed(1)}`; }); return d; };
+    const db = step(cb, -1), da = step(ca, 1);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'rem'; svg.style.height = H + 'rem';
+    svg.innerHTML = `<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34da62" stop-opacity=".35"/><stop offset="1" stop-color="#34da62" stop-opacity=".04"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5d5d" stop-opacity=".35"/><stop offset="1" stop-color="#ff5d5d" stop-opacity=".04"/></linearGradient></defs>`
+      + `<path d="${db}L${(W / 2 - 6 - half).toFixed(1)},${bot}Z" fill="url(#g1)"/><path d="${db}" fill="none" stroke="#34da62" stroke-width="2.4"/>`
+      + `<path d="${da}L${(W / 2 + 6 + half).toFixed(1)},${bot}Z" fill="url(#g2)"/><path d="${da}" fill="none" stroke="#ff5d5d" stroke-width="2.4"/>`
+      + `<line x1="${W / 2}" x2="${W / 2}" y1="${top - 6}" y2="${bot}" stroke="#333" stroke-dasharray="4 5"/><line x1="0" x2="${W}" y1="${bot}" y2="${bot}" stroke="#262626"/>`;
+    dl.innerHTML = `<span>${KM.money(mid - 36, 0)}</span><span>${KM.money(mid, 0)}</span><span>${KM.money(mid + 36, 0)}</span>`;
+    document.getElementById('spr').textContent = (.5 + .3).toFixed(1) + ' · 0.001%';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Bitcoin candles</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* a candlestick chart: the last candle keeps trading, a new one opens every few seconds, volume underneath */
+.top { gap: 16rem }
+.stats { gap: 34rem }
+.stats .col { gap: 6rem; align-items: flex-end }
+.chart { position: relative; height: 330rem; margin-top: 30rem }
+@media (max-aspect-ratio: 6/5) { .chart { height: 420rem } .seg span { padding: 8rem 12rem } }
+.chart > svg { position: absolute; left: 0; top: 0 }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="row top"><div class="coin" style="background:#f7931a">B</div><div class="name">Bitcoin<small>BTC / USD</small></div></div>
+    <div class="seg"><span>1m</span><span class="on">5m</span><span>15m</span><span class="wide-only">1H</span></div>
+  </div>
+  <div class="row between" style="margin-top:22rem">
+    <div class="row" style="gap:16rem"><div class="big" id="px">$67,240.12</div><span class="chip" id="ch">+2.14%</span></div>
+    <div class="row stats wide-only"><div class="col"><span class="small">24h high</span><span class="label" style="color:var(--text)" id="hi">$68,102.40</span></div><div class="col"><span class="small">24h low</span><span class="label" style="color:var(--text)" id="lo">$65,880.15</span></div></div>
+  </div>
+  <div class="chart" id="chart"><svg id="svg"></svg></div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const N = 34, svg = document.getElementById('svg'), box = document.getElementById('chart');
+  const px = document.getElementById('px'), ch = document.getElementById('ch'), hiEl = document.getElementById('hi'), loEl = document.getElementById('lo');
+  const open0 = 65830; let c = [], p = 66900;
+  const candle = o => ({ o, h: o, l: o, c: o, v: KM.rnd(.3, 1) });
+  // history: a gentle climb with some red, so the chart starts looking like a real market
+  for (let i = 0; i < N; i++) { const k = candle(p); for (let j = 0; j < 12; j++) { p += KM.rnd(-34, 38); k.c = p; k.h = Math.max(k.h, p + KM.rnd(0, 18)); k.l = Math.min(k.l, p - KM.rnd(0, 18)); } k.v = KM.rnd(.25, 1); c.push(k); }
+  let lo = Math.min(...c.map(k => k.l)), hi = Math.max(...c.map(k => k.h)), sLo = lo, sHi = hi, shown = p, born = performance.now();
+  KM.every(90, () => {                                   // the live candle trades
+    const k = c[N - 1]; p += KM.rnd(-16, 17.5); k.c = p; k.h = Math.max(k.h, p); k.l = Math.min(k.l, p); k.v = Math.min(1.25, k.v + KM.rnd(0, .02));
+    if (performance.now() - born > 2600) { c.shift(); c.push(candle(p)); born = performance.now(); }   // a new candle opens
+  });
+  KM.frame(() => {
+    const [W, H] = KM.size(box), G = 78, CW = W - G, VH = H * .2, PH = H - VH - 18;
+    lo = Math.min(...c.map(k => k.l)); hi = Math.max(...c.map(k => k.h)); const pad = (hi - lo) * .12;
+    sLo += (lo - pad - sLo) * .08; sHi += (hi + pad - sHi) * .08;            // the scale eases, so nothing jumps
+    const y = v => (1 - (v - sLo) / (sHi - sLo)) * PH, slot = CW / N, bw = slot * .6;
+    let s = '';
+    for (let g = 0; g <= 3; g++) { const v = sLo + (sHi - sLo) * (g + .5) / 4, yy = y(v).toFixed(1);
+      s += `<line x1="0" x2="${CW}" y1="${yy}" y2="${yy}" stroke="#222" stroke-width="1.2"/><text x="${W}" y="${(+yy + 6).toFixed(1)}" fill="#5c5c5c" font-size="16" text-anchor="end">${Math.round(v).toLocaleString('en-US')}</text>`; }
+    const vmax = Math.max(...c.map(k => k.v));
+    c.forEach((k, i) => { const x = i * slot + (slot - bw) / 2, up = k.c >= k.o, col = up ? '#34da62' : '#ff5d5d';
+      const t = y(Math.max(k.o, k.c)), b = Math.max(t + 2, y(Math.min(k.o, k.c)));
+      s += `<line x1="${(x + bw / 2).toFixed(1)}" x2="${(x + bw / 2).toFixed(1)}" y1="${y(k.h).toFixed(1)}" y2="${y(k.l).toFixed(1)}" stroke="${col}" stroke-width="2"/>`;
+      s += `<rect x="${x.toFixed(1)}" y="${t.toFixed(1)}" width="${bw.toFixed(1)}" height="${(b - t).toFixed(1)}" rx="2" fill="${col}"/>`;
+      const vh = k.v / vmax * VH; s += `<rect x="${x.toFixed(1)}" y="${(H - vh).toFixed(1)}" width="${bw.toFixed(1)}" height="${vh.toFixed(1)}" rx="2" fill="${col}" opacity=".28"/>`; });
+    const last = c[N - 1], ly = y(last.c), up = last.c >= c[0].o, col = up ? '#34da62' : '#ff5d5d';
+    s += `<line x1="0" x2="${CW}" y1="${ly.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${col}" stroke-width="1.4" stroke-dasharray="5 6" opacity=".7"/>`;
+    s += `<rect x="${CW + 6}" y="${(ly - 15).toFixed(1)}" width="${G - 6}" height="30" rx="6" fill="${col}"/><text x="${CW + 6 + (G - 6) / 2}" y="${(ly + 6).toFixed(1)}" fill="#0b0b0b" font-size="16" font-weight="500" text-anchor="middle">${Math.round(last.c).toLocaleString('en-US')}</text>`;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W + 'rem'); svg.setAttribute('height', H + 'rem'); svg.style.width = W + 'rem'; svg.style.height = H + 'rem'; svg.innerHTML = s;
+    shown += (p - shown) * .2; px.textContent = '$' + KM.money(shown); KM.setChip(ch, (shown - open0) / open0 * 100);
+    hiEl.textContent = '$' + KM.money(Math.max(68102.4, hi)); loEl.textContent = '$' + KM.money(Math.min(65880.15, lo));
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Portfolio allocation</title>
+<link rel="preload" href="../assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>
+/* a portfolio ring: shares shift as prices move, and each holding takes its turn in the spotlight */
+.body { display: grid; grid-template-columns: 330rem 1fr; gap: 60rem; align-items: center; margin-top: 34rem }
+.ring { position: relative; width: 330rem; height: 330rem }
+.ring svg { width: 100%; height: 100% }
+.ring .c { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6rem }
+.ring .c b { font-size: 40rem; font-weight: 500; letter-spacing: -.4rem }
+.legend .it { display: grid; grid-template-columns: 16rem 1fr auto 90rem; gap: 16rem; align-items: center; padding: 15rem 16rem; border-radius: 12rem; transition: background .4s }
+.legend .it.on { background: var(--raise) }
+.legend .dot { width: 14rem; height: 14rem; border-radius: 50% }
+.legend .nm { font-size: 22rem } .legend .nm small { color: var(--muted); font-size: 18rem; margin-left: 8rem }
+.legend .vl { font-size: 22rem; font-weight: 500 } .legend .sh { font-size: 19rem; color: var(--muted); text-align: right }
+@media (max-aspect-ratio: 6/5) { .body { grid-template-columns: 1fr; gap: 26rem; justify-items: center } .legend { width: 100% } .ring { width: 300rem; height: 300rem } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row between">
+    <div class="col" style="gap:8rem"><span class="label">Total balance</span><div class="row" style="gap:16rem"><div class="big" id="tot">$48,210.55</div><span class="chip" id="ch">+1.84%</span></div></div>
+    <div class="seg wide-only"><span>24h</span><span class="on">7d</span><span>30d</span></div>
+  </div>
+  <div class="body">
+    <div class="ring"><svg viewBox="0 0 330 330" id="svg"></svg><div class="c"><span class="small" id="cn">Bitcoin</span><b id="cp">52.1%</b></div></div>
+    <div class="legend" id="lg"></div>
+  </div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  const A = [['Bitcoin', 'BTC', '#f7931a', 25110], ['Ethereum', 'ETH', '#627eea', 12480], ['Solana', 'SOL', '#a35dff', 6920], ['USD Coin', 'USDC', '#2bb3a0', 3700]];
+  let val = A.map(a => a[3]), shown = val.slice(), hot = 0;
+  const lg = document.getElementById('lg');
+  lg.innerHTML = A.map(a => `<div class="it"><i class="dot" style="background:${a[2]}"></i><span class="nm">${a[0]}<small>${a[1]}</small></span><span class="vl">$0</span><span class="sh">0%</span></div>`).join('');
+  const rows = [...lg.children], svg = document.getElementById('svg'), tot = document.getElementById('tot'), ch = document.getElementById('ch'), cn = document.getElementById('cn'), cp = document.getElementById('cp');
+  const start = val.reduce((a, b) => a + b) / 1.0184;
+  KM.every(1500, () => { val = val.map((v, i) => i === 3 ? v : v * (1 + KM.rnd(-.012, .014))); });
+  KM.every(2600, () => { hot = (hot + 1) % A.length; rows.forEach((r, i) => r.classList.toggle('on', i === hot)); });
+  rows[0].classList.add('on');
+  let gr = A.map((_, i) => i === 0 ? 1 : 0);
+  const base = document.documentElement.classList.contains('light') ? .78 : .55;   // quieter rings fade less on white, so they don't wash out
+  KM.frame(() => {
+    shown = shown.map((v, i) => v + (val[i] - v) * .06); const T = shown.reduce((a, b) => a + b);
+    gr = gr.map((g, i) => g + ((i === hot ? 1 : 0) - g) * .12);
+    const cx = 165, R = 128, C = 2 * Math.PI * R, gap = 7; let off = 0, s = '';
+    shown.forEach((v, i) => { const len = v / T * C; const w = 30 + gr[i] * 12;
+      s += `<circle cx="${cx}" cy="${cx}" r="${R}" fill="none" stroke="${A[i][2]}" stroke-width="${w.toFixed(1)}" stroke-dasharray="${Math.max(0, len - gap).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${cx} ${cx})" opacity="${(base + gr[i] * (1 - base)).toFixed(2)}"/>`; off += len; });
+    svg.innerHTML = s;
+    rows.forEach((r, i) => { r.querySelector('.vl').textContent = '$' + KM.money(shown[i], 0); r.querySelector('.sh').textContent = (shown[i] / T * 100).toFixed(1) + '%'; });
+    tot.textContent = '$' + KM.money(T); KM.setChip(ch, (T - start) / start * 100);
+    cn.textContent = A[hot][0]; cp.textContent = (shown[hot] / T * 100).toFixed(1) + '%';
+  });
+})();
+</script>
+</body>
+</html>
