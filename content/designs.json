@@ -44,7 +44,7 @@
     },
     {
       "title": "Badge, purple",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/badge-purple.jpg",
@@ -53,7 +53,8 @@
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "A star badge on a purple stage, with confetti in the air."
+      "desc": "A star badge on a purple stage, with confetti in the air.",
+      "case": "3d-collection"
     },
     {
       "title": "Rolled $100 bill",
@@ -196,7 +197,7 @@
     },
     {
       "title": "Wine glass",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/uploads/glass-of-wine1.jpg",
@@ -206,7 +207,8 @@
       "bg": "#13100f",
       "dark": true,
       "desc": "A card holder covered in bright stickers, for a playful payments brand.",
-      "credits": []
+      "credits": [],
+      "case": "3d-collection"
     },
     {
       "title": "Ivieomas tote bag",
@@ -236,7 +238,7 @@
     },
     {
       "title": "Badge",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/badge-on-a-orange-background.jpg",
@@ -245,11 +247,12 @@
       ],
       "bg": "#c1902e",
       "dark": false,
-      "desc": "A badge on an orange background, part of a set of reward objects."
+      "desc": "A badge on an orange background, part of a set of reward objects.",
+      "case": "3d-collection"
     },
     {
       "title": "Gold badge, blue",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/gold-badge-blue.jpg",
@@ -258,11 +261,12 @@
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "A gold medal with red ribbons on a blue stage."
+      "desc": "A gold medal with red ribbons on a blue stage.",
+      "case": "3d-collection"
     },
     {
       "title": "Badge in a box",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/batch-in-a-box.jpg",
@@ -271,11 +275,12 @@
       ],
       "bg": "#cc8d35",
       "dark": false,
-      "desc": "A badge packed in its box, the unboxing moment of a reward."
+      "desc": "A badge packed in its box, the unboxing moment of a reward.",
+      "case": "3d-collection"
     },
     {
       "title": "Price tag and coins",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/price-tag-and-coins.jpg",
@@ -284,11 +289,12 @@
       ],
       "bg": "#050607",
       "dark": true,
-      "desc": "A price tag and coins, an illustration of value for commerce brands."
+      "desc": "A price tag and coins, an illustration of value for commerce brands.",
+      "case": "3d-collection"
     },
     {
       "title": "Debit card, floating",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
@@ -297,11 +303,12 @@
       ],
       "bg": "#5b94d5",
       "dark": false,
-      "desc": "A debit card floating among colourful objects."
+      "desc": "A debit card floating among colourful objects.",
+      "case": "3d-collection"
     },
     {
       "title": "Debit card with shapes",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/debit-card-with-colorful-objects.jpg",
@@ -310,7 +317,8 @@
       ],
       "bg": "#638db5",
       "dark": true,
-      "desc": "A debit card surrounded by soft, colourful shapes."
+      "desc": "A debit card surrounded by soft, colourful shapes.",
+      "case": "3d-collection"
     },
     {
       "title": "Price tag and silver coins",
@@ -327,7 +335,7 @@
     },
     {
       "title": "Pink debit card",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/debit-card.jpg",
@@ -336,7 +344,8 @@
       ],
       "bg": "#aa4b78",
       "dark": true,
-      "desc": "A pink debit card, styled as a hero image for a card launch."
+      "desc": "A pink debit card, styled as a hero image for a card launch.",
+      "case": "3d-collection"
     },
     {
       "title": "Tennis ball and rackets",
@@ -382,7 +391,7 @@
     },
     {
       "title": "Star badge",
-      "category": "brand",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/star-badge.jpg",
@@ -391,7 +400,8 @@
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "A copper star badge with lilac ribbons on a warm yellow ground."
+      "desc": "A copper star badge with lilac ribbons on a warm yellow ground.",
+      "case": "3d-collection"
     },
     {
       "title": "Tennis on court",
