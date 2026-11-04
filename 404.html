@@ -68,7 +68,7 @@ body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9
 (function () {
   'use strict';
   // where the site lives: the root of its own domain, or a folder on GitHub Pages (filled in by the build)
-  var BASE = '/kingsley-portfolio/'; if (location.pathname.indexOf(BASE) !== 0) BASE = '/';
+  var BASE = '/'; if (location.pathname.indexOf(BASE) !== 0) BASE = '/';
   var STATIONS = [[94.0, 'About', 'about.html'], [96.0, 'Engineering', 'engineering.html'], [98.0, 'Home', 'index.html'], [100.0, 'Designs', 'designs.html'], [102.0, 'Shop', 'shop.html']];
   var $ = function (id) { return document.getElementById(id); };
   $('home').href = BASE + 'index.html';
