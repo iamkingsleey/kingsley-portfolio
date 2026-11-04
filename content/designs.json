@@ -211,6 +211,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Root Sauce coffee cup",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-coffee-cup.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#1a150e",
+      "dark": true,
+      "desc": "The Root Sauce mark on a takeaway cup, under the espresso machine."
+    },
+    {
       "title": "Ivieomas tote bag",
       "category": "brand",
       "images": [
@@ -222,6 +235,19 @@
       "bg": "#dedede",
       "dark": false,
       "desc": "The Ivieomas mark on a tote, with stickers and bold shapes."
+    },
+    {
+      "title": "Edore event poster, group",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-holding-event-group.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#5a6467",
+      "dark": true,
+      "desc": "The same Edore event in a second poster: friends in bright colour, the type set over the photo."
     },
     {
       "title": "Ivieomas varsity jacket",
@@ -974,6 +1000,19 @@
       "tools": "Illustrator"
     },
     {
+      "title": "Root Sauce \"Open Research\"",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-open-research.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#362720",
+      "dark": true,
+      "desc": "A Root Sauce document cover: \"Open Research\" in bold type, the mark at the foot."
+    },
+    {
       "title": "Casa Verde identity",
       "category": "brand",
       "images": [
@@ -1000,6 +1039,19 @@
       "desc": "A fashion label wordmark set on cobalt blue, with a ring built into the O."
     },
     {
+      "title": "Edore tote bag",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-tote-bag.jpg",
+          "ratio": 1.066
+        }
+      ],
+      "bg": "#080605",
+      "dark": true,
+      "desc": "A tote for Edore, a community events brand: \"Community, Connect, Live\" under a wall of bright word pills."
+    },
+    {
       "title": "Ivieomas bottle",
       "category": "brand",
       "images": [
@@ -1011,6 +1063,19 @@
       "bg": "#9a9a9a",
       "dark": false,
       "desc": "The identity wrapped around a bottle, with the blue tape motif."
+    },
+    {
+      "title": "Root Sauce sticky notes",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-sticky-notes.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#695241",
+      "dark": true,
+      "desc": "A Root Sauce sticky-note block in a walnut tray, catching the afternoon light."
     },
     {
       "title": "OSCAFest’25, call for speakers",
@@ -1059,6 +1124,19 @@
       "mix": true,
       "client": "OSCA",
       "tools": "Figma"
+    },
+    {
+      "title": "Edore event poster",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-holding-event-poster.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#5c666a",
+      "dark": true,
+      "desc": "\"Holding Event, before night begins\": an Edore event poster with a portrait on soft blue."
     },
     {
       "title": "Pricing plans, light",
