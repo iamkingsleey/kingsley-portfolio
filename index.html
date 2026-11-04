@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <script>
-  var BUILD = "202611041424";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202611041436";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -969,7 +969,7 @@ h1.typer { position: relative }
     setTimeout(() => { syncVideos(); bendRemeasure(); }, 60);
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
-    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+    try { history.replaceState(null, '', s.id === 'home' ? 'home' : '#' + s.id); } catch (_) {}   // Home's address is /home
   }
 
   // ---------- Designs: projects come from content/designs.json (the CMS will edit that file) ----------
@@ -1892,7 +1892,7 @@ h1.typer { position: relative }
       if (on) Popkit.play('pop');
     }, true); })();
 </script>
-<script src="nav.js?v=80ffc654" defer></script>
+<script src="nav.js?v=1fc48f3b" defer></script>
 <script>window.KM_HOMEBG = [{"src": "assets/designs/thumbs/paper-plane-with-coin.webp", "ratio": 0.8}, {"src": "assets/designs/dollar-bills-on-red-stairs.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/3d-tumbler-render.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/badge-purple.webp", "ratio": 1.5}, {"src": "assets/designs/rolled-100-dollar-bill.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/safe-with-coins.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/pawn-in-an-archway.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/colorful-award-with-ribbons.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/gold-coins-glassy-mouse.webp", "ratio": 0.8}, {"src": "assets/designs/rolled-dollar-and-naira-notes.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/fintech-box.webp", "ratio": 1.5}, {"src": "assets/designs/thumbs/silver-coins-glassy-mouse.webp", "ratio": 0.8}];</script>
 <script src="homebg.js?v=14a9878b" defer></script>
 <script src="kit.js?v=2ab9e6a1" defer></script>
@@ -1900,7 +1900,7 @@ h1.typer { position: relative }
 <script src="protips.js?v=fb1b5aa7" defer></script>
 <script src="feedback.js?v=54cf3e76" defer></script>
 <script src="home.js?v=6d8a7b28" defer></script>
-<script src="flow.js?v=8676ae70" defer></script>
+<script src="flow.js?v=413b56fb" defer></script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
 </body>
 </html>

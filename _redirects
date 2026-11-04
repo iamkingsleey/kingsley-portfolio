@@ -1,0 +1,2 @@
+# Home's address is /home (path rules only; hostname rules live in Cloudflare's Redirect Rules)
+/home /index.html 200

@@ -253,7 +253,7 @@ def publish(message):
     msg = (message or '').strip() or 'Update content'
     if not os.path.exists(BUILD_OK):
         return {'ok': False, 'log': 'Not published: the last rebuild did not finish (see Rebuild, or cms/build/last-build.log). Fix it and rebuild first, so a broken site never goes live.'}
-    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', '*.html', '*.js', '.gitignore', 'wrangler.toml', '.assetsignore'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
+    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', '*.html', '*.js', '.gitignore', 'wrangler.toml', '.assetsignore', '_redirects'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
              ['git', 'commit', '-m', msg], ['git', 'push']]
     log = []
     for s in steps:
@@ -269,6 +269,7 @@ class H(SimpleHTTPRequestHandler):
         u = urllib.parse.urlparse(path).path
         if u.startswith('/site/'):
             path = os.path.join(REPO, urllib.parse.unquote(u[6:]))
+            if u.rstrip('/') == '/site/home': path = os.path.join(REPO, 'index.html')   # Home's address is /home
             if not os.path.exists(path) and os.path.exists(path + '.html'): path += '.html'   # clean addresses, as on the live site
             return path
         if u == '/site': return REPO

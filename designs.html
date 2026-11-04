@@ -1139,7 +1139,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   $('back').addEventListener('click', () => {
     if (openIdx >= 0) { tap(); stepBack(); return; }
     if (leaving) return; leaving = true; tap();
-    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'index.html#home' }); return; }   // the readout moves to the middle and tunes down
+    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'home' }); return; }   // the readout moves to the middle and tunes down
     const station = $('station'), fq = $('fq'), nm = $('nm');
     station.classList.add('tune-out'); document.body.classList.add('leaving');
     const t0 = performance.now(), dur = reduce ? 0 : 700;
@@ -1150,7 +1150,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       // silent: no ticks on the way back to Home
       if (k < 1) return requestAnimationFrame(run);
       nm.textContent = 'Home'; station.classList.remove('tune-out');
-      location.href = 'index.html#home';
+      location.href = 'home';
     })(t0);
   });
 
@@ -2446,12 +2446,12 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   if (document.fonts) document.fonts.ready.then(drawStrip);
 })();
 </script>
-<script src="nav.js?v=80ffc654" defer></script>
+<script src="nav.js?v=1fc48f3b" defer></script>
 <script src="kit.js?v=2ab9e6a1" defer></script>
 <script src="ripple.js?v=2e2214a6" defer></script>
 <script src="protips.js?v=fb1b5aa7" defer></script>
 <script src="feedback.js?v=54cf3e76" defer></script>
-<script src="flow.js?v=8676ae70" defer></script>
+<script src="flow.js?v=413b56fb" defer></script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
 </body>
 </html>

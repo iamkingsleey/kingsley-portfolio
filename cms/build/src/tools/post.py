@@ -339,6 +339,7 @@ INDEX = {}
 # clean addresses: the site's own links drop ".html" (Cloudflare serves /designs for designs.html and redirects the
 # .html form; the CMS preview does the same, see cms/server.py). Links into folders (Prototype/…) keep their names.
 def _clean_links(h):
+    h = h.replace('href="index.html#home"', 'href="home"')   # Home's address is /home
     h = re.sub(r'href="index\.html(["#?])', r'href="./\1', h)
     return re.sub(r'href="([a-z0-9-]+)\.html(["#?])', r'href="\1\2', h)
 for _p in PAGES:

@@ -7,7 +7,7 @@
   const ORDER = ['index.html', 'designs.html', 'engineering.html', 'about.html'];
   const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')).toLowerCase();
   const at = ORDER.indexOf(file); if (at < 0) return;
-  const clean = u => u === 'index.html' ? './' : u.replace(/\.html$/, '');   // clean addresses, as the nav uses
+  const clean = u => u === 'index.html' ? 'home' : u.replace(/\.html$/, '');   // clean addresses, as the nav uses
   const withV = u => { u = u && clean(u); return u && window.BUILD ? u + '?v=' + window.BUILD : u; };   /* the same address the nav uses, so one cached copy serves both */
   // only between Home and Designs: Home flows down into Designs, and Designs flows back up to Home
   // Home → Designs everywhere; Designs → Home only on phones and tablets, by pulling down at the top of the grid

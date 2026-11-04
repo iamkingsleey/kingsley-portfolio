@@ -226,7 +226,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 </style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="./#home" id="back"><span aria-hidden="true">‹</span><b>98.0</b> Home</a><span class="fq">102.0</span><span class="nm">Projects</span></div>
+<div class="station" data-readout><a class="back" href="home" id="back"><span aria-hidden="true">‹</span><b>98.0</b> Home</a><span class="fq">102.0</span><span class="nm">Projects</span></div>
 
   <!-- 1 · hero: the signal tunes in to a face -->
 <!-- hero, switched off for now: the page opens on the statement (inner comment markers written as <!~~ ~~> so this block stays one comment)
@@ -250,7 +250,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   <div class="shead" id="s-band"><div><h2>Case studies</h2><p>Scroll to tune through them. Each one is a station; open one for the full story.</p></div><span class="mono">Six stations</span></div>
   <section class="band" id="band"><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
 
-  <div class="foot"><span class="mono">Kingsley M. · 102.0 Projects</span><a class="mono" href="./#home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
+  <div class="foot"><span class="mono">Kingsley M. · 102.0 Projects</span><a class="mono" href="home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
 
@@ -438,10 +438,10 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   </script>
   <script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
-    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202611041424#' + hp[1];
+    var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=202611041436#' + hp[1];
     if (window.Tuner) Tuner.go({ from: 102, to: +a.dataset.fq, name: a.dataset.nm, href: href }); else location.href = href; });
 </script>
-<script src="nav.js?v=80ffc654" defer></script>
+<script src="nav.js?v=1fc48f3b" defer></script>
 <script src="kit.js?v=2ab9e6a1" defer></script>
 <script src="ripple.js?v=2e2214a6" defer></script>
 <script src="protips.js?v=fb1b5aa7" defer></script>

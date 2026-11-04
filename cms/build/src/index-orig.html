@@ -858,7 +858,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     setTimeout(() => { syncVideos(); bendRemeasure(); }, 60);
     const t = document.getElementById('tuner');
     t.setAttribute('aria-valuenow', s.f); t.setAttribute('aria-valuetext', s.name);
-    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+    try { history.replaceState(null, '', s.id === 'home' ? 'home' : '#' + s.id); } catch (_) {}   // Home's address is /home
   }
 
   // ---------- Designs: projects come from content/designs.json (the CMS will edit that file) ----------
