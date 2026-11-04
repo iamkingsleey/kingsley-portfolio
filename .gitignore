@@ -11,3 +11,5 @@ cms/build/.gen/
 cms/build/.index.json
 __pycache__/
 /Oghosa/
+cms/build/last-build.log
+cms/build/.last-build-ok

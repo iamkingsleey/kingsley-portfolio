@@ -37,11 +37,26 @@ def run(cmd, timeout=180):
     p = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True, timeout=timeout)
     return p.returncode, (p.stdout + p.stderr).strip()
 
+BUILD_LOG = os.path.join(HERE, 'build', 'last-build.log')
+BUILD_OK = os.path.join(HERE, 'build', '.last-build-ok')
+
 def build():
     with _build_lock:
         t = time.time()
         code, out = run([sys.executable, os.path.join(HERE, 'build', 'build.py')])
-        return {'ok': code == 0, 'log': out[-4000:], 'seconds': round(time.time() - t, 1)}
+        ok = code == 0 and 'post ok' in out   # the last step (post) is what gives every page its nav, scripts and corners
+        try:
+            with open(BUILD_LOG, 'w', encoding='utf-8') as f: f.write(f'{time.strftime("%Y-%m-%d %H:%M:%S")}  exit {code}  {"ok" if ok else "FAILED"}\n\n{out}\n')
+            if ok: open(BUILD_OK, 'w').write('1')
+            elif os.path.exists(BUILD_OK): os.remove(BUILD_OK)
+        except OSError: pass
+        if not ok:
+            # a build that stopped partway leaves half-made pages on disk; put the last committed pages back so the site
+            # on disk (and anything published from it) is never worse than the last good one. Your content edits are safe:
+            # they live in content/*.json, and the next successful rebuild picks them up.
+            run(['git', 'checkout', '--', '*.html', '*.js'])
+            out += '\n\nThe pages were restored to the last published version. Fix the error above and rebuild before publishing.'
+        return {'ok': ok, 'log': out[-4000:], 'seconds': round(time.time() - t, 1)}
 
 def version(name):
     """A fingerprint of a content file as it is on disk, so the editor can tell when something else changed it."""
@@ -236,6 +251,8 @@ def git_status():
 
 def publish(message):
     msg = (message or '').strip() or 'Update content'
+    if not os.path.exists(BUILD_OK):
+        return {'ok': False, 'log': 'Not published: the last rebuild did not finish (see Rebuild, or cms/build/last-build.log). Fix it and rebuild first, so a broken site never goes live.'}
     steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', '*.html', '*.js', '.gitignore'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
              ['git', 'commit', '-m', msg], ['git', 'push']]
     log = []
