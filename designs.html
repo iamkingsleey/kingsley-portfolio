@@ -408,6 +408,18 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 .reelv.moving .rcap { opacity: 0 }
 @media (max-width: 900px) { .reelv { top: 150px } }
 </style>
+<link rel="preload" as="image" href="assets/uploads/thumbs/kusnap-preview-2.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/ai-assets.webp" data-first>
+<link rel="preload" as="image" href="assets/uploads/thumbs/bulvds-casestudy-cover.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/notebook.webp" data-first>
+<link rel="preload" as="image" href="assets/uploads/thumbs/sharebuddy-cover.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/parcel-check.webp" data-first>
+<link rel="preload" as="image" href="assets/uploads/thumbs/oghosa/cover.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/ai-assistant-card.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/rootsauce-coffee-cup.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/pricing-plans-dark.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/ivieomas-tote-bag.webp" data-first>
+<link rel="preload" as="image" href="assets/designs/thumbs/time-out-tickets.webp" data-first>
 <script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};if(document.prerendering)document.addEventListener("prerenderingchange",on,{once:true});else on()})()</script><style>html.flow-up body>*:not(.kmn-scale):not(.ov):not([class^="pt-"]),html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation-name:flfade}html.flow-up .ov{animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}@keyframes flfade{from{opacity:.15}}html.flow-up{--fl:36px}@keyframes flin{from{translate:0 var(--fl);opacity:.15}}</style>
 <meta name="description" content="Kingsley M., brand and product designer, designing from 0 to 1 at fintech, e-commerce and property startups.">
 <meta property="og:type" content="website">
@@ -559,9 +571,12 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const xo = (im, u) => { if (remote(u)) { im.crossOrigin = 'anonymous'; im.addEventListener('error', function retry() { im.removeEventListener('error', retry); im.dataset.nox = '1'; im.removeAttribute('crossorigin'); im.src = u; }); } return im; };
   const okDraw = im => !(im && im.dataset && im.dataset.nox);
   // the 1000px copy of a design (made by the build next to each WebP) for places that show it small: the All grid and the tap ripple
-  const thOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/thumbs/') : mdOf(u);
-  const smOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/sm/') : u;   // 640px, for the grid tiles
-  const mdOf = u => (u && /(^|\/)assets\/designs\/[^/]+\.webp$/.test(u)) ? u.replace('assets/designs/', 'assets/designs/md/')
+  // the case studies' covers (assets/uploads/…) get the same three copies from the build, so they load as fast as the rest
+  const SIZED = /(^|\/)assets\/(designs\/[^/]+|uploads\/(?!(?:thumbs|sm|md)\/)[\w\/.-]+)\.webp$/;
+  const sized = (u, d) => u.replace(/assets\/(designs|uploads)\//, `assets/$1/${d}/`);
+  const thOf = u => (u && SIZED.test(u)) ? sized(u, 'thumbs') : mdOf(u);
+  const smOf = u => (u && SIZED.test(u)) ? sized(u, 'sm') : u;   // 640px, for the grid tiles
+  const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md')
     : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
   const row = $('row');
   const slots = items.map((it, i) => {
@@ -1803,8 +1818,9 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const cols = innerWidth < 900 ? 2 : 4, spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = vis[0].offsetTop, left0 = vis[0].offsetLeft;
     vis.forEach(t => { if (t.offsetTop - ov.scrollTop > innerHeight * 1.4) return;
       const c = Math.round((t.offsetLeft - left0) / (t.offsetWidth + mGap())), row = Math.max(0, Math.round((t.offsetTop - top0) / 300));
-      t.style.setProperty('--fx', (spread[c] || 0) + 'px'); t.style.setProperty('--fy', (300 + row * 100) + 'px');
-      t.style.setProperty('--fdl', (.15 + c * .06 + row * .2).toFixed(2) + 's'); t.style.setProperty('--fd', [1.5, 2.1, 1.9, 1.7][(c + row) % 4] + 's');
+      // a quick arrival: the whole first screen is in the air within a quarter second and settled by about a second
+      t.style.setProperty('--fx', Math.round((spread[c] || 0) * .6) + 'px'); t.style.setProperty('--fy', (200 + row * 60) + 'px');
+      t.style.setProperty('--fdl', (.02 + c * .04 + row * .07).toFixed(2) + 's'); t.style.setProperty('--fd', [1.05, 1.3, 1.2, 1.15][(c + row) % 4] + 's');
       const go = () => { t.classList.remove('m-in'); void t.offsetWidth; t.classList.add('m-in'); };
       flown.add(t);
       if (t.classList.contains('ok')) go(); else { t.style.setProperty('--fdl', '0s'); t._fly = go; } });
@@ -1836,7 +1852,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // the shape is read from the tiny thumbnail (same proportions), so the page doesn't wait on 6 MB of grid pictures to lay itself out
   ovTiles.forEach(o => { const u = thOf(still(items[o.i])), i = new Image();
     i.onload = () => { const r = items[o.i].cs && +items[o.i].r ? +items[o.i].r : i.naturalWidth / i.naturalHeight; /* case-study covers all keep one shape (3:2), whatever size the picture is */ o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
-    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u; });   // shape known from the CMS: wait until the tile nears the screen
+    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u;
+    if (o.load && o.i < 16) { o.load(); o.load = null; } });   // shape known from the CMS: wait until the tile nears the screen (the first screenful starts at once)
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); mScrollFly(); });
   // each tile's sharp grid picture is fetched as it nears the screen; the 240px thumbnail shows until then.
   // The copy is picked by the tile's real size in screen pixels: 640px on phones, 1000px on laptops, the full original on large
@@ -2250,7 +2267,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
   // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
-  ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
+  ov.style.transition = 'none'; ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
+  requestAnimationFrame(() => requestAnimationFrame(() => { ov.style.transition = ''; }));   // no fade on arrival: the grid is there as the page paints
   addEventListener('pageshow', e => { if (e.persisted) setTimeout(markHere, 0); });   // back from another page: this place keeps its own name
   const H0 = readHash();
   if (!H0.f && H0.p < 0) setTimeout(markHere, 0);
@@ -2464,6 +2482,6 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 })();
 </script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
-<script src="site-designs.js?v=37540701" defer></script>
+<script src="site-designs.js?v=944eaf08" defer></script>
 </body>
 </html>

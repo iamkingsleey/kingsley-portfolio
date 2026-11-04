@@ -1101,11 +1101,23 @@ addEventListener('wheel', e => {
     // (the page itself is fetched, not pre-built: a page built in the background loses its WebGL grid and its scroll handling)
     try { const sr = document.createElement('script'); sr.type = 'speculationrules'; sr.textContent = JSON.stringify({ prefetch: [next, prev].filter(Boolean).map(u => ({ source: 'list', urls: [u] })) }); document.head.append(sr); } catch (_) {}
     [next, prev].filter(Boolean).forEach(u => fetch(u, { credentials: 'same-origin' }).then(r => r.text()).then(t => {
-      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); const im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async'; im.src = /^assets\/designs\/[^/]+\.webp$/.test(s) ? s.replace('assets/designs/', 'assets/designs/sm/') : s; /* the Designs grid shows the 640px copies, so those are the ones worth having ready */ } });
+      const get = s => { const im = new Image(); im.decoding = 'async'; im.src = s; };
+      // its script, so the page can run the moment it arrives
+      const js = (t.match(/<script src="(site-[\w-]+\.js\?v=\w+)"/) || [])[1]; if (js) fetch(js, { credentials: 'same-origin' }).catch(() => {});
+      // Designs lists the pictures on its first screen (in the order its grid shows them): fetch their thumbnails, then
+      // the sharp copies the grid will lay over them, the same size the grid picks for this screen
+      const first = [...t.matchAll(/<link rel="preload" as="image" href="([^"]+)" data-first>/g)].map(m => m[1]);
+      if (first.length) {
+        const w = (innerWidth < 900 ? (innerWidth - 76) / 2 : (innerWidth - 162) / 4) * (devicePixelRatio || 1), d = w <= 520 ? 'sm' : 'md';
+        first.forEach(get); first.forEach(s => get(s.replace('/thumbs/', '/' + d + '/')));
+        return;
+      }
+      const seen = new Set(); (t.match(/(?:assets\/[\w\/-]+|pv\/[\w-]+)\.(?:jpe?g|png|webp)/g) || []).forEach(s => { if (seen.size < 12 && !seen.has(s)) { seen.add(s); get(s); } });
     }).catch(() => {}));
   };
-  // only once this page has finished loading, so the neighbours never compete with it
-  const idle = () => (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warm, { timeout: 2500 });
+  // as soon as this page has finished loading (so the neighbours never compete with it): Home → Designs is the move
+  // most visitors make first, often within a second or two, so this doesn't wait for the page to go idle
+  const idle = () => setTimeout(warm, 150);
   if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
 })();
 ;

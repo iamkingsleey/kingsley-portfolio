@@ -273,6 +273,25 @@ try:
                         os.makedirs(os.path.dirname(_th), exist_ok=True)
                         _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((300, 300)); _m.save(_th, 'WEBP', quality=80, method=6)
             except Exception as _e: print('webp skipped', _rel, _e)
+    # the case studies' cover pictures sit in the Designs grid too: give each the same 300 / 640 / 1000px copies the design
+    # pieces have (assets/uploads/thumbs|sm|md/…), so the grid's first screen isn't waiting on 3200px pictures
+    try:
+        _up = set()
+        for _c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases']:
+            for _k in ('preview', 'cover'):
+                if isinstance(_c.get(_k), str): _up.add(_c[_k])
+        for _p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8'))['projects']:
+            for _x in _p.get('images', [])[:1]: _up.add(_x.get('src') or '')
+        for _rel in sorted(u for u in _up if re.match(r'assets/uploads/(?!(?:thumbs|sm|md)/).+\.(?:jpe?g|png|webp)$', u, re.I)):
+            _src = f'{REPO}/{_rel}'
+            if not os.path.exists(_src): continue
+            _stem = re.sub(r'\.(?:jpe?g|png|webp)$', '.webp', _rel[len('assets/uploads/'):], flags=re.I)
+            for _d, _w, _q in (('thumbs', 300, 80), ('sm', 640, 78), ('md', 1000, 80)):
+                _o = f'{REPO}/assets/uploads/{_d}/{_stem}'
+                if os.path.exists(_o) and os.path.getmtime(_o) >= os.path.getmtime(_src): continue
+                os.makedirs(os.path.dirname(_o), exist_ok=True)
+                _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((_w, _w * 4)); _m.save(_o, 'WEBP', quality=_q, method=6)
+    except Exception as _e: print('grid copies skipped', _e)
     # WebPs uploaded as-is (no JPG/PNG beside them) can be huge lossless files: one 360 KB picture held the Shop back
     # past 2 s on a phone. Over 250 KB they're re-saved lossy once; the smaller copy is kept only if it saves 40%+, so a
     # file is never squeezed twice.
