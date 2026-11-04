@@ -415,7 +415,7 @@ for _p in PAGES:
     _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback|ripple)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     _s = _clean_links(_s)
     _s = _local_fonts(_s)
-    if 'property="og:image"' not in _s and '</head>' in _s:   # link previews (WhatsApp, LinkedIn, X, Slack…): assets/og-preview.jpg, made from Website_preview.png
+    if 'property="og:image"' not in _s and '</head>' in _s:   # link previews (WhatsApp, LinkedIn, X, Slack…): assets/og-preview-3.jpg, made from Website_preview.png
         _t = (re.search(r'<title>([^<]*)</title>', _s) or [None, 'Kingsley M.'])[1]
         _slug = '' if _p == 'index.html' else _p.replace('.html', '')
         _u = 'https://iamkingsleey.com/' + _slug
@@ -423,10 +423,10 @@ for _p in PAGES:
         _og = (f'<meta name="description" content="{_d}">\n'
                f'<meta property="og:type" content="website">\n<meta property="og:site_name" content="Kingsley M.">\n'
                f'<meta property="og:title" content="{_t}">\n<meta property="og:description" content="{_d}">\n<meta property="og:url" content="{_u}">\n'
-               f'<meta property="og:image" content="https://iamkingsleey.com/assets/og-preview.jpg">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
+               f'<meta property="og:image" content="https://iamkingsleey.com/assets/og-preview-3.jpg">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
                f'<meta property="og:image:alt" content="A collage of Kingsley\'s design work: 3D renders, product screens and the Oghosa brand">\n'
                f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{_t}">\n<meta name="twitter:description" content="{_d}">\n'
-               f'<meta name="twitter:image" content="https://iamkingsleey.com/assets/og-preview.jpg">\n<link rel="canonical" href="{_u}">\n')
+               f'<meta name="twitter:image" content="https://iamkingsleey.com/assets/og-preview-3.jpg">\n<link rel="canonical" href="{_u}">\n')
         if 'name="description"' in _s: _og = _og.split('\n', 1)[1]
         _s = _s.replace('</head>', _og + '</head>', 1)
     _s = _bundle(_s, _p)

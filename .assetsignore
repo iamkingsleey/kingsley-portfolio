@@ -13,3 +13,4 @@ node_modules
 wrangler.toml
 .assetsignore
 /Website_preview.png
+/Website_preview_.png
