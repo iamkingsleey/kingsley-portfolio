@@ -1361,7 +1361,7 @@
     "",
     ""
    ],
-   "cover": "https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400",
+   "cover": "assets/uploads/oghosa/bento.jpg",
    "story": [
     "Protection, drawn as a bag",
     [
@@ -1535,7 +1535,26 @@
      ]
     }
    ],
-   "fxDefault": "kenburns"
+   "fxDefault": "kenburns",
+   "marquee": {
+    "k": "Social · 8 posts",
+    "t": "On the feed",
+    "p": "The identity put to work: a run of posts and posters built from the ring mark, the type system and the three-colour palette. Portraits sit on the dot pattern; the ring carries the line “Powering the future of investments”.",
+    "images": [
+     "assets/uploads/oghosa/post-01.webp",
+     "assets/uploads/oghosa/post-02.webp",
+     "assets/uploads/oghosa/post-03.webp",
+     "assets/uploads/oghosa/post-04.webp",
+     "assets/uploads/oghosa/post-05.webp",
+     "assets/uploads/oghosa/post-06.webp",
+     "assets/uploads/oghosa/post-07.webp",
+     "assets/uploads/oghosa/post-08.webp"
+    ],
+    "rows": 1,
+    "speed": 38,
+    "radius": 16,
+    "height": 420
+   }
   },
   {
    "slug": "kauri",

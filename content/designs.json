@@ -209,6 +209,32 @@
       "credits": []
     },
     {
+      "title": "Ivieomas tote bag",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/ivieomas-tote-bag.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#dedede",
+      "dark": false,
+      "desc": "The Ivieomas mark on a tote, with stickers and bold shapes."
+    },
+    {
+      "title": "Ivieomas varsity jacket",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/ivieomas-varsity-jacket.jpg",
+          "ratio": 1.61
+        }
+      ],
+      "bg": "#055cdc",
+      "dark": true,
+      "desc": "A cobalt varsity jacket carrying the wordmark on the chest."
+    },
+    {
       "title": "Badge",
       "category": "brand",
       "images": [
@@ -562,6 +588,19 @@
       "desc": "A single thread looped into a figure of eight, set as a type poster."
     },
     {
+      "title": "CHAOSS Africa Hacktoberfest",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/chaoss-africa-hacktoberfest.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#dcedf6",
+      "dark": false,
+      "desc": "Event poster for a technical writing and open source documentation program: big type, dots and a scan-to-register panel."
+    },
+    {
       "title": "Reeled",
       "category": "poster",
       "images": [
@@ -573,6 +612,19 @@
       "bg": "#d8ddd2",
       "dark": false,
       "desc": "A colourful reel with a black line winding through it, and a short line about straight lines learning to spin."
+    },
+    {
+      "title": "GitCertified campaign",
+      "category": "poster",
+      "images": [
+        {
+          "src": "assets/designs/gitcertified-campaign.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#f4f4f4",
+      "dark": false,
+      "desc": "Campaign visual for a 30-day push to make the GitHub Foundations certification a must-have for early-career developers across Africa."
     },
     {
       "title": "Stitched, spiral",
@@ -905,6 +957,19 @@
       "tools": "Illustrator"
     },
     {
+      "title": "Casa Verde identity",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/casa-verde-identity.jpg",
+          "ratio": 1.184
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A hospitality brand: the roof-and-leaf mark across cups, cards and signage."
+    },
+    {
       "title": "OSCAFest’25, keynote speaker",
       "category": "brand",
       "images": [
@@ -919,6 +984,19 @@
       "tools": "Figma",
       "mix": true,
       "client": "OSCA"
+    },
+    {
+      "title": "Ivieomas wordmark",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/ivieomas-wordmark.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#015ee9",
+      "dark": true,
+      "desc": "A fashion label wordmark set on cobalt blue, with a ring built into the O."
     },
     {
       "title": "OSCAFest’25, sold out",
@@ -967,6 +1045,19 @@
       "tools": "Figma",
       "mix": true,
       "client": "OSCA"
+    },
+    {
+      "title": "Ivieomas bottle",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/ivieomas-bottle.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#9a9a9a",
+      "dark": false,
+      "desc": "The identity wrapped around a bottle, with the blue tape motif."
     },
     {
       "title": "OSCAFest’25, call for speakers",
@@ -1031,6 +1122,19 @@
       "mix": true,
       "client": "OSCA",
       "tools": "Figma"
+    },
+    {
+      "title": "Pricing plans, light",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-light.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "The same pricing page in light mode."
     },
     {
       "title": "Spring menu, food ordering app",
@@ -1132,6 +1236,19 @@
       "mix": true
     },
     {
+      "title": "Team members modal",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/team-members-modal.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#f8f8f8",
+      "dark": false,
+      "desc": "A workspace members modal: search, invite and per-person roles."
+    },
+    {
       "title": "AI writing assistant",
       "category": "ui",
       "images": [
@@ -1206,6 +1323,19 @@
       "tools": "Figma",
       "mix": true,
       "case": "bulvds"
+    },
+    {
+      "title": "Pricing plans, dark",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-dark.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
     },
     {
       "title": "Bulvds, add-ons at checkout",

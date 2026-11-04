@@ -31,6 +31,24 @@ button { font: inherit; color: inherit; cursor: pointer }
 /* top bar: back to Designs, and the case's frequency */
 .top { display: flex; justify-content: space-between; align-items: center; padding: 24px var(--gut); font-size: 14px }
 .top a { text-decoration: none; color: var(--muted); transition: color .2s } .top a:hover { color: var(--ink) }
+
+/* marquee: posters and social mockups in a constant scroll, edge to edge, last thing before the next case (content: c.marquee) */
+.mqb { padding: 120px 0 40px }
+.mqb .mqh { padding: 0 var(--gut); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px 48px; align-items: end; margin-bottom: 34px }
+.mqb .mqh h2 { margin: 10px 0 0; font: 600 clamp(28px, 3.2vw, 44px)/1.04 var(--body); letter-spacing: -.035em; color: var(--ink) }
+.mqb .mqh p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text); max-width: 50ch }
+.mqb .mq { position: relative; overflow: hidden; --h: 420px; --gap: 18px; --r: 16px; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y }
+.mqb .mq.drag { cursor: grabbing }
+.mqb .track { display: flex; gap: var(--gap); width: max-content; will-change: transform; padding: 16px 0 10px }
+.mqb .track + .track { margin-top: calc(var(--gap) - 16px) }
+.mqb figure { margin: 0; flex: none; height: var(--h); border-radius: var(--r); overflow: hidden; background: var(--panel); transition: transform .5s cubic-bezier(.2, .8, .2, 1) }
+.mqb figure img { height: 100%; width: auto; display: block; pointer-events: none }
+.mqb figure:hover { transform: translateY(-10px) }
+.mqb .mq.two { --h: 300px }
+.mqb .mqr { display: flex; justify-content: space-between; align-items: center; padding: 14px var(--gut) 0; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.mqb .mqr .dots { display: flex; gap: 6px } .mqb .mqr .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--line) } .mqb .mqr .dots i.on { background: var(--red) }
+@media (max-width: 760px) { .mqb { padding: 72px 0 24px } .mqb .mqh { grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px } .mqb .mq { --h: 280px; --gap: 12px } .mqb .mq.two { --h: 220px } .mqb .mqr { display: none } }
+@media (prefers-reduced-motion: reduce) { .mqb .mq { overflow-x: auto } .mqb figure:hover { transform: none } }
 /* next case, at the end of every layout */
 .next { display: block; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; padding: 48px var(--gut) 160px; transition: background .25s }
 .next:hover { background: var(--panel) }
@@ -1072,6 +1090,16 @@ function prep(c) {
   return { ...c, meta, secs, stats, cover: c.cover, lede: c.blurb };
 }
 const nextOf = c => { const list = CASES.filter(x => x.kind === c.kind), i = list.findIndex(x => x.slug === c.slug); return list[(i + 1) % list.length]; };
+
+// the marquee block (content: c.marquee = { k, t, p, images: [...], rows: 1|2, speed, radius, height })
+const MQB = c => { const m = c.marquee; if (!m || !Array.isArray(m.images) || !m.images.filter(Boolean).length) return '';
+  const imgs = m.images.filter(Boolean), rows = +m.rows === 2 ? 2 : 1;
+  const fig = (u, i) => `<figure><img src="${esc(u)}" alt="${esc(c.title)} post ${i + 1}" loading="lazy" draggable="false"></figure>`;
+  const track = (list) => `<div class="track">${list.map(fig).join('')}${list.map(fig).join('')}</div>`;   // doubled, so the loop never shows a seam
+  const second = imgs.slice(Math.floor(imgs.length / 2)).concat(imgs.slice(0, Math.floor(imgs.length / 2)));
+  return `<section class="mqb covers"><div class="mqh"><div>${m.k ? `<span class="mono">${esc(m.k)}</span>` : ''}${m.t ? `<h2>${esc(m.t)}</h2>` : ''}</div>${m.p ? `<p>${esc(m.p)}</p>` : ''}</div>
+    <div class="mq${rows === 2 ? ' two' : ''}" data-speed="${+m.speed || 38}" data-n="${imgs.length}" style="${m.radius != null ? `--r:${+m.radius}px;` : ''}${m.height ? `--h:${+m.height}px;` : ''}">${track(imgs)}${rows === 2 ? track(second) : ''}</div>
+    <div class="mqr"><span>Drag to scrub</span><span class="dots">${imgs.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span><span class="cnt">01 / ${String(imgs.length).padStart(2, '0')}</span></div></section>`; };
 const NEXT = c => { const n = nextOf(c); return `<button class="next" type="button" data-go="${esc(n.slug)}"><span class="mono">Next case · ${esc(n.kind)}</span><span class="t">${esc(n.title)}<i>→</i></span></button>`; };
 // the same header as a piece open on Designs: "All designs" back, the piece's number, its name and the signal bars
 const TOP = c => { const k = CASES.findIndex(x => x.slug === c.slug) + 1;
@@ -1565,7 +1593,7 @@ R.N = function (c) {
     return g.length ? g : null; })();
   if (GAL) {
     GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}" data-rows="1"` : ''}>${rowsBlock(sec.rows)}</div>`; });
-    return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
+    return h + `<div style="height:96px"></div>${MQB(c)}${NEXT(c)}</main>`;
   }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
   // the closing pictures: a square pair, one wide 16:9 picture across the full width, then another square pair. The most landscape
@@ -1587,8 +1615,34 @@ R.N = function (c) {
     const wide = wi >= 0 ? oth[wi] : null, last = oth.filter((_, i) => i !== wi).slice(0, 2);
     const W = (m, x = '') => `<div class="fill clw${x}">${M(m)}</div>`;
     h += `<div class="nf covers"><div class="cl">${wide ? W(wide) : ''}${W(first[0], ' clt')}${last.length === 2 ? `<div class="clp">${last.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : ''}</div></div>`; }
-  return h + `<div style="height:96px"></div>${NEXT(c)}</main>`;
+  return h + `<div style="height:96px"></div>${MQB(c)}${NEXT(c)}</main>`;
 };
+
+// the marquee: a constant drift that eases to a crawl under the pointer, drag to scrub, a counter for the post in the middle
+const MQS = [];
+function setupMarquee() {
+  MQS.splice(0).forEach(stop => stop());
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  document.querySelectorAll('.mqb .mq').forEach(mq => {
+    const tracks = [...mq.querySelectorAll('.track')].map((el, i) => ({ el, dir: i ? -1 : 1, x: 0, half: 0 })), n = +mq.dataset.n || 1, speed = +mq.dataset.speed || 38;
+    const dots = [...mq.parentElement.querySelectorAll('.dots i')], cnt = mq.parentElement.querySelector('.cnt');
+    let raf = 0, last = performance.now(), drag = null, slow = 1, k = -1;
+    const measure = () => tracks.forEach(t => { t.half = t.el.scrollWidth / 2; });
+    measure(); const ro = 'ResizeObserver' in window ? new ResizeObserver(measure) : null; if (ro) ro.observe(mq);
+    const tick = now => { raf = requestAnimationFrame(tick); const dt = Math.min(50, now - last); last = now;
+      const target = drag ? 0 : (fine && mq.matches(':hover') ? .12 : 1); slow += (target - slow) * .08;
+      const v = speed * slow * dt / 1000;
+      tracks.forEach(t => { if (!drag) t.x -= v * t.dir; if (t.half) { if (t.x <= -t.half) t.x += t.half; if (t.x > 0) t.x -= t.half; } t.el.style.transform = `translate3d(${t.x.toFixed(2)}px,0,0)`; });
+      const t0 = tracks[0]; if (t0 && t0.half && dots.length) { const cw = t0.half / n, i = Math.floor(((mq.clientWidth / 2 - t0.x) % t0.half) / cw), j = ((i % n) + n) % n;
+        if (j !== k) { k = j; if (cnt) cnt.textContent = `${String(j + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`; dots.forEach((d, q) => d.classList.toggle('on', q === j)); } } };
+    if (!reduce) raf = requestAnimationFrame(tick);
+    const down = e => { if (e.button > 0 || reduce) return; drag = { x: e.clientX }; mq.classList.add('drag'); try { mq.setPointerCapture(e.pointerId); } catch (_) {} };
+    const move = e => { if (!drag) return; const dx = e.clientX - drag.x; drag.x = e.clientX; tracks.forEach(t => { t.x += dx * t.dir; }); };
+    const up = () => { drag = null; mq.classList.remove('drag'); };
+    mq.addEventListener('pointerdown', down); mq.addEventListener('pointermove', move); mq.addEventListener('pointerup', up); mq.addEventListener('pointercancel', up);
+    MQS.push(() => { cancelAnimationFrame(raf); if (ro) ro.disconnect(); });
+  });
+}
 // wire the pinned sections once the page is drawn
 const nOff = [];
 // drag a scale like a dial: the section scrolls with your finger (one stop per 120px, the ruler's own spacing), then settles on the nearest stop
@@ -1716,7 +1770,7 @@ function paint(keep) {
   app.querySelectorAll('[data-kdec]').forEach(d => { const bs = [...d.querySelectorAll('nav button')], ps = [...d.querySelectorAll('.pane')];
     d.querySelector('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const i = +b.dataset.i;
       bs.forEach((x, j) => x.setAttribute('aria-selected', j === i)); ps.forEach((p, j) => p.hidden = j !== i); }); });
-  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw); setupBoards(); setupDials();
+  setupIndex(); setupN(); if (L === 'H') trackIn(); setupPlay(); countUp(); applyFx(raw); setupBoards(); setupDials(); setupMarquee();
   if (window.KM && KM.trail) KM.trail.mark(undefined, c.title);   // this case's own name, whatever the page said a moment before
   if (KM_EDIT) editable(c);
 }
