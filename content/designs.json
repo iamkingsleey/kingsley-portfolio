@@ -237,6 +237,19 @@
       "desc": "The Ivieomas mark on a tote, with stickers and bold shapes."
     },
     {
+      "title": "Casa Verde signage",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/casa-verde-signage.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#7c7c7c",
+      "dark": false,
+      "desc": "A mockup from the Casa Verde brand project: the mark on a wall sign, built for better living."
+    },
+    {
       "title": "ShareBuddy \"Share with Buddies\"",
       "category": "brand",
       "images": [
@@ -1307,6 +1320,21 @@
       "mix": true
     },
     {
+      "title": "Dashboard on a laptop",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/laptop-on-a-car.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#17171b",
+      "dark": true,
+      "desc": "A dashboard UI shown on a laptop resting on a car.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
       "title": "AI assistant card",
       "category": "ui",
       "images": [
@@ -1424,6 +1452,21 @@
       "bg": "#7f8287",
       "dark": false,
       "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Cend, home in hand",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-home-in-hand.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#2e3642",
+      "dark": true,
+      "desc": "The Cend home, with quick sends, riders nearby and recent orders, in hand.",
       "tools": "Figma",
       "mix": true
     },
