@@ -12,3 +12,4 @@ node_modules
 .gitignore
 wrangler.toml
 .assetsignore
+/Website_preview.png
