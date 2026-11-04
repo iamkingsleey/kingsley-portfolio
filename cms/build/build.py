@@ -320,7 +320,7 @@ for p in pj:
         if p.get(f_): e[f_] = p[f_]
     A.setdefault(p.get('category', '3d'), []).append(e)
 # case studies (content/cases.json) join the feed first in their category, tagged, and open case.html
-CASES = json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases']
+CASES = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden')]   # a case hidden in the CMS leaves the feed too
 def _loc(o):
     if isinstance(o, str) and o.startswith('https://framerusercontent.com/'):
         n = o.split('?')[0].rsplit('/', 1)[1]

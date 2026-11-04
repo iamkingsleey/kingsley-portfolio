@@ -103,7 +103,7 @@ _sh.copy(f'{KFM}/nav.js', f'{REPO}/nav.js')
 NAV = '<script src="nav.js" defer></script>\n'
 # iteration 4: Home's intro status (home.js), Home ↔ Designs by scrolling (flow.js), tips for getting around (protips.js)
 _sh.copy(f'{KFM}/kit.js', f'{REPO}/kit.js'); _sh.copy(f'{KFM}/feedback.js', f'{REPO}/feedback.js'); _sh.copy(f'{KFM}/home.js', f'{REPO}/home.js'); _sh.copy(f'{KFM}/flow.js', f'{REPO}/flow.js')
-_cases = json.load(open(f'{REPO}/content/cases.json', encoding='utf-8')).get('cases', [])
+_cases = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8')).get('cases', []) if not c.get('hidden')]
 _dsn = [p for p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8')).get('projects', []) if not p.get('hidden')]
 _ncs = len(_cases) + sum(1 for p in _dsn if p.get('caseStudy'))
 _hint = f"{len(_dsn) + len(_cases)} pieces · {_ncs} case stud{'y' if _ncs == 1 else 'ies'}"
