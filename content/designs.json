@@ -340,7 +340,7 @@
     },
     {
       "title": "Tennis ball and rackets",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/tennis-ball-and-racket.jpg",
@@ -349,11 +349,12 @@
       ],
       "bg": "#585858",
       "dark": true,
-      "desc": "A tennis ball between two rackets, lit like a studio product shot."
+      "desc": "A tennis ball between two rackets, lit like a studio product shot.",
+      "case": "3d-collection"
     },
     {
       "title": "Tennis in motion, blue",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/tennis-in-motion-blue-background.jpg",
@@ -362,11 +363,12 @@
       ],
       "bg": "#4a6892",
       "dark": true,
-      "desc": "A tennis ball and racket caught mid-swing, on blue."
+      "desc": "A tennis ball and racket caught mid-swing, on blue.",
+      "case": "3d-collection"
     },
     {
       "title": "Tennis in motion, dark blue",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/tennis-in-motion-dark-blue-background.jpg",
@@ -375,7 +377,8 @@
       ],
       "bg": "#102a3a",
       "dark": true,
-      "desc": "The same swing on dark blue, for a darker brand."
+      "desc": "The same swing on dark blue, for a darker brand.",
+      "case": "3d-collection"
     },
     {
       "title": "Star badge",
@@ -392,7 +395,7 @@
     },
     {
       "title": "Tennis on court",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/tennis-and-racket.jpg",
@@ -401,11 +404,12 @@
       ],
       "bg": "#338189",
       "dark": true,
-      "desc": "A tennis ball and racket on court."
+      "desc": "A tennis ball and racket on court.",
+      "case": "3d-collection"
     },
     {
       "title": "Red padlock",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/red-lock-with-robe.jpg",
@@ -414,11 +418,12 @@
       ],
       "bg": "#b52f23",
       "dark": true,
-      "desc": "A red padlock with a rope, an image of security that still feels friendly."
+      "desc": "A red padlock with a rope, an image of security that still feels friendly.",
+      "case": "3d-collection"
     },
     {
       "title": "Orange padlock",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
@@ -427,7 +432,8 @@
       ],
       "bg": "#ccbfc1",
       "dark": false,
-      "desc": "A bright orange padlock with a rope, from the same security set."
+      "desc": "A bright orange padlock with a rope, from the same security set.",
+      "case": "3d-collection"
     },
     {
       "title": "Rolled ₦1,000 note",
@@ -523,7 +529,7 @@
     },
     {
       "title": "Tennis, from above",
-      "category": "motion",
+      "category": "3d",
       "images": [
         {
           "src": "assets/designs/tennis-aerial.jpg",
@@ -532,7 +538,8 @@
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "Tennis balls and a racket on a blue court, seen from above."
+      "desc": "Tennis balls and a racket on a blue court, seen from above.",
+      "case": "3d-collection"
     },
     {
       "title": "Star trophy",
