@@ -1180,6 +1180,22 @@
       "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
     },
     {
+      "title": "Bulvds, wallet home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-wallet-home.jpg",
+          "ratio": 1.5267
+        }
+      ],
+      "bg": "#ebebeb",
+      "dark": false,
+      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
       "title": "Pricing plans, light",
       "category": "ui",
       "images": [
@@ -1191,90 +1207,6 @@
       "bg": "#ffffff",
       "dark": false,
       "desc": "The same pricing page in light mode."
-    },
-    {
-      "title": "Spring menu, food ordering app",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/spring-menu-food-ordering-app.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#f2f5f7",
-      "dark": false,
-      "desc": "A UI study: replicating an existing food brand’s spring menu onboarding, with big type over food photography leading into sign-in and ordering. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
-    },
-    {
-      "title": "eBay, home and categories",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#f2f5f7",
-      "dark": false,
-      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
-    },
-    {
-      "title": "eBay, price history and reporting",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ebay-concept-price-history-and-reporting.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#f2f5f7",
-      "dark": false,
-      "desc": "A UI study: replicating eBay’s item details, with the sold-price chart, its time filters and the flow for reporting a message. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
-    },
-    {
-      "title": "Discord, servers and messages",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#ffffff",
-      "dark": false,
-      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
     },
     {
       "title": "Search, recent and related",
@@ -1292,6 +1224,21 @@
       "mix": true
     },
     {
+      "title": "Top destinations, travel site",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/travel-destinations-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3d3b3a",
+      "dark": true,
+      "desc": "A travel site’s top destinations: Kyoto, London, Barcelona and more, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
       "title": "Team members modal",
       "category": "ui",
       "images": [
@@ -1305,17 +1252,45 @@
       "desc": "A workspace members modal: search, invite and per-person roles."
     },
     {
-      "title": "AI writing assistant",
+      "title": "Pricing plans, dark",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/ai-writing-assistant.jpg",
+          "src": "assets/designs/pricing-plans-dark.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
+    },
+    {
+      "title": "Smart Cards landing page",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/smart-cards-on-a-laptop.jpg",
           "ratio": 1.3333
         }
       ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
+      "bg": "#3e3c3b",
+      "dark": true,
+      "desc": "A landing page for smart business cards, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "DIGIM, “Don’t be a spectator”",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-dont-be-a-spectator.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#393635",
+      "dark": true,
+      "desc": "A DIGIM agency page with a bold headline over a strip of campaign images, shown on a laptop.",
       "tools": "Figma",
       "mix": true
     },
@@ -1350,6 +1325,88 @@
       "mix": true
     },
     {
+      "title": "Bulvds, choosing how to pay",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-payment-method.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#f0f0f0",
+      "dark": false,
+      "desc": "The payment summary, with Bulvds Wallet, Paystack or Split Payment.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
+      "title": "DIGIM, footer",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-footer.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#2f2d2c",
+      "dark": true,
+      "desc": "The DIGIM site footer: “Making brands unforgettable” with a newsletter sign-up, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Cend, search home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-search-home.jpg",
+          "ratio": 1.5002
+        }
+      ],
+      "bg": "#7f8287",
+      "dark": false,
+      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "eBay, price history and reporting",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ebay-concept-price-history-and-reporting.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#f2f5f7",
+      "dark": false,
+      "desc": "A UI study: replicating eBay’s item details, with the sold-price chart, its time filters and the flow for reporting a message. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
+      "title": "DIGIM, agency home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-agency-home.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#403d3c",
+      "dark": true,
+      "desc": "The DIGIM digital marketing agency home page, bold type and client logos, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
       "title": "Design Build Share, orange",
       "category": "poster",
       "images": [
@@ -1380,35 +1437,6 @@
       "mix": true
     },
     {
-      "title": "Bulvds, wallet home",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/bulvds-wallet-home.jpg",
-          "ratio": 1.5267
-        }
-      ],
-      "bg": "#ebebeb",
-      "dark": false,
-      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
-      "tools": "Figma",
-      "mix": true,
-      "case": "bulvds"
-    },
-    {
-      "title": "Pricing plans, dark",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/pricing-plans-dark.jpg",
-          "ratio": 1.218
-        }
-      ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
-    },
-    {
       "title": "Bulvds, add-ons at checkout",
       "category": "ui",
       "images": [
@@ -1425,33 +1453,89 @@
       "case": "bulvds"
     },
     {
-      "title": "Bulvds, choosing how to pay",
+      "title": "AI writing assistant",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/bulvds-payment-method.jpg",
-          "ratio": 1.0
+          "src": "assets/designs/ai-writing-assistant.jpg",
+          "ratio": 1.3333
         }
       ],
-      "bg": "#f0f0f0",
+      "bg": "#e4eaef",
       "dark": false,
-      "desc": "The payment summary, with Bulvds Wallet, Paystack or Split Payment.",
+      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
       "tools": "Figma",
-      "mix": true,
-      "case": "bulvds"
+      "mix": true
     },
     {
-      "title": "Cend, search home",
+      "title": "Discord, servers and messages",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/cend-search-home.jpg",
-          "ratio": 1.4995
+          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
+      "title": "Cend, incoming requests",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-requests.jpg",
+          "ratio": 1.4988
         }
       ],
       "bg": "#7f8287",
       "dark": false,
-      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "desc": "Incoming requests stacked as cards, each with its price, pickup and drop-off.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "eBay, home and categories",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#f2f5f7",
+      "dark": false,
+      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
+      "title": "Travel Explore, flight search",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/flight-search-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3c3b3c",
+      "dark": true,
+      "desc": "A flight booking home with the search right under the hero, shown on a laptop.",
       "tools": "Figma",
       "mix": true
     },
@@ -1471,19 +1555,25 @@
       "mix": true
     },
     {
-      "title": "Cend, incoming requests",
+      "title": "Spring menu, food ordering app",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/cend-requests.jpg",
-          "ratio": 1.4981
+          "src": "assets/designs/spring-menu-food-ordering-app.jpg",
+          "ratio": 1.3333
         }
       ],
-      "bg": "#7f8287",
+      "bg": "#f2f5f7",
       "dark": false,
-      "desc": "Incoming requests stacked as cards, each with its price, pickup and drop-off.",
+      "desc": "A UI study: replicating an existing food brand’s spring menu onboarding, with big type over food photography leading into sign-in and ordering. Not my original design.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "ShareBuddy, logo in motion",
