@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}, "needle": "line", "corners": "rounded"};document.documentElement.dataset.corners=window.KM_SITE.corners;window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();if(k==="dot"){c.arc(hx,hy,t*1.4+1.5,0,7)}else if(k==="diamond"){var d=t*1.6+2;c.moveTo(hx-d,hy);c.lineTo(hx,hy-d);c.lineTo(hx+d,hy);c.lineTo(hx,hy+d)}else if(k==="triangle"){var s=t*1.7+2;if(hz){c.moveTo(hx+s*1.3,hy);c.lineTo(hx-s*.4,hy-s);c.lineTo(hx-s*.4,hy+s)}else{c.moveTo(hx,hy-s*1.3);c.lineTo(hx-s,hy+s*.4);c.lineTo(hx+s,hy+s*.4)}}else if(k==="cap"){var L=t*2.6+3;if(hz)c.rect(hx-t,hy-L,t*1.6,L*2);else c.rect(hx-L,hy-t*.6,L*2,t*1.6)}c.closePath();c.fill()};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
+<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}, "needle": "line", "corners": "rounded"};document.documentElement.dataset.corners=window.KM_SITE.corners;window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();if(k==="dot"){c.arc(hx,hy,t*1.4+1.5,0,7)}else if(k==="diamond"){var d=t*1.6+2;c.moveTo(hx-d,hy);c.lineTo(hx,hy-d);c.lineTo(hx+d,hy);c.lineTo(hx,hy+d)}else if(k==="triangle"){var s=t*1.7+2;if(hz){c.moveTo(hx+s*1.3,hy);c.lineTo(hx-s*.4,hy-s);c.lineTo(hx-s*.4,hy+s)}else{c.moveTo(hx,hy-s*1.3);c.lineTo(hx-s,hy+s*.4);c.lineTo(hx+s,hy+s*.4)}}else if(k==="cap"){var L=t*2.6+3;if(hz)c.rect(hx-t,hy-L,t*1.6,L*2);else c.rect(hx-L,hy-t*.6,L*2,t*1.6)}c.closePath();c.fill()};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html").replace(/^home\.html$/,"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 <style id="km-corners">html[data-corners="rounded"]{--km-r:14px}html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in,.d-frame,.d-pic,span.th,.keep,.gal .main){border-radius:var(--km-r)!important;overflow:hidden}html[data-corners="rounded"] .lb img{border-radius:var(--km-r)!important}html[data-corners="rounded"] figure.sw .m img{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.gal .thumbs button,#strip button,.d-gt){border-radius:8px!important;overflow:hidden}html[data-corners="rounded"] :is(#strip button,.d-gt) img{border-radius:inherit}html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}</style>
 
 <meta charset="utf-8">
@@ -12,11 +12,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kingsley M.</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600;700&display=swap">
+<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-latin.woff2) format("woff2")}@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-mono-latin.woff2) format("woff2")}@font-face{font-family:"Jockey One";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/jockey-one-latin.woff2) format("woff2")}</style>
 <script>
-  var BUILD = "202611041442";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202611041505";   // changes every build so browsers fetch the new Designs page
   // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
   (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
     if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -439,6 +437,7 @@ h1.typer { position: relative }
 .fm-wave { position: absolute; left: 0; top: 0; pointer-events: none }
 </style>
 <style>#dialLayer, .side-nav, .station .back, .sdial { display: none !important }</style>
+<style>.socials .wip { font-size: 13px; padding: 6px 4px 6px 8px; color: var(--muted); letter-spacing: .02em; cursor: default; align-self: center }</style>
 <script>(function(){var on=function(){try{var f=JSON.parse(sessionStorage.getItem("km-flow")||"null");sessionStorage.removeItem("km-flow");if(f&&Date.now()-f.t<6000)document.documentElement.classList.add(f.d>0?"flow-up":"flow-down")}catch(e){}};if(document.prerendering)document.addEventListener("prerenderingchange",on,{once:true});else on()})()</script><style>html.flow-up body>*:not(.kmn-scale):not(.ov):not([class^="pt-"]),html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation:flin .45s cubic-bezier(.2,.8,.2,1) both}html.flow-down body>*:not(.kmn-scale):not([class^="pt-"]){animation-name:flfade}html.flow-up .ov{animation:flfade .45s cubic-bezier(.2,.8,.2,1) both}@keyframes flfade{from{opacity:.15}}html.flow-up{--fl:36px}@keyframes flin{from{translate:0 var(--fl);opacity:.15}}</style>
 </head>
 <body>
@@ -527,7 +526,7 @@ h1.typer { position: relative }
         <p>Previously, I led design at <span class="ref" tabindex="0">Kusnap<span class="ref-card" role="tooltip"><b>Kusnap</b><span class="k">Peer-to-peer marketplace · Head of Design</span><span class="n">50,000+</span><span class="k">users, designed from early stage</span></span></span>.</p>
       </div>
     </div>
-    <nav class="socials" aria-label="Social"><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://dribbble.com/kingsleey" target="_blank" rel="noopener">Dribbble</a><a href="https://www.instagram.com/iamkingsleey/" target="_blank" rel="noopener">Instagram</a><a href="https://medium.com/@iamkingsleey" target="_blank" rel="noopener">Medium</a><a href="https://unsplash.com/@iamkingsleey" target="_blank" rel="noopener">Unsplash</a></nav>
+    <nav class="socials" aria-label="Social"><a href="https://www.linkedin.com/in/iamkingsleey/" target="_blank" rel="noopener">LinkedIn</a><a href="https://dribbble.com/kingsleey" target="_blank" rel="noopener">Dribbble</a><a href="https://www.instagram.com/iamkingsleey/" target="_blank" rel="noopener">Instagram</a><a href="https://medium.com/@iamkingsleey" target="_blank" rel="noopener">Medium</a><a href="https://unsplash.com/@iamkingsleey" target="_blank" rel="noopener">Unsplash</a><span class="wip" title="Work in progress, version 1">WIP.V1</span></nav>
   </section>
   <div class="role-peek" id="rolePeek" aria-hidden="true"><img alt=""></div>
   <div class="peek" id="peek" aria-hidden="true"></div>
@@ -1896,15 +1895,8 @@ h1.typer { position: relative }
       if (on) Popkit.play('pop');
     }, true); })();
 </script>
-<script src="nav.js?v=1fc48f3b" defer></script>
 <script>window.KM_HOMEBG = [{"src": "assets/designs/thumbs/paper-plane-with-coin.webp", "ratio": 0.8}, {"src": "assets/designs/dollar-bills-on-red-stairs.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/3d-tumbler-render.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/badge-purple.webp", "ratio": 1.5}, {"src": "assets/designs/rolled-100-dollar-bill.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/safe-with-coins.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/pawn-in-an-archway.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/colorful-award-with-ribbons.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/gold-coins-glassy-mouse.webp", "ratio": 0.8}, {"src": "assets/designs/rolled-dollar-and-naira-notes.webp", "ratio": 0.8}, {"src": "assets/designs/thumbs/fintech-box.webp", "ratio": 1.5}, {"src": "assets/designs/thumbs/silver-coins-glassy-mouse.webp", "ratio": 0.8}];</script>
-<script src="homebg.js?v=14a9878b" defer></script>
-<script src="kit.js?v=2ab9e6a1" defer></script>
-<script src="ripple.js?v=2e2214a6" defer></script>
-<script src="protips.js?v=fb1b5aa7" defer></script>
-<script src="feedback.js?v=54cf3e76" defer></script>
-<script src="home.js?v=6d8a7b28" defer></script>
-<script src="flow.js?v=413b56fb" defer></script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
+<script src="site-home.js?v=f33a3085" defer></script>
 </body>
 </html>

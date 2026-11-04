@@ -284,7 +284,7 @@ s = rep(s, "  const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.sl
         "  if (['about', 'engineering', 'projects'].includes(hashId)) { location.replace(hashId + '.html?v=' + BUILD); return; }")
 s = rep(s, "    if (sound) play(open ? 'open' : 'close', true);", "    if (sound) play('pop', true);   // one click sound everywhere")
 s = rep(s, '</body>', CLICK + '</body>')
-s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a></nav>')
+s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a><span class="wip" title="Work in progress, version 1">WIP.V1</span></nav>')
 s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailto:iamkingsleey@gmail.com" id="emailLink" data-email="iamkingsleey@gmail.com">email</a>')
 s = rep(s, '<p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>',
         '<p>Brand and product designer, designing from <span class="hl">0-1</span> at <br><span class="hl">fintech, e-commerce</span> and property startups.</p>')
@@ -294,6 +294,7 @@ for _n, _u in [('LinkedIn', 'https://www.linkedin.com/in/iamkingsleey/'), ('Medi
 # the old dial (v3) is still in the markup; nav.js hides it once it loads, which can show it for a frame on arrival.
 # Hide it in the page's own styles so it never paints.
 s = rep(s, '</head>', '<style>#dialLayer, .side-nav, .station .back, .sdial { display: none !important }</style>\n</head>')
+s = rep(s, '</head>', '<style>.socials .wip { font-size: 13px; padding: 6px 4px 6px 8px; color: var(--muted); letter-spacing: .02em; cursor: default; align-self: center }</style>\n</head>')
 open(f'{REPO}/index.html', 'w', encoding='utf-8').write(s)
 
 # ================================================================ designs.html

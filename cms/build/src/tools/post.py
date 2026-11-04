@@ -187,7 +187,7 @@ SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('avai
   # kmSend: every form on the site sends through this. With an inbox set up (CMS → Settings → Inbox) the message goes there;
   # it resolves true once it is stored, false when there is no inbox or it could not be reached (the form then falls back to email)
   + 'window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);'
-  + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html")+location.hash},o);'
+  + 'var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html").replace(/^home\.html$/,"index.html")+location.hash},o);'
   + 'return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};'
   + '</script>\n' + CORNERS)   # settings the pages read (CMS → Settings)
 # arriving by scroll: Designs settles up into place (its grid only fades: moving it would throw its drum out of line); Home only fades
@@ -301,6 +301,50 @@ def _ver(n):
         try: _vers[n] = _hl.md5(open(f'{REPO}/{n}.js', 'rb').read()).hexdigest()[:8]
         except OSError: _vers[n] = '0'
     return _vers[n]
+
+# ---- speed: fonts served from the site (no trip to Google), one script file per page, long cache for assets
+_LOCAL_FONTS = {'Geist': ('geist-latin.woff2', 'normal'), 'Geist Mono': ('geist-mono-latin.woff2', 'normal'), 'Jockey One': ('jockey-one-latin.woff2', 'normal')}
+_FONT_CSS = ('<style>@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-latin.woff2) format("woff2")}'
+             '@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-mono-latin.woff2) format("woff2")}'
+             '@font-face{font-family:"Jockey One";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/jockey-one-latin.woff2) format("woff2")}</style>')
+def _local_fonts(h):
+    """The Google Fonts link becomes local @font-face rules (the files live in assets/fonts). Families we do not host
+    (the serif and display faces on the case pages) keep a Google link, loaded without blocking the first paint."""
+    m = re.search(r'<link rel="stylesheet" href="https://fonts\.googleapis\.com/css2\?([^"]+)">', h)
+    if not m: return h
+    fams = re.findall(r'family=([^&]+)', m.group(1))
+    keep = [f for f in fams if f.split(':')[0].replace('+', ' ') not in _LOCAL_FONTS]
+    pre = ''.join(f'<link rel="preload" href="assets/fonts/{f}" as="font" type="font/woff2" crossorigin>' for f in ('geist-latin.woff2',) )
+    rest = ''
+    if keep:
+        u = 'https://fonts.googleapis.com/css2?' + '&'.join('family=' + f for f in keep) + '&display=swap'
+        rest = f'<link rel="preload" href="{u}" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" href="{u}"></noscript>'
+    h = h.replace(m.group(0), pre + _FONT_CSS + rest, 1)
+    h = h.replace('<link rel="preconnect" href="https://fonts.googleapis.com">\n', '' if not keep else '<link rel="preconnect" href="https://fonts.googleapis.com">\n', 1)
+    if not keep: h = h.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n', '', 1)
+    return h
+
+_BUNDLES = {}
+def _bundle(h, page):
+    """Every deferred script tag at the end of the page becomes one file, site-<page>.js, in the same order."""
+    tags = re.findall(r'<script src="(nav|kit|protips|home|flow|homebg|feedback|ripple)\.js(?:\?v=\w+)?" defer></script>\n?', h)
+    if len(tags) < 2: return h
+    parts = []
+    for n in tags:
+        try: parts.append(f'/* {n}.js */\n' + open(f'{REPO}/{n}.js', encoding='utf-8').read().rstrip() + '\n;\n')
+        except OSError: pass
+    body = ''.join(parts); name = 'site-home' if page == 'index.html' else 'site-designs' if page == 'designs.html' else 'site'   # three bundles: Home, Designs, every other page
+    open(f'{REPO}/{name}.js', 'w', encoding='utf-8').write(body)
+    v = _hl.md5(body.encode('utf-8')).hexdigest()[:8]
+    h = re.sub(r'<script src="(nav|kit|protips|home|flow|homebg|feedback|ripple)\.js(?:\?v=\w+)?" defer></script>\n?', '', h)
+    return h.replace('</body>', f'<script src="{name}.js?v={v}" defer></script>\n</body>', 1)
+
+open(f'{REPO}/_headers', 'w', encoding='utf-8').write(
+    '# cache: pictures, fonts and icons never change at the same address; scripts carry ?v=; pages are checked each visit\n'
+    '/*\n  Cache-Control: public, max-age=0, must-revalidate\n'
+    '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'
+    '/*.js\n  Cache-Control: public, max-age=604800\n'
+    '/sw.js\n  Cache-Control: no-cache\n')
 # ---- offline page (cms/build/src/offline.html) and the small service worker that shows it when a page can't load.
 # The worker only steps in when the network fails; online, every page comes straight from the site as before.
 _off = _acc(open(f'{KFM}/offline.html', encoding='utf-8').read())
@@ -370,6 +414,8 @@ for _p in PAGES:
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
     _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback|ripple)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     _s = _clean_links(_s)
+    _s = _local_fonts(_s)
+    _s = _bundle(_s, _p)
     if 'rel="icon"' not in _s and '<meta charset="utf-8">' in _s:   # the favicon (assets/icons, made from favicon.png)
         _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<link rel="icon" href="assets/icons/favicon.ico" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">\n<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/favicon-180.png">', 1)
     open(_f, 'w', encoding='utf-8').write(_s)

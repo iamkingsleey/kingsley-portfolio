@@ -1,0 +1,9 @@
+# cache: pictures, fonts and icons never change at the same address; scripts carry ?v=; pages are checked each visit
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/*.js
+  Cache-Control: public, max-age=604800
+/sw.js
+  Cache-Control: no-cache
