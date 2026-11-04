@@ -1,0 +1,14 @@
+# not published to the site (they stay in the repo)
+.git
+.github
+cms
+iteration-1
+iteration-2
+iteration-3
+img
+Oghosa
+node_modules
+*.md
+.gitignore
+wrangler.toml
+.assetsignore
