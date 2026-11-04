@@ -370,6 +370,8 @@ for _p in PAGES:
     # every shared script gets ?v=<its content hash>, so a push shows up straight away instead of waiting out the browser's cache
     _s = re.sub(r'src="(nav|kit|protips|home|flow|homebg|tuner|popkit|feedback|ripple)\.js(?:\?v=\w+)?"', lambda m: f'src="{m.group(1)}.js?v={_ver(m.group(1))}"', _s)
     _s = _clean_links(_s)
+    if 'rel="icon"' not in _s and '<meta charset="utf-8">' in _s:   # the favicon (assets/icons, made from favicon.png)
+        _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<link rel="icon" href="assets/icons/favicon.ico" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">\n<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/favicon-180.png">', 1)
     open(_f, 'w', encoding='utf-8').write(_s)
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')
