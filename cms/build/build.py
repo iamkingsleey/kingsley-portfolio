@@ -291,6 +291,9 @@ s = rep(s, '<p>Senior product designer with experience designing from <span clas
 # real links from the old site (the rest stay as # until there's a URL)
 for _n, _u in [('LinkedIn', 'https://www.linkedin.com/in/iamkingsleey/'), ('Medium', 'https://medium.com/@iamkingsleey'), ('Dribbble', 'https://dribbble.com/kingsleey'), ('Instagram', 'https://www.instagram.com/iamkingsleey/'), ('Unsplash', 'https://unsplash.com/@iamkingsleey'), ('github', 'https://github.com/iamkingsleey')]:
     s = rep(s, f'<a href="#">{_n}</a>', f'<a href="{_u}" target="_blank" rel="noopener">{_n}</a>')
+# the old dial (v3) is still in the markup; nav.js hides it once it loads, which can show it for a frame on arrival.
+# Hide it in the page's own styles so it never paints.
+s = rep(s, '</head>', '<style>#dialLayer, .side-nav, .station .back, .sdial { display: none !important }</style>\n</head>')
 open(f'{REPO}/index.html', 'w', encoding='utf-8').write(s)
 
 # ================================================================ designs.html
