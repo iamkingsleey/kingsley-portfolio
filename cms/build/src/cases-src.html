@@ -1324,12 +1324,13 @@ const R = {
       const media = s.media.filter(m => !same(m));
       if (s.stats) {
         h += `<section class="tx ch" data-ix="${esc(ixOf(s))}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}</section>${s.view === 'dial' ? BADIAL(s) : bigNums(s.stats, s._i)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`;
-        h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); return;
+        h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); if (c.marquee && c.marquee.pos === 'after:' + s.h) h += MQB(c); return;
       }
       if (ph(s)[0] === 'Results' && s.list) { h += `<section class="tx ch" data-ix="${esc(ixOf(s))}">${T}${EB(s, i, `${pad(i + 1)} · Results`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}</section>${bigList(s.list, `sections.${s._i}.list`)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`; h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0)); return; }
       const lead = s.list ? `<div class="lead">${s.list.map(([a, b], k) => `<div><b${E(`sections.${s._i}.list.${k}.0`)}>${esc(a)}</b>. <span${E(`sections.${s._i}.list.${k}.1`)}>${esc(b)}</span></div>`).join('')}</div>` : '';
       h += `<section class="tx ch" data-ix="${esc(ixOf(s))}">${T}${EB(s, i, `${pad(i + 1)} · ${ph(s)[0]}`)}<h2${E(`sections.${s._i}.title`)}>${esc(ph(s)[1])}</h2>${pBlocks(s)}${lead}</section>${NOTES(s)}${pics(media, capOf(s), s._i, CP)}${afterBlocks(s)}`;
       h = h.slice(0, k0) + WRAP(String(s._i), off, h.slice(k0));
+      if (c.marquee && c.marquee.pos === 'after:' + s.h) h += MQB(c);   // the poster strip right after a chosen chapter (CMS: "after:<chapter name>")
       if (i === 2 && c.statement && !V2) h += WRAP('principle', OFF.principle, `<section class="tx ch">${TOOLS('principle', OFF.principle, false, 'Design principle')}<span class="eb">Design principle</span><p class="pull" style="margin-top:12px"${E('statement')}>${esc(c.statement)}</p></section>`);
     });
     if (c.impact && c.impact.list && !c.secs.some(s => /impact|result/i.test(s.h))) h += `<section class="tx ch" data-ix="The impact"><span class="eb">Results</span><h2>What changed</h2></section>${bigList(c.impact.list, 'impact.list')}`;
