@@ -237,6 +237,20 @@
       "desc": "The Ivieomas mark on a tote, with stickers and bold shapes."
     },
     {
+      "title": "ShareBuddy \"Share with Buddies\"",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-share-with-buddies.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#4b4948",
+      "dark": true,
+      "desc": "A campaign poster from the ShareBuddy brand project: \"Share with Buddies, split bills with friends.\"",
+      "case": "sharebuddy"
+    },
+    {
       "title": "Ẹdorẹ event poster, group",
       "category": "brand",
       "images": [
@@ -1063,6 +1077,20 @@
       "bg": "#9a9a9a",
       "dark": false,
       "desc": "The identity wrapped around a bottle, with the blue tape motif."
+    },
+    {
+      "title": "ShareBuddy \"Big style. Small share.\"",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-big-style.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#ab505b",
+      "dark": true,
+      "desc": "A campaign poster from the ShareBuddy brand project, with the app's notification as the headline.",
+      "case": "sharebuddy"
     },
     {
       "title": "RootSauce sticky notes",
