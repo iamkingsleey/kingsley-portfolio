@@ -300,6 +300,15 @@
       { k: 'heroVideo', label: 'Opening video', type: 'media', accept: 'video/*', help: 'Landscape works best. Leave empty to open on the first screen.' },
       { k: 'heroPoster', label: 'Video poster (shown while it loads)', type: 'media', accept: 'image/*' },
       { k: 'exp', label: 'Feature notes', type: 'tuple', cols: 1, fields: [{ label: 'Heading' }, { label: 'Notes', type: 'list', itemLabel: 'Note', def: () => ['', ''], title: n => n[0], of: { type: 'tuple', cols: 1, fields: [{ label: 'Title' }, { label: 'Text', type: 'textarea', rows: 2 }] } }] } ] },
+    { title: 'Poster strip', help: 'A full-width row of posters or social posts that drifts across the page, slows on hover and can be dragged. Leave the pictures empty to turn it off.', fields: [
+      { k: 'marquee', label: '', type: 'object', cols: 3, fields: [
+        { k: 'images', label: 'Posters, in order', type: 'list', full: true, itemLabel: 'Poster', def: '', title: (m, i) => `${i + 1} · ${mname(m)}`, of: { type: 'media', rich: true } },
+        { k: 'speed', label: 'Speed', type: 'number', ph: '60', help: 'Pixels per second. 40 calm · 60 default · 90 brisk' },
+        { k: 'rows', label: 'Rows', type: 'select', options: [['1', 'One row'], ['2', 'Two rows (the second runs the other way)']] },
+        { k: 'radius', label: 'Corners', type: 'number', ph: '16', help: 'Corner radius in px' },
+        { k: 'height', label: 'Height', type: 'number', ph: '640', help: 'Poster height in px on desktop (phones scale it down)' },
+        { k: 'gap', label: 'Gap', type: 'number', ph: '22', help: 'Space between posters in px' },
+        { k: 'pos', label: 'Where it sits', type: 'text', ph: 'after:Strategy', help: '"after:" and a chapter name (e.g. after:Strategy) · "type" right after Type on brand pages · empty = just before the next case' } ] } ] },
     { title: 'Impact note', when: o => o.kind !== 'Brand', help: 'Put the big numbers in a section (Sections → Big numbers). This note sits under them.', fields: [
       { k: '_imp', label: 'Numbers', when: () => false, type: 'list', itemLabel: 'Number', def: () => ['', ''], title: s => s[0] + ' ' + s[1], of: PAIR('Number', 'What it means') },
       { k: 'impactNote', label: 'How these were measured', type: 'textarea', rows: 2 } ] },

@@ -333,20 +333,6 @@
       "case": "3d-collection"
     },
     {
-      "title": "Debit card, floating",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/debit-card-with-colorful-objects1.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#5b94d5",
-      "dark": false,
-      "desc": "A debit card floating among colourful objects.",
-      "case": "3d-collection"
-    },
-    {
       "title": "Debit card with shapes",
       "category": "3d",
       "images": [
@@ -1025,6 +1011,20 @@
       "bg": "#362720",
       "dark": true,
       "desc": "A design shot from the RootSauce brand project: the \"Open Research\" report cover."
+    },
+    {
+      "title": "ShareBuddy \"Your share, deducted\"",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-your-share.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#bd0002",
+      "dark": true,
+      "desc": "A campaign poster from the ShareBuddy brand project: the app's notification does the talking.",
+      "case": "sharebuddy"
     },
     {
       "title": "Casa Verde identity",

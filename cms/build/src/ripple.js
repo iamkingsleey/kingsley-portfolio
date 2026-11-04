@@ -50,6 +50,7 @@
     let el = t.closest('img, video');
     if (!el) for (let e = t, k = 0; e && k < 4; e = e.parentElement, k++) {
       const v = e.querySelector && e.querySelector(':scope > video'); if (v && natW(v)) { el = v; break; }   // a motion tile: its playing video
+      const pi = e.querySelector && e.querySelector(':scope > img'); if (pi && pi.naturalWidth && getComputedStyle(pi).pointerEvents === 'none') { el = pi; break; }   // a picture that lets the pointer through (the poster strips)
       if (bgUrl(e)) { el = e; break; } }
     if (!el || el.closest(SKIP) || el.dataset.noripple !== undefined) return null;
     if (el.tagName === 'IMG' && (!el.complete || !el.naturalWidth || /\.svg(\?|$)/i.test(el.currentSrc || el.src))) return null;

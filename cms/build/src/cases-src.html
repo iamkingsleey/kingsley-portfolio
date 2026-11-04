@@ -42,7 +42,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 .mqb .track { display: flex; gap: var(--gap); width: max-content; will-change: transform; padding: 16px 0 10px }
 .mqb .track + .track { margin-top: calc(var(--gap) - 16px) }
 .mqb figure { margin: 0; flex: none; height: var(--h); border-radius: var(--r); overflow: hidden; background: transparent; -webkit-mask-image: -webkit-radial-gradient(#fff, #000); transition: transform .5s cubic-bezier(.2, .8, .2, 1) }
-.mqb figure img { height: 100%; width: auto; display: block; pointer-events: none }
+.mqb figure img { width: calc(100% + 2px); height: calc(100% + 2px); max-width: none; margin: -1px; object-fit: cover; display: block; pointer-events: none }
 .mqb figure:hover { transform: translateY(-10px) }
 .mqb .mq.two { --h: min(440px, 50vh) }
 .mqb.pos-type { padding: 72px 0 48px }
@@ -1096,7 +1096,8 @@ const nextOf = c => { const list = CASES.filter(x => x.kind === c.kind), i = lis
 // the marquee block (content: c.marquee = { k, t, p, images: [...], rows: 1|2, speed, radius, height })
 const MQB = c => { const m = c.marquee; if (!m || !Array.isArray(m.images) || !m.images.filter(Boolean).length) return '';
   const imgs = m.images.filter(Boolean), rows = +m.rows === 2 ? 2 : 1;
-  const fig = (u, i) => `<figure><img src="${esc(u)}" alt="${esc(c.title)} post ${i + 1}" loading="lazy" draggable="false"></figure>`;
+  const fig = (u, i) => { const r = RATIO[u] || RATIO[String(u).replace(/\.(jpe?g|png)$/i, '.webp')] || .8;   // each poster's shape is known before it loads, so the loop measures right
+    return `<figure style="aspect-ratio:${(+r).toFixed(4)}"><img src="${esc(u)}" alt="${esc(c.title)} post ${i + 1}" loading="lazy" decoding="async" draggable="false"></figure>`; };
   const track = (list) => `<div class="track">${list.map(fig).join('')}${list.map(fig).join('')}</div>`;   // doubled, so the loop never shows a seam
   const second = imgs.slice(Math.floor(imgs.length / 2)).concat(imgs.slice(0, Math.floor(imgs.length / 2)));
   const hdr = (m.k || m.t || m.p) ? `<div class="mqh"><div>${m.k ? `<span class="mono">${esc(m.k)}</span>` : ''}${m.t ? `<h2>${esc(m.t)}</h2>` : ''}</div>${m.p ? `<p>${esc(m.p)}</p>` : ''}</div>` : '';   // no header when the CMS leaves it empty
@@ -1633,7 +1634,8 @@ function setupMarquee() {
     const dots = [...mq.parentElement.querySelectorAll('.dots i')], cnt = mq.parentElement.querySelector('.cnt');
     let raf = 0, last = performance.now(), drag = null, slow = 1, k = -1;
     const measure = () => tracks.forEach(t => { t.half = t.el.scrollWidth / 2; });
-    measure(); const ro = 'ResizeObserver' in window ? new ResizeObserver(measure) : null; if (ro) ro.observe(mq);
+    measure(); const ro = 'ResizeObserver' in window ? new ResizeObserver(measure) : null; if (ro) { ro.observe(mq); tracks.forEach(t => ro.observe(t.el)); }   // re-measure whenever a track's length changes
+    mq.querySelectorAll('img').forEach(im => { if (!im.complete) im.addEventListener('load', measure, { once: true }); });
     const tick = now => { raf = requestAnimationFrame(tick); const dt = Math.min(50, now - last); last = now;
       const target = drag ? 0 : (fine && mq.matches(':hover') ? .12 : 1); slow += (target - slow) * .08;
       const v = speed * slow * dt / 1000;
