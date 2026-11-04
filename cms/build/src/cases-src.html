@@ -37,17 +37,18 @@ button { font: inherit; color: inherit; cursor: pointer }
 .mqb .mqh { padding: 0 var(--gut); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px 48px; align-items: end; margin-bottom: 34px }
 .mqb .mqh h2 { margin: 10px 0 0; font: 600 clamp(28px, 3.2vw, 44px)/1.04 var(--body); letter-spacing: -.035em; color: var(--ink) }
 .mqb .mqh p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text); max-width: 50ch }
-.mqb .mq { position: relative; overflow: hidden; --h: 420px; --gap: 18px; --r: 16px; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y }
+.mqb .mq { position: relative; overflow: hidden; --h: var(--hd, min(640px, 78vh)); --gap: 22px; --r: 16px; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y }
 .mqb .mq.drag { cursor: grabbing }
 .mqb .track { display: flex; gap: var(--gap); width: max-content; will-change: transform; padding: 16px 0 10px }
 .mqb .track + .track { margin-top: calc(var(--gap) - 16px) }
-.mqb figure { margin: 0; flex: none; height: var(--h); border-radius: var(--r); overflow: hidden; background: var(--panel); transition: transform .5s cubic-bezier(.2, .8, .2, 1) }
+.mqb figure { margin: 0; flex: none; height: var(--h); border-radius: var(--r); overflow: hidden; background: transparent; -webkit-mask-image: -webkit-radial-gradient(#fff, #000); transition: transform .5s cubic-bezier(.2, .8, .2, 1) }
 .mqb figure img { height: 100%; width: auto; display: block; pointer-events: none }
 .mqb figure:hover { transform: translateY(-10px) }
-.mqb .mq.two { --h: 300px }
+.mqb .mq.two { --h: min(440px, 50vh) }
+.mqb.pos-type { padding: 72px 0 48px }
 .mqb .mqr { display: flex; justify-content: space-between; align-items: center; padding: 14px var(--gut) 0; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
 .mqb .mqr .dots { display: flex; gap: 6px } .mqb .mqr .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--line) } .mqb .mqr .dots i.on { background: var(--red) }
-@media (max-width: 760px) { .mqb { padding: 72px 0 24px } .mqb .mqh { grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px } .mqb .mq { --h: 280px; --gap: 12px } .mqb .mq.two { --h: 220px } .mqb .mqr { display: none } }
+@media (max-width: 760px) { .mqb { padding: 72px 0 24px } .mqb .mqh { grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px } .mqb .mq { --h: min(440px, 62vh); --gap: 12px } .mqb .mq.two { --h: 300px } .mqb .mqr { display: none } }
 @media (prefers-reduced-motion: reduce) { .mqb .mq { overflow-x: auto } .mqb figure:hover { transform: none } }
 /* next case, at the end of every layout */
 .next { display: block; width: 100%; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; padding: 48px var(--gut) 160px; transition: background .25s }
@@ -510,6 +511,7 @@ html.themed body, html.themed .K { transition: background .45s, color .45s }
 :is(.N, .H) .cl .clt { --fo: 50% 64% }
 :is(.N, .H) .clp.asy { grid-template-columns: var(--cols); aspect-ratio: 2 / 1 } :is(.N, .H) .clp.asy .fill { aspect-ratio: auto; height: 100% }
 :is(.N, .H) .cl .m img, :is(.N, .H) .cl .m video { object-position: var(--fo, 50% 50%) }
+:is(.N, .H) .cl .fill .m.kx > img.kx-base, :is(.N, .H) .cl .fill .m.kx > video.kx-base { inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px) !important }
 :is(.N, .H) .cl .fill.own { aspect-ratio: auto } :is(.N, .H) .cl .fill.own .m { position: static } :is(.N, .H) .cl .fill.own .m img, :is(.N, .H) .cl .fill.own .m video { height: auto; display: block }
 .N .g4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ng) }   /* two by two */ .N .g4 .fill { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 4 / 5 } .N .g4 .m { position: absolute; inset: 0 } .N .g4 .m img, .N .g4 .m video { width: 100%; height: 100%; object-fit: cover }
 @media (max-width: 899px) { .N .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
@@ -871,7 +873,7 @@ function ROWS(list, cls = '', after = '') {
 // repeats until its pictures run out); without one it keeps the shape-aware rows.
 const ASY = { 2: { left: '3fr 2fr', right: '2fr 3fr' }, 3: { left: '3fr 1fr 1fr', middle: '1fr 3fr 1fr', right: '1fr 1fr 3fr' } };
 const AR = { '16:9': '16 / 9', '2:1': '2 / 1', '1:1': '1', 'own': '' }, FO = { top: '50% 15%', upper: '50% 36%', lower: '50% 64%', bottom: '50% 85%' };
-const box = (m, r, wide) => { const a = wide ? (AR[r.shape || '16:9'] ?? '16 / 9') : '1', o = FO[r.focus];
+const box = (m, r, wide) => { const a = wide ? (r.shape === 'own' ? String(+rOf(m).toFixed(4)) : (AR[r.shape || '16:9'] ?? '16 / 9')) : '1', o = FO[r.focus];   // 'own': the picture's real shape, full width
   return `<div class="fill${wide ? ' clw' : ''}${a ? '' : ' own'}" style="${a ? `aspect-ratio:${a};` : ''}${o ? `--fo:${o}` : ''}">${M(m)}</div>`; };
 const cwOf = (r, n) => Array.isArray(r.w) && r.w.length === n && n > 1 ? r.w.map(x => Math.max(1, +x || 1)) : null;   // widths set by dragging in the CMS
 const rowH = (P, r) => cwOf(r, P.length) ? `<div class="clp asy" style="--cols:${cwOf(r, P.length).map(x => x.toFixed(2) + 'fr').join(' ')};aspect-ratio:${r.ar || '2 / 1'}">${P.map(m => box(m, { focus: r.focus }, false).replace('aspect-ratio:1;', '')).join('')}</div>`
@@ -1097,8 +1099,9 @@ const MQB = c => { const m = c.marquee; if (!m || !Array.isArray(m.images) || !m
   const fig = (u, i) => `<figure><img src="${esc(u)}" alt="${esc(c.title)} post ${i + 1}" loading="lazy" draggable="false"></figure>`;
   const track = (list) => `<div class="track">${list.map(fig).join('')}${list.map(fig).join('')}</div>`;   // doubled, so the loop never shows a seam
   const second = imgs.slice(Math.floor(imgs.length / 2)).concat(imgs.slice(0, Math.floor(imgs.length / 2)));
-  return `<section class="mqb covers"><div class="mqh"><div>${m.k ? `<span class="mono">${esc(m.k)}</span>` : ''}${m.t ? `<h2>${esc(m.t)}</h2>` : ''}</div>${m.p ? `<p>${esc(m.p)}</p>` : ''}</div>
-    <div class="mq${rows === 2 ? ' two' : ''}" data-speed="${+m.speed || 38}" data-n="${imgs.length}" style="${m.radius != null ? `--r:${+m.radius}px;` : ''}${m.height ? `--h:${+m.height}px;` : ''}">${track(imgs)}${rows === 2 ? track(second) : ''}</div>
+  const hdr = (m.k || m.t || m.p) ? `<div class="mqh"><div>${m.k ? `<span class="mono">${esc(m.k)}</span>` : ''}${m.t ? `<h2>${esc(m.t)}</h2>` : ''}</div>${m.p ? `<p>${esc(m.p)}</p>` : ''}</div>` : '';   // no header when the CMS leaves it empty
+  return `<section class="mqb covers${m.pos === 'type' ? ' pos-type' : ''}">${hdr}
+    <div class="mq${rows === 2 ? ' two' : ''}" data-speed="${+m.speed || 38}" data-n="${imgs.length}" style="${m.radius != null ? `--r:${+m.radius}px;` : ''}${m.height ? `--hd:min(${+m.height}px, 78vh);` : ''}${m.gap ? `--gap:${+m.gap}px;` : ''}">${track(imgs)}${rows === 2 ? track(second) : ''}</div>
     <div class="mqr"><span>Drag to scrub</span><span class="dots">${imgs.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span><span class="cnt">01 / ${String(imgs.length).padStart(2, '0')}</span></div></section>`; };
 const NEXT = c => { const n = nextOf(c); return `<button class="next" type="button" data-go="${esc(n.slug)}"><span class="mono">Next case · ${esc(n.kind)}</span><span class="t">${esc(n.title)}<i>→</i></span></button>`; };
 // the same header as a piece open on Designs: "All designs" back, the piece's number, its name and the signal bars
@@ -1582,6 +1585,7 @@ R.N = function (c) {
       <p class="tpm" style="font-family:${B.css}">${esc(c.client)} · ${esc(c.role)}</p></div></section>`;
     if (c.statement) h += `<section class="tticker covers"><div class="tkrow" id="ntk1" style="font-weight:600">${(esc(c.statement.replace(/\.$/, '')) + ' · ').repeat(4)}</div>
       <div class="tkrow rev" id="ntk2">${(esc(c.lede) + ' · ').repeat(3)}</div><div class="tread mono"><span>${b.type.map(t => esc(t.fam)).join(' · ')}</span><span>Scroll to change speed</span></div></section>`; }
+  if (c.marquee && c.marquee.pos === 'type') h += MQB(c);   // the poster strip straight after the type, when the CMS puts it there
   // a case can set its own pictures after the type ("Picture sections" in the CMS). Each section is a stack of rows: a row
   // with one picture runs the full width (16:9, 2:1 or its own shape), two or three sit side by side as squares. When a case
   // has picture sections, only those show after the type. (An older plain list of pictures reads as wide, wide, pair.)
@@ -1593,7 +1597,7 @@ R.N = function (c) {
     return g.length ? g : null; })();
   if (GAL) {
     GAL.forEach((sec, si) => { h += `<div class="nf covers"${KM_EDIT ? ` data-pick="gallery.${si}" data-rows="1"` : ''}>${rowsBlock(sec.rows)}</div>`; });
-    return h + `<div style="height:96px"></div>${MQB(c)}${NEXT(c)}</main>`;
+    return h + `<div style="height:96px"></div>${c.marquee && c.marquee.pos === 'type' ? '' : MQB(c)}${NEXT(c)}</main>`;
   }
   if (b.pers) h += pics(b.pers.media, b.pers._i);   // personality and mockups speak through their pictures: no text
   // the closing pictures: a square pair, one wide 16:9 picture across the full width, then another square pair. The most landscape
@@ -1615,7 +1619,7 @@ R.N = function (c) {
     const wide = wi >= 0 ? oth[wi] : null, last = oth.filter((_, i) => i !== wi).slice(0, 2);
     const W = (m, x = '') => `<div class="fill clw${x}">${M(m)}</div>`;
     h += `<div class="nf covers"><div class="cl">${wide ? W(wide) : ''}${W(first[0], ' clt')}${last.length === 2 ? `<div class="clp">${last.map(m => `<div class="fill">${M(m)}</div>`).join('')}</div>` : ''}</div></div>`; }
-  return h + `<div style="height:96px"></div>${MQB(c)}${NEXT(c)}</main>`;
+  return h + `<div style="height:96px"></div>${c.marquee && c.marquee.pos === 'type' ? '' : MQB(c)}${NEXT(c)}</main>`;
 };
 
 // the marquee: a constant drift that eases to a crawl under the pointer, drag to scrub, a counter for the post in the middle

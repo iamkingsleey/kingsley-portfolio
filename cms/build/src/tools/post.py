@@ -254,8 +254,8 @@ try:
                 if not os.path.exists(_out) or os.path.getmtime(_out) < os.path.getmtime(_src):
                     _im = _Im.open(_src); _alpha = _im.mode in ('RGBA', 'LA', 'P')
                     _im = _im.convert('RGBA' if _alpha else 'RGB')
-                    if max(_im.size) > 2400: _im.thumbnail((2400, 2400))
-                    _im.save(_out, 'WEBP', quality=82, method=6)
+                    if max(_im.size) > 3200: _im.thumbnail((3200, 3200))
+                    _im.save(_out, 'WEBP', quality=86, method=6)
                 if os.path.getsize(_out) < os.path.getsize(_src): _WEBP.add(_rel)
                 if '/thumbs/' not in _rel and _rel.startswith('assets/designs/') and _rel.count('/') == 2:
                     _md = f'{REPO}/assets/designs/md/' + os.path.basename(_out)
