@@ -1052,6 +1052,7 @@ addEventListener('wheel', e => {
   @media (prefers-reduced-motion: reduce) { .introst i::before, .introst i::after { animation: none; opacity: 0 } }
   .introst b { font-weight: inherit; color: var(--text); text-decoration: underline; text-decoration-color: var(--line, rgb(0 0 0 / .2)); text-underline-offset: 3px; transition: text-decoration-color .2s }
   .introst:hover b { text-decoration-color: currentColor }
+@media (max-width: 600px) { .bio br.dbr { display: none } }   /* the intro's line break is for wide screens; phones wrap it naturally */
 .introst { display: block; line-height: 1.5 } .introst i { display: inline-block; vertical-align: 1px; margin-right: 8px } .introst b { white-space: nowrap; margin-left: 6px }   /* the line wraps like text on phones; "Book a call →" stays in one piece */
   @media (min-width: 900px) {
     .theme-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: max(64px, env(safe-area-inset-right, 0px)) !important }
