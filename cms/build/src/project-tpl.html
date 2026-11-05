@@ -248,7 +248,7 @@ __POPKIT__<script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const A = __ITEMS__, TOOL_SRC = __TOOLS__;   // pieces by category (as on Designs) and the tool icons
-  const CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product', ui: 'UI' };
+  const CAT = { '3d': '3D', illustration: 'Illustration', poster: 'Poster', brand: 'Brand', motion: 'Motion', product: 'Product', ui: 'UI/UX' };
   const all = []; for (const k of ['3d', 'illustration', 'poster', 'product', 'brand', 'motion', 'ui']) (A[k] || []).forEach(it => all.push({ ...it, src: it.src || it.poster, cat: CAT[k] }));
   const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const idx = t => all.findIndex(x => x.t === t);

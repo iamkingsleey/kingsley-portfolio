@@ -473,7 +473,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const CATS = [
     { k: 'product', name: 'Case study', tools: 'Figma · Code', back: 'Case studies' },   // the filters run in this order, after All
     { k: 'brand', name: 'Brand', tools: 'Blender · Figma' },
-    { k: 'ui', name: 'UI', tools: 'Figma' },
+    { k: 'ui', name: 'UI/UX', tools: 'Figma' },
     { k: '3d', name: '3D', tools: 'Blender' },
     { k: 'illustration', name: 'Illustration', tools: 'Illustrator' },
     { k: 'poster', name: 'Poster', tools: 'Figma' },
@@ -497,7 +497,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const slugOf = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   // the newer kinds (illustrations, posters) are mixed through the rest instead of sitting in a block of their own:
   // spread evenly, in a fixed shuffled order so the page looks the same on every visit
-  const MIX = ['Illustration', 'Poster', 'UI'];
+  const MIX = ['Illustration', 'Poster', 'UI/UX'];
   const mixIn = list => {
     const isX = x => MIX.includes(x.cat) || x.mix, base = list.filter(x => !isX(x)), extra = list.filter(isX);   // (a piece can also ask to be mixed in: "mix": true)
     let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -1176,7 +1176,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       p: ['I started from the identity system, its colours, marks and tone, and asked where it could live as a physical thing.',
           'Each object was modelled and dressed in the brand’s language so it works as merch, campaign imagery or a hero visual on its own.'],
       steps: [['Identity', 'Colours, marks and tone of voice.'], ['Objects', 'Where the brand lives in real life.'], ['Model', 'Built and dressed in 3D.'], ['Details', 'Stickers, stitching and texture.'], ['Assets', 'Crops for web, social and print.']] },
-    'UI': { type: 'UI design', role: 'Product design, UI, interaction',
+    'UI/UX': { type: 'UI design', role: 'Product design, UI, interaction',
       sum: 'Screens for a real product flow, designed to be clear at a glance and easy to act on.',
       state: t => `${t} started with one question: what does someone need to see first on this screen?`,
       p: ['I start from the task, not the layout: what the person came to do, and what could stop them.',
@@ -1858,7 +1858,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         { root: ov, threshold: [0, .2, .35, .6, .9] });
       const far = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) return; const o = lives.find(x => x.t === e.target); if (o) drop(o); }), { root: ov, rootMargin: '120% 0px' });
       lives.forEach(o => { io.observe(o.t); far.observe(o.t); });
-      const onMove = () => { moving = true; clearTimeout(stillT); stillT = setTimeout(() => { moving = false; pump(); }, 220); };
+      const onMove = () => { if (!moving) lives.forEach(o => post(o, false)); moving = true; clearTimeout(stillT);
+        stillT = setTimeout(() => { moving = false; lives.forEach(o => { if (o.f) post(o, vis.has(o.t)); }); setTimeout(pump, 250); }, 260); };
       ov.addEventListener('scroll', onMove, { passive: true }); addEventListener('scroll', onMove, { passive: true });
       document.addEventListener('visibilitychange', pump); } }
   addEventListener('resize', () => requestAnimationFrame(mSpans));
@@ -2131,6 +2132,9 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // short settle after each change for the tiles' own fade-in; when nothing moves, the page does no work at all
   let ovKey = '', ovSettle = 0;
   const tileCache = new Map();
+  // while the grid is moving the drum is drawn at a lighter resolution (a whole-screen picture is sent to the graphics chip every
+  // frame, which at 2-3x was the drag on laptops); it redraws sharp as soon as the grid settles
+  let ovMoved = 0; ov.addEventListener('scroll', () => { ovMoved = performance.now(); }, { passive: true });
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
       let nLoaded = 0; texCache.forEach(im => { if (im.complete) nLoaded++; });
@@ -2138,7 +2142,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       const now = performance.now();
       if (key !== ovKey) { ovKey = key; ovSettle = now + 1400; }
       if (now > ovSettle) { requestAnimationFrame(ovWarp); return; }
-      const dpr = Math.min(innerWidth >= 900 ? 3 : 1.5, devicePixelRatio || 1), vw = innerWidth, vh = innerHeight;   // full Retina sharpness on laptops and desktops, so the grid is as crisp as the opened piece; phones keep 1.5x to stay smooth
+      const full = Math.min(innerWidth >= 900 ? 2 : 1.5, devicePixelRatio || 1), dpr = now - ovMoved < 180 ? Math.min(full, innerWidth >= 900 ? 1.25 : 1) : full, vw = innerWidth, vh = innerHeight;   // full Retina sharpness on laptops and desktops, so the grid is as crisp as the opened piece; phones keep 1.5x to stay smooth
       const on = !reduce && !!ogl, mid = vh / 2, R = vh * DRUM.radius, M = on ? Math.round(vh * DRUM.margin) : 0;
       if (ovc.width !== Math.round(vw * dpr) || ovc.height !== Math.round(vh * dpr)) {
         ovc.width = Math.round(vw * dpr); ovc.height = Math.round(vh * dpr);

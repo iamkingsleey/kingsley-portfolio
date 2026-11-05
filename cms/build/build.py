@@ -352,9 +352,9 @@ d = rep(d, '  const A = __ASSETS__;', '  // Pieces by category. Images and video
 # Their small thumbnails are asked for in the page's head, before its script runs, and Home reads the same list to fetch
 # them while you're still on Home, so scrolling down into Designs lands on pictures, not a dark page.
 def _grid_order():
-    cats = [('product', 'Case study'), ('brand', 'Brand'), ('ui', 'UI'), ('3d', '3D'), ('illustration', 'Illustration'), ('poster', 'Poster'), ('motion', 'Motion')]
+    cats = [('product', 'Case study'), ('brand', 'Brand'), ('ui', 'UI/UX'), ('3d', '3D'), ('illustration', 'Illustration'), ('poster', 'Poster'), ('motion', 'Motion')]
     lst = [dict(x, cat=name) for k, name in cats for x in A.get(k, [])]
-    isx = lambda x: x['cat'] in ('Illustration', 'Poster', 'UI') or x.get('mix')
+    isx = lambda x: x['cat'] in ('Illustration', 'Poster', 'UI/UX') or x.get('mix')
     base = [x for x in lst if not isx(x)]; extra = [x for x in lst if isx(x)]
     sd = 7
     for i in range(len(extra) - 1, 0, -1):
