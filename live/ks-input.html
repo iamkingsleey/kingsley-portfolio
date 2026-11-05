@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap input states</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+.card { position: absolute; left: 50%; top: 50%; width: 680rem; transform: translate(-50%, -56%) scale(1.3) }
+.st { display: flex; gap: 10rem; margin-bottom: 28rem } .st span { height: 40rem; padding: 0 18rem; border-radius: 99rem; display: grid; place-items: center; font-size: 18rem; font-weight: 500; color: var(--body); box-shadow: inset 0 0 0 1.4rem var(--divider); transition: .25s }
+.st span.on { background: var(--high); color: #fff; box-shadow: none }
+.inp .ok { margin-left: auto; color: var(--ok); opacity: 0; transform: scale(.5); transition: .3s cubic-bezier(.2,.9,.3,1.4); display: grid } .inp.done .ok { opacity: 1; transform: none }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="card"><div class="st" id="st"><span data-s="default">Default</span><span data-s="focus">Focused</span><span data-s="error">Error</span><span data-s="done">Completed</span><span data-s="dis">Disabled</span></div>
+  <label class="lbl">Email address<em>*</em></label><div class="inp ph" id="in"><span id="tx">name@example.com</span><span class="ok"><svg style="width:22rem;height:22rem;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="hint" id="hi">We'll send order updates here.</div></div>
+<div class="cap"><b>Input</b> · one field, every state designed</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const inp = $('#in'), tx = $('#tx'), hi = $('#hi');
+  const mark = s => $$('#st span').forEach(e => e.classList.toggle('on', e.dataset.s === s));
+  const set = (s, text) => { mark(s); inp.className = 'inp' + ({ default: ' ph', focus: ' f', error: ' e', done: ' done', dis: ' dis ph' })[s]; if (text !== undefined) tx.innerHTML = text;
+    hi.className = 'hint' + (s === 'error' ? ' e' : ''); hi.textContent = s === 'error' ? 'Enter a valid email, like name@kusnap.com' : s === 'dis' ? 'Verified accounts can\'t change this' : 'We\'ll send order updates here.'; };
+  const typeIn = async (H, text, from = '') => { for (let i = from.length; i <= text.length; i++) { tx.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(60); } };
+  $$('#st span').forEach(e => e.onclick = () => set(e.dataset.s, e.dataset.s === 'default' || e.dataset.s === 'dis' ? 'name@example.com' : e.dataset.s === 'error' ? 'kingsley@kusnap' : 'kingsley@kusnap.com'));
+  set('default');
+  CO.demo(async H => { set('default', 'name@example.com'); await H.sleep(900);
+    await H.tap(inp, () => { set('focus', '<i class="caret"></i>'); }, .3); H.away(); await typeIn(H, 'kingsley@kusnap'); await H.sleep(400);
+    set('error', 'kingsley@kusnap'); await H.sleep(1500); set('focus'); await typeIn(H, 'kingsley@kusnap.com', 'kingsley@kusnap'); await H.sleep(300);
+    set('done', 'kingsley@kusnap.com'); await H.sleep(1800); set('dis', 'kingsley@kusnap.com'); await H.sleep(1600); });
+})();
+</script>
+</body>
+</html>

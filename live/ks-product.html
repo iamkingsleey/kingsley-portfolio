@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap product card</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+/* built to the Figma component (Product card, Property 1=Default) at 1.7x */
+.wrap { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%); display: flex; gap: 64rem; align-items: flex-start }
+.pc { width: 425rem }
+.pc .im { position: relative; width: 425rem; height: 425rem; border-radius: 27rem; background: #fff; box-shadow: inset 0 0 0 1.7rem var(--subtle), 0 1.7rem 0 .85rem #01182b0a; padding: 10rem }
+.pc .ph { position: relative; width: 100%; height: 100%; border-radius: 20rem; background: var(--surface); overflow: hidden }
+.pc .ph img { display: block; width: 100%; height: 100%; object-fit: cover; transition: filter .4s, opacity .4s } .pc.oos .ph img { filter: grayscale(1); opacity: .5 }
+.tg { position: absolute; display: inline-flex; align-items: center; justify-content: center; color: #fff; transition: opacity .3s, transform .3s cubic-bezier(.2,.9,.3,1.3) } .tg.off { opacity: 0; transform: scale(.6) }
+.disc { left: 25rem; top: 25rem; height: 36rem; padding: 0 7rem; border-radius: 7rem; background: #e44040; font-size: 17rem; font-weight: 700 }
+.ver { right: 25rem; top: 25rem; width: 48rem; height: 36rem; border-radius: 7rem; background: var(--high) }
+.boost { left: 0; bottom: 0; width: 146rem; height: 48rem; gap: 2rem; border-radius: 0 14rem 0 0; background: var(--brand); font-size: 24rem; font-weight: 500; transform-origin: 0 100% }
+.like { right: 14rem; bottom: 12rem; height: 48rem; padding: 0 14rem; gap: 7rem; border-radius: 41rem; background: rgb(1 24 43 / .6); backdrop-filter: blur(7rem); -webkit-backdrop-filter: blur(7rem); font-size: 24rem; font-weight: 500; cursor: pointer; transform-origin: 100% 100% }
+.like { transition: opacity .3s, transform .3s cubic-bezier(.2,.9,.3,1.3), background .3s, color .3s } .like svg { transition: transform .35s cubic-bezier(.2,.9,.3,1.8) } .like.on svg { transform: scale(1.18) } .like.on path { fill: #e8173f; stroke: #fff; stroke-width: 1.4; paint-order: stroke }
+.pc .dt { padding-top: 27rem } .pc .nm, .pc .pr, .pc .old, .pc .un { font-size: 24rem; line-height: 34rem; color: var(--head) } .pc .nm { font-weight: 500 } .pc .pr { font-weight: 600 }
+.pc .old { color: var(--small); text-decoration: line-through; transition: opacity .3s, max-height .3s; max-height: 36rem; overflow: hidden } .pc .old.off { opacity: 0; max-height: 0 }
+.pc .un { margin-top: 14rem; transition: opacity .3s, max-height .3s, margin .3s; max-height: 36rem; overflow: hidden } .pc .un.off { opacity: 0; max-height: 0; margin-top: 0 }
+.tk { display: flex; gap: 7rem; margin-top: 14rem } .tk span { display: inline-flex; align-items: center; gap: 7rem; height: 37rem; padding: 0 14rem; border-radius: 7rem; background: var(--surface); font-size: 17rem; font-weight: 500; color: var(--body); transition: background .3s, color .3s }
+.tk .st i { width: 10rem; height: 10rem; border-radius: 50%; background: var(--ok); transition: background .3s } .pc.oos .tk .st { background: var(--errbg); color: var(--errhd) } .pc.oos .tk .st i { background: var(--err) }
+.props { width: 420rem; padding: 30rem } .props .k { font-size: 15rem; font-weight: 600; letter-spacing: 1.6rem; text-transform: uppercase; color: var(--small); display: block; margin-bottom: 14rem }
+.seg { display: grid; grid-template-columns: 1fr 1fr; padding: 5rem; border-radius: 14rem; background: var(--surface); position: relative; margin-bottom: 22rem }
+.seg .sl { position: absolute; left: 5rem; top: 5rem; bottom: 5rem; width: calc(50% - 5rem); border-radius: 10rem; background: #fff; box-shadow: 0 1.5rem 3rem rgb(1 24 43 / .08); transition: transform .35s cubic-bezier(.3,.9,.3,1.2) } .seg.r .sl { transform: translateX(100%) }
+.seg span { position: relative; height: 46rem; display: grid; place-items: center; font-size: 19rem; font-weight: 500; color: var(--body); cursor: pointer } .seg span.on { color: var(--high) }
+.row { display: flex; justify-content: space-between; align-items: center; height: 54rem; font-size: 20rem; color: var(--head); border-top: 1.4rem solid var(--subtle); cursor: pointer }
+.sw { width: 50rem; height: 30rem; border-radius: 99rem; background: var(--input); position: relative; transition: background .25s; flex: none } .sw::after { content: ""; position: absolute; left: 3rem; top: 3rem; width: 24rem; height: 24rem; border-radius: 50%; background: #fff; box-shadow: 0 2rem 4rem rgb(0 0 0 / .15); transition: transform .25s cubic-bezier(.3,.9,.3,1.3) }
+.row.on .sw { background: var(--brand) } .row.on .sw::after { transform: translateX(20rem) }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="wrap">
+  <div class="pc" id="pc">
+    <div class="im"><div class="ph"><img src="ks/jbl.webp" alt="">
+      <span class="tg boost" id="t-boost">Boosted<svg style="width:24rem;height:24rem;flex:none" viewBox="0 0 24 24"><path fill="#fff" d="M13 2 5.5 13.2h5.6L10 22l8.5-12h-6z"/></svg></span>
+      <span class="tg like" id="t-like"><svg style="width:30rem;height:30rem;flex:none" viewBox="0 0 24 24"><path d="M12 20.5c-.3 0-.6-.1-.8-.3C8 17.6 3 13.6 3 9.3 3 6.6 5.1 4.5 7.7 4.5c1.7 0 3.2.9 4.3 2.3 1.1-1.4 2.6-2.3 4.3-2.3 2.6 0 4.7 2.1 4.7 4.8 0 4.3-5 8.3-8.2 10.9-.2.2-.5.3-.8.3Z" fill="#fff"/></svg><b id="lk" style="font-weight:500">0</b></span>
+    </div>
+      <span class="tg disc" id="t-disc">-25%</span>
+      <span class="tg ver" id="t-ver"><svg style="width:20rem;height:20rem;flex:none" viewBox="0 0 24 24"><path fill="#fff" d="m12 1 2.6 2.2 3.4-.4.9 3.3 3 1.7-1.3 3.2 1.3 3.2-3 1.7-.9 3.3-3.4-.4L12 23l-2.6-2.2-3.4.4-.9-3.3-3-1.7L3.4 13 2.1 9.8l3-1.7.9-3.3 3.4.4Z"/><path d="m8 12 3 3 5-6" stroke="#01182b" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+    <div class="dt"><div class="nm">Black JBL Headset</div><div class="pr" id="pr">₦345,000.00</div><div class="old" id="old">₦460,000.00</div><div class="un" id="un">5 units left</div>
+      <div class="tk"><span class="st"><i></i><em id="st" style="font-style:normal">In Stock</em></span><span>Refurbished</span><span><svg style="width:20rem;height:20rem;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>1K views</span></div></div>
+  </div>
+  <div class="card props"><span class="k">Product card · properties</span>
+    <div class="seg" id="seg"><b class="sl"></b><span class="on" data-v="in">In stock</span><span data-v="out">Out of stock</span></div>
+    <div class="row on" data-p="disc">Discount tag<i class="sw"></i></div>
+    <div class="row on" data-p="ver">Verification tag<i class="sw"></i></div>
+    <div class="row on" data-p="boost">Boosted tag<i class="sw"></i></div>
+    <div class="row on" data-p="like">Like tag<i class="sw"></i></div>
+    <div class="row on" data-p="un">Units left<i class="sw"></i></div>
+  </div>
+</div>
+<div class="cap"><b>Product card</b> · one component, every property a switch</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const P = { disc: true, ver: true, boost: true, like: true, un: true }; let out = false, liked = false;
+  const draw = () => { ['disc', 'ver', 'boost', 'like'].forEach(k => $('#t-' + k).classList.toggle('off', !P[k])); $('#old').classList.toggle('off', !P.disc); $('#pr').textContent = P.disc ? '₦345,000.00' : '₦460,000.00';
+    $('#un').classList.toggle('off', !P.un || out); $('#pc').classList.toggle('oos', out); $('#st').textContent = out ? 'Out of Stock' : 'In Stock';
+    $$('.row').forEach(r => r.classList.toggle('on', P[r.dataset.p])); $('#seg').classList.toggle('r', out); $$('#seg span').forEach(s => s.classList.toggle('on', (s.dataset.v === 'out') === out));
+    $('#t-like').classList.toggle('on', liked); $('#lk').textContent = liked ? 1 : 0; };
+  const flip = k => { P[k] = !P[k]; draw(); }, stock = v => { out = v; draw(); }, like = () => { liked = !liked; draw(); };
+  $$('.row').forEach(r => r.onclick = () => flip(r.dataset.p)); $$('#seg span').forEach(s => s.onclick = () => stock(s.dataset.v === 'out')); $('#t-like').onclick = like;
+  const reset = () => { Object.keys(P).forEach(k => P[k] = true); out = false; liked = false; draw(); };
+  reset();
+  const row = k => $(`.row[data-p="${k}"]`);
+  CO.demo(async H => { reset(); await H.sleep(900);
+    await H.tap('#t-like', like); await H.sleep(800);
+    await H.tap(row('boost'), () => flip('boost'), .85); await H.sleep(600); await H.tap(row('disc'), () => flip('disc'), .85); await H.sleep(900);
+    await H.tap($$('#seg span')[1], () => stock(true)); await H.sleep(1600); await H.tap($$('#seg span')[0], () => stock(false)); await H.sleep(600);
+    await H.tap(row('disc'), () => flip('disc'), .85); await H.sleep(400); await H.tap(row('boost'), () => flip('boost'), .85); H.away(); await H.sleep(1600); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap quick list</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+.wrap { position: absolute; left: 50%; top: 50%; width: 900rem; transform: translate(-50%, -52%) }
+.q { padding: 30rem 34rem; transition: padding .4s }
+.qh { display: flex; gap: 18rem; align-items: center } .ico { width: 60rem; height: 60rem; border-radius: 50%; background: var(--brandbg); color: var(--brand); display: grid; place-items: center; flex: none }
+.qh b { display: block; font-size: 24rem; font-weight: 500 } .qh span { font-size: 20rem; color: var(--body) } .cv { margin-left: auto; width: 14rem; height: 14rem; border: solid var(--high); border-width: 0 2.4rem 2.4rem 0; transform: rotate(-135deg); transition: transform .35s; margin-right: 8rem }
+.q.shut .cv { transform: rotate(45deg) } .qb { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .45s cubic-bezier(.3,.8,.2,1) } .q.shut .qb { grid-template-rows: 0fr } .qb > div { overflow: hidden }
+.oos { display: flex; align-items: center; gap: 20rem; padding: 18rem; border-radius: 19rem; box-shadow: inset 0 0 0 1.4rem var(--subtle); margin-top: 16rem; transition: background .25s, box-shadow .25s }
+.oos:first-child { margin-top: 26rem } .oos img { width: 80rem; height: 80rem; border-radius: 14rem; object-fit: cover } .oos .t { flex: 1 } .oos b { display: block; font-size: 22rem; font-weight: 500 } .oos .t > span { font-size: 19rem; color: var(--body) }
+.oos .m { display: flex; gap: 14rem; align-items: center; margin-top: 6rem; font-size: 17rem; color: var(--body) } .oos.on { background: var(--brandbg); box-shadow: inset 0 0 0 1.6rem var(--brand) }
+.pi { margin-top: 20rem; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 18rem; padding: 30rem 34rem; transition: opacity .4s, transform .4s } .pi.dim { opacity: .45 }
+.pi .lbl { font-size: 19rem } .pi .inp { height: 70rem; font-size: 21rem; padding: 0 20rem }
+.inp.fill { background: var(--brandbg); box-shadow: inset 0 0 0 1.6rem var(--brand) }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="wrap">
+  <div class="card q" id="q"><div class="qh"><span class="ico"><svg style="width:28rem;height:28rem;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="15" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2"/><circle cx="18" cy="17" r="4" fill="#fff"/><path d="M18 15.5V17l1 1"/></svg></span><div><b>Quick List Similar Product</b><span>Reuse details from your previous out-of-stock listings</span></div><i class="cv"></i></div>
+    <div class="qb"><div>
+      <div class="oos"><img src="ks/headset.webp" alt=""><div class="t"><b>Premium Wireless Headphones</b><span>Electronics &gt; Audio &amp; Headphones</span><div class="m"><span class="pill err">Out of Stock</span>Last sold 2 days ago</div></div><div class="btn sec u">Use Details</div></div>
+      <div class="oos"><img src="ks/p1.webp" alt=""><div class="t"><b>iPhone 15, 128GB Midnight</b><span>Phones &gt; Smartphones</span><div class="m"><span class="pill err">Out of Stock</span>Last sold 6 days ago</div></div><div class="btn sec u">Use Details</div></div>
+    </div></div></div>
+  <div class="card pi dim" id="pi"><div><label class="lbl">Product Name<em>*</em></label><div class="inp ph" id="a">Enter product name</div></div><div><label class="lbl">Category<em>*</em></label><div class="inp ph" id="b">Select</div></div><div><label class="lbl">Price<em>*</em></label><div class="inp ph" id="c">₦ 0</div></div></div>
+</div>
+<div class="toast">Details copied from your old listing</div>
+<div class="cap"><b>Quick list</b> · relist a sold-out product in one tap</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const D = [['Premium Wireless Headphones', 'Gadgets', '₦ 185,000'], ['iPhone 15, 128GB Midnight', 'Gadgets', '₦ 720,000']];
+  const reset = () => { $('#q').classList.remove('shut'); $$('.oos').forEach(o => o.classList.remove('on')); $('#pi').classList.add('dim');
+    [['a', 'Enter product name'], ['b', 'Select'], ['c', '₦ 0']].forEach(([i, t]) => { $('#' + i).className = 'inp ph'; $('#' + i).textContent = t; }); };
+  const use = async (i, H) => { $$('.oos').forEach((o, k) => o.classList.toggle('on', k === i)); await (H ? H.sleep(350) : 0); $('#q').classList.add('shut'); $('#pi').classList.remove('dim');
+    ['a', 'b', 'c'].forEach((id, k) => setTimeout(() => { const e = $('#' + id); e.className = 'inp fill'; e.textContent = D[i][k]; setTimeout(() => e.className = 'inp', 900); }, 380 + k * 160)); toast('Details copied from your old listing'); };
+  $$('.u').forEach((b, i) => b.onclick = () => use(i)); $('.qh').onclick = () => $('#q').classList.toggle('shut');
+  reset();
+  CO.demo(async H => { reset(); await H.sleep(900); await H.at($$('.oos')[1], .4, .5, 700); await H.sleep(300); await H.tap($$('.u')[0]); H.away(); await use(0, H); await H.sleep(2600);
+    await H.tap('.qh', () => $('#q').classList.remove('shut'), .9); H.away(); await H.sleep(1500); });
+})();
+</script>
+</body>
+</html>

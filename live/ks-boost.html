@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap boost your product</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+.card { position: absolute; left: 50%; top: 50%; width: 860rem; transform: translate(-50%, -54%) }
+.sub { font-size: 21rem; color: var(--body); margin: 6rem 0 6rem }
+.op { border-radius: 19rem; box-shadow: inset 0 0 0 1.4rem var(--subtle); padding: 24rem; margin-top: 18rem; transition: box-shadow .25s } .op.on { box-shadow: inset 0 0 0 2.2rem var(--brand) } .op b { font-size: 22rem; font-weight: 600 }
+.op .hd { display: flex; justify-content: space-between; align-items: center } .op .hd span { font-size: 19rem; color: var(--body) }
+.chips { display: flex; gap: 12rem; margin-top: 22rem } .chip { height: 50rem; padding: 0 22rem; border-radius: 99rem; display: grid; place-items: center; font-size: 21rem; box-shadow: inset 0 0 0 1.6rem var(--high); transition: .2s }
+.chip.on { background: var(--brandbg); color: var(--brand); box-shadow: none } .chip.no { background: var(--surface); color: var(--dis); box-shadow: none }
+.sum { display: flex; align-items: center; gap: 22rem; margin-top: 24rem; padding-top: 22rem; border-top: 1.4rem solid var(--subtle) }
+.sum .pl { flex: 1; min-width: 0 } .sum .pl b { display: block; font-size: 21rem; font-weight: 600; color: var(--high) } .sum .pl span { display: block; font-size: 18rem; color: var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.sum .am { font-size: 30rem; font-weight: 600; color: var(--high); white-space: nowrap; font-variant-numeric: tabular-nums } .sum .btn { flex: none; white-space: nowrap }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="card"><h3>Boost your Product</h3><p class="sub">You've reached the limit of free promotions.</p>
+  <div class="op on" id="o0"><div class="hd"><b>Basic</b><span>Free</span></div><div class="chips"><span class="chip on">Lifetime</span><span class="chip no">7days</span><span class="chip no">15days</span><span class="chip no">30days</span></div></div>
+  <div class="op" id="o1"><div class="hd"><b>Premium Listing</b><span>Top of search &amp; category</span></div><div class="chips" id="pc"><span class="chip">7days</span><span class="chip">15days</span><span class="chip">30days</span></div></div>
+  <div class="sum"><div class="pl"><b id="sn">Basic</b><span id="sl">Stays up until it sells</span></div><b class="am" id="sp">₦0</b><span class="btn pri">Continue</span></div></div>
+<div class="cap"><b>Boost card</b> · pick a plan, see the cost before you commit</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const PR = [2500, 4500, 8000], D = ['7 days', '15 days', '30 days'];
+  const tween = (a, b) => { const t0 = performance.now(), f = now => { const k = Math.min(1, (now - t0) / 450); $('#sp').textContent = naira(a + (b - a) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); };
+  let cur = 0;
+  const basic = () => { $('#o0').classList.add('on'); $('#o1').classList.remove('on'); $$('#pc .chip').forEach(c => c.classList.remove('on')); $('#sn').textContent = 'Basic'; $('#sl').textContent = 'Stays up until it sells'; tween(cur, 0); cur = 0; };
+  const prem = i => { $('#o0').classList.remove('on'); $('#o1').classList.add('on'); $$('#pc .chip').forEach((c, k) => c.classList.toggle('on', k === i)); $('#sn').textContent = `Premium · ${D[i]}`; $('#sl').textContent = 'About 6× more views'; tween(cur, PR[i]); cur = PR[i]; };
+  $('#o0').onclick = basic; $$('#pc .chip').forEach((c, i) => c.onclick = e => { e.stopPropagation(); prem(i); }); $('#o1').onclick = () => prem(0);
+  basic();
+  CO.demo(async H => { basic(); await H.sleep(1000); await H.tap($$('#pc .chip')[0], () => prem(0)); await H.sleep(900); await H.tap($$('#pc .chip')[1], () => prem(1)); await H.sleep(900);
+    await H.tap($$('#pc .chip')[2], () => prem(2)); await H.sleep(1200); await H.tap($$('#pc .chip')[1], () => prem(1)); H.away(); await H.sleep(1500); await H.tap('#o0', basic, .2, .3); H.away(); await H.sleep(1200); });
+})();
+</script>
+</body>
+</html>

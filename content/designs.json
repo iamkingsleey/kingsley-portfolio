@@ -1180,90 +1180,20 @@
       "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
     },
     {
-      "title": "Kusnap, default delivery",
+      "title": "ShareBuddy, getting started",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/kusnap-ui-default-delivery.jpg",
-          "ratio": 1.2,
-          "live": "Prototype/kusnap-details.html?part=delivery"
+          "src": "assets/designs/sharebuddy-ui-start.jpg",
+          "ratio": 0.6,
+          "live": "Prototype/sharebuddy.html?flow=start&fs&tile&theme=dark"
         }
       ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "From the Kusnap case study: delivery costs set once, within the city and outside it, saved as the default and shown on every product.",
-      "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
-    },
-    {
-      "title": "Kusnap, account verification",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-verification.jpg",
-          "ratio": 1.5,
-          "live": "live/kusnap-browser?p=verification"
-        }
-      ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "From the Kusnap case study: account verification on the web. A one-time code confirms the phone, then an ID number confirms the person, played start to finish.",
-      "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
-    },
-    {
-      "title": "Solana, wallet card",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/solana-wallet-card.jpg",
-          "ratio": 1.5,
-          "live": "live/sol-line",
-          "srcm": "assets/designs/solana-wallet-card-phone.jpg",
-          "ratiom": 0.8
-        }
-      ],
-      "bg": "#111111",
+      "bg": "#141414",
       "dark": true,
-      "desc": "Market UI exploration: a live Solana wallet card. The price line keeps moving with a pulse on its newest point, and the badge compares it with where the chart began.",
+      "desc": "From the ShareBuddy case study: the splash, sign up, then home with every split at a glance.",
       "tools": "Figma · Code",
-      "mix": true
-    },
-    {
-      "title": "Kusnap, specifications",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-specifications.jpg",
-          "ratio": 1.2,
-          "live": "Prototype/kusnap-details.html?part=spec"
-        }
-      ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "From the Kusnap case study: specification fields that follow the category. A phone asks for storage, RAM and battery; switch to shoes and the fields become size and material.",
-      "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
-    },
-    {
-      "title": "Order book and depth",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/market-order-book.jpg",
-          "ratio": 1.5,
-          "live": "live/order-book",
-          "srcm": "assets/designs/market-order-book-phone.jpg",
-          "ratiom": 0.8
-        }
-      ],
-      "bg": "#111111",
-      "dark": true,
-      "desc": "Market UI exploration: a Bitcoin order book beside its depth chart. Orders come and go and flash green or red, and the buy and sell walls rise and fall with them.",
-      "tools": "Figma · Code",
+      "case": "sharebuddy",
       "mix": true
     },
     {
@@ -1282,52 +1212,20 @@
       "mix": true
     },
     {
-      "title": "Bulvds, wallet home",
+      "title": "Kusnap, Quick List",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/bulvds-wallet-home.jpg",
-          "ratio": 1.5267
-        }
-      ],
-      "bg": "#ebebeb",
-      "dark": false,
-      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
-      "tools": "Figma",
-      "mix": true,
-      "case": "bulvds"
-    },
-    {
-      "title": "Top destinations, travel site",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/travel-destinations-on-a-laptop.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#3d3b3a",
-      "dark": true,
-      "desc": "A travel site’s top destinations: Kyoto, London, Barcelona and more, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Stock watchlist",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/market-stock-watchlist.jpg",
+          "src": "assets/designs/kusnap-ui-quick-list.jpg",
           "ratio": 1.5,
-          "live": "live/watchlist",
-          "srcm": "assets/designs/market-stock-watchlist-phone.jpg",
-          "ratiom": 0.8
+          "live": "Prototype/kusnap-quicklist"
         }
       ],
-      "bg": "#f2f2f2",
+      "bg": "#eef1f5",
       "dark": false,
-      "desc": "Market UI exploration: a stock watchlist. Prices tick and flash green or red, and each sparkline draws in its newest point.",
+      "desc": "From the Kusnap case study: Quick List. Pick a past, out-of-stock listing and its name, category, photos and price fill the new product form.",
       "tools": "Figma · Code",
+      "case": "kusnap",
       "mix": true
     },
     {
@@ -1348,129 +1246,41 @@
       "mix": true
     },
     {
-      "title": "Search, recent and related",
+      "title": "Bulvds, wallet home",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/search-recent-and-related.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A search panel that keeps recent searches one tap away and suggests related ones as chips.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "ShareBuddy, scan a receipt",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/sharebuddy-ui-scan.jpg",
-          "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=scan&fs&tile&theme=dark"
-        }
-      ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "From the ShareBuddy case study: tap +, scan the receipt, check the items and share one link in a chat.",
-      "tools": "Figma · Code",
-      "case": "sharebuddy",
-      "mix": true
-    },
-    {
-      "title": "Bulvds, add-ons at checkout",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/bulvds-add-on.jpg",
+          "src": "assets/designs/bulvds-wallet-home.jpg",
           "ratio": 1.5267
         }
       ],
-      "bg": "#a7a7a7",
+      "bg": "#ebebeb",
       "dark": false,
-      "desc": "Adding an extra to a stay at checkout, from the Bulvds booking flow.",
+      "desc": "The Bulvds wallet home: total balance, Fund wallet and Withdraw, and recent transactions.",
       "tools": "Figma",
       "mix": true,
       "case": "bulvds"
     },
     {
-      "title": "DIGIM, footer",
+      "title": "Discord, servers and messages",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/digim-footer.jpg",
+          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
           "ratio": 1.3333
         }
       ],
-      "bg": "#2f2d2c",
-      "dark": true,
-      "desc": "The DIGIM site footer: “Making brands unforgettable” with a newsletter sign-up, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Smart Cards landing page",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/smart-cards-on-a-laptop.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#3e3c3b",
-      "dark": true,
-      "desc": "A landing page for smart business cards, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Cend, search home",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/cend-search-home.jpg",
-          "ratio": 1.5002
-        }
-      ],
-      "bg": "#7f8287",
+      "bg": "#ffffff",
       "dark": false,
-      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
       "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Cend, home in hand",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/cend-home-in-hand.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#2e3642",
-      "dark": true,
-      "desc": "The Cend home, with quick sends, riders nearby and recent orders, in hand.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Kusnap, search, recent and related",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-search.jpg",
-          "ratio": 1.5,
-          "live": "live/kusnap-browser?p=search"
-        }
-      ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "Kusnap's suggestive search, live. Tap the box and your recent searches are one tap away, with Most Searched underneath; type and related searches appear as chips; pick one and you're on the results.",
-      "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
     },
     {
       "title": "Spring menu, food ordering app",
@@ -1494,21 +1304,220 @@
       ]
     },
     {
-      "title": "ShareBuddy, pay without the app",
+      "title": "Stock watchlist",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/sharebuddy-ui-pay.jpg",
+          "src": "assets/designs/market-stock-watchlist.jpg",
+          "ratio": 1.5,
+          "live": "live/watchlist",
+          "srcm": "assets/designs/market-stock-watchlist-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
+      "dark": false,
+      "desc": "Market UI exploration: a stock watchlist. Prices tick and flash green or red, and each sparkline draws in its newest point.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Bulvds, add-ons at checkout",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-add-on.jpg",
+          "ratio": 1.5267
+        }
+      ],
+      "bg": "#a7a7a7",
+      "dark": false,
+      "desc": "Adding an extra to a stay at checkout, from the Bulvds booking flow.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
+      "title": "Cend, home in hand",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/cend-home-in-hand.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#2e3642",
+      "dark": true,
+      "desc": "The Cend home, with quick sends, riders nearby and recent orders, in hand.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, site header",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ds-nav.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-nav"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: the site header in both variants. Search suggests as you type, the state picker and account menu drop down, and the top bar switches between the account bar and the escrow reminder.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, store verification",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ui-store-verification.jpg",
+          "ratio": 1.5,
+          "live": "Prototype/kusnap-shop"
+        }
+      ],
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "From the Kusnap case study: store verification, started from the seller dashboard, checking the shop is ready before it applies.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Ethereum, area chart",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-ethereum-area.jpg",
+          "ratio": 1.5,
+          "live": "live/eth-area",
+          "srcm": "assets/designs/market-ethereum-area-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#f2f2f2",
+      "dark": false,
+      "desc": "Market UI exploration: an Ethereum area chart that switches through its time ranges, 1H to 1Y, reshaping the line each time, while a crosshair reads prices off it.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "DIGIM, “Don’t be a spectator”",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-dont-be-a-spectator.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#393635",
+      "dark": true,
+      "desc": "A DIGIM agency page with a bold headline over a strip of campaign images, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, search, recent and related",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ui-search.jpg",
+          "ratio": 1.5,
+          "live": "live/kusnap-browser?p=search"
+        }
+      ],
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "Kusnap's suggestive search, live. Tap the box and your recent searches are one tap away, with Most Searched underneath; type and related searches appear as chips; pick one and you're on the results.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, boost your product",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ds-boost.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-boost"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: pick Basic or Premium and a duration, and the price counts up to the new total before you commit.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "ShareBuddy, add your buddies",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-ui-friends.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=pay&fs&tile&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=friends&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
       "dark": true,
-      "desc": "From the ShareBuddy case study: guests open the link, pick their items and pay their share by card.",
+      "desc": "From the ShareBuddy case study: search your contacts, invite the people you split with, and get a heads-up when they join.",
       "tools": "Figma · Code",
       "case": "sharebuddy",
       "mix": true
+    },
+    {
+      "title": "Bitcoin, candlesticks",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-bitcoin-candles.jpg",
+          "ratio": 1.5,
+          "live": "live/btc-candles",
+          "srcm": "assets/designs/market-bitcoin-candles-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a live Bitcoin candlestick chart. The last candle keeps trading and a new one opens every few seconds, with volume underneath, a live price tag and the 24h high and low.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Order book and depth",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-order-book.jpg",
+          "ratio": 1.5,
+          "live": "live/order-book",
+          "srcm": "assets/designs/market-order-book-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a Bitcoin order book beside its depth chart. Orders come and go and flash green or red, and the buy and sell walls rise and fall with them.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "Pricing plans, dark",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-dark.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
     },
     {
       "title": "Design Build Share, orange",
@@ -1541,52 +1550,79 @@
       "mix": true
     },
     {
-      "title": "Buy ticket",
+      "title": "Kusnap, product card",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/market-buy-ticket.jpg",
+          "src": "assets/designs/kusnap-ds-product.jpg",
           "ratio": 1.5,
-          "live": "live/trade",
-          "srcm": "assets/designs/market-buy-ticket-phone.jpg",
-          "ratiom": 0.8
+          "live": "live/ks-product"
         }
       ],
-      "bg": "#f2f2f2",
+      "bg": "#f4f6f8",
       "dark": false,
-      "desc": "Market UI exploration: a buy ticket that runs on its own. The slider moves, an amount is typed, the order goes through and is filled, while live trades stream beside it.",
-      "tools": "Figma · Code",
-      "mix": true
-    },
-    {
-      "title": "Kusnap, Quick List",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-quick-list.jpg",
-          "ratio": 1.5,
-          "live": "Prototype/kusnap-quicklist"
-        }
-      ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "From the Kusnap case study: Quick List. Pick a past, out-of-stock listing and its name, category, photos and price fill the new product form.",
+      "desc": "From the Kusnap design system: the marketplace product card, with its component properties as switches. Discount, verification, boosted and like tags, units left, and in or out of stock.",
       "tools": "Figma · Code",
       "case": "kusnap",
       "mix": true
     },
     {
-      "title": "eBay, home and categories",
+      "title": "Cend, search home",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
+          "src": "assets/designs/cend-search-home.jpg",
+          "ratio": 1.5002
+        }
+      ],
+      "bg": "#7f8287",
+      "dark": false,
+      "desc": "A map-first home for finding nearby help, with the user’s location and what’s around them.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Travel Explore, flight search",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/flight-search-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3c3b3c",
+      "dark": true,
+      "desc": "A flight booking home with the search right under the hero, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "AI writing assistant",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ai-writing-assistant.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#e4eaef",
+      "dark": false,
+      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "eBay, price history and reporting",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ebay-concept-price-history-and-reporting.jpg",
           "ratio": 1.3333
         }
       ],
       "bg": "#f2f5f7",
       "dark": false,
-      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
+      "desc": "A UI study: replicating eBay’s item details, with the sold-price chart, its time filters and the flow for reporting a message. Not my original design.",
       "tools": "Figma",
       "mix": true,
       "credits": [
@@ -1597,36 +1633,99 @@
       ]
     },
     {
-      "title": "DIGIM, “Don’t be a spectator”",
+      "title": "Kusnap, quick list",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/digim-dont-be-a-spectator.jpg",
+          "src": "assets/designs/kusnap-ds-quicklist.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-quicklist"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: relist a sold-out product in one tap. Use Details folds the card away and fills the new listing from the old one.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Top destinations, travel site",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/travel-destinations-on-a-laptop.jpg",
           "ratio": 1.3333
         }
       ],
-      "bg": "#393635",
+      "bg": "#3d3b3a",
       "dark": true,
-      "desc": "A DIGIM agency page with a bold headline over a strip of campaign images, shown on a laptop.",
+      "desc": "A travel site’s top destinations: Kyoto, London, Barcelona and more, shown on a laptop.",
       "tools": "Figma",
       "mix": true
     },
     {
-      "title": "Ethereum, area chart",
+      "title": "ShareBuddy, scan a receipt",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/market-ethereum-area.jpg",
-          "ratio": 1.5,
-          "live": "live/eth-area",
-          "srcm": "assets/designs/market-ethereum-area-phone.jpg",
-          "ratiom": 0.8
+          "src": "assets/designs/sharebuddy-ui-scan.jpg",
+          "ratio": 0.6,
+          "live": "Prototype/sharebuddy.html?flow=scan&fs&tile&theme=dark"
         }
       ],
-      "bg": "#f2f2f2",
-      "dark": false,
-      "desc": "Market UI exploration: an Ethereum area chart that switches through its time ranges, 1H to 1Y, reshaping the line each time, while a crosshair reads prices off it.",
+      "bg": "#141414",
+      "dark": true,
+      "desc": "From the ShareBuddy case study: tap +, scan the receipt, check the items and share one link in a chat.",
       "tools": "Figma · Code",
+      "case": "sharebuddy",
+      "mix": true
+    },
+    {
+      "title": "Search, recent and related",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/search-recent-and-related.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#e4eaef",
+      "dark": false,
+      "desc": "A search panel that keeps recent searches one tap away and suggests related ones as chips.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, account verification",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ui-verification.jpg",
+          "ratio": 1.5,
+          "live": "live/kusnap-browser?p=verification"
+        }
+      ],
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "From the Kusnap case study: account verification on the web. A one-time code confirms the phone, then an ID number confirms the person, played start to finish.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "AI assistant card",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ai-assistant-card.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#e4eaef",
+      "dark": false,
+      "desc": "A feature card for an AI assistant that answers questions in seconds, showing the chat it opens into.",
+      "tools": "Figma",
       "mix": true
     },
     {
@@ -1645,113 +1744,21 @@
       "mix": true
     },
     {
-      "title": "Bulvds, choosing how to pay",
+      "title": "Buy ticket",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/bulvds-payment-method.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#f0f0f0",
-      "dark": false,
-      "desc": "The payment summary, with Bulvds Wallet, Paystack or Split Payment.",
-      "tools": "Figma",
-      "mix": true,
-      "case": "bulvds"
-    },
-    {
-      "title": "AI writing assistant",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ai-writing-assistant.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A dark, compact AI assistant: summarize notes, draft an email and set the tone, all from one column.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Team members modal",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/team-members-modal.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#f8f8f8",
-      "dark": false,
-      "desc": "A workspace members modal: search, invite and per-person roles."
-    },
-    {
-      "title": "Pricing plans, dark",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/pricing-plans-dark.jpg",
-          "ratio": 1.218
-        }
-      ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "A three-tier pricing page in dark mode with the standard plan lifted."
-    },
-    {
-      "title": "Kusnap, store verification",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-store-verification.jpg",
+          "src": "assets/designs/market-buy-ticket.jpg",
           "ratio": 1.5,
-          "live": "Prototype/kusnap-shop"
+          "live": "live/trade",
+          "srcm": "assets/designs/market-buy-ticket-phone.jpg",
+          "ratiom": 0.8
         }
       ],
-      "bg": "#eef1f5",
+      "bg": "#f2f2f2",
       "dark": false,
-      "desc": "From the Kusnap case study: store verification, started from the seller dashboard, checking the shop is ready before it applies.",
+      "desc": "Market UI exploration: a buy ticket that runs on its own. The slider moves, an amount is typed, the order goes through and is filled, while live trades stream beside it.",
       "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
-    },
-    {
-      "title": "Discord, servers and messages",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/discord-concept-servers-and-messages.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#ffffff",
-      "dark": false,
-      "desc": "A UI study: replicating Discord’s mobile app, with a server home, the join-a-server empty state and the new message sheet. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
-    },
-    {
-      "title": "AI assistant card",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ai-assistant-card.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#e4eaef",
-      "dark": false,
-      "desc": "A feature card for an AI assistant that answers questions in seconds, showing the chat it opens into.",
-      "tools": "Figma",
       "mix": true
     },
     {
@@ -1812,6 +1819,23 @@
       "desc": "An isometric wallet with a wrap of notes, coins and bills floating above it."
     },
     {
+      "title": "Kusnap, input states",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ds-input.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-input"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: one field with every state designed. Default, focused, error, completed and disabled; it types, fails validation, then recovers.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
       "title": "ShareBuddy, circles and Buddy",
       "category": "ui",
       "images": [
@@ -1829,53 +1853,53 @@
       "mix": true
     },
     {
-      "title": "DIGIM, agency home",
+      "title": "Solana, wallet card",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/digim-agency-home.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#403d3c",
-      "dark": true,
-      "desc": "The DIGIM digital marketing agency home page, bold type and client logos, shown on a laptop.",
-      "tools": "Figma",
-      "mix": true
-    },
-    {
-      "title": "Bitcoin, candlesticks",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/market-bitcoin-candles.jpg",
+          "src": "assets/designs/solana-wallet-card.jpg",
           "ratio": 1.5,
-          "live": "live/btc-candles",
-          "srcm": "assets/designs/market-bitcoin-candles-phone.jpg",
+          "live": "live/sol-line",
+          "srcm": "assets/designs/solana-wallet-card-phone.jpg",
           "ratiom": 0.8
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "Market UI exploration: a live Bitcoin candlestick chart. The last candle keeps trading and a new one opens every few seconds, with volume underneath, a live price tag and the 24h high and low.",
+      "desc": "Market UI exploration: a live Solana wallet card. The price line keeps moving with a pulse on its newest point, and the badge compares it with where the chart began.",
       "tools": "Figma · Code",
       "mix": true
     },
     {
-      "title": "ShareBuddy, add your buddies",
+      "title": "Kusnap, verified seller",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/sharebuddy-ui-friends.jpg",
-          "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=friends&fs&tile&theme=dark"
+          "src": "assets/designs/kusnap-ui-verified-seller.jpg",
+          "ratio": 1.5,
+          "live": "Prototype/kusnap-badge"
         }
       ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "From the ShareBuddy case study: search your contacts, invite the people you split with, and get a heads-up when they join.",
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "From the Kusnap case study: where buyers see trust. The verified tick on the seller card, on the desktop product page and then on mobile.",
       "tools": "Figma · Code",
-      "case": "sharebuddy",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Smart Cards landing page",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/smart-cards-on-a-laptop.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#3e3c3b",
+      "dark": true,
+      "desc": "A landing page for smart business cards, shown on a laptop.",
+      "tools": "Figma",
       "mix": true
     },
     {
@@ -1897,83 +1921,48 @@
       "mix": true
     },
     {
-      "title": "Pricing plans, light",
+      "title": "DIGIM, footer",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/pricing-plans-light.jpg",
-          "ratio": 1.218
-        }
-      ],
-      "bg": "#ffffff",
-      "dark": false,
-      "desc": "The same pricing page in light mode."
-    },
-    {
-      "title": "Kusnap, verified seller",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/kusnap-ui-verified-seller.jpg",
-          "ratio": 1.5,
-          "live": "Prototype/kusnap-badge"
-        }
-      ],
-      "bg": "#eef1f5",
-      "dark": false,
-      "desc": "From the Kusnap case study: where buyers see trust. The verified tick on the seller card, on the desktop product page and then on mobile.",
-      "tools": "Figma · Code",
-      "case": "kusnap",
-      "mix": true
-    },
-    {
-      "title": "Fear & Greed gauge",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/market-fear-greed.jpg",
-          "ratio": 1.5,
-          "live": "live/fear-greed",
-          "srcm": "assets/designs/market-fear-greed-phone.jpg",
-          "ratiom": 0.8
-        }
-      ],
-      "bg": "#111111",
-      "dark": true,
-      "desc": "Market UI exploration: a sentiment gauge. The needle swings to each new reading and settles, with yesterday, last week and last month beside it.",
-      "tools": "Figma · Code",
-      "mix": true
-    },
-    {
-      "title": "Travel Explore, flight search",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/flight-search-on-a-laptop.jpg",
+          "src": "assets/designs/digim-footer.jpg",
           "ratio": 1.3333
         }
       ],
-      "bg": "#3c3b3c",
+      "bg": "#2f2d2c",
       "dark": true,
-      "desc": "A flight booking home with the search right under the hero, shown on a laptop.",
+      "desc": "The DIGIM site footer: “Making brands unforgettable” with a newsletter sign-up, shown on a laptop.",
       "tools": "Figma",
       "mix": true
     },
     {
-      "title": "ShareBuddy, getting started",
+      "title": "Team members modal",
       "category": "ui",
       "images": [
         {
-          "src": "assets/designs/sharebuddy-ui-start.jpg",
-          "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=start&fs&tile&theme=dark"
+          "src": "assets/designs/team-members-modal.jpg",
+          "ratio": 1.0
         }
       ],
-      "bg": "#141414",
-      "dark": true,
-      "desc": "From the ShareBuddy case study: the splash, sign up, then home with every split at a glance.",
+      "bg": "#f8f8f8",
+      "dark": false,
+      "desc": "A workspace members modal: search, invite and per-person roles."
+    },
+    {
+      "title": "Kusnap, product images",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ds-upload.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-upload"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: photo upload with progress rings, photo tips, and the first photo marked as the cover.",
       "tools": "Figma · Code",
-      "case": "sharebuddy",
+      "case": "kusnap",
       "mix": true
     },
     {
@@ -1994,6 +1983,157 @@
       "mix": true
     },
     {
+      "title": "Kusnap, default delivery",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ui-default-delivery.jpg",
+          "ratio": 1.2,
+          "live": "Prototype/kusnap-details.html?part=delivery"
+        }
+      ],
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "From the Kusnap case study: delivery costs set once, within the city and outside it, saved as the default and shown on every product.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "ShareBuddy, pay without the app",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-ui-pay.jpg",
+          "ratio": 0.6,
+          "live": "Prototype/sharebuddy.html?flow=pay&fs&tile&theme=dark"
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "From the ShareBuddy case study: guests open the link, pick their items and pay their share by card.",
+      "tools": "Figma · Code",
+      "case": "sharebuddy",
+      "mix": true
+    },
+    {
+      "title": "eBay, home and categories",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/ebay-concept-home-and-categories.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#f2f5f7",
+      "dark": false,
+      "desc": "A UI study: replicating eBay’s app home, with live shopping, curated categories and story-led promos on one feed. Not my original design.",
+      "tools": "Figma",
+      "mix": true,
+      "credits": [
+        [
+          "Recreated by",
+          "Kingsley Mkpandiok"
+        ]
+      ]
+    },
+    {
+      "title": "Fear & Greed gauge",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/market-fear-greed.jpg",
+          "ratio": 1.5,
+          "live": "live/fear-greed",
+          "srcm": "assets/designs/market-fear-greed-phone.jpg",
+          "ratiom": 0.8
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "Market UI exploration: a sentiment gauge. The needle swings to each new reading and settles, with yesterday, last week and last month beside it.",
+      "tools": "Figma · Code",
+      "mix": true
+    },
+    {
+      "title": "DIGIM, agency home",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/digim-agency-home.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#403d3c",
+      "dark": true,
+      "desc": "The DIGIM digital marketing agency home page, bold type and client logos, shown on a laptop.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
+      "title": "Kusnap, specifications",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ui-specifications.jpg",
+          "ratio": 1.2,
+          "live": "Prototype/kusnap-details.html?part=spec"
+        }
+      ],
+      "bg": "#eef1f5",
+      "dark": false,
+      "desc": "From the Kusnap case study: specification fields that follow the category. A phone asks for storage, RAM and battery; switch to shoes and the fields become size and material.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Pricing plans, light",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/pricing-plans-light.jpg",
+          "ratio": 1.218
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "The same pricing page in light mode."
+    },
+    {
+      "title": "Kusnap, listing quality",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/kusnap-ds-quality.jpg",
+          "ratio": 1.5,
+          "live": "live/ks-quality"
+        }
+      ],
+      "bg": "#f4f6f8",
+      "dark": false,
+      "desc": "From the Kusnap design system: the listing form scores itself as the seller fills it. The meter climbs from red to amber to green, and Publish unlocks at 80%.",
+      "tools": "Figma · Code",
+      "case": "kusnap",
+      "mix": true
+    },
+    {
+      "title": "Bulvds, choosing how to pay",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/bulvds-payment-method.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#f0f0f0",
+      "dark": false,
+      "desc": "The payment summary, with Bulvds Wallet, Paystack or Split Payment.",
+      "tools": "Figma",
+      "mix": true,
+      "case": "bulvds"
+    },
+    {
       "title": "Portfolio allocation",
       "category": "ui",
       "images": [
@@ -2010,27 +2150,6 @@
       "desc": "Market UI exploration: a portfolio ring. Each holding’s share shifts as prices move, one holding is spotlighted at a time, and the total balance follows.",
       "tools": "Figma · Code",
       "mix": true
-    },
-    {
-      "title": "eBay, price history and reporting",
-      "category": "ui",
-      "images": [
-        {
-          "src": "assets/designs/ebay-concept-price-history-and-reporting.jpg",
-          "ratio": 1.3333
-        }
-      ],
-      "bg": "#f2f5f7",
-      "dark": false,
-      "desc": "A UI study: replicating eBay’s item details, with the sold-price chart, its time filters and the flow for reporting a message. Not my original design.",
-      "tools": "Figma",
-      "mix": true,
-      "credits": [
-        [
-          "Recreated by",
-          "Kingsley Mkpandiok"
-        ]
-      ]
     }
   ]
 }

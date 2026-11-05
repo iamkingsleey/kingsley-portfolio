@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap product images</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+.card { position: absolute; left: 50%; top: 50%; width: 760rem; transform: translate(-50%, -54%) }
+.sub { font-size: 21rem; color: var(--body); margin: 6rem 0 20rem }
+.drop { border: 2.4rem dashed var(--input); border-radius: 19rem; padding: 34rem; text-align: center; font-size: 21rem; color: var(--head); transition: border-color .2s, background .2s } .drop.ov { border-color: var(--brand); background: var(--infobg) }
+.drop b { color: var(--brand); font-weight: 600 } .drop svg { color: var(--body); margin-bottom: 8rem } .drop span { display: block; color: var(--body) }
+.ths { display: flex; gap: 14rem; margin-top: 18rem; min-height: 0 } .ths:empty { display: none }
+.th { position: relative; width: 110rem; height: 110rem; border-radius: 16rem; overflow: hidden; background: var(--surface); animation: pop .35s cubic-bezier(.2,.9,.3,1.3) } @keyframes pop { from { transform: scale(.6); opacity: 0 } }
+.th img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s } .th.up img { opacity: .4 } .th .rg { position: absolute; inset: 0; display: grid; place-items: center } .th:not(.up) .rg { display: none }
+.th .cv { position: absolute; left: 8rem; bottom: 8rem; font-size: 14rem; font-weight: 600; background: var(--high); color: #fff; padding: 3rem 8rem; border-radius: 6rem; opacity: 0 } .th.cover .cv { opacity: 1 }
+.tips { margin-top: 20rem; background: var(--surface); border-radius: 19rem; padding: 20rem 24rem; font-size: 19rem; color: var(--head) } .tips b { color: var(--brand); font-weight: 500 } .tips ul { margin-top: 6rem; padding-left: 26rem }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="card"><h3>Product Images</h3><p class="sub">Add at least one photo, sellers with high quality photos sell faster</p>
+  <div class="drop" id="dp"><svg style="width:38rem;height:38rem;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/><path d="m4 16 4-3 3 2 4-3 5 4"/><path d="M18 2v6M15 5l3-3 3 3"/></svg><div><b>Click</b> to upload or drag and drop</div><span>Supported formats are *.jpg and *.png</span></div>
+  <div class="ths" id="ths"></div>
+  <div class="tips"><b>Photo Tips</b><ul><li>Use natural lighting and clean backgrounds</li><li>Show multiple angles and key features</li></ul></div></div>
+<div class="cap"><b>Product images</b> · upload, progress, first photo becomes the cover</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const P = ['ks/p1.webp', 'ks/p2.webp', 'ks/p3.webp', 'ks/headset.webp']; let n = 0;
+  const add = () => { if (n >= 4) return; const src = P[n++], d = document.createElement('div'); d.className = 'th up' + (n === 1 ? ' cover' : '');
+    d.innerHTML = `<img src="${src}" alt=""><span class="rg"><svg style="width:46rem;height:46rem;flex:none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/><circle cx="18" cy="18" r="14" fill="none" stroke="#0776d8" stroke-width="3" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88" transform="rotate(-90 18 18)"/></svg></span><span class="cv">Cover</span>`;
+    $('#ths').append(d); const c = d.querySelectorAll('circle')[1], t0 = performance.now(), f = now => { const k = Math.min(1, (now - t0) / 1000); c.setAttribute('stroke-dashoffset', 88 * (1 - k)); k < 1 ? requestAnimationFrame(f) : d.classList.remove('up'); }; requestAnimationFrame(f); };
+  const reset = () => { n = 0; $('#ths').innerHTML = ''; };
+  $('#dp').onclick = add;
+  CO.demo(async H => { reset(); await H.sleep(800); await H.at('#dp', .5, .5); $('#dp').classList.add('ov'); await H.sleep(250); await H.tap('#dp', add, .5, .5); $('#dp').classList.remove('ov');
+    await H.sleep(500); await H.tap('#dp', add, .5, .5); await H.sleep(300); await H.tap('#dp', add, .5, .5); H.away(); await H.sleep(2600); });
+})();
+</script>
+</body>
+</html>

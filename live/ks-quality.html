@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap listing quality</title>
+<link rel="stylesheet" href="ks.css">
+<style>
+.wrap { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%); display: flex; gap: 28rem; align-items: flex-start }
+.form { width: 600rem } .f { margin-bottom: 22rem } .f:last-child { margin-bottom: 0 }
+.ph2 { display: flex; gap: 12rem } .ph2 i { width: 84rem; height: 84rem; border-radius: 14rem; border: 2rem dashed var(--input); display: grid; place-items: center; color: var(--small); font-style: normal; font-size: 30rem; overflow: hidden; transition: border-color .2s }
+.ph2 i img { width: 100%; height: 100%; object-fit: cover; animation: pop .4s cubic-bezier(.2,.9,.3,1.3) } .ph2 i.has { border: 0 } @keyframes pop { from { transform: scale(.6); opacity: 0 } }
+.lq { width: 440rem } .lq h3 { margin-bottom: 20rem }
+.bar { display: flex; align-items: center; gap: 18rem } .tr { flex: 1; height: 10rem; border-radius: 5rem; background: var(--errbg); overflow: hidden; transition: background .4s } .fl { height: 100%; width: 1%; border-radius: 5rem; background: var(--err); transition: width .6s cubic-bezier(.3,.8,.2,1), background .4s }
+.pc { font-size: 24rem; font-weight: 600; color: var(--head); min-width: 62rem; text-align: right; font-variant-numeric: tabular-nums }
+.lq ul { margin-top: 26rem; padding-left: 28rem; font-size: 21rem; color: var(--head) } .lq li { margin: 10rem 0; transition: color .3s } .lq li.d { color: var(--small); text-decoration: line-through }
+.lq .btn { width: 100%; margin-top: 22rem }
+</style>
+</head>
+<body>
+<div class="fr">
+<div class="wrap">
+  <div class="card form">
+    <div class="f"><label class="lbl">Product Name<em>*</em></label><div class="inp ph" id="nm">Enter product name</div></div>
+    <div class="f"><label class="lbl">Description<em>*</em></label><div class="inp ph" id="ds">Condition, what's in the box</div></div>
+    <div class="f"><label class="lbl">Price<em>*</em></label><div class="inp ph" id="pr">₦ 0</div></div>
+    <div class="f"><label class="lbl">Photos<em>*</em></label><div class="ph2" id="phs"><i>+</i><i>+</i><i>+</i></div></div>
+  </div>
+  <div class="card lq"><h3>Listing Quality</h3><div class="bar"><div class="tr" id="tr"><div class="fl" id="fl"></div></div><span class="pc" id="pc">1%</span></div>
+    <ul><li data-k="nm">Add a clear product name</li><li data-k="ds">Describe the condition</li><li data-k="pr">Set a price</li><li data-k="ph">Add at least 2 photos</li></ul>
+    <div class="btn off" id="pub">Publish</div></div>
+</div>
+<div class="cap"><b>Listing quality</b> · the form scores itself as you fill it</div>
+</div>
+<script src="co.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const { naira } = CO;
+  const type = async (H, el, text, ms = 55, from = '') => { el.classList.remove('ph'); for (let i = from.length; i <= text.length; i++) { el.innerHTML = text.slice(0, i) + '<i class="caret"></i>'; await H.sleep(ms); } };
+  const settle = (el, text) => { el.textContent = text; };
+  const toast = (t, ms = 1600) => { const e = $('.toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); };
+
+  const W = { nm: 25, ds: 25, pr: 15, ph: 35 }, done = new Set(); let pct = 1;
+  const score = () => { const to = Math.max(1, [...done].reduce((a, k) => a + W[k], 0)); const c = to >= 80 ? ['var(--ok)', 'var(--okbg)'] : to >= 20 ? ['var(--warn)', 'var(--warnbg)'] : ['var(--err)', 'var(--errbg)'];
+    $('#fl').style.width = to + '%'; $('#fl').style.background = c[0]; $('#tr').style.background = c[1]; const a = pct; pct = to;
+    const t0 = performance.now(); const f = now => { const k = Math.min(1, (now - t0) / 600); $('#pc').textContent = Math.round(a + (to - a) * k) + '%'; if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f);
+    $$('.lq li').forEach(l => l.classList.toggle('d', done.has(l.dataset.k))); $('#pub').className = 'btn ' + (to >= 80 ? 'pri' : 'off'); };
+  const reset = () => { done.clear(); $('#nm').className = 'inp ph'; $('#nm').textContent = 'Enter product name'; $('#ds').className = 'inp ph'; $('#ds').textContent = 'Condition, what\'s in the box'; $('#pr').className = 'inp ph'; $('#pr').textContent = '₦ 0';
+    $$('#phs i').forEach(i => { i.className = ''; i.innerHTML = '+'; }); score(); };
+  const field = async (H, id, text, k) => { const el = $('#' + id); await H.tap(el, () => el.classList.add('f'), .25); H.away(); await type(H, el, text, 45); settle(el, text); el.classList.remove('f'); done.add(k); score(); await H.sleep(500); };
+  const P = ['ks/p1.webp', 'ks/p2.webp', 'ks/headset.webp'];
+  $$('#phs i').forEach((i, n) => i.onclick = () => { i.className = 'has'; i.innerHTML = `<img src="${P[n]}" alt="">`; if ($$('#phs i.has').length >= 2) { done.add('ph'); score(); } });
+  reset();
+  CO.demo(async H => { reset(); await H.sleep(800);
+    await field(H, 'nm', 'Google Pixel 10 Pro 256GB', 'nm'); await field(H, 'ds', 'Brand new, sealed, with receipt', 'ds');
+    for (let n = 0; n < 2; n++) { const i = $$('#phs i')[n]; await H.tap(i, () => { i.className = 'has'; i.innerHTML = `<img src="${P[n]}" alt="">`; }); } done.add('ph'); score(); await H.sleep(700);
+    await field(H, 'pr', '₦ 1,950,000', 'pr'); await H.sleep(300); await H.tap('#pub'); H.away(); await H.sleep(1800); });
+})();
+</script>
+</body>
+</html>
