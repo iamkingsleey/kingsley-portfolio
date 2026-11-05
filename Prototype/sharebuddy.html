@@ -413,8 +413,11 @@ const flow = (new URLSearchParams(location.search).get('flow') || 'start').repla
 document.getElementById('ttl').textContent = F.t;
 document.getElementById('steps').innerHTML = F.s.map((s, i, a) => `<li data-n="${String(i + 1).padStart(2, '0')} / ${String(a.length).padStart(2, '0')}">${s}</li>`).join('');
 const st = document.getElementById('st'), app = document.getElementById('app'), steps = [...document.querySelectorAll('#steps li')];
-let FS = new URLSearchParams(location.search).has('fs');   // full screen (the case study page tells us, or ?fs in the address): just the phone, as big as the screen allows
-const fit = () => { if (FS) { const d = st.querySelector('.dev'), W = d.offsetWidth + 40, H = d.offsetHeight + 96; st.classList.add('fs'); st.style.width = W + 'px'; st.style.height = H + 'px'; d.style.transform = 'none'; d.style.left = '20px'; d.style.top = '64px';
+let FS = new URLSearchParams(location.search).has('fs'), TILE = new URLSearchParams(location.search).has('tile');   // ?tile: the phone on its own in a Designs tile, with generous room above and below   // full screen (the case study page tells us, or ?fs in the address): just the phone, as big as the screen allows
+const fit = () => { if (FS && TILE) { const d = st.querySelector('.dev'), pw = d.offsetWidth, ph = d.offsetHeight, H = Math.round(ph / .76), W = Math.max(pw + 80, Math.round(H * .6));
+    st.classList.add('fs'); st.style.width = W + 'px'; st.style.height = H + 'px'; d.style.transform = 'none'; d.style.left = (W - pw) / 2 + 'px'; d.style.top = (H - ph) / 2 + 'px';
+    const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; return; }
+  if (FS) { const d = st.querySelector('.dev'), W = d.offsetWidth + 40, H = d.offsetHeight + 96; st.classList.add('fs'); st.style.width = W + 'px'; st.style.height = H + 'px'; d.style.transform = 'none'; d.style.left = '20px'; d.style.top = '64px';
     const k = Math.min(innerWidth / W, innerHeight / H); st.style.transform = `translate(${(innerWidth - W * k) / 2}px, ${(innerHeight - H * k) / 2}px) scale(${k})`; return; }
   st.classList.remove('fs'); st.style.width = ''; { const d = st.querySelector('.dev'); if (d) d.style.top = ''; }
   const v = innerWidth / innerHeight < 1, W = v ? 600 : 1200, H = v ? Math.max(880, Math.round(600 * innerHeight / innerWidth)) : 800; st.classList.toggle('v', v);

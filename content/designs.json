@@ -1216,7 +1216,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-friends.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=friends&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=friends&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
@@ -1332,7 +1332,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-circle.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=circle&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=circle&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
@@ -1626,7 +1626,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-pay.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=pay&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=pay&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
@@ -1677,7 +1677,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-scan.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=scan&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=scan&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
@@ -1946,7 +1946,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-start.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=start&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=start&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
@@ -1963,7 +1963,7 @@
         {
           "src": "assets/designs/sharebuddy-ui-split.jpg",
           "ratio": 0.6,
-          "live": "Prototype/sharebuddy.html?flow=split&fs&theme=dark"
+          "live": "Prototype/sharebuddy.html?flow=split&fs&tile&theme=dark"
         }
       ],
       "bg": "#141414",
