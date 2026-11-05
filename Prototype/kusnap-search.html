@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kusnap Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Kusnap's search panel, live: recent searches one tap away, related searches as chips while you type, most searched underneath.
+   ?autoplay=1 plays it on its own; any real click, key or scroll hands it to the visitor. */
+:root {
+  --bg: #f7f9fb; --card: #fff; --line: #eaecf0; --ph: #98a2b3; --ink: #101828; --text: #344054; --muted: #667085;
+  --chip: #eef1f4; --blue: #0b6fd6; --blue-soft: #e6f2fd; --top: #0156a1; --navy: #1e4a94; --lime: #a8d23e; --green: #2ea20b; --green-dk: #1f7a05;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0 }
+html, body { background: var(--bg) }
+body { font: 400 14px/1.45 Inter, system-ui, -apple-system, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden }
+button, input { font: inherit; color: inherit }
+button { cursor: pointer; border: 0; background: none }
+svg { display: block; flex: none }
+
+/* bars */
+.strip { height: 34px; background: var(--top); color: #fff }
+.wrap { max-width: 1060px; height: 100%; margin: 0 auto; padding: 0 20px; display: flex; align-items: center }
+.strip .wrap { justify-content: flex-end; gap: 18px; font-weight: 500; font-size: 13px }
+.strip svg { opacity: .95 }
+.nav { position: relative; z-index: 6; height: 62px; background: #fff; border-bottom: 1px solid var(--line) }
+.nav .wrap { gap: 24px }
+.logo { height: 40px; width: auto; display: block }
+.sell { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 8px; background: var(--green); color: #fff; font-weight: 500; font-size: 13.5px; box-shadow: inset 0 -2px 0 var(--green-dk); margin-left: auto; white-space: nowrap; text-decoration: none }
+
+/* search */
+.sbox { position: relative; flex: 1; max-width: 560px; margin-left: 40px }
+.field { display: flex; align-items: center; height: 42px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; transition: border-color .2s, box-shadow .2s }
+.sbox.open .field { background: #fff; border-color: var(--blue); box-shadow: 0 0 0 3px rgb(11 111 214 / .12) }
+.field .mag { margin: 0 8px 0 14px; color: #8a94a6 }
+.field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font-size: 14px; color: var(--ink) }
+.field input::placeholder { color: var(--ph) }
+.clr { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: #8a94a6; opacity: 0; pointer-events: none; transition: opacity .2s }
+.sbox.has .clr { opacity: 1; pointer-events: auto }
+.state { display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 14px; border-left: 1px solid #e3e7ed; color: #8a94a6; font-size: 13.5px; white-space: nowrap }
+
+/* the panel */
+.panel { position: absolute; left: 0; right: 0; top: calc(100% + 8px); background: #fff; border-radius: 12px; padding: 18px 16px 18px; box-shadow: 0 1px 2px rgb(16 24 40 / .06), 0 14px 34px rgb(16 24 40 / .14);
+  opacity: 0; transform: translateY(-6px) scale(.99); transform-origin: top center; pointer-events: none; transition: opacity .2s, transform .28s var(--ease) }
+.sbox.open .panel { opacity: 1; transform: none; pointer-events: auto }
+.sec + .sec { margin-top: 18px }
+.sec.most { padding-top: 16px; border-top: 1px solid var(--line) }
+.sec[hidden] { display: none !important }
+.h { font-size: 13.5px; font-weight: 500; color: var(--ink); margin-bottom: 8px }
+.h b { font-weight: 600 }
+.rows { overflow: hidden }
+.row { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 6px 0 6px; border-bottom: 1px solid var(--line); border-radius: 0; color: var(--text); font-size: 13.5px; cursor: pointer; transition: background .15s, height .3s var(--ease), opacity .25s }
+.row:hover, .row.hov { background: #f7f9fb }
+.row .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.row .t mark { background: none; color: var(--ink); font-weight: 600 }
+.row .x { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #344054; transition: background .15s, transform .15s }
+.row .x:hover, .row .x.hov { background: #eef1f4 } .row .x.prs { transform: scale(.88) }
+#sRecent:has(+ #sRel[hidden]) .row:last-child { border-bottom-color: transparent }   /* Most Searched brings its own divider: no double line */
+.row.out { height: 0; opacity: 0; border-color: transparent }
+.row.in { animation: rowin .45s var(--ease) both } @keyframes rowin { from { height: 0; opacity: 0 } }
+.chips { position: relative; display: flex; align-items: center; gap: 10px }
+.track { flex: 1; min-width: 0; display: flex; gap: 8px; overflow: hidden; scroll-behavior: smooth; mask-image: linear-gradient(90deg, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent) }
+.track.end { mask-image: none; -webkit-mask-image: none }
+.chip { flex: none; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--chip); color: var(--text); font-size: 13.5px; white-space: nowrap; transition: background .15s, color .15s, transform .15s }
+.chip:hover, .chip.hov { background: var(--blue-soft); color: var(--blue) }
+.chip.prs { transform: scale(.95) }
+.chips.swap .chip { animation: chipin .35s var(--ease) both } @keyframes chipin { from { opacity: 0; transform: translateY(4px) } }
+.arr { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid #344054; display: grid; place-items: center; color: #344054; background: #fff; transition: transform .15s, background .15s }
+.arr:hover, .arr.hov { background: #f2f4f7 } .arr.prs { transform: scale(.9) }
+.arr.back svg { transform: rotate(180deg) }
+
+/* page under it */
+.scrim { position: fixed; inset: 96px 0 0; z-index: 5; background: rgb(16 24 40 / .18); opacity: 0; pointer-events: none; transition: opacity .25s }
+body.searching .scrim { opacity: 1; pointer-events: auto }
+main { max-width: 1060px; margin: 0 auto; padding: 22px 20px 40px }
+/* the home hero, from the Figma file: categories, the main banner, Sell more; then the app and escrow banners */
+.home { display: grid; grid-template-columns: 241fr 770fr 241fr; gap: 12px }
+.cats { background: #fff; border-radius: 12px; padding: 14px 12px; box-shadow: 0 1px 2px rgb(16 24 40 / .04) }
+.cats h4 { font-size: 18px; font-weight: 600; color: #0f172a; margin: 0 0 6px }
+.cat { display: flex; align-items: center; gap: 10px; height: 31px; font-size: 13.5px; color: #64748b }
+.cat img { width: 28px; height: 28px; flex: none }
+.bn { display: block; width: 100%; height: auto; border-radius: 13px }
+.home .bn.tall { height: 100%; object-fit: cover; min-height: 0 }
+.home > .bn:not(.tall) { align-self: start }
+.home .tallwrap { position: relative } .home .tallwrap .bn { position: absolute; inset: 0; height: 100% }
+.row2 { grid-column: 1 / -1; display: grid; grid-template-columns: 761fr 505fr; gap: 12px }
+/* results, from the Figma search page: breadcrumb, a Kusnap Group banner, the filter column and the product cards */
+.res { animation: in .4s var(--ease) both } @keyframes in { from { opacity: 0; transform: translateY(8px) } }
+.res[hidden], .home[hidden] { display: none }
+main.r { padding-top: 14px }
+.crumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; margin-bottom: 14px }
+.crumb b { font-weight: 500; color: #0f172a } .crumb svg { color: #94a3b8 }
+.grow { display: flex; align-items: center; justify-content: space-between; gap: 24px; background: #fff; border-radius: 12px; padding: 9px 9px 9px 28px; box-shadow: 0 1px 2px rgb(16 24 40 / .04); margin-bottom: 26px }
+.grow p { font-size: 17px; line-height: 1.3; font-weight: 600; color: #0f172a; letter-spacing: -.01em } .grow p em { font-style: normal; color: #1b8a2f }
+.grow img { width: 415px; height: 77px; object-fit: cover; border-radius: 8px; display: block }
+.rlay { display: grid; grid-template-columns: 249px minmax(0, 1fr); gap: 20px; align-items: start }
+.rlay h2 { font-size: 23px; font-weight: 600; color: #0f172a; letter-spacing: -.01em; margin-bottom: 14px; height: 31px; display: flex; align-items: center }
+.rtop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; height: 31px } .rtop h2 { margin: 0 }
+.sort { display: flex; gap: 7px } .sort > * { height: 31px; border: 1px solid #e2e8f0; border-radius: 7px; background: #fff; display: grid; place-items: center }
+.sort .bm { display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 12.5px; color: #0f172a } .sort .ic { width: 31px; color: #475569 } .sort .ic.on { color: var(--blue) }
+.filt { background: #fff; border-radius: 12px; padding: 14px 13px; box-shadow: 0 1px 2px rgb(16 24 40 / .04) }
+.fg + .fg { margin-top: 13px; padding-top: 13px; border-top: 1px solid #eef1f5 }
+.fl { font-size: 12.5px; font-weight: 500; color: #0f172a; margin-bottom: 8px }
+.sel { display: flex; align-items: center; justify-content: space-between; height: 36px; border: 1px solid #dbe2ea; border-radius: 8px; padding: 0 10px; font-size: 12.5px; color: #94a3b8 }
+.sel.v { color: #0f172a } .sel + .sel { margin-top: 7px }
+.ck { display: flex; align-items: center; gap: 9px; height: 26px; font-size: 12.5px; color: #475569; cursor: pointer; user-select: none }
+.ck i { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid #cbd5e1; display: grid; place-items: center; transition: background .15s, border-color .15s }
+.ck.on i { background: var(--blue); border-color: var(--blue) } .ck.on i::after { content: ""; width: 7px; height: 4px; border: solid #fff; border-width: 0 0 1.8px 1.8px; transform: translateY(-1px) rotate(-45deg) }
+.mm { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px } .mm span { height: 32px; border: 1px solid #dbe2ea; border-radius: 7px; padding: 0 9px; display: flex; align-items: center; font-size: 12px; color: #94a3b8 } .mm b { width: 12px; height: 1.5px; background: #0f172a }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px }
+.card { min-width: 0; animation: in .45s var(--ease) both; cursor: pointer }
+.card .ph { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #ecede5; box-shadow: 0 0 0 4px #fff, 0 1px 3px 4px rgb(16 24 40 / .05); margin: 4px 4px 0 }
+.card .ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--ease) } .card:hover .ph img, .card.hov .ph img { transform: scale(1.04) }
+.off { position: absolute; left: 7px; top: 7px; background: #e5484d; color: #fff; font-size: 10.5px; font-weight: 600; padding: 2px 6px; border-radius: 5px }
+.sv { position: absolute; right: 7px; top: 7px; width: 22px; height: 22px; border-radius: 6px; background: rgb(15 23 42 / .85); display: grid; place-items: center; color: #fff }
+.bst { position: absolute; left: 0; bottom: 8px; background: var(--blue); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 0 5px 5px 0; display: flex; align-items: center; gap: 3px }
+.lk { position: absolute; right: 7px; bottom: 7px; display: flex; align-items: center; gap: 4px; background: rgb(15 23 42 / .62); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 999px; backdrop-filter: blur(4px) }
+.card .bd { padding: 10px 2px 0 }
+.card .nm { font-size: 12.5px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.card .pr { font-size: 13px; font-weight: 600; color: #0f172a; margin-top: 2px }
+.card .was { font-size: 11.5px; color: #94a3b8; text-decoration: line-through; height: 16px }
+.card .ul { font-size: 12px; color: #334155; margin-top: 6px }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px } .tags span { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: #475569; background: #f1f5f9; padding: 2px 6px; border-radius: 5px }
+.tags .dot::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #22a845 } .tags .dot.no::before { background: #e5484d }
+/* autoplay cursor */
+.cur { position: fixed; z-index: 20; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; opacity: 0; transform: translate(var(--x, 50vw), var(--y, 60vh)); transition: transform .8s cubic-bezier(.45, .05, .2, 1), opacity .3s; filter: drop-shadow(0 2px 3px rgba(16, 24, 40, .25)) }
+.cur.on { opacity: 1 }
+.cur svg { position: absolute; left: 0; top: 0; width: 26px; height: 26px; transform-origin: 6px 4px; transition: transform .12s, opacity .15s }
+.cur .hd { opacity: 0 } .cur.hand .hd { opacity: 1 } .cur.hand .ar { opacity: 0 }
+.cur.down svg { transform: scale(.82) }
+.cur i { position: absolute; left: 6px; top: 4px; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: rgba(11, 111, 214, .22); transform: scale(0); opacity: 0 }
+.cur.tap i { animation: tap .5s ease-out } @keyframes tap { 0% { transform: scale(.2); opacity: 1 } 100% { transform: scale(1.4); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
+</style>
+</head>
+<body>
+<div class="strip"><div class="wrap">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.6c1.5.6 2.4 2 2.7 4.4"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 13h4.5l1.5 2h5l1.5-2h4.5"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-1.6 8.2a2 2 0 0 1-2 1.6H7.6a2 2 0 0 1-2-1.6z"/><path d="M8.5 7a3.5 3.5 0 0 1 7 0"/></svg>
+  <span>Login or Register</span>
+</div></div>
+<header class="nav"><div class="wrap">
+  <button id="home" aria-label="Kusnap, home"><img class="logo" alt="Kusnap" src="data:image/webp;base64,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"></button>
+  <div class="sbox" id="sbox">
+    <div class="field">
+      <svg class="mag" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <input id="q" type="text" placeholder="Search for products, brands or categories" autocomplete="off" aria-label="Search Kusnap">
+      <button class="clr" id="clr" aria-label="Clear"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span class="state">Select state <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+    </div>
+    <div class="panel" id="panel" role="listbox" aria-label="Search suggestions">
+      <div class="sec" id="sRecent"><div class="h">Your Recent Searches</div><div class="rows" id="recent"></div></div>
+      <div class="sec" id="sRel" hidden><div class="h">Related Searches for <b id="relq"></b></div><div class="chips" id="rel"><div class="track"></div><button class="arr" aria-label="More"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div></div>
+      <div class="sec most" id="sMost"><div class="h">Most Searched</div><div class="chips" id="most"><div class="track"></div><button class="arr" aria-label="More"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div></div>
+    </div>
+  </div>
+  <a class="sell" href="#" onclick="return false">Sell on Kusnap <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M8 10h8M8 14h5"/></svg></a>
+</div></header>
+<div class="scrim" id="scrim"></div>
+<main>
+  <section class="home" id="pHome">
+    <div class="cats"><h4>Category</h4>
+      <div class="cat"><img src="kusnap-search/ic-real-estate.png" alt="">Real Estate</div><div class="cat"><img src="kusnap-search/ic-health.png" alt="">Health &amp; Beauty</div><div class="cat"><img src="kusnap-search/ic-gadgets.png" alt="">Gadgets</div><div class="cat"><img src="kusnap-search/ic-jobs.png" alt="">Jobs</div><div class="cat"><img src="kusnap-search/ic-agric.png" alt="">Agric &amp; Food</div><div class="cat"><img src="kusnap-search/ic-mens.png" alt="">Mens’ Fashion</div><div class="cat"><img src="kusnap-search/ic-womens.png" alt="">Women’s Fashion</div><div class="cat"><img src="kusnap-search/ic-more.png" alt="">Find more…</div>
+    </div>
+    <img class="bn" src="kusnap-search/b-main.webp" alt="Buy and Sell Anything on Kusnap." width="770" height="398">
+    <div class="tallwrap"><img class="bn tall" src="kusnap-search/b-sell.webp" alt="Sell more!" width="242" height="399"></div>
+    <div class="row2"><img class="bn" src="kusnap-search/b-app.webp" alt="Don’t miss deals, install Kusnap App." width="762" height="232"><img class="bn" src="kusnap-search/b-escrow.webp" alt="For safe transaction pay with Kusnap Escrow" width="506" height="232"></div>
+  </section>
+  <section class="res" id="pRes" hidden>
+    <div class="crumb"><span>Home</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><span>Mobile Phones &amp; Tablets</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><b id="rc"></b></div>
+    <div class="grow"><p><em>Grow</em> your Business with<br>Kusnap Group.</p><img src="kusnap-search/grow.webp" alt=""></div>
+    <div class="rlay">
+      <div><h2>Filter</h2>
+        <div class="filt" id="filt">
+          <div class="fg"><div class="fl">Category</div><div class="sel v">Mobile Phones <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+          <div class="fg"><div class="fl">Brands</div><div class="ck on"><i></i>Apple</div><div class="ck"><i></i>Samsung</div><div class="ck"><i></i>Tecno</div><div class="ck"><i></i>Infinix</div><div class="ck"><i></i>Google</div><div class="ck"><i></i>Xiaomi</div></div>
+          <div class="fg"><div class="fl">Region</div><div class="sel v">Lagos <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5-5 5 5M7 14l5 5 5-5"/></svg></div><div class="sel v">Ikeja</div></div>
+          <div class="fg"><div class="fl">Condition</div><div class="ck on"><i></i>New</div><div class="ck"><i></i>Used</div><div class="ck"><i></i>Refurbished</div></div>
+          <div class="fg"><div class="fl">Price Range</div><div class="mm"><span>Min</span><b></b><span>Max</span></div></div>
+        </div></div>
+      <div><div class="rtop"><h2 id="rt"></h2><div class="sort"><span class="bm">Best Match <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span><span class="ic on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></svg></span><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".6"/><circle cx="4.5" cy="12" r=".6"/><circle cx="4.5" cy="18" r=".6"/></svg></span></div></div>
+        <div class="grid" id="grid"></div></div>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const sbox = $('#sbox'), q = $('#q'), body = document.body;
+let RECENT = ['iphone Xr', 'samsung galaxy a54', '2 bedroom flat in lekki'];
+const MOST = ['iphone 13', 'ps5', 'generator', 'toyota camry', 'sneakers', 'air fryer', 'macbook air', 'shoe rack', 'standing fan'];
+const REL = {
+  iphone: ['iphone 13 pro max', 'iphone 13 case', 'iphone 12 pro', 'iphone xs', 'iphone 8 plus', 'iphone 14', 'airpods pro', 'iphone charger'],
+  samsung: ['samsung a14', 'galaxy s23', 'galaxy buds', 'samsung tv', 'galaxy a54 case', 'note 20'],
+  flat: ['self contain lekki', '3 bedroom flat', 'mini flat yaba', 'shortlet lekki', 'duplex ajah'],
+  _: ['phones', 'laptops', 'fashion', 'cars', 'home appliances', 'furniture']
+};
+const relFor = t => { const k = Object.keys(REL).find(k => k !== '_' && t.includes(k)) || (/bed|flat|room/.test(t) ? 'flat' : '_'); return REL[k]; };
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+const ICON_H = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4.5v4h4"/><path d="M12 7.5V12l3 2"/></svg>';
+const ICON_X = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+function rowsHTML(list, term) {
+  return list.map(r => { let t = esc(r); if (term) { const i = r.toLowerCase().indexOf(term); if (i >= 0) t = esc(r.slice(0, i)) + '<mark>' + esc(r.slice(i, i + term.length)) + '</mark>' + esc(r.slice(i + term.length)); }
+    return `<div class="row" data-v="${esc(r)}">${ICON_H}<span class="t">${t}</span><button class="x" aria-label="Remove ${esc(r)}">${ICON_X}</button></div>`; }).join('');
+}
+function chips(el, list) { const tr = el.querySelector('.track'); tr.innerHTML = list.map(c => `<button class="chip" data-v="${esc(c)}">${esc(c)}</button>`).join(''); tr.scrollLeft = 0; tr.classList.remove('end'); el.querySelector('.arr').classList.remove('back'); el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); }
+function paint() {
+  const term = q.value.trim().toLowerCase();
+  sbox.classList.toggle('has', !!term);
+  const rec = term ? RECENT.filter(r => r.toLowerCase().includes(term.split(' ')[0])) : RECENT;
+  $('#recent').innerHTML = rowsHTML(rec, term);
+  $('#sRecent').hidden = !rec.length;
+  const rel = term.length > 1;
+  $('#sRel').hidden = !rel;
+  if (rel) { $('#relq').textContent = q.value.trim(); chips($('#rel'), relFor(term)); }
+}
+function open() { if (sbox.classList.contains('open')) return; paint(); sbox.classList.add('open'); body.classList.add('searching'); }
+function close() { sbox.classList.remove('open'); body.classList.remove('searching'); }
+function remove(row) { const v = row.dataset.v; RECENT = RECENT.filter(r => r !== v); row.style.height = row.offsetHeight + 'px'; void row.offsetWidth; row.classList.add('out'); setTimeout(() => { row.remove(); if (!$('#recent').children.length) $('#sRecent').hidden = true; }, 320); }
+
+const IMG = 'kusnap-search/';
+const PHONES = [
+  { img: 'p1', v: '128GB, Midnight', price: 850000, was: 1050000, units: 3, stock: 1, cond: 'New', views: '2.4K', likes: 12, boost: 1 },
+  { img: 'p2', v: '256GB, Blue', price: 920000, was: 980000, units: 1, stock: 1, cond: 'UK used', views: '1.1K', likes: 8, boost: 0 },
+  { img: 'p3', v: '128GB, Purple', price: 1020000, was: 0, units: 5, stock: 1, cond: 'New', views: '860', likes: 21, boost: 1 },
+  { img: 'p4', v: '128GB, Starlight', price: 640000, was: 700000, units: 1, stock: 0, cond: 'Refurbished', views: '3.2K', likes: 5, boost: 0 }];
+const naira = n => '₦' + n.toLocaleString('en-NG') + '.00';
+const title = t => t.replace(/\biphone\b/gi, 'iPhone').replace(/^[a-z](?![A-Z])/, c => c.toUpperCase());
+function search(term) {
+  term = term.trim(); if (!term) return;
+  RECENT = [term, ...RECENT.filter(r => r.toLowerCase() !== term.toLowerCase())].slice(0, 4);
+  q.value = term; close(); q.blur();
+  const phone = /iphone|phone|samsung|galaxy|pixel|tecno|infinix/i.test(term), T = title(term);
+  $('#grid').innerHTML = PHONES.map((p, i) => {
+    const img = phone ? p.img : 'headset', name = phone ? `${T}, ${p.v}` : `${T}${['', ', brand new', ', fairly used', ', with warranty'][i]}`;
+    const off = p.was ? Math.round((1 - p.price / p.was) * 100) : 0;
+    return `<div class="card" style="animation-delay:${i * 60}ms"><div class="ph"><img src="${IMG}${img}.webp" alt="${esc(name)}">`
+      + (off ? `<span class="off">-${off}%</span>` : '') + `<span class="sv"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg></span>`
+      + (p.boost ? `<span class="bst">Boosted <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>` : '')
+      + `<span class="lk"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>${p.likes}</span></div>`
+      + `<div class="bd"><div class="nm">${esc(name)}</div><div class="pr">${naira(p.price)}</div><div class="was">${p.was ? naira(p.was) : ''}</div><div class="ul">${p.units} unit${p.units > 1 ? 's' : ''} left</div>`
+      + `<div class="tags"><span class="dot${p.stock ? '' : ' no'}">${p.stock ? 'In Stock' : 'Out of Stock'}</span><span>${p.cond}</span><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${p.views} views</span></div></div></div>`; }).join('');
+  $('#rt').textContent = T; $('#rc').textContent = T;
+  document.querySelector('main').classList.add('r'); $('#pHome').hidden = true; $('#pRes').hidden = false; scrollTo(0, 0);
+}
+$('#filt').addEventListener('click', e => { const c = e.target.closest('.ck'); if (c) c.classList.toggle('on'); });
+function goHome() { close(); q.value = ''; sbox.classList.remove('has'); document.querySelector('main').classList.remove('r'); $('#pRes').hidden = true; $('#pHome').hidden = false; }
+
+q.addEventListener('focus', open);
+q.addEventListener('input', () => { open(); paint(); });
+q.addEventListener('keydown', e => { if (e.key === 'Enter') search(q.value); if (e.key === 'Escape') { close(); q.blur(); } });
+$('#clr').addEventListener('click', () => { q.value = ''; paint(); q.focus(); });
+$('#scrim').addEventListener('click', close);
+$('#home').addEventListener('click', goHome);
+$('#panel').addEventListener('click', e => {
+  const x = e.target.closest('.x'); if (x) { e.stopPropagation(); remove(x.closest('.row')); return; }
+  const r = e.target.closest('.row'); if (r) return search(r.dataset.v);
+  const c = e.target.closest('.chip'); if (c) return search(c.dataset.v);
+  const a = e.target.closest('.arr'); if (a) { const tr = a.previousElementSibling; const atEnd = a.classList.contains('back');
+    tr.scrollLeft = atEnd ? 0 : tr.scrollLeft + tr.clientWidth * .7;
+    setTimeout(() => { const end = tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 4; tr.classList.toggle('end', end); a.classList.toggle('back', end); }, 420); }
+});
+document.addEventListener('mousedown', e => { if (!sbox.contains(e.target)) close(); });
+chips($('#most'), MOST);
+
+// ---- autoplay (?autoplay=1): a shopper searches, clears a stale search, follows a related chip, then comes back.
+const AUTO = /[?&]autoplay=(1|true|yes)/.test(location.search);
+if (!AUTO) return;
+const cur = document.createElement('div'); cur.className = 'cur'; cur.setAttribute('aria-hidden', 'true');
+cur.innerHTML = '<i></i><svg class="ar" viewBox="0 0 26 26"><path d="M6 3.5v17.2l4.6-4.3 2.9 6.6 3-1.3-2.9-6.5h6.3z" fill="#101828" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+  + '<svg class="hd" viewBox="0 0 26 26"><path d="M9.2 12.4V5.6a1.7 1.7 0 0 1 3.4 0v5.3l.1-1.2a1.6 1.6 0 0 1 3.2.2v1.3a1.6 1.6 0 0 1 3.1.4v1.1a1.5 1.5 0 0 1 3 .3v4.4c0 3.5-2.6 6.1-6.1 6.1h-1.6c-2 0-3.4-.8-4.6-2.4l-3.6-4.8a1.6 1.6 0 0 1 2.4-2.1z" fill="#fff" stroke="#101828" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+body.append(cur);
+let live = true, playing = true, gen = 0;
+addEventListener('message', e => { if (e.data && typeof e.data.km_play === 'boolean') playing = e.data.km_play; });
+const sleep = async ms => { const g = gen; let t = 0; while (t < ms) { await new Promise(r => setTimeout(r, 50)); if (playing) t += 50; if (!live || g !== gen) throw 0; } };
+const place = (x, y) => { cur.style.setProperty('--x', (x - 6) + 'px'); cur.style.setProperty('--y', (y - 4) + 'px'); };
+const at = (el, fx = .5, fy = .55) => { const r = el.getBoundingClientRect(); cur.classList.add('on'); place(r.left + r.width * fx, r.top + r.height * fy); };
+async function press(el, fx, fy, then) { cur.classList.remove('hand'); at(el, fx, fy); await sleep(820); cur.classList.add('hand'); el.classList.add('hov'); await sleep(380);
+  el.classList.add('prs'); cur.classList.add('down'); await sleep(120); cur.classList.remove('down', 'tap'); void cur.offsetWidth; cur.classList.add('tap'); el.classList.remove('prs'); await sleep(90); el.classList.remove('hov');
+  (then || (() => el.click()))(); setTimeout(() => cur.classList.remove('hand'), 300); }
+async function type(text) { for (const ch of text) { q.value += ch; q.dispatchEvent(new Event('input')); await sleep(90 + Math.random() * 70); } }
+async function run() {
+  place(innerWidth * .7, innerHeight * .75);
+  while (live) {
+    RECENT = ['iphone Xr', 'samsung galaxy a54', '2 bedroom flat in lekki']; goHome(); await sleep(900);
+    await press(q, .3, .5, () => { open(); });                     // tap the search box: recent searches, most searched
+    await sleep(1300);
+    await press($('#recent .row:nth-child(2) .x'), .5, .5);        // clear a search you no longer need
+    await sleep(900);
+    cur.classList.remove('hand'); at(q, .12, .5); await sleep(700);
+    await type('iphone 13'); await sleep(1100);                    // type: related searches appear as chips
+    await press($('#rel .arr'), .5, .5); await sleep(1100);        // see more chips
+    const tr = $('#rel .track').getBoundingClientRect(); const vis = [...document.querySelectorAll('#rel .chip')].filter(c => { const r = c.getBoundingClientRect(); return r.left >= tr.left - 1 && r.right <= tr.right - 30; });
+    const pick = vis.find(c => c.dataset.v === 'iphone 14') || vis[0] || $('#rel .chip');
+    await press(pick, .5, .5); await sleep(3800);                  // results for the chip
+    cur.classList.remove('hand'); await press(q, .7, .5, () => { q.focus(); open(); }); await sleep(2000);   // back to search: it's now the top recent search
+    close(); q.blur(); await sleep(700);
+  }
+}
+const stop = e => { if (!e.isTrusted || !live) return; live = false; gen++; cur.classList.remove('on'); };
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(t => addEventListener(t, stop, { capture: true, passive: true }));
+run().catch(() => {});
+})();
+</script>
+</body>
+</html>

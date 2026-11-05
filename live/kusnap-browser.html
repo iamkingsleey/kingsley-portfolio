@@ -7,7 +7,7 @@
 <title>Kusnap prototype</title>
 <style>
 /* a Kusnap web prototype in a browser window, on a soft stage, playing on its own.
-   ?p=verification|listing picks the prototype; the window is laid out at desktop size and scaled to fit the tile. */
+   ?p=verification|listing|search picks the prototype; the window is laid out at desktop size and scaled to fit the tile. */
 :root { --stage: #eceff4; --win: #ffffff; --bar: #f6f7f9; --line: #e6e9ee; --muted: #8a93a3 }
 * { box-sizing: border-box; margin: 0 }
 html, body { width: 100%; height: 100%; overflow: hidden; background: radial-gradient(120% 90% at 50% 30%, #f5f7fa, var(--stage)) }
@@ -25,7 +25,7 @@ iframe { display: block; width: 100%; height: calc(100% - 44px); border: 0 }
 <div class="st" id="st"><div class="win"><div class="bar"><i></i><i></i><i></i><span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b id="addr" style="font-weight:400">kusnap.com</b></span></div><iframe id="f" title="Kusnap prototype"></iframe></div></div>
 <script>
 (() => {
-  const P = { verification: ['kusnap-verification', 'kusnap.com/account/verify'], listing: ['kusnap-listing', 'kusnap.com/sell/new-product'] };
+  const P = { verification: ['kusnap-verification', 'kusnap.com/account/verify'], listing: ['kusnap-listing', 'kusnap.com/sell/new-product'], search: ['kusnap-search', 'kusnap.com'] };
   const q = new URLSearchParams(location.search), [file, addr] = P[q.get('p')] || P.verification;
   document.getElementById('addr').textContent = addr;
   document.getElementById('f').src = `../Prototype/${file}.html?autoplay=1`;

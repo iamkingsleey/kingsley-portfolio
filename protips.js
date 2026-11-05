@@ -100,8 +100,8 @@
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 50,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '141 pieces · 4 case studies']],
-      Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 50,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '142 pieces · 4 case studies']],
+      Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#kauri', 'Kauri case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
       '3D':    [['designs.html#p-paper-plane-with-coin', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
       Motion:  [['designs.html#p-tennis-ball-and-rackets', 'Tennis ball and rackets', 'Motion'], ['designs.html#p-red-padlock', 'Red padlock', 'Motion'], ['designs.html', 'All motion work', 'Loops on Designs']]
