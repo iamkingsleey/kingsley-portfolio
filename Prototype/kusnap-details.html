@@ -77,6 +77,8 @@ label, .lb { display: block; font-size: 13px; font-weight: 500; color: var(--ink
 .cu i { position: absolute; left: 6px; top: 4px; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: rgba(11, 111, 214, .22); transform: scale(0); opacity: 0 }
 .cu.tap i { animation: tap .5s ease-out } @keyframes tap { 0% { transform: scale(.2); opacity: 1 } 100% { transform: scale(1.4); opacity: 0 } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important } .cu { display: none } }
+/* ?part=spec or ?part=delivery: just one of the two ideas, on its own smaller stage (the Designs grid shows them as two pieces) */
+html[data-part="spec"] .rcol, html[data-part="delivery"] #spec { display: none }
 </style>
 </head>
 <body>
@@ -114,10 +116,13 @@ label, .lb { display: block; font-size: 13px; font-weight: 500; color: var(--ink
 </div>
 <script>
 const $ = s => document.querySelector(s), st = $('#st'), cu = $('#cu'), grid = $('#grid');
-const fit = () => { const k = Math.min(innerWidth / 1200, innerHeight / 800); st.style.transform = `translate(${(innerWidth - 1200 * k) / 2}px, ${(innerHeight - 800 * k) / 2}px) scale(${k})`; };
+const PART = (new URLSearchParams(location.search).get('part') || '').replace(/[^a-z]/g, ''); if (PART) document.documentElement.dataset.part = PART;
+// one card: a roomier stage, so it has clear space above and below and sits in the middle
+const SW = PART ? 984 : 1200, SH = PART ? 820 : 800; st.style.width = SW + 'px'; st.style.height = SH + 'px';
+const fit = () => { const k = Math.min(innerWidth / SW, innerHeight / SH); st.style.transform = `translate(${(innerWidth - SW * k) / 2}px, ${(innerHeight - SH * k) / 2}px) scale(${k})`; };
 fit(); addEventListener('resize', fit);
 // the specifications card matches the delivery dialog's height
-const match = () => { $('#spec').style.height = $('#dlv').offsetHeight + 'px'; }; match(); document.fonts.ready.then(match);
+const match = () => { if (!PART) $('#spec').style.height = $('#dlv').offsetHeight + 'px'; }; match(); document.fonts.ready.then(match);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const SPECS = {
   phone: { n: 'mobile phones', f: [['Condition', 'sel', 'New'], ['Brand', '', 'Google'], ['Model', '', 'Pixel 10 Pro'], ['Storage', 'sel', '256 GB'], ['RAM', 'sel', '16 GB'], ['Colour', '', 'Obsidian'], ['Screen size', 'sel', '6.3 in'], ['Battery', '', '4,870 mAh'], ['Network', 'sel', '5G'], ['SIM', 'sel', 'Dual SIM']] },
@@ -126,7 +131,7 @@ const SPECS = {
 const ph = (l, t) => t ? 'Select' : 'Enter ' + l.toLowerCase().replace(' (eu)', '');
 const build = k => { grid.innerHTML = SPECS[k].f.map(([l, t]) => `<div class="f"><span class="lb">${l}</span><div class="in ${t}"><span class="v ph">${ph(l, t)}</span><span class="car"></span></div></div>`).join(''); $('#tag').textContent = SPECS[k].f.length + ' fields for ' + SPECS[k].n; };
 // stage coordinates of an element's point
-const pt = (el, fx = .5, fy = .55) => { const r = el.getBoundingClientRect(), s = st.getBoundingClientRect(), k = s.width / 1200; return [(r.left - s.left + r.width * fx) / k, (r.top - s.top + r.height * fy) / k]; };
+const pt = (el, fx = .5, fy = .55) => { const r = el.getBoundingClientRect(), s = st.getBoundingClientRect(), k = s.width / SW; return [(r.left - s.left + r.width * fx) / k, (r.top - s.top + r.height * fy) / k]; };
 const at = (x, y) => { cu.style.setProperty('--x', x - 6 + 'px'); cu.style.setProperty('--y', y - 4 + 'px'); };
 const go = async (el, fx, fy, ms = 800) => { const [x, y] = pt(el, fx, fy); at(x, y); await sleep(ms); };
 const tap = async () => { cu.classList.add('down'); await sleep(110); cu.classList.remove('down', 'tap'); void cu.offsetWidth; cu.classList.add('tap'); await sleep(140); };
@@ -143,8 +148,9 @@ async function loop() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { reset(); return; }
   while (true) {
     while (!visible) await sleep(300);
-    reset(); cu.classList.remove('on'); cu.style.transition = 'none'; at(600, 790); void cu.offsetWidth; cu.style.transition = ''; await sleep(700);
+    reset(); cu.classList.remove('on'); cu.style.transition = 'none'; at(SW / 2, SH - 10); void cu.offsetWidth; cu.style.transition = ''; await sleep(700);
     cu.classList.add('on');
+    if (PART !== 'delivery') {
     // 1 · a phone: the specification fields fill in
     const fs = [...grid.querySelectorAll('.in')], vals = SPECS.phone.f;
     for (let i = 0; i < fs.length; i++) { await go(fs[i], .3, .55, i ? 420 : 800); await tap(); if (vals[i][1]) await pick(fs[i], vals[i][2]); else await type(fs[i], vals[i][2]); }
@@ -156,6 +162,9 @@ async function loop() {
     grid.querySelectorAll('.f').forEach(f => f.classList.add('out')); await sleep(280); build('fashion');
     grid.querySelectorAll('.f').forEach((f, i) => { f.classList.add('out'); setTimeout(() => f.classList.remove('out'), 40 + i * 70); });
     $('#tag').classList.remove('flash'); void $('#tag').offsetWidth; $('#tag').classList.add('flash'); await sleep(1600);
+    if (PART === 'spec') { cu.classList.remove('on'); await sleep(2200); }
+    }
+    if (PART !== 'spec') {
     // 3 · delivery, set once
     await go($('#sf'), .4, .55, 900); await tap(); await pick($('#sf'), 'Lagos');
     await go($('#mw'), .3); await tap(); await type($('#mw'), '2');
@@ -166,8 +175,9 @@ async function loop() {
     await go($('#d4'), .4, .55, 500); await tap(); await type($('#d4'), '800');
     const add = $('#add'); await go(add, .5, .55, 750); cu.classList.add('hand'); add.classList.add('hov'); await sleep(350); add.classList.add('prs'); await tap(); add.classList.remove('prs', 'hov'); cu.classList.remove('hand');
     // 4 · the same fees appear on every product
-    await sleep(150); $('#dlv').classList.add('gone'); at(1100, 790); await sleep(250); $('#res').classList.add('on'); await sleep(900); cu.classList.remove('on');
+    await sleep(150); $('#dlv').classList.add('gone'); at(SW - 100, SH - 10); await sleep(250); $('#res').classList.add('on'); await sleep(900); cu.classList.remove('on');
     await sleep(3400);
+    }
   }
 }
 addEventListener('load', loop);

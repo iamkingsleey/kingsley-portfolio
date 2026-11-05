@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kusnap prototype</title>
+<style>
+/* a Kusnap web prototype in a browser window, on a soft stage, playing on its own.
+   ?p=verification|listing picks the prototype; the window is laid out at desktop size and scaled to fit the tile. */
+:root { --stage: #eceff4; --win: #ffffff; --bar: #f6f7f9; --line: #e6e9ee; --muted: #8a93a3 }
+* { box-sizing: border-box; margin: 0 }
+html, body { width: 100%; height: 100%; overflow: hidden; background: radial-gradient(120% 90% at 50% 30%, #f5f7fa, var(--stage)) }
+body { font-family: Inter, -apple-system, "Segoe UI", sans-serif }
+.st { position: absolute; left: 0; top: 0; width: 1200px; height: 800px; transform-origin: 0 0 }
+.win { position: absolute; left: 50px; top: 46px; width: 1100px; height: 708px; border-radius: 16px; overflow: hidden; background: var(--win);
+  box-shadow: 0 1px 2px rgb(15 25 45 / .06), 0 12px 30px rgb(15 25 45 / .1), 0 40px 80px rgb(15 25 45 / .1) }
+.bar { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: var(--bar); border-bottom: 1px solid var(--line) }
+.bar i { width: 12px; height: 12px; border-radius: 50% } .bar i:nth-child(1) { background: #ff5f57 } .bar i:nth-child(2) { background: #febc2e } .bar i:nth-child(3) { background: #28c840 }
+.bar span { margin: 0 auto; transform: translateX(-30px); width: 420px; height: 28px; border-radius: 8px; background: #fff; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 13px; color: var(--muted) }
+iframe { display: block; width: 100%; height: calc(100% - 44px); border: 0 }
+</style>
+</head>
+<body>
+<div class="st" id="st"><div class="win"><div class="bar"><i></i><i></i><i></i><span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b id="addr" style="font-weight:400">kusnap.com</b></span></div><iframe id="f" title="Kusnap prototype"></iframe></div></div>
+<script>
+(() => {
+  const P = { verification: ['kusnap-verification', 'kusnap.com/account/verify'], listing: ['kusnap-listing', 'kusnap.com/sell/new-product'] };
+  const q = new URLSearchParams(location.search), [file, addr] = P[q.get('p')] || P.verification;
+  document.getElementById('addr').textContent = addr;
+  document.getElementById('f').src = `../Prototype/${file}.html?autoplay=1`;
+  const st = document.getElementById('st');
+  const fit = () => { const k = Math.min(innerWidth / 1200, innerHeight / 800); st.style.transform = `translate(${(innerWidth - 1200 * k) / 2}px, ${(innerHeight - 800 * k) / 2}px) scale(${k})`; };
+  fit(); addEventListener('resize', fit);
+  // pass the grid's play / pause on to the prototype inside
+  addEventListener('message', e => { if (e.data && typeof e.data.km_play === 'boolean') try { document.getElementById('f').contentWindow.postMessage(e.data, '*'); } catch (_) {} });
+})();
+</script>
+</body>
+</html>
