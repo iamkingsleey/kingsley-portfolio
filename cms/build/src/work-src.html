@@ -439,7 +439,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const NS = 'http://www.w3.org/2000/svg';
   // ---------- Theme ----------
   const THEME = { ink: '#000000', muted: '#8c8c8c', edge: 'rgba(0,0,0,.08)' };
-  function applyTheme(dark) {
+  function applyTheme(dark, save) {   // save: only a real tap on the theme button remembers a choice
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     Object.assign(THEME, dark ? { ink: '#ffffff', muted: '#7a7a7a', edge: 'rgba(255,255,255,.1)' } : { ink: '#000000', muted: '#8c8c8c', edge: 'rgba(0,0,0,.08)' });
     const b = document.getElementById('themeBtn');
@@ -449,12 +449,12 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         ? '<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>'
         : '<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>';
     }
-    try { localStorage.setItem('kfm-theme', dark ? 'dark' : 'light'); } catch (_) {}
+    if (save) try { localStorage.setItem('kfm-theme', dark ? 'dark' : 'light'); } catch (_) {}
   }
   let startDark = matchMedia('(prefers-color-scheme: dark)').matches;
   try { const v = localStorage.getItem('kfm-theme'); if (v) startDark = v === 'dark'; } catch (_) {}
   applyTheme(startDark);
-  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark'); });
+  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark', true); });
   const $ = id => document.getElementById(id);
 
   // ---------- Content ----------

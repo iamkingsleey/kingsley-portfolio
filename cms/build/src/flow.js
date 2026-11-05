@@ -16,7 +16,7 @@
   if (!ALLOW.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const home = file === 'index.html';
-  const bgOf = f => f === 'designs.html' || document.documentElement.dataset.theme === 'dark' ? '#0b0b0b' : '#ffffff';
+  const bgOf = () => document.documentElement.dataset.theme === 'dark' ? '#0b0b0b' : '#ffffff';   // every page wears the visitor's theme, Designs included
   // what scrolls on this page (Designs scrolls its grid; Home doesn't scroll at all)
   const scroller = () => {
     if (home) return null;

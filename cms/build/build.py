@@ -24,9 +24,9 @@ def rep(s, a, b, n=1):
 
 # ---------------------------------------------------------------- shared theme bootstrap (no flash of the wrong theme)
 THEME_BOOT = """<script>
-  // Theme: remembered choice, else the system setting. Shared by index.html and designs.html.
-  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
-    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  // Theme: the visitor's saved pick, else dark. Shared by every page.
+  (function () { var t; try { if (!localStorage.getItem('km-theme-v2')) { localStorage.removeItem('km-theme'); localStorage.setItem('km-theme-v2', '1'); } t = localStorage.getItem('km-theme'); } catch (e) {}   /* v2: forget the dark choice Designs used to save on its own (Nov 2026) */
+    if (!t) t = 'dark';   // dark unless the visitor picks light with a theme button (a pick is the only thing ever saved)
     document.documentElement.dataset.theme = t; })();
 </script>
 """
@@ -345,7 +345,7 @@ for kind, k in [('Brand', 'brand'), ('Product', 'product')]:
 
 d = rep(d, '<meta charset="utf-8">\n<title>Designs Dial</title>',
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>Designs · Kingsley M.</title>')
-d = rep(d, '<meta name="claude:viewport-fit-sides" content="cover">\n', '<meta name="claude:viewport-fit-sides" content="cover">\n' + THEME_BOOT.replace("if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';", "if (!t) t = 'dark';   // Designs opens dark unless the visitor picked a theme") + TUNER)
+d = rep(d, '<meta name="claude:viewport-fit-sides" content="cover">\n', '<meta name="claude:viewport-fit-sides" content="cover">\n' + THEME_BOOT + TUNER)   # Designs follows the same rule as every page: the visitor's own pick, else dark
 d = rep(d, '</style>\n', '</style>\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n</head>\n<body>\n', 1)
 d = rep(d, '  const A = __ASSETS__;', '  // Pieces by category. Images and videos are the files in assets/designs (listed in content/designs.json).\n  const A = ' + json.dumps(A, ensure_ascii=False) + ';')
 # the first screen of Designs, in the order the grid deals it (the same fixed shuffle as mixIn in work-src.html).
@@ -373,8 +373,8 @@ d = d.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorig
 # theme: share the key with index.html; the page's own theme button stays
 d = rep(d, "  let startDark = matchMedia('(prefers-color-scheme: dark)').matches;\n  try { const v = localStorage.getItem('kfm-theme'); if (v) startDark = v === 'dark'; } catch (_) {}\n  applyTheme(startDark);",
         "  applyTheme(document.documentElement.dataset.theme === 'dark');")
-d = rep(d, "    try { localStorage.setItem('kfm-theme', dark ? 'dark' : 'light'); } catch (_) {}",
-        "    try { localStorage.setItem('km-theme', dark ? 'dark' : 'light'); } catch (_) {}")
+d = rep(d, "    if (save) try { localStorage.setItem('kfm-theme', dark ? 'dark' : 'light'); } catch (_) {}",
+        "    if (save) try { localStorage.setItem('km-theme', dark ? 'dark' : 'light'); } catch (_) {}")
 # back to Home: after the readout tunes 100.0 → 98.0, go to index.html#home
 d = rep(d, """      nm.textContent = 'Home'; station.classList.remove('tune-out');
       $('toast').classList.add('show');
@@ -394,7 +394,7 @@ d = d[:i0] + "  function tick() {                             // same detent as 
 d = rep(d, '<button type="button" id="snd" aria-label="Mute ticks" aria-pressed="true">', '<button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true">')
 # one theme toggle for the site, on Home: Designs follows the saved choice and has no toggle of its own
 d = rep(d, '<button type="button" class="themebtn" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco"></svg></button>', '')
-d = rep(d, "  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark'); });", "")
+d = rep(d, "  document.getElementById('themeBtn').addEventListener('click', () => { applyTheme(document.documentElement.dataset.theme !== 'dark', true); });", "")
 # sound: one switch for the site, next to the theme toggle on Home. Designs follows it and has no button.
 d = rep(d, '<button type="button" id="snd" aria-label="Mute dial sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="sndIco"></svg></button>', '<button type="button" id="snd" style="display:none" aria-hidden="true" tabindex="-1"><svg viewBox="0 0 16 16" id="sndIco"></svg></button>')
 d = rep(d, "  let ac = null, soundOn = true;", "  let ac = null, soundOn = true;\n  try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (e) {}   // set by the sound button on Home")

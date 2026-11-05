@@ -6,9 +6,9 @@
 <title>Offline · Kingsley M.</title>
 <meta name="robots" content="noindex">
 <script>
-  // Theme: the same remembered choice as the rest of the site (km-theme), else the system setting
-  (function () { var t; try { t = localStorage.getItem('km-theme'); } catch (e) {}
-    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  // Theme: the same saved pick as the rest of the site (km-theme), else dark
+  (function () { var t; try { if (!localStorage.getItem('km-theme-v2')) { localStorage.removeItem('km-theme'); localStorage.setItem('km-theme-v2', '1'); } t = localStorage.getItem('km-theme'); } catch (e) {}   /* v2: forget the dark choice Designs used to save on its own (Nov 2026) */
+    if (!t) t = 'dark';   // dark unless the visitor picks light with a theme button (a pick is the only thing ever saved)
     document.documentElement.dataset.theme = t; })();
 </script>
 <style>
