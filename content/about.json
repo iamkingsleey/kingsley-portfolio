@@ -113,7 +113,8 @@
    "statLabel": "",
    "years": "",
    "stat2": "",
-   "stat2Label": ""
+   "stat2Label": "",
+   "hidden": true
   },
   {
    "fq": "105.7",
