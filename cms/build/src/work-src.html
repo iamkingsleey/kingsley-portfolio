@@ -76,6 +76,7 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 .d-mini .d-info { position: sticky; top: 140px; margin-top: 0; max-width: none }
 .d-mini .d-frame.m { width: min(100%, calc((100svh - 200px) * var(--r))) }
 @media (max-width: 899px) { .d-mini .d-cols { grid-template-columns: 1fr; gap: 36px } .d-mini .d-info { position: static } }
+@media (max-width: 899px) { .d-mini .d-frame.m { width: 100%; margin-inline: auto } }   /* phones: every piece spans the page's content width (its own margins), centred, however tall it is */
 .d-mini .d-frame.m { height: auto; overflow: hidden; background: var(--tile) }
 .d-mini .d-frame.m .d-pic { inset: 0 }
 .d-info { display: grid; gap: 44px; max-width: 620px; margin-top: 44px }
