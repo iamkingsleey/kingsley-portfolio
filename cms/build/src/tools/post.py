@@ -438,7 +438,7 @@ for _p in PAGES:
         _t = (re.search(r'<title>([^<]*)</title>', _s) or [None, 'Kingsley M.'])[1]
         _slug = '' if _p == 'index.html' else _p.replace('.html', '')
         _u = 'https://iamkingsleey.com/' + _slug
-        _d = 'Kingsley M., brand and product designer, designing from 0 to 1 at fintech, e-commerce and property startups.'
+        _d = 'Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.'
         _og = (f'<meta name="description" content="{_d}">\n'
                f'<meta property="og:type" content="website">\n<meta property="og:site_name" content="Kingsley M.">\n'
                f'<meta property="og:title" content="{_t}">\n<meta property="og:description" content="{_d}">\n<meta property="og:url" content="{_u}">\n'

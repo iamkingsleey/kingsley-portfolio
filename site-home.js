@@ -716,7 +716,7 @@ addEventListener('wheel', e => {
   .pt-card .go small { grid-column: 1; font-size: 12.5px; color: var(--muted, #888) }
   .pt-card .go i { grid-row: 1 / span 2; grid-column: 2; font-style: normal; color: var(--muted, #888); transition: transform .25s cubic-bezier(.2,.8,.2,1), color .2s }
   .pt-card .go a:hover i { transform: translateX(3px); color: var(--ink, #111) }
-  .pt-card .ac { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+  .pt-card .ac { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px }   /* Résumé shows again once the Home links row has a resume link */
   .pt-card .ac a, .pt-card .ac button { height: 40px; padding: 0 14px; border-radius: 12px; border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--pill, #f2f2f2); color: var(--ink, #111);
     font: 500 13.5px Geist, system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s }
   .pt-card .ac a:hover, .pt-card .ac button:hover { transform: translateY(-1px) }
@@ -769,12 +769,12 @@ addEventListener('wheel', e => {
     card.innerHTML = `<span class="lb">For recruiters · the short route</span>
       <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r || 'Any'}</button>`).join('')}</div>
       <div class="go"></div>
-      <div class="ac"><a href="${cv ? cv.getAttribute('href') : '#'}" class="cv">Résumé</a><button type="button" class="bk">Book a call</button></div>`;
+      <div class="ac">${cv ? `<a href="${cv.getAttribute('href')}" class="cv">Résumé</a>` : ''}<button type="button" class="bk">Book a call</button></div>`;
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '141 pieces · 4 case studies']],
-      Product: [['case.html#kusnap', 'Kusnap case study', 'Product, 0 to 1'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 50,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '141 pieces · 4 case studies']],
+      Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 50,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#kauri', 'Kauri case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
       '3D':    [['designs.html#p-paper-plane-with-coin', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
       Motion:  [['designs.html#p-tennis-ball-and-rackets', 'Tennis ball and rackets', 'Motion'], ['designs.html#p-red-padlock', 'Red padlock', 'Motion'], ['designs.html', 'All motion work', 'Loops on Designs']]
@@ -1052,6 +1052,7 @@ addEventListener('wheel', e => {
   @media (prefers-reduced-motion: reduce) { .introst i::before, .introst i::after { animation: none; opacity: 0 } }
   .introst b { font-weight: inherit; color: var(--text); text-decoration: underline; text-decoration-color: var(--line, rgb(0 0 0 / .2)); text-underline-offset: 3px; transition: text-decoration-color .2s }
   .introst:hover b { text-decoration-color: currentColor }
+.introst { display: block; line-height: 1.5 } .introst i { display: inline-block; vertical-align: 1px; margin-right: 8px } .introst b { white-space: nowrap; margin-left: 6px }   /* the line wraps like text on phones; "Book a call →" stays in one piece */
   @media (min-width: 900px) {
     .theme-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: max(64px, env(safe-area-inset-right, 0px)) !important }
     .sound-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: calc(max(64px, env(safe-area-inset-right, 0px)) + 44px) !important }
@@ -1063,7 +1064,7 @@ addEventListener('wheel', e => {
   const prev = [...document.querySelectorAll('p')].find(p => p.textContent.startsWith('Previously'));
   if (prev && (window.KM_SITE || {}).available !== false) {   // shown only while taking new work (CMS → Settings)
     const l = document.createElement('div'); l.className = 'introst';
-    l.innerHTML = '<i></i><span>Open to new work.</span><b>Book a call</b>';
+    l.innerHTML = '<i></i><span>Open to full-time roles, contracts and projects.</span><b>Book a call →</b>';
     l.addEventListener('click', () => { if (book) book.click(); });
     prev.after(l);
   }

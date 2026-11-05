@@ -285,9 +285,10 @@ s = rep(s, "  const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.sl
 s = rep(s, "    if (sound) play(open ? 'open' : 'close', true);", "    if (sound) play('pop', true);   // one click sound everywhere")
 s = rep(s, '</body>', CLICK + '</body>')
 s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a><span class="wip" title="Work in progress, version 1">WIP.V1</span></nav>')
+s = rep(s, '<span>x</span><a href="#">resume</a>', '')   # no resume link for now
 s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailto:iamkingsleey@gmail.com" id="emailLink" data-email="iamkingsleey@gmail.com">email</a>')
 s = rep(s, '<p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>',
-        '<p>Brand and product designer, designing from <span class="hl">0-1</span> at <br><span class="hl">fintech, e-commerce</span> and property startups.</p>')
+        '<p>I design where money meets trust: wallets, checkouts and the brands around them.</p>')
 # real links from the old site (the rest stay as # until there's a URL)
 for _n, _u in [('LinkedIn', 'https://www.linkedin.com/in/iamkingsleey/'), ('Medium', 'https://medium.com/@iamkingsleey'), ('Dribbble', 'https://dribbble.com/kingsleey'), ('Instagram', 'https://www.instagram.com/iamkingsleey/'), ('Unsplash', 'https://unsplash.com/@iamkingsleey'), ('github', 'https://github.com/iamkingsleey')]:
     s = rep(s, f'<a href="#">{_n}</a>', f'<a href="{_u}" target="_blank" rel="noopener">{_n}</a>')

@@ -14,6 +14,7 @@
   @media (prefers-reduced-motion: reduce) { .introst i::before, .introst i::after { animation: none; opacity: 0 } }
   .introst b { font-weight: inherit; color: var(--text); text-decoration: underline; text-decoration-color: var(--line, rgb(0 0 0 / .2)); text-underline-offset: 3px; transition: text-decoration-color .2s }
   .introst:hover b { text-decoration-color: currentColor }
+.introst { display: block; line-height: 1.5 } .introst i { display: inline-block; vertical-align: 1px; margin-right: 8px } .introst b { white-space: nowrap; margin-left: 6px }   /* the line wraps like text on phones; "Book a call →" stays in one piece */
   @media (min-width: 900px) {
     .theme-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: max(64px, env(safe-area-inset-right, 0px)) !important }
     .sound-btn { top: calc(48px + env(safe-area-inset-top, 0px)) !important; bottom: auto !important; right: calc(max(64px, env(safe-area-inset-right, 0px)) + 44px) !important }
@@ -25,7 +26,7 @@
   const prev = [...document.querySelectorAll('p')].find(p => p.textContent.startsWith('Previously'));
   if (prev && (window.KM_SITE || {}).available !== false) {   // shown only while taking new work (CMS → Settings)
     const l = document.createElement('div'); l.className = 'introst';
-    l.innerHTML = '<i></i><span>Open to new work.</span><b>Book a call</b>';
+    l.innerHTML = '<i></i><span>Open to full-time roles, contracts and projects.</span><b>Book a call →</b>';
     l.addEventListener('click', () => { if (book) book.click(); });
     prev.after(l);
   }
