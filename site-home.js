@@ -472,6 +472,19 @@ addEventListener('wheel', e => {
   const go = () => { watch(); arrive(); setTimeout(() => KM.trail.mark(), 400); document.dispatchEvent(new Event('km-trail')); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
+
+// ---------- live figures sleep when far off screen (case pages): every prototype is its own page on the same thread,
+// so one that has scrolled well away is told to pause and then unloaded; it loads again before it comes back into view
+(() => {
+  if (!('IntersectionObserver' in window)) return;
+  const figs = [...document.querySelectorAll('.kframe iframe, .kproto iframe')]; if (!figs.length) return;
+  const post = (f, on) => { try { f.contentWindow && f.contentWindow.postMessage({ km_play: on }, location.origin); } catch (_) {} };
+  const near = new IntersectionObserver(es => es.forEach(e => { const f = e.target;
+    if (e.isIntersecting) { if (f.dataset.sleep) { f.src = f.dataset.sleep; delete f.dataset.sleep; } post(f, true); }
+    else if (!f.dataset.sleep && f.src && f.src !== 'about:blank') { post(f, false); f.dataset.sleep = f.getAttribute('src'); f.src = 'about:blank'; } }), { rootMargin: '150% 0px' });
+  const seen = new IntersectionObserver(es => es.forEach(e => post(e.target, e.isIntersecting)), { rootMargin: '0px' });
+  figs.forEach(f => { near.observe(f); seen.observe(f); });
+})();
 ;
 /* ripple.js */
 /* Ripple: pictures react to the pointer like water. Small moves leave soft rings; keep moving and the water builds up,
