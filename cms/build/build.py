@@ -286,7 +286,7 @@ s = rep(s, "    if (sound) play(open ? 'open' : 'close', true);", "    if (sound
 s = rep(s, '</body>', CLICK + '</body>')
 s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a><span class="wip" title="Work in progress, version 1">WIP.V1</span></nav>')
 s = rep(s, '<span>x</span><a href="#">resume</a>', '')   # no resume link for now
-s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailto:iamkingsleey@gmail.com" id="emailLink" data-email="iamkingsleey@gmail.com">email</a>')
+s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailto:kingsleymkpandiok@gmail.com" id="emailLink" data-email="kingsleymkpandiok@gmail.com">email</a>')
 s = rep(s, '<p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>',
         '<p>I design where money meets trust: wallets, <br class="dbr">checkouts and the brands around them.</p>')
 # real links from the old site (the rest stay as # until there's a URL)
