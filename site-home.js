@@ -786,7 +786,7 @@ addEventListener('wheel', e => {
       if (window.KM && KM.role) KM.role.set(b.dataset.r); else role(b.dataset.r); });
     addEventListener('km-role', e => role(e.detail));
     role(window.KM && KM.role ? KM.role.get() : '');
-    card.querySelector('.bk').addEventListener('click', () => { const b = document.getElementById('bookCall'); if (b) b.click(); });
+    card.querySelector('.bk').addEventListener('click', () => { const b = document.getElementById('bookCall'); if (b) b.click(); else window.open('https://calendar.app.google/SYtdbSRB4j49QPeG6', '_blank', 'noopener'); });
     const setOpen = o => { card.classList.toggle('on', o); rec.setAttribute('aria-expanded', o); };
     rec.addEventListener('click', e => { e.stopPropagation(); setOpen(!card.classList.contains('on')); });
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
