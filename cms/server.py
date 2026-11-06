@@ -30,7 +30,12 @@ def read_json(path, default):
 
 def write_json(path, data):
     tmp = path + '.tmp'
-    with open(tmp, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=1); f.write('\n')
+    ind = 1   # keep the file's own indentation, so a save only changes what was edited
+    try:
+        with open(path, encoding='utf-8') as f: f.readline(); l2 = f.readline()
+        ind = max(1, min(4, len(l2) - len(l2.lstrip(' ')))) if l2.strip() else 1
+    except OSError: pass
+    with open(tmp, 'w', encoding='utf-8') as f: json.dump(data, f, ensure_ascii=False, indent=ind); f.write('\n')
     os.replace(tmp, path)
 
 def run(cmd, timeout=180):
@@ -253,7 +258,7 @@ def publish(message):
     msg = (message or '').strip() or 'Update content'
     if not os.path.exists(BUILD_OK):
         return {'ok': False, 'log': 'Not published: the last rebuild did not finish (see Rebuild, or cms/build/last-build.log). Fix it and rebuild first, so a broken site never goes live.'}
-    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', 'live', '*.html', '*.js', '.gitignore', 'wrangler.toml', '.assetsignore', '_redirects', '_headers'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
+    steps = [['git', 'add', '-A', '--', 'content', 'assets', 'cms', 'Prototype', 'live', '*.html', '*.js', '.gitignore', 'wrangler.toml', '.assetsignore', '_redirects', '_headers', 'robots.txt', 'sitemap.xml'],   # *.js: the site's scripts the build writes (nav, sw, tuner…)
              ['git', 'commit', '-m', msg], ['git', 'push']]
     log = []
     for s in steps:
@@ -340,7 +345,10 @@ class H(SimpleHTTPRequestHandler):
             os.makedirs(UPLOADS, exist_ok=True)
             fn, k = f'{stem}{ext.lower()}', 1
             while os.path.exists(os.path.join(UPLOADS, fn)): k += 1; fn = f'{stem}-{k}{ext.lower()}'
-            with open(os.path.join(UPLOADS, fn), 'wb') as f: f.write(self._body())
+            body = self._body()
+            if len(body) > 25 * 1024 * 1024:   # Cloudflare won't publish a file over 25 MB, and one such file stops the whole site deploying
+                return self._json({'error': f'This file is {len(body) / 1048576:.0f} MB. The site can only publish files up to 25 MB: export a smaller copy (for a video, about 1080px wide) and upload that.'}, 413)
+            with open(os.path.join(UPLOADS, fn), 'wb') as f: f.write(body)
             return self._json({'ok': True, 'path': f'assets/uploads/{fn}'})
         return self._json({'error': 'not found'}, 404)
 

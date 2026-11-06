@@ -332,7 +332,7 @@
   const DESIGN = [
     { title: 'The piece', cols: 2, fields: [
       { k: 'title', label: 'Title' },
-      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['ui', 'UI'], ['product', 'Case study']] },
+      { k: 'category', label: 'Category', type: 'select', options: [['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['ui', 'UI/UX'], ['product', 'Case study']] },
       { k: 'year', label: 'Year' }, { k: 'case', label: 'Part of a collection or case study', type: 'select', options: CASE_SLUGS, help: 'A collection (e.g. 3D collection): its pieces share arrows and a grid on Designs. A product or brand case study: adds “Read case study”.' },
       { k: 'desc', label: 'Project info', type: 'textarea', full: true },
       { k: 'caseStudy', label: 'Show as a case study (it opens its layout page, set under “Opens”)', type: 'bool', full: true },
@@ -363,7 +363,7 @@
   function prep(only) {
     const on = n => !only || only === n;
     if (on('cases')) for (const c of C.cases.cases || []) { if (c.impact === undefined) c.impact = null; c._imp = (c.impact && c.impact.stats) || []; }
-    if (on('designs')) for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = im.video || ''; p._ratio = im.ratio; p._more = p.images.slice(1).map(x => x.src); }
+    if (on('designs')) for (const p of C.designs.projects || []) { const im = (p.images = p.images && p.images.length ? p.images : [{ src: '', ratio: .8 }])[0]; p._img = im.src; p._vid = p._vid0 = im.video || ''; p._ratio = im.ratio; p._more = p.images.slice(1).map(x => x.src); }
     if (on('about')) for (const ch of C.about.chapters || []) { ch.s1 = [ch.stat || '', ch.statLabel || '']; ch.s2 = [ch.stat2 || '', ch.stat2Label || '']; }
     if (on('engineering')) for (const t of C.engineering.tools || []) t.s = [t.stat || '', t.statLabel || ''];
   }
@@ -386,8 +386,9 @@
     }
     if (name === 'designs') for (const p of d.projects) {
       const im = p.images[0]; im.src = p._img; if (p._vid) im.video = p._vid; else delete im.video; if (p._ratio) im.ratio = +p._ratio;
+      if ((p._vid || '') !== (p._vid0 || '')) { delete im.hd; delete im.sound; }   // a new video: the full-size and with-sound copies belonged to the old one
       { const old = Object.fromEntries(p.images.slice(1).map(x => [x.src, x])); p.images = [p.images[0], ...(p._more || []).filter(Boolean).map(src => old[src] || { src, ratio: .8 })]; }
-      delete p._img; delete p._vid; delete p._ratio; delete p._more; for (const k of ['case', 'link', 'layout', 'year', 'caseStudy']) if (!p[k]) delete p[k];
+      delete p._img; delete p._vid; delete p._vid0; delete p._ratio; delete p._more; for (const k of ['case', 'link', 'layout', 'year', 'caseStudy']) if (!p[k]) delete p[k];
     }
     if (name === 'about') for (const ch of d.chapters) { [ch.stat, ch.statLabel] = ch.s1; [ch.stat2, ch.stat2Label] = ch.s2; delete ch.s1; delete ch.s2; }
     if (name === 'engineering') for (const t of d.tools) { [t.stat, t.statLabel] = t.s; delete t.s; }
@@ -694,7 +695,7 @@
     }
     head('Content', 'Designs');
     v.append(el('p', { class: 'lead', text: 'Every piece on the Designs dial, in order within each category. Case studies join the dial automatically.' }));
-    const cats = [['all', 'All'], ['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['brand', 'Brand'], ['motion', 'Motion'], ['product', 'Product']];
+    const cats = [['all', 'All'], ['product', 'Case study'], ['brand', 'Brand'], ['ui', 'UI/UX'], ['3d', '3D'], ['illustration', 'Illustration'], ['poster', 'Poster'], ['motion', 'Motion']];   // the same names and order as the site
     let cat = vDesigns.cat || 'all';
     const tabs = el('div', { class: 'tabs' }), g = el('div', { class: 'grid' });
     const paint = () => {
