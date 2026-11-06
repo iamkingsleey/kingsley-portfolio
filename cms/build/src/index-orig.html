@@ -1165,7 +1165,7 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     if (M.mode === 'bottom') {
       const want = Math.min(Math.max(96, innerHeight * 0.227), 240);
       const dialTop = M.cy - R_PILL * M.S - 24;
-      hero.style.top = Math.round(Math.max(72, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';
+      hero.style.top = Math.round(Math.max(108, Math.min(want, dialTop - hero.offsetHeight - 20))) + 'px';   // at least ~54px of air under the nav
     }
     if (active) moveTag(active, false);
     if (active && active.id === 'designs') { buildFeed(); sizeRuler(); }
