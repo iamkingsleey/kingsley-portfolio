@@ -372,6 +372,74 @@ def _thumb(u):
 _first = [t for t in (_thumb(x.get('poster') if x.get('video') else x.get('src')) for x in _grid_order()[:12]) if t]
 d = d.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n</head>',
               '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' + ''.join(f'<link rel="preload" as="image" href="{t}" data-first>\n' for t in _first) + '</head>', 1)
+# ---- the All grid, built into the page. Designs used to draw its grid with script once the whole page had loaded, so on a
+# slow phone the screen stayed empty for seconds. Now the tiles are in the HTML, in the same order and with the same shapes the
+# page script uses; a few lines right after them size the grid and bring the first screen in, before the long script runs.
+# The page script then picks these tiles up instead of drawing its own (and redraws them if they ever disagree with the data).
+import html as _html
+try:
+    from PIL import Image as _PILIm
+except Exception:
+    _PILIm = None
+def _ratio(u, fallback):
+    """The shape the grid reads from the thumbnail (width / height, 3 decimals), so nothing moves when the script takes over."""
+    if _PILIm:
+        t = _thumb(u)
+        for pth in ([f'{REPO}/{t}'] if t else []) + ([f'{REPO}/{u}'] if u and not u.startswith(('http', 'data:')) else []):
+            if os.path.exists(pth):
+                try:
+                    with _PILIm.open(pth) as _im: w, h = _im.size
+                    return f'{w / h:.3f}'
+                except Exception: pass
+    try: return f'{float(fallback):.3f}'
+    except Exception: return '0.800'
+def _th_of(u):
+    t = _thumb(u)
+    if t and os.path.exists(f'{REPO}/{t}'): return t
+    if u and re.search(r'framerusercontent\.com/images/', u):
+        return re.sub(r'([?&])scale-down-to=\d+', r'\1scale-down-to=1024', u) if 'scale-down-to=' in u else u + '?scale-down-to=1024'
+    return u
+_ovt = []
+for _i, _x in enumerate(_grid_order()):
+    _still = _x.get('poster') if _x.get('video') else _x.get('src')
+    _r = f"{float(_x.get('r') or 1.5):.3f}" if _x.get('cs') else _ratio(_still, _x.get('r', .8))
+    _mob = ''
+    if _x.get('live') and _x.get('srcm'):   # phones show live pieces in their portrait layout
+        _mob = f' data-thm="{_th_of(_x["srcm"])}" data-bgm="{_x["srcm"]}" data-rm="{_ratio(_x["srcm"], _x.get("rm", .8))}"'
+    _ovt.append(f'<button class="ov-t{" white" if _x.get("video") and not _x.get("dark", True) else ""}" type="button" data-i="{_i}" style="--d:{min(_i, 8) * 40}ms;--r:{_r}"{_mob}>'
+                f'<span class="ov-im" data-th="{_th_of(_still)}" data-bg="{_still}"></span><span class="ov-c"><b>{_i + 1:02d}</b> <span class="ov-n">{_html.escape(_x["t"], quote=False)}</span><em>{_x["cat"]}</em></span></button>')
+OV_STATIC = ('<div class="ov flat" id="ov" role="dialog" aria-label="All work"><div class="ov-grid">' + ''.join(_ovt) + '</div></div>\n'
+  '<script>(function () {   /* the first screen of the grid, before the page script: size the tiles and bring them in */\n'
+  "var ov = document.getElementById('ov'); if (!ov) return;\n"
+  "var mob = innerWidth < 900, T = [].slice.call(ov.querySelectorAll('.ov-t'));\n"
+  "if (mob) T.forEach(function (t) { if (!t.dataset.thm) return; var im = t.firstChild; im.dataset.th = t.dataset.thm; im.dataset.bg = t.dataset.bgm; t.style.setProperty('--r', t.dataset.rm); });\n"
+  "var role = ''; try { role = localStorage.getItem('km-role') || ''; } catch (e) {}\n"
+  "if (['Product', 'UI/UX', 'Brand', '3D', 'Motion'].indexOf(role) >= 0 || /^#f-|(^#|\\/)p-/.test(decodeURIComponent(location.hash))) return;   // a chosen role or a link to one piece: the page script lays these out\n"
+  "var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, grid = ov.firstChild;\n"
+  "ov.style.transition = 'none'; document.body.classList.add('all');\n"
+  "var cols = mob ? 2 : 4, g = mob ? 12 : 22, gw = grid.clientWidth; if (!gw || !T.length) return;\n"
+  "var w = (gw - g * (cols - 1)) / cols;\n"
+  "T.forEach(function (t) { var r = parseFloat(t.style.getPropertyValue('--r')) || .8; t.style.setProperty('--sp', String(Math.round(w / r + g))); });\n"
+  "var SIZED = /(^|\\/)assets\\/(designs\\/[^/]+|uploads\\/(?!(?:thumbs|sm|md)\\/)[\\w\\/.-]+)\\.webp$/, sized = function (u, d) { return u.replace(/assets\\/(designs|uploads)\\//, 'assets/$1/' + d + '/'); };\n"
+  "var sharp = function (el, u) { var px = (el.offsetWidth || gw / cols || 400) * (devicePixelRatio || 1); return !SIZED.test(u) ? u : px <= 520 ? sized(u, 'sm') : px <= 760 ? sized(u, 'md') : u; };\n"
+  "var spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = T[0].offsetTop, left0 = T[0].offsetLeft, lim = innerHeight * 1.4;\n"
+  "var geo = T.map(function (t) { return [t.offsetTop, t.offsetLeft, t.offsetWidth]; });\n"
+  "T.forEach(function (t, k) { var ot = geo[k][0], ol = geo[k][1], ow = geo[k][2]; if (ot > lim) return;\n"
+  "  var im = t.firstChild, th = im.dataset.th, bg = im.dataset.bg;\n"
+  "  if (th) { im.style.setProperty('--th', 'url(' + th + ')'); im.removeAttribute('data-th'); }\n"
+  "  if (ot < innerHeight && bg) { im.style.setProperty('--bg', 'url(' + sharp(t, bg) + ')'); im.removeAttribute('data-bg'); }   // the sharp copy for what's on screen, as the page script would pick it\n"
+  "  t.dataset.pf = '1';\n"
+  "  var go = function () { t.classList.remove('m-in'); requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('m-in'); }); }); };\n"
+  "  if (!reduce) { var c = Math.round((ol - left0) / (ow + g)), row = Math.max(0, Math.round((ot - top0) / 300));\n"
+  "    t.style.setProperty('--fx', Math.round((spread[c] || 0) * .6) + 'px'); t.style.setProperty('--fy', (200 + row * 60) + 'px');\n"
+  "    t.style.setProperty('--fdl', (.02 + c * .04 + row * .07).toFixed(2) + 's'); t.style.setProperty('--fd', [1.05, 1.3, 1.2, 1.15][(c + row) % 4] + 's'); }\n"
+  "  var ok = function () { t.classList.add('ok'); if (t._fly) { t._fly(); t._fly = null; } };\n"
+  "  if (!th) { ok(); return; }\n"
+  "  var i = new Image(); i.onload = i.onerror = ok; i.src = th;\n"
+  "  if (!reduce) { if (i.complete) t._fly = go; else { t.style.setProperty('--fdl', '0s'); t._fly = go; } }\n"
+  "});\n"
+  "})();</script>\n")
+d = rep(d, '</div>\n\n<script>\n(function () {\n', '</div>\n\n' + OV_STATIC + '<script>\n(function () {\n')
 # theme: share the key with index.html; the page's own theme button stays
 d = rep(d, "  let startDark = matchMedia('(prefers-color-scheme: dark)').matches;\n  try { const v = localStorage.getItem('kfm-theme'); if (v) startDark = v === 'dark'; } catch (_) {}\n  applyTheme(startDark);",
         "  applyTheme(document.documentElement.dataset.theme === 'dark');")

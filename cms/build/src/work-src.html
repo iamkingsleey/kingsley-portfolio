@@ -1732,9 +1732,13 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 
   // ---------- See everything ----------
   // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
-  const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
+  // the grid is built into the page by the build (so a slow phone sees it at once); pick it up, or draw it if it isn't there
+  // or disagrees with the data (the same tiles, in the same order)
+  let ov = document.getElementById('ov');
+  if (ov && [...ov.querySelectorAll('.ov-n')].map(n => n.textContent).join('\n') !== items.map(it => it.t).join('\n')) { ov.remove(); ov = null; }
+  if (!ov) { ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
   ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video && !it.dark ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${it.video ? it.poster : it.src}"></span><span class="ov-c"><b>${pad(i)}</b> <span class="ov-n">${it.t}</span><em>${it.cat}</em></span></button>`).join('')}</div>`;
-  document.body.appendChild(ov);
+  document.body.appendChild(ov); }
   let ovOpen = false;
   function openOverview() {
     if (ovOpen || openIdx >= 0) return; ovOpen = true; tap();
@@ -1781,7 +1785,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     const cols = innerWidth < 900 ? 2 : 4, spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = vis[0].offsetTop, left0 = vis[0].offsetLeft;
     const g = mGap(), st = ov.scrollTop, lim = innerHeight * 1.4;   // read every place first, then write (reads between writes re-laid the page per piece)
     const geo = new Map(vis.map(t => [t, [t.offsetTop, t.offsetLeft, t.offsetWidth]]));
-    vis.forEach(t => { const [ot, ol, ow] = geo.get(t); if (ot - st > lim) return;
+    vis.forEach(t => { if (t.dataset.pf) { flown.add(t); return; }   // already flown in by the grid's first lines, before this script
+      const [ot, ol, ow] = geo.get(t); if (ot - st > lim) return;
       const c = Math.round((ol - left0) / (ow + g)), row = Math.max(0, Math.round((ot - top0) / 300));
       // a quick arrival: the whole first screen is in the air within a quarter second and settled by about a second
       t.style.setProperty('--fx', Math.round((spread[c] || 0) * .6) + 'px'); t.style.setProperty('--fy', (200 + row * 60) + 'px');
@@ -1818,7 +1823,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // the shape is read from the tiny thumbnail (same proportions), so the page doesn't wait on 6 MB of grid pictures to lay itself out
   ovTiles.forEach(o => { const u = thOf(still(items[o.i])), i = new Image();
     i.onload = () => { const r = items[o.i].cs && +items[o.i].r ? +items[o.i].r : i.naturalWidth / i.naturalHeight; /* case-study covers all keep one shape (3:2), whatever size the picture is */ o.t.style.setProperty('--r', r.toFixed(3)); o.t.classList.add('ok'); if (o.t._fly) { o.t._fly(); o.t._fly = null; } clearTimeout(mT); mT = setTimeout(mSpans, 30); };
-    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u;
+    i.onerror = () => o.t.classList.add('ok'); if (items[o.i].r) { if (!o.t.style.getPropertyValue('--r')) o.t.style.setProperty('--r', items[o.i].r); o.load = () => { i.src = u; }; } else i.src = u;   /* tiles built into the page already carry their real shape */
     if (o.load && o.i < 16) { o.load(); o.load = null; } });   // shape known from the CMS: wait until the tile nears the screen (the first screenful starts at once)
   mSpans(); requestAnimationFrame(() => { mSpans(); mFly(); mScrollFly(); });
   // each tile's sharp grid picture is fetched as it nears the screen; the 240px thumbnail shows until then.
