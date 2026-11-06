@@ -1976,6 +1976,20 @@
       "case": "sharebuddy"
     },
     {
+      "title": "Time:Out, countdown",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/time-out-countdown-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/time-out-countdown-motion.mp4"
+        }
+      ],
+      "bg": "#070707",
+      "dark": true,
+      "desc": "A countdown teaser for Time:Out Motion: the red digital clock ticks down to 00:00, then [TIME:OUT] lands and types out “is coming soon…”."
+    },
+    {
       "title": "AI icons and laptop",
       "category": "motion",
       "images": [
@@ -1988,6 +2002,20 @@
       "bg": "#040404",
       "dark": true,
       "desc": "An isometric laptop with AI icons circling its screen on a turning ring."
+    },
+    {
+      "title": "Open Source Sustainability Lab, logo in motion",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/ossl-logo-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/ossl-logo-motion.mp4"
+        }
+      ],
+      "bg": "#0f0f0f",
+      "dark": true,
+      "desc": "The Open Source Sustainability Lab logo animation: a dot turns into a block, splits into pieces that fly apart and snap back together as the mark, and the name settles underneath."
     },
     {
       "title": "POS and search",

@@ -1830,7 +1830,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         if (e.isIntersecting) { if (!o.v) { const v = document.createElement('video'); v.className = 'ov-v'; v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.preload = 'auto';
             v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.src = items[o.i].video; v.poster = items[o.i].poster; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); o.im.appendChild(v); o.v = v; }
           const pr = o.v.play(); if (pr && pr.catch) pr.catch(() => {}); }
-        else if (o.v) o.v.pause(); }), { root: ov, rootMargin: '10% 0px' });
+        else if (o.v) o.v.pause(); }), { root: ov, rootMargin: '50% 0px' });   // starts loading half a screen early, so a clip is already playing as it comes into view
       vids.forEach(o => vio.observe(o.t)); } }
   // live pieces run in the grid too: the page loads once its tile comes near, fades in over the still, and is told to
   // pause whenever the tile is off screen (it also stops by itself when the tab is hidden)
