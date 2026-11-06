@@ -15,6 +15,7 @@
 (function (root) {
   'use strict';
   var ctx = null, master = null, muted = false, vol = 0.7;
+  var LEAD = 0.012;   // every sound starts 12 ms ahead, so its opening is never cut off
 
   function ensure() {
     if (!ctx) {
@@ -30,10 +31,40 @@
     if (ctx.state === 'suspended') ctx.resume();
     return ctx;
   }
+  // Wake the audio on the first touch or key press, before the click lands, and prime the output with a silent blip.
+  // Waking it on the click itself lost the first sound's opening, so the first click came out thin and watery.
+  function warm() { if (!ensure()) return; try { var b = ctx.createBuffer(1, 1, ctx.sampleRate), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(); } catch (e) {} }
+  ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) { root.addEventListener(ev, warm, { capture: true, once: true, passive: true }); });
+
+  // Which sound a click plays depends on what was clicked (CMS → Settings → Click sound: "By action").
+  //  Desktop: nav and back tick (detent), choices play select, pictures pop, anything else ticks.
+  //  Phones:  choices play select, everything else pops (the closest thing to a tap).
+  // A control can name its own with data-snd="nav|back|select|image|other".
+  function role(e) {
+    var t = e && e.target;
+    if (e && /^key/.test(e.type)) { if (e.key === 'Escape') return 'back'; t = document.activeElement; }
+    if (!t || !t.closest) return 'other';
+    var c = t.closest('a,button,[role="button"],[role="tab"],[role="option"],[role="radio"],[role="switch"],summary,label,input,select,[tabindex]') || t;
+    var own = c.closest('[data-snd]'); if (own) return own.getAttribute('data-snd');
+    var aria = (c.getAttribute('aria-label') || c.getAttribute('title') || ''), text = (c.textContent || '').trim();
+    if (/^(←|‹|back\b|go back|close\b|×|✕)/i.test(text) || /\b(back|close)\b/i.test(aria) || c.matches('.dback,.back,.km-back,.close')) return 'back';
+    if (c.matches('[role="tab"],[role="option"],[role="radio"],[role="switch"],[aria-pressed],[aria-selected],[aria-checked],input[type="checkbox"],input[type="radio"],select') || c.closest('.chips,.chip,.seg,.swatches,.sw')) return 'select';
+    if (c.closest('.kmn-scale,.kmn-menu,.kmn-mb,.kmn-opts,nav,[role="navigation"]')) return 'nav';
+    if (t.closest('img,video,picture,canvas,figure') || c.matches('.ov-t,.tile') || /picture|image|photo/i.test(aria) ||
+        (c.querySelector && c.querySelector('img,video,canvas,picture') && text.length < 60)) return 'image';
+    return 'other';
+  }
+  var touchUI = root.matchMedia ? root.matchMedia('(hover: none) and (pointer: coarse)') : null;
+  function byRole(e) {
+    var r = role(e), phone = (e && e.pointerType === 'touch') || (e && /^touch/.test(e.type)) || (touchUI && touchUI.matches);
+    if (r === 'select') return 'select';
+    if (phone) return 'pop';
+    return r === 'image' ? 'pop' : 'detent';
+  }
 
   // A single pitched blip with a fast attack and exponential decay.
   function tone(o) {
-    var t = ctx.currentTime + (o.at || 0);
+    var t = ctx.currentTime + LEAD + (o.at || 0);
     var osc = ctx.createOscillator(), g = ctx.createGain();
     osc.type = o.type || 'sine';
     osc.frequency.setValueAtTime(o.f0, t);
@@ -54,7 +85,7 @@
       var d = noiseBuf.getChannelData(0);
       for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
-    var t = ctx.currentTime + (o.at || 0);
+    var t = ctx.currentTime + LEAD + (o.at || 0);
     var src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
     src.buffer = noiseBuf;
     bp.type = 'bandpass'; bp.frequency.value = o.freq || 4000; bp.Q.value = o.q || 1.2;
@@ -77,7 +108,7 @@
     var sr = ctx.sampleRate, j = 1 + (Math.random() * 2 - 1) * 0.1 * (o.vary / 100);
     var fc = 1300 * Math.pow(140 / 1300, o.weight / 100) * j, q = 0.55 + Math.pow(o.ring / 100, 1.5) * 4, bite = o.bite / 100;
     var ms = 8 + o.len / 100 * 52, amp = Math.pow(o.vol / 100, 1.5) * 1.6 * (1.1 + (1 - q / 4.6) * 0.6);
-    var t0 = ctx.currentTime + 0.004, n = Math.round(sr * (ms + 6) / 1000), b = ctx.createBuffer(1, n, sr), d = b.getChannelData(0);
+    var t0 = ctx.currentTime + LEAD, n = Math.round(sr * (ms + 6) / 1000), b = ctx.createBuffer(1, n, sr), d = b.getChannelData(0);
     var w = Math.max(8, Math.round(sr / (fc * 2.2)));
     for (var i = 0; i < w && i < n; i++) d[i] = -Math.sin(Math.PI * i / w) * 0.9;
     if (bite) { var m = Math.round(sr * 0.0012), lp = 0; for (var k = 0; k < m; k++) { lp += ((Math.random() * 2 - 1) - lp) * 0.5; d[k] += lp * bite * 1.4 * (1 - k / m); } }
@@ -184,19 +215,29 @@
   // click handler and the button's own handler, a tick that follows a click). Only a run of detent ticks, as when
   // dragging a dial, keeps going. Silent helpers (wake) don't count.
   var lastName = '', lastAt = 0, clickAt = 0, QUIET = { wake: 1 };
+  var CLICKY = { click: 1, pointerdown: 1, pointerup: 1, mousedown: 1, mouseup: 1, touchstart: 1, touchend: 1, keydown: 1, keyup: 1 };
+  var DRAG = { pointermove: 1, mousemove: 1, touchmove: 1, wheel: 1, scroll: 1, input: 1 };   // a hand moving something: its ticks may play
   function play(name, opt) {
-    // One click sound for the whole site (CMS → Settings → Click sound). Every sound asked for by a click, tap or key
-    // press plays it, whatever name the control asked for (open, close, select, success…). The only other sound is
-    // the soft detent tick while something is dragged or scrolled.
-    var ev = root.event && root.event.type, CLICKY = { click: 1, pointerdown: 1, pointerup: 1, mousedown: 1, mouseup: 1, touchstart: 1, touchend: 1, keydown: 1, keyup: 1 };
-    if (!QUIET[name] && (name !== 'detent' || CLICKY[ev])) { var c = (root.KM_SITE || {}).click || 'pop'; name = sounds[c] ? c : 'pop'; }
+    // Every sound asked for by a click, tap or key press is chosen here from what was clicked, whatever name the
+    // control asked for (open, close, success…). The only other sound is the detent tick while something is dragged.
+    var e = root.event, clicky = !!(e && CLICKY[e.type]);
+    if (!QUIET[name] && clicky) {
+      var c = (root.KM_SITE || {}).click || 'auto';
+      name = c === 'auto' || !sounds[c] ? byRole(e) : c;
+    }
     if (muted || !sounds[name] || !ensure()) return;
     var now = Date.now();
     if (!QUIET[name]) {
-      if (now - lastAt < 220 && !(name === 'detent' && lastName === 'detent')) return;
-      if (name === 'detent' && now - clickAt < 700) return;   // no ticks from something a click set moving (a scroll, a dial gliding)
-      lastName = name; lastAt = now; if (name !== 'detent') clickAt = now;
+      if (clicky) { if (now - lastAt < 220) return; clickAt = now; }   // one sound per click
+      else {
+        if (!(e && DRAG[e.type])) return;                                  // nothing plays on its own (timers, animations, page load)
+        if (ctx.state !== 'running') return;
+        if (now - clickAt < 700) return;                                 // nothing from what a click set moving (a scroll, a dial gliding)
+        if (now - lastAt < 220 && !(name === 'detent' && lastName === 'detent')) return;   // a run of ticks while dragging keeps going
+      }
+      lastName = name; lastAt = now;
     }
+    if (ctx.state !== 'running') { ctx.resume().then(function () { sounds[name](opt); }, function () {}); return; }   // still waking: play the whole sound once it is
     sounds[name](opt);
   }
 

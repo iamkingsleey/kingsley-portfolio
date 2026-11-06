@@ -852,8 +852,8 @@
         onclick: () => { tx.value = h; pk.value = h; tx.dispatchEvent(new Event('input')); check(); } })));
       tx.addEventListener('input', check); pk.addEventListener('input', check); box.append(sw, note); check(); v.append(g);
     }
-    if (!C.site.click) C.site.click = 'pop';
-    v.append(form([{ title: 'Click sound', help: 'The one sound on every click across the site: the nav, links, buttons and chips. There are no hover sounds, and nothing plays straight after a click. Visitors can still mute it with the sound button. Publish to hear it on the live site.', fields: [{ k: 'click', label: 'Sound', type: 'select', options: [['pop', 'Pop (default): the original bubble pop'], ['pulse', 'Pulse: short, low and heavy'], ['deep', 'Deep: lower and rounder'], ['snap', 'Soft snap: lighter and quicker']] }] }], C.site, 'site'));
+    if (!C.site.click) C.site.click = 'auto';
+    v.append(form([{ title: 'Click sound', help: 'By action: on desktop the nav and going back tick, choices (chips, tabs, toggles) play select, and pictures pop. On phones choices play select and every other tap pops. Every click plays one sound only, and there are no hover sounds. Visitors can still mute it with the sound button. Publish to hear it on the live site.', fields: [{ k: 'click', label: 'Sound', type: 'select', options: [['auto', 'By action (default): tick for nav and back, select for choices, pop for pictures; phones mostly pop'], ['pop', 'Pop on everything'], ['detent', 'Tick (detent) on everything'], ['pulse', 'Pulse on everything'], ['deep', 'Deep on everything'], ['snap', 'Soft snap on everything']] }] }], C.site, 'site'));
     if (!C.site.needle) C.site.needle = 'line';
     v.append(form([{ title: 'Dials', help: 'The head on the red needle, on every dial across the site (About, Engineering, the case study rulers and the logo and product pages).', fields: [{ k: 'needle', label: 'Needle head', type: 'select', options: [['line', 'Plain line (as now)'], ['dot', 'Dot'], ['triangle', 'Arrow'], ['diamond', 'Diamond'], ['cap', 'T cap']] }] }], C.site, 'site'));
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };
