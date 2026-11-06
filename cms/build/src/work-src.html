@@ -1200,7 +1200,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   function render(i) {
     const it = items[i], c = COPY[it.cat], nx = items[(i + 1) % N];
     const media = it.live ? `<iframe class="d-live" src="${it.live}" title="${it.t}" style="background:#111 url(${mdOf(it.src)}) center/cover"></iframe>`
-      : it.video ? `<video src="${it.sound || it.video}" poster="${it.poster}" muted loop playsinline autoplay></video>${it.sound ? `<button type="button" class="d-snd" id="dsnd" aria-label="Sound on" aria-pressed="false"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">${SND_OFF}</svg></button>` : ''}` : `<img src="${it.src}" alt="${it.t}">`;
+      : it.video ? `<video src="${it.sound || it.hd || it.video}" poster="${it.poster}" muted loop playsinline autoplay></video>${it.sound ? `<button type="button" class="d-snd" id="dsnd" aria-label="Sound on" aria-pressed="false"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">${SND_OFF}</svg></button>` : ''}` : `<img src="${it.src}" alt="${it.t}">`;
     document.body.classList.toggle('mini', true);
     if (true) {                                     // every piece: picture, title, info, credits, next (the CMS can point a piece elsewhere with "link")
       dwrap.classList.add('d-mini');
@@ -1759,8 +1759,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const ovTiles = [...ov.querySelectorAll('.ov-t')].map(t => ({ t, im: t.querySelector('.ov-im'), c: t.querySelector('.ov-c'), i: +t.dataset.i, cy: 0 }));
   // ---------- role match: "Hiring for" (kit.js keeps the choice). Fitting work moves to the front with a tag; the rest dims but stays. ----------
   // a role is just its chip: the work shown matches the chip's count exactly
-  const fits = (it, r) => it.cat === { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' }[r];
-  let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)
+  const fits = (it, r) => it.cat === { Product: 'Case study', 'UI/UX': 'UI/UX', Brand: 'Brand', '3D': '3D', Motion: 'Motion' }[r];
+  let roleNow = (() => { try { const r = localStorage.getItem('km-role'); return ['Product', 'UI/UX', 'Brand', '3D', 'Motion'].includes(r) ? r : ''; } catch (_) { return ''; } })();   // (kit.js loads after this page's script, so read the choice directly)
   const ovGrid = ov.querySelector('.ov-grid'), ovOrder = ovTiles.map(o => o.t);
   ovTiles.forEach(o => { const tg = document.createElement('i'); tg.className = 'fit'; o.c.prepend(tg); o.tag = tg; });
   // ---------- masonry + fly-in ----------
@@ -1925,7 +1925,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
     addEventListener('resize', () => { cx0 = innerWidth / 2; cy0 = innerHeight / 2; });
   }
   // a role shows only the work that fits it (a recruiter hiring for Brand sees Brand); the chips and the picker bring the rest back
-  const ROLE_CHIP = { Product: 'Case study', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
+  const ROLE_CHIP = { Product: 'Case study', 'UI/UX': 'UI/UX', Brand: 'Brand', '3D': '3D', Motion: 'Motion' };
   function applyRole(r, animate) {
     roleNow = r; filt = null;
     chipAll.classList.toggle('on', !r); chipEls.forEach((b, ci) => b.classList.toggle('on', !!r && CATS[ci].name === ROLE_CHIP[r]));

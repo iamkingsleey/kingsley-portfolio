@@ -94,17 +94,18 @@
     const cv = [...document.querySelectorAll('a')].find(a => a.textContent.trim().toLowerCase() === 'resume');
     // the short route through the site: what to open first (nothing the landing page already says)
     card.innerHTML = `<span class="lb">For recruiters · the short route</span>
-      <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r || 'Any'}</button>`).join('')}</div>
+      <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'UI/UX', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r || 'Any'}</button>`).join('')}</div>
       <div class="go"></div>
       <div class="ac">${cv ? `<a href="${cv.getAttribute('href')}" class="cv">Résumé</a>` : ''}<button type="button" class="bk">Book a call</button></div>`;
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '166 pieces · 4 case studies']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '168 pieces · 4 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
-      Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['brand.html#kauri', 'Kauri case study', 'Brand identity'], ['designs.html', 'All brand work', 'Identities and brand pieces on Designs']],
-      '3D':    [['designs.html#p-paper-plane-with-coin', '3D collection', 'Every render in one place'], ['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
-      Motion:  [['designs.html#p-tennis-ball-and-rackets', 'Tennis ball and rackets', 'Motion'], ['designs.html#p-red-padlock', 'Red padlock', 'Motion'], ['designs.html', 'All motion work', 'Loops on Designs']]
+      'UI/UX': [['designs.html#p-kusnap-account-verification', 'Kusnap, account verification', 'UI/UX, live prototype'], ['designs.html#p-kusnap-product-card', 'Kusnap, product card', 'UI/UX, design system'], ['designs.html', 'All UI/UX work', 'Interfaces and live prototypes on Designs']],
+      Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html#p-etionary-properties-poster', 'Etionary Properties poster', 'Brand'], ['designs.html', 'All brand work', 'Identities and logos on Designs']],
+      '3D':    [['designs.html#p-paper-plane-with-coin', 'Paper plane with coin', '3D render'], ['designs.html#p-red-padlock', 'Red padlock', '3D render'], ['designs.html', 'All 3D work', 'Renders on Designs']],
+      Motion:  [['designs.html#p-sharebuddy-logo-in-motion', 'ShareBuddy, logo in motion', 'Logo animation'], ['designs.html#p-time-out-countdown', 'Time:Out, countdown', 'Event countdown, with sound'], ['designs.html', 'All motion work', 'Logo animations and loops on Designs']]
     };
     const rr = card.querySelector('.rr'), go = card.querySelector('.go');
     const role = r => { rr.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.r === r)));

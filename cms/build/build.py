@@ -311,7 +311,8 @@ for p in pj:
     e = {'t': p['title'], 'bg': p.get('bg', '#111111'), 'dark': p.get('dark', True), 'r': im.get('ratio', 0.8)}
     if im.get('video'):
         e['video'] = im['video']; e['poster'] = im['src']
-        if im.get('sound'): e['sound'] = im['sound']   # a copy with its soundtrack, played only once someone opens the piece
+        if im.get('sound'): e['sound'] = im['sound']
+        if im.get('hd'): e['hd'] = im['hd']   # a full-resolution copy, loaded only when the piece is opened (the grid keeps the light one)   # a copy with its soundtrack, played only once someone opens the piece
     else:
         e['src'] = im['src']
     if im.get('live'):   # a piece that runs as a small live page (live/…): the picture is its still; phones get a portrait layout and still

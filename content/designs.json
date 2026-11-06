@@ -1967,7 +1967,8 @@
         {
           "src": "assets/designs/sharebuddy-logo-motion.jpg",
           "ratio": 0.8,
-          "video": "assets/designs/sharebuddy-logo-motion.mp4"
+          "video": "assets/designs/sharebuddy-logo-motion.mp4",
+          "hd": "assets/designs/sharebuddy-logo-motion-hd.mp4"
         }
       ],
       "bg": "#ff0a3c",
@@ -2019,6 +2020,21 @@
       "desc": "The Open Source Sustainability Lab logo animation: a dot turns into a block, splits into pieces that fly apart and snap back together as the mark, and the name settles underneath."
     },
     {
+      "title": "Tennis rackets in motion",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/tennis-racket-motion.jpg",
+          "ratio": 1.0,
+          "video": "assets/designs/tennis-racket-motion.mp4",
+          "hd": "assets/designs/tennis-racket-motion-hd.mp4"
+        }
+      ],
+      "bg": "#192150",
+      "dark": true,
+      "desc": "A looping animation: red rackets swing through the frame on navy, sending tennis balls flying past with speed lines."
+    },
+    {
       "title": "POS and search",
       "category": "motion",
       "images": [
@@ -2031,6 +2047,21 @@
       "bg": "#040404",
       "dark": true,
       "desc": "An isometric POS terminal drops in, prints a receipt and gets a magnifier over its keys."
+    },
+    {
+      "title": "Figma motion exploration",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/figma-motion-exploration.jpg",
+          "ratio": 1.0,
+          "video": "assets/designs/figma-motion-exploration.mp4",
+          "hd": "assets/designs/figma-motion-exploration-hd.mp4"
+        }
+      ],
+      "bg": "#ddfcb0",
+      "dark": false,
+      "desc": "A motion exploration made in Figma: four isometric icons, a laptop, a price tag, a parcel and an hourglass, grow in on their own coloured tiles and come alive."
     },
     {
       "title": "Wrap of money and wallet",

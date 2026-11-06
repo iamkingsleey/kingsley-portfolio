@@ -107,7 +107,7 @@
   };
 
   // ---------- role match ----------
-  const ROLES = ['Product', 'Brand', '3D', 'Motion'];
+  const ROLES = ['Product', 'UI/UX', 'Brand', '3D', 'Motion'];
   KM.role = {
     list: ROLES,
     get() { const r = store.get('km-role'); return ROLES.includes(r) ? r : ''; },
