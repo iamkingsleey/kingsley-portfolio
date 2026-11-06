@@ -1982,7 +1982,8 @@
         {
           "src": "assets/designs/time-out-countdown-motion.jpg",
           "ratio": 0.8,
-          "video": "assets/designs/time-out-countdown-motion.mp4"
+          "video": "assets/designs/time-out-countdown-motion.mp4",
+          "sound": "assets/designs/time-out-countdown-motion-sound.mp4"
         }
       ],
       "bg": "#070707",
