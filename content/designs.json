@@ -211,32 +211,6 @@
       "case": "3d-collection"
     },
     {
-      "title": "RootSauce coffee cup",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/rootsauce-coffee-cup.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#1a150e",
-      "dark": true,
-      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
-    },
-    {
-      "title": "Tote bag design",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/tote-bag-design.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#dedede",
-      "dark": false,
-      "desc": "The mark on a tote, with stickers and bold shapes."
-    },
-    {
       "title": "Casa Verde signage",
       "category": "brand",
       "images": [
@@ -264,6 +238,46 @@
       "case": "sharebuddy"
     },
     {
+      "title": "Etionary Properties poster",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/etionary-poster.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#3c315b",
+      "dark": true,
+      "desc": "From the Etionary Properties brand project: a campaign poster, \"Comfort is not luxury. It’s our standard.\""
+    },
+    {
+      "title": "Oghosa Holdings logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oghosa-logo-horizontal.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#f0ece1",
+      "dark": false,
+      "desc": "From the Oghosa brand project: the horizontal lockup of the mark and wordmark.",
+      "case": "oghosa"
+    },
+    {
+      "title": "MentSource stickers",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/mentsource-stickers.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#e7e0e6",
+      "dark": false,
+      "desc": "A logo project: MentSource stickers, the wordmark and the MS monogram."
+    },
+    {
       "title": "Ẹdorẹ event poster, group",
       "category": "brand",
       "images": [
@@ -275,19 +289,6 @@
       "bg": "#5a6467",
       "dark": true,
       "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
-    },
-    {
-      "title": "Varsity jacket design",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/varsity-jacket-design.jpg",
-          "ratio": 1.61
-        }
-      ],
-      "bg": "#055cdc",
-      "dark": true,
-      "desc": "A cobalt varsity jacket carrying the wordmark on the chest."
     },
     {
       "title": "Badge",
@@ -1013,6 +1014,88 @@
       "tools": "Illustrator"
     },
     {
+      "title": "RootSauce coffee cup",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-coffee-cup.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#1a150e",
+      "dark": true,
+      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
+    },
+    {
+      "title": "Tote bag design",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/tote-bag-design.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#dedede",
+      "dark": false,
+      "desc": "The mark on a tote, with stickers and bold shapes."
+    },
+    {
+      "title": "Kuba wordmark",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/kuba-wordmark.jpg",
+          "ratio": 1.488
+        }
+      ],
+      "bg": "#121212",
+      "dark": true,
+      "desc": "From the Kuba brand identity project: the wordmark on black."
+    },
+    {
+      "title": "OSCAFest’25, call for speakers",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-call-for-speakers.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The call for speakers for Open Source Festival 2025 and KCD Nigeria.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
+      "title": "Ẹdorẹ tote bag",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-tote-bag.jpg",
+          "ratio": 1.066
+        }
+      ],
+      "bg": "#080605",
+      "dark": true,
+      "desc": "A shot from the Ẹdorẹ brand project, a community-first events platform for African cultural organisers."
+    },
+    {
+      "title": "Oghosa icon colourways",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oghosa-icon-colourways.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#726149",
+      "dark": true,
+      "desc": "From the Oghosa brand project: the icon across the brand’s light and dark colours.",
+      "case": "oghosa"
+    },
+    {
       "title": "RootSauce \"Open Research\"",
       "category": "brand",
       "images": [
@@ -1040,6 +1123,32 @@
       "case": "sharebuddy"
     },
     {
+      "title": "Etionary Properties logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/etionary-logo.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#dcf6f3",
+      "dark": false,
+      "desc": "From the Etionary Properties brand project: the logo, beside the brand guide cover."
+    },
+    {
+      "title": "Varsity jacket design",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/varsity-jacket-design.jpg",
+          "ratio": 1.61
+        }
+      ],
+      "bg": "#055cdc",
+      "dark": true,
+      "desc": "A cobalt varsity jacket carrying the wordmark on the chest."
+    },
+    {
       "title": "Casa Verde identity",
       "category": "brand",
       "images": [
@@ -1053,57 +1162,31 @@
       "desc": "A hospitality brand: the roof-and-leaf mark across cups, cards and signage."
     },
     {
-      "title": "Wordmark design",
+      "title": "Ẹdorẹ event poster",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/fashion-wordmark-design.jpg",
-          "ratio": 1.6
-        }
-      ],
-      "bg": "#015ee9",
-      "dark": true,
-      "desc": "A fashion label wordmark set on cobalt blue, with a ring built into the O."
-    },
-    {
-      "title": "Ẹdorẹ tote bag",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/edore-tote-bag.jpg",
-          "ratio": 1.066
-        }
-      ],
-      "bg": "#080605",
-      "dark": true,
-      "desc": "A shot from the Ẹdorẹ brand project, a community-first events platform for African cultural organisers."
-    },
-    {
-      "title": "Bottle design",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/bottle-design.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#9a9a9a",
-      "dark": false,
-      "desc": "The identity wrapped around a bottle, with the blue tape motif."
-    },
-    {
-      "title": "ShareBuddy \"Big style. Small share.\"",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/sharebuddy-big-style.jpg",
+          "src": "assets/designs/edore-holding-event-poster.jpg",
           "ratio": 0.8
         }
       ],
-      "bg": "#ab505b",
+      "bg": "#5c666a",
       "dark": true,
-      "desc": "A campaign poster from the ShareBuddy brand project, with the app's notification as the headline.",
-      "case": "sharebuddy"
+      "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
+    },
+    {
+      "title": "Oghosa Holdings brand board",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oghosa-bento.jpg",
+          "ratio": 1.333
+        }
+      ],
+      "bg": "#1c1b1a",
+      "dark": true,
+      "desc": "From the Oghosa brand project: photography, the pattern, a report cover and the mark, laid out together.",
+      "case": "oghosa"
     },
     {
       "title": "RootSauce sticky notes",
@@ -1117,35 +1200,6 @@
       "bg": "#695241",
       "dark": true,
       "desc": "A mockup from the RootSauce brand project: the mark on a sticky-note block."
-    },
-    {
-      "title": "RootSauce event pass",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/rootsauce-event-pass.jpg",
-          "ratio": 1.066
-        }
-      ],
-      "bg": "#0b0b0d",
-      "dark": true,
-      "desc": "A mockup from the RootSauce brand project: the \"Your Event Pass\" lanyard card, clipped to a jacket."
-    },
-    {
-      "title": "OSCAFest’25, call for speakers",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/oscafest-call-for-speakers.jpg",
-          "ratio": 1
-        }
-      ],
-      "bg": "#111111",
-      "dark": true,
-      "desc": "The call for speakers for Open Source Festival 2025 and KCD Nigeria.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "OSCA"
     },
     {
       "title": "OSCAFest’25, hallway",
@@ -1164,33 +1218,30 @@
       "client": "OSCA"
     },
     {
-      "title": "OSCAFest’25, thank you",
+      "title": "Naija Boiz Farm badge",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/oscafest-thank-you.jpg",
-          "ratio": 1.0
+          "src": "assets/designs/naija-boiz-farm-badge.jpg",
+          "ratio": 1.5
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "The thank-you post for OSCAFest’25, with the festival’s sponsors.",
-      "mix": true,
-      "client": "OSCA",
-      "tools": "Figma"
+      "desc": "A logo project: the Naija Boiz Farm badge, on black."
     },
     {
-      "title": "Ẹdorẹ event poster",
+      "title": "Wordmark design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/edore-holding-event-poster.jpg",
-          "ratio": 0.8
+          "src": "assets/designs/fashion-wordmark-design.jpg",
+          "ratio": 1.6
         }
       ],
-      "bg": "#5c666a",
+      "bg": "#015ee9",
       "dark": true,
-      "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
+      "desc": "A fashion label wordmark set on cobalt blue, with a ring built into the O."
     },
     {
       "title": "Ẹdorẹ logo colourways",
@@ -1206,6 +1257,86 @@
       "desc": "From the Ẹdorẹ brand project: the app icon and wordmark lockup across the brand's six colours."
     },
     {
+      "title": "ShareBuddy \"Big style. Small share.\"",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/sharebuddy-big-style.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#ab505b",
+      "dark": true,
+      "desc": "A campaign poster from the ShareBuddy brand project, with the app's notification as the headline.",
+      "case": "sharebuddy"
+    },
+    {
+      "title": "Kuba logo on blue",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/kuba-logo-blue.jpg",
+          "ratio": 1.463
+        }
+      ],
+      "bg": "#00006d",
+      "dark": true,
+      "desc": "From the Kuba brand identity project: the logo on the brand blue."
+    },
+    {
+      "title": "Etionary brand guide, pattern",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/etionary-pattern.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#dcf6f3",
+      "dark": false,
+      "desc": "From the Etionary Properties brand project: the pattern page of the brand guide, built from the mark."
+    },
+    {
+      "title": "Ticketbird logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/ticketbird-logo.jpg",
+          "ratio": 1.492
+        }
+      ],
+      "bg": "#faecec",
+      "dark": false,
+      "desc": "A logo project: the Ticketbird mark, a ticket stub shaped into a bird."
+    },
+    {
+      "title": "Oghosa business card",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oghosa-business-card.jpg",
+          "ratio": 1.512
+        }
+      ],
+      "bg": "#7f7b75",
+      "dark": true,
+      "desc": "From the Oghosa brand project: the business card.",
+      "case": "oghosa"
+    },
+    {
+      "title": "RootSauce event pass",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-event-pass.jpg",
+          "ratio": 1.066
+        }
+      ],
+      "bg": "#0b0b0d",
+      "dark": true,
+      "desc": "A mockup from the RootSauce brand project: the \"Your Event Pass\" lanyard card, clipped to a jacket."
+    },
+    {
       "title": "Ẹdorẹ wordmark",
       "category": "brand",
       "images": [
@@ -1217,6 +1348,35 @@
       "bg": "#ffd94a",
       "dark": false,
       "desc": "From the Ẹdorẹ brand project: the wordmark, dots under each ẹ intact, on the brand yellow."
+    },
+    {
+      "title": "Bottle design",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/bottle-design.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#9a9a9a",
+      "dark": false,
+      "desc": "The identity wrapped around a bottle, with the blue tape motif."
+    },
+    {
+      "title": "OSCAFest’25, thank you",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-thank-you.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The thank-you post for OSCAFest’25, with the festival’s sponsors.",
+      "mix": true,
+      "client": "OSCA",
+      "tools": "Figma"
     },
     {
       "title": "ShareBuddy, getting started",
