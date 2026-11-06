@@ -1178,7 +1178,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   $('back').addEventListener('click', () => {
     if (openIdx >= 0) { tap(); stepBack(); return; }
     if (leaving) return; leaving = true; tap();
-    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'home' }); return; }   // the readout moves to the middle and tunes down
+    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: './' }); return; }   // the readout moves to the middle and tunes down
     const station = $('station'), fq = $('fq'), nm = $('nm');
     station.classList.add('tune-out'); document.body.classList.add('leaving');
     const t0 = performance.now(), dur = reduce ? 0 : 700;
@@ -1189,7 +1189,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       // silent: no ticks on the way back to Home
       if (k < 1) return requestAnimationFrame(run);
       nm.textContent = 'Home'; station.classList.remove('tune-out');
-      location.href = 'home';
+      location.href = './';
     })(t0);
   });
 
@@ -2543,6 +2543,6 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 })();
 </script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
-<script src="site-designs.js?v=0cc71ddc" defer></script>
+<script src="site-designs.js?v=9657218a" defer></script>
 </body>
 </html>

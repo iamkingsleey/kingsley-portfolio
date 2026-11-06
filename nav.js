@@ -21,7 +21,7 @@
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
   const go = s => {
     if (s === cur && !PARENT[file]) { scrollTo({ top: 0, behavior: 'smooth' }); return; }   // already here: back to the top
-    const to = s.href === 'index.html' ? 'home' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
+    const to = s.href === 'index.html' ? './' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
     if (window.Tuner) Tuner.go({ from: cur.fq, to: s.fq, name: s.name, href: to }); else location.href = to;
   };
   const css = `

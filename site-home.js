@@ -22,7 +22,7 @@
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
   const go = s => {
     if (s === cur && !PARENT[file]) { scrollTo({ top: 0, behavior: 'smooth' }); return; }   // already here: back to the top
-    const to = s.href === 'index.html' ? 'home' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
+    const to = s.href === 'index.html' ? './' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
     if (window.Tuner) Tuner.go({ from: cur.fq, to: s.fq, name: s.name, href: to }); else location.href = to;
   };
   const css = `
@@ -1095,7 +1095,7 @@ addEventListener('wheel', e => {
   const ORDER = ['index.html', 'designs.html', 'engineering.html', 'about.html'];
   const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html').replace(/^home\.html$/, 'index.html')).toLowerCase();
   const at = ORDER.indexOf(file); if (at < 0) return;
-  const clean = u => u === 'index.html' ? 'home' : u.replace(/\.html$/, '');   // clean addresses, as the nav uses
+  const clean = u => u === 'index.html' ? './' : u.replace(/\.html$/, '');   // clean addresses, as the nav uses
   const withV = u => { u = u && clean(u); return u && window.BUILD ? u + '?v=' + window.BUILD : u; };   /* the same address the nav uses, so one cached copy serves both */
   // only between Home and Designs: Home flows down into Designs, and Designs flows back up to Home
   // Home → Designs everywhere; Designs → Home only on phones and tablets, by pulling down at the top of the grid

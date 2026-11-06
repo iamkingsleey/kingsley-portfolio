@@ -384,7 +384,7 @@ d = rep(d, """      nm.textContent = 'Home'; station.classList.remove('tune-out'
         $('toast').classList.remove('show'); document.body.classList.remove('leaving');
         fq.textContent = '100.0'; nm.textContent = 'Designs'; leaving = false;
       }, 1600);""", """      nm.textContent = 'Home'; station.classList.remove('tune-out');
-      location.href = 'home';""")
+      location.href = './';""")
 d = rep(d, '<div class="toast" id="toast" role="status">In the real site this lands back on Home</div>\n', '')
 # returning via the back button (bfcache): reset the readout
 d = rep(d, "  addEventListener('resize', measure);\n  measure();",

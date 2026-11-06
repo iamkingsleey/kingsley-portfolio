@@ -1121,7 +1121,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   $('back').addEventListener('click', () => {
     if (openIdx >= 0) { tap(); stepBack(); return; }
     if (leaving) return; leaving = true; tap();
-    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: 'home' }); return; }   // the readout moves to the middle and tunes down
+    if (window.Tuner) { Tuner.go({ from: 100, to: 98, name: 'Home', href: './' }); return; }   // the readout moves to the middle and tunes down
     const station = $('station'), fq = $('fq'), nm = $('nm');
     station.classList.add('tune-out'); document.body.classList.add('leaving');
     const t0 = performance.now(), dur = reduce ? 0 : 700;
