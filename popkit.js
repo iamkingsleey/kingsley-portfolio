@@ -183,15 +183,19 @@
   // One sound per action: once a sound plays, anything else asked for in the next 220 ms is dropped (a page-wide
   // click handler and the button's own handler, a tick that follows a click). Only a run of detent ticks, as when
   // dragging a dial, keeps going. Silent helpers (wake) don't count.
-  var lastName = '', lastAt = 0, QUIET = { wake: 1 };
+  var lastName = '', lastAt = 0, clickAt = 0, QUIET = { wake: 1 };
   function play(name, opt) {
-    // the site's click (every link and button, and the nav) plays the sound picked in CMS → Settings → Click sound
-    if (name === 'pop') { var c = (root.KM_SITE || {}).click || 'pop'; if (c !== 'pop' && sounds[c]) name = c; }
+    // One click sound for the whole site (CMS → Settings → Click sound). Every sound asked for by a click, tap or key
+    // press plays it, whatever name the control asked for (open, close, select, success…). The only other sound is
+    // the soft detent tick while something is dragged or scrolled.
+    var ev = root.event && root.event.type, CLICKY = { click: 1, pointerdown: 1, pointerup: 1, mousedown: 1, mouseup: 1, touchstart: 1, touchend: 1, keydown: 1, keyup: 1 };
+    if (!QUIET[name] && (name !== 'detent' || CLICKY[ev])) { var c = (root.KM_SITE || {}).click || 'pop'; name = sounds[c] ? c : 'pop'; }
     if (muted || !sounds[name] || !ensure()) return;
     var now = Date.now();
     if (!QUIET[name]) {
       if (now - lastAt < 220 && !(name === 'detent' && lastName === 'detent')) return;
-      lastName = name; lastAt = now;
+      if (name === 'detent' && now - clickAt < 700) return;   // no ticks from something a click set moving (a scroll, a dial gliding)
+      lastName = name; lastAt = now; if (name !== 'detent') clickAt = now;
     }
     sounds[name](opt);
   }

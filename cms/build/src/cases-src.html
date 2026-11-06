@@ -915,7 +915,8 @@ const FX_SELF = new Set(['kenburns', 'reveal', 'parallax', 'patternzoom']), FX_V
 const kxRel = (el, e) => { const r = el.getBoundingClientRect(); return { x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)), r }; };
 const kxIO = (el, on, off) => { const o = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? on() : off && off()), { threshold: .3 }); o.observe(el); return () => o.disconnect(); };
 const kxReduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let kxAc = null; const kxShutter = () => { if (!soundOn) return; try { kxAc = kxAc || new (window.AudioContext || window.webkitAudioContext)(); const ac = kxAc, t = ac.currentTime, n = ac.createBufferSource(), b = ac.createBuffer(1, ac.sampleRate * .08, ac.sampleRate), d = b.getChannelData(0);
+let kxAc = null; const kxShutter = () => { return;   // off: the click itself plays the site's one click sound
+  if (!soundOn) return; try { kxAc = kxAc || new (window.AudioContext || window.webkitAudioContext)(); const ac = kxAc, t = ac.currentTime, n = ac.createBufferSource(), b = ac.createBuffer(1, ac.sampleRate * .08, ac.sampleRate), d = b.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3); n.buffer = b; const g = ac.createGain(); g.gain.value = .3; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800; n.connect(hp).connect(g).connect(ac.destination); n.start(t); } catch (_) {} };
 const KFX = {
   beforeafter(f, im, o) { f.classList.add('kx-ba'); const b = document.createElement('img'); b.className = 'kx-before' + (o.second ? '' : ' mono'); b.alt = ''; b.src = o.second || im.getAttribute('src'); f.append(b);
