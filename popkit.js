@@ -9,7 +9,7 @@
  *   Popkit.play('success');        // or trigger from your own handlers
  *   Popkit.volume(0.6); Popkit.mute(true);
  *
- * Sounds: tap, pop, select, toggleOn, toggleOff, open, close,
+ * Sounds: tap, pop, pulse, deep, snap, select, toggleOn, toggleOff, open, close,
  *         next, back, like, copy, success, error
  */
 (function (root) {
@@ -65,6 +65,37 @@
     src.start(t); src.stop(t + o.dur + 0.02);
   }
 
+  // Low pulses (CMS → Settings → Click sound): one very short push of air under a low-pass filter, no echo.
+  // Heavy without anything sharp on top. Built from the click lab: weight, body, bite, length, volume, variation (0–100).
+  var pulseOut = null;
+  function pulse(o) {
+    if (!pulseOut) {
+      var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.ratio.value = 12; lim.attack.value = 0.001; lim.release.value = 0.05;
+      pulseOut = ctx.createGain(); pulseOut.connect(lim); lim.connect(ctx.destination);
+    }
+    pulseOut.gain.value = vol / 0.7;
+    var sr = ctx.sampleRate, j = 1 + (Math.random() * 2 - 1) * 0.1 * (o.vary / 100);
+    var fc = 1300 * Math.pow(140 / 1300, o.weight / 100) * j, q = 0.55 + Math.pow(o.ring / 100, 1.5) * 4, bite = o.bite / 100;
+    var ms = 8 + o.len / 100 * 52, amp = Math.pow(o.vol / 100, 1.5) * 1.6 * (1.1 + (1 - q / 4.6) * 0.6);
+    var t0 = ctx.currentTime + 0.004, n = Math.round(sr * (ms + 6) / 1000), b = ctx.createBuffer(1, n, sr), d = b.getChannelData(0);
+    var w = Math.max(8, Math.round(sr / (fc * 2.2)));
+    for (var i = 0; i < w && i < n; i++) d[i] = -Math.sin(Math.PI * i / w) * 0.9;
+    if (bite) { var m = Math.round(sr * 0.0012), lp = 0; for (var k = 0; k < m; k++) { lp += ((Math.random() * 2 - 1) - lp) * 0.5; d[k] += lp * bite * 1.4 * (1 - k / m); } }
+    var src = ctx.createBufferSource(); src.buffer = b;
+    var f1 = ctx.createBiquadFilter(); f1.type = 'lowpass'; f1.frequency.value = fc; f1.Q.value = q;
+    var f2 = ctx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = Math.min(16000, fc * 3.2 + bite * 5000); f2.Q.value = 0.5;
+    var hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 35; hp.Q.value = 0.5;
+    var g = ctx.createGain(), end = t0 + ms / 1000;
+    g.gain.setValueAtTime(amp, t0); g.gain.setValueAtTime(amp, t0 + ms / 2000); g.gain.exponentialRampToValueAtTime(0.0005, end);
+    src.connect(f1); f1.connect(f2); f2.connect(hp); hp.connect(g); g.connect(pulseOut);
+    src.start(t0); src.stop(end + 0.01);
+  }
+  var PULSES = {
+    pulse: { weight: 58, ring: 30, bite: 0, len: 30, vol: 70, vary: 20 },
+    deep:  { weight: 78, ring: 25, bite: 0, len: 38, vol: 75, vary: 20 },
+    snap:  { weight: 25, ring: 15, bite: 18, len: 15, vol: 60, vary: 25 }
+  };
+
   var sounds = {
     // Generic tap: crisp, tiny, falls slightly.
     tap: function () {
@@ -84,6 +115,9 @@
       tone({ f0: 1900, dur: 0.025, gain: 0.04, type: 'triangle' });
       tone({ f0: 300, f1: 210, dur: 0.045, gain: 0.12 });
     },
+    pulse: function () { pulse(PULSES.pulse); },
+    deep: function () { pulse(PULSES.deep); },
+    snap: function () { pulse(PULSES.snap); },
     // Primary action: a rounded bubble pop that rises.
     pop: function () {
       tone({ f0: 520, f1: 1250, glide: 0.05, dur: 0.11, gain: 0.32 });
@@ -150,6 +184,8 @@
   // handler and the button's own handler) plays once.
   var lastName = '', lastAt = 0;
   function play(name, opt) {
+    // the site's click (every link and button, and the nav) plays the sound picked in CMS → Settings → Click sound
+    if (name === 'pop') { var c = (root.KM_SITE || {}).click || 'pulse'; if (c !== 'pop' && sounds[c]) name = c; }
     if (muted || !sounds[name] || !ensure()) return;
     var now = Date.now();
     if (name === lastName && now - lastAt < 250 && name !== 'detent' && name !== 'hover') return;

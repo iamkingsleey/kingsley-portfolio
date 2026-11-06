@@ -175,7 +175,7 @@ _ib = _site.get('inbox') or {}
 SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
   'feedback': {'on': _fb.get('on', True) is not False, 'to': _fb.get('to') or 'iamkingsleey@gmail.com', 'after': _fb.get('after') or 3},
   'inbox': {'url': (_ib.get('url') or '').strip().rstrip('/'), 'email': _ib.get('email', True) is not False},
-  'needle': _site.get('needle') or 'line', 'corners': _site.get('corners') or 'rounded'}) + ';'
+  'click': _site.get('click') or 'pulse', 'needle': _site.get('needle') or 'line', 'corners': _site.get('corners') or 'rounded'}) + ';'
   # corners (CMS → Settings → Corners): set on <html> before anything paints, so pictures and panels never flash sharp
   + 'document.documentElement.dataset.corners=window.KM_SITE.corners;'
   # kmNeedle: every dial draws its red needle through this, so the head (CMS → Settings → Dials) is the same everywhere.

@@ -21,3 +21,6 @@ cms/build/.last-build-ok
 
 # Original motion files: kept on this Mac only. The site uses the small copies in assets/designs.
 /motion/
+
+# Awwwards submission screenshots: kept on this Mac only.
+/awwwards/
