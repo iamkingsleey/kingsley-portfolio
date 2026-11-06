@@ -10,7 +10,7 @@
 /* About page: the signal tunes in to a face (lines across the whole screen), one statement, the career as a
    band you tune through, skills as a mixing desk, on air from Lagos and calling in to the station. Geist throughout; Jockey One only for the name. */
 :root {
-  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f3f3f3;
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f3f3f3;
   --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
   --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -20,7 +20,7 @@
   --pop: linear(0, .42 7%, .88 14%, 1.06 20%, 1.09 25%, 1.05 32%, .99 44%, .99 56%, 1.003 70%, 1);
   color-scheme: light;
 }
-html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #141414;
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #3a3a3a; --pill: #1c1c1c; --panel: #141414;
   --line: #242424; --edge: rgb(255 255 255 / .1); color-scheme: dark }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
@@ -148,6 +148,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call label { display: grid; gap: 6px }
 .call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
 .call input:focus, .call textarea:focus { border-color: var(--ink) }
+.call input:focus-visible, .call textarea:focus-visible { border-color: var(--ink); box-shadow: 0 1px 0 var(--ink) }   /* keyboard: a clear, thicker line under the field you're in */
 .call .cerr { margin: 0; color: #ff4a1c }
 .call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
 .call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }

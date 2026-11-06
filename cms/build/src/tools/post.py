@@ -343,6 +343,15 @@ def _local_fonts(h):
     if not keep: h = h.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n', '', 1)
     return h
 
+_ICONS = '<link rel="icon" href="assets/icons/favicon.ico" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">\n<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/favicon-180.png">'
+def _head_first(h, icons_base=''):
+    """The character set has to be declared in the first 1024 bytes of a page, so it moves to the very top of <head>.
+    Pages without a favicon get one here too."""
+    if 'rel="icon"' not in h and '<head>' in h:
+        h = h.replace('<head>', '<head>\n' + _ICONS.replace('href="assets/', f'href="{icons_base}assets/'), 1)
+    h = re.sub(r'\n?<meta charset="utf-8">', '', h, count=1)
+    return h.replace('<head>', '<head>\n<meta charset="utf-8">', 1)
+
 _BUNDLES = {}
 def _bundle(h, page):
     """Every deferred script tag at the end of the page becomes one file, site-<page>.js, in the same order."""
@@ -366,7 +375,7 @@ open(f'{REPO}/_headers', 'w', encoding='utf-8').write(
     '/sw.js\n  Cache-Control: no-cache\n')
 # ---- offline page (cms/build/src/offline.html) and the small service worker that shows it when a page can't load.
 # The worker only steps in when the network fails; online, every page comes straight from the site as before.
-_off = _acc(open(f'{KFM}/offline.html', encoding='utf-8').read())
+_off = _head_first(_acc(open(f'{KFM}/offline.html', encoding='utf-8').read()), '/')
 open(f'{REPO}/offline.html', 'w', encoding='utf-8').write(_off)
 _swv = _hl.md5(_off.encode('utf-8')).hexdigest()[:8]
 open(f'{REPO}/sw.js', 'w', encoding='utf-8').write(f"""// Offline page: keeps a copy of offline.html and shows it in place of any page that can't load (built by cms/build/src/tools/post.py)
@@ -388,7 +397,7 @@ self.addEventListener('fetch', e => {{
 # any depth (/kingsley-portfolio/a/b/c), so its links start from the site's own folder: the root when the site has its
 # own domain (a CNAME file), otherwise /<repo>/ on github.io.
 def _base():
-    if os.path.exists(f'{REPO}/CNAME'): return '/'
+    if os.path.exists(f'{REPO}/CNAME') or os.path.exists(f'{REPO}/wrangler.toml'): return '/'   # own domain (GitHub Pages CNAME, or Cloudflare)
     try:
         import subprocess
         u = subprocess.run(['git', '-C', REPO, 'remote', 'get-url', 'origin'], capture_output=True, text=True, timeout=5).stdout.strip()
@@ -396,7 +405,7 @@ def _base():
     except Exception: name = ''
     if not name: name = os.path.basename(os.path.abspath(REPO))
     return '/' if name.endswith('.github.io') else f'/{name}/'
-open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())))
+open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_head_first(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())), _base()))
 SWREG = "<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>\n"
 INDEX = {}
 # clean addresses: the site's own links drop ".html" (Cloudflare serves /designs for designs.html and redirects the
@@ -450,7 +459,18 @@ for _p in PAGES:
         _s = _s.replace('</head>', _og + '</head>', 1)
     _s = _bundle(_s, _p)
     if 'rel="icon"' not in _s and '<meta charset="utf-8">' in _s:   # the favicon (assets/icons, made from favicon.png)
-        _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<link rel="icon" href="assets/icons/favicon.ico" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">\n<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/favicon-180.png">', 1)
+        _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + _ICONS, 1)
+    if _p not in ('index.html', 'designs.html') and 'scrollbar-gutter' not in _s:   # pages that scroll keep room for the scrollbar from the first paint, so nothing slides sideways when it appears (Windows)
+        _s = _s.replace('</head>', '<style>html{scrollbar-gutter:stable}</style>\n</head>', 1)
+    _s = _head_first(_s)
     open(_f, 'w', encoding='utf-8').write(_s)
+# search engines: what to crawl, and the pages a visitor can reach (the unlinked explorations stay out)
+_SITE = 'https://iamkingsleey.com/'
+_MAP = [p for p in ('index.html', 'designs.html', 'case.html', 'brand.html', 'engineering.html', 'about.html', 'shop.html') if os.path.exists(f'{REPO}/{p}')]   # the pages the nav and Designs reach
+open(f'{REPO}/robots.txt', 'w', encoding='utf-8').write(f'User-agent: *\nAllow: /\nDisallow: /cms/\n\nSitemap: {_SITE}sitemap.xml\n')
+import datetime as _dt
+_today = _dt.date.today().isoformat()
+open(f'{REPO}/sitemap.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
+    f'  <url><loc>{_SITE}{"" if p == "index.html" else p[:-5]}</loc><lastmod>{_today}</lastmod></url>\n' for p in _MAP) + '</urlset>\n')
 json.dump(INDEX, open(f'{HERE}/.index.json', 'w', encoding='utf-8'), ensure_ascii=False)
 print('post ok', sum(len(v['texts']) for v in INDEX.values()), 'texts,', sum(len(v['media']) for v in INDEX.values()), 'media')

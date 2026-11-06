@@ -67,7 +67,7 @@ s = rep(s, 'text-decoration: underline dotted rgb(0 0 0 / .35);', 'text-decorati
 DARK_CSS = """
 /* ---------- Dark mode ---------- */
 html[data-theme="dark"] {
-  --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --time: #8a8a8a; --ring: #2a2a2a; --disc: #1a1a1a;
+  --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --time: #8a8a8a; --ring: #2a2a2a; --disc: #1a1a1a;
   --pill: #1c1c1c; --pill-hover: #262626; --tile: #161616; --photo: #333333; --marker: rgb(255 224 102 / .28);
   --on-ink: #000000; --line: #222222; --card: #161616; --glass: rgb(11 11 11 / .8); --scrim: rgb(11 11 11 / .72); --edge: rgb(255 255 255 / .1);
   color-scheme: dark;
@@ -284,7 +284,7 @@ s = rep(s, "  const hashId = OLD_IDS[location.hash.slice(1)] || location.hash.sl
         "  if (['about', 'engineering', 'projects'].includes(hashId)) { location.replace(hashId + '.html?v=' + BUILD); return; }")
 s = rep(s, "    if (sound) play(open ? 'open' : 'close', true);", "    if (sound) play('pop', true);   // one click sound everywhere")
 s = rep(s, '</body>', CLICK + '</body>')
-s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a><span class="wip" title="Work in progress, version 1">WIP.V1</span></nav>')
+s = rep(s, '<a href="#">Medium</a></nav>', '<a href="#">Medium</a><a href="#">Unsplash</a></nav>')
 s = rep(s, '<span>x</span><a href="#">resume</a>', '')   # no resume link for now
 s = rep(s, '<a href="#" id="emailLink" data-email="">email</a>', '<a href="mailto:kingsleymkpandiok@gmail.com" id="emailLink" data-email="kingsleymkpandiok@gmail.com">email</a>')
 s = rep(s, '<p>Senior product designer with experience designing from <span class="hl">0-1</span> at <br><span class="hl">e-commerce startups</span> and enterprise.</p>',

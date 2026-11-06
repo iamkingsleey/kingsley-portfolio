@@ -38,7 +38,8 @@
       ],
       "link": "",
       "status": "soon",
-      "featured": true
+      "featured": true,
+      "hidden": true
     },
     {
       "id": "fintech-objects",
@@ -60,7 +61,8 @@
         "assets/designs/red-lock-with-robe.jpg"
       ],
       "link": "",
-      "status": "soon"
+      "status": "soon",
+      "hidden": true
     },
     {
       "id": "tune-template",

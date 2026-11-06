@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
 <script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}, "needle": "line", "corners": "rounded"};document.documentElement.dataset.corners=window.KM_SITE.corners;window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();if(k==="dot"){c.arc(hx,hy,t*1.4+1.5,0,7)}else if(k==="diamond"){var d=t*1.6+2;c.moveTo(hx-d,hy);c.lineTo(hx,hy-d);c.lineTo(hx+d,hy);c.lineTo(hx,hy+d)}else if(k==="triangle"){var s=t*1.7+2;if(hz){c.moveTo(hx+s*1.3,hy);c.lineTo(hx-s*.4,hy-s);c.lineTo(hx-s*.4,hy+s)}else{c.moveTo(hx,hy-s*1.3);c.lineTo(hx-s,hy+s*.4);c.lineTo(hx+s,hy+s*.4)}}else if(k==="cap"){var L=t*2.6+3;if(hz)c.rect(hx-t,hy-L,t*1.6,L*2);else c.rect(hx-L,hy-t*.6,L*2,t*1.6)}c.closePath();c.fill()};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html").replace(/^home\.html$/,"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 <style id="km-corners">html[data-corners="rounded"]{--km-r:14px}html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in,.d-frame,.d-pic,span.th,.keep,.gal .main){border-radius:var(--km-r)!important;overflow:hidden}html[data-corners="rounded"] .lb img{border-radius:var(--km-r)!important}html[data-corners="rounded"] figure.sw .m img{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.gal .thumbs button,#strip button,.d-gt){border-radius:8px!important;overflow:hidden}html[data-corners="rounded"] :is(#strip button,.d-gt) img{border-radius:inherit}html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}</style>
 
-<meta charset="utf-8">
 <link rel="icon" href="assets/icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">
@@ -22,11 +22,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-latin.woff2) format("woff2")}@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-mono-latin.woff2) format("woff2")}@font-face{font-family:"Jockey One";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/jockey-one-latin.woff2) format("woff2")}</style><link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200..800&family=Epilogue:wght@100..900&family=Source+Serif+4:opsz,wght@8..60,200..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200..800&family=Epilogue:wght@100..900&family=Source+Serif+4:opsz,wght@8..60,200..900&display=swap"></noscript>
 <style>
-:root { --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --line: #e4e4e4; --panel: #f3f3f3; --pill: #f2f2f2; --edge: rgb(0 0 0 / .08);
+:root { --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #6f6f6f; --line: #e4e4e4; --panel: #f3f3f3; --pill: #f2f2f2; --edge: rgb(0 0 0 / .08);
   --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace; --red: #fb233b;
   --gut: max(48px, env(safe-area-inset-left, 0px)); color-scheme: light }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark } }
-:root[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --line: #242424; --panel: #141414; --pill: #1c1c1c; --edge: rgb(255 255 255 / .1); color-scheme: dark }
 * { box-sizing: border-box }
 html { -webkit-text-size-adjust: 100% }
 body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; transition: background .3s, color .3s }
@@ -332,7 +332,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .kproto .pbar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none } .H .kproto .pbar i + i { margin-left: -4px }
 .H .kproto .pbar span { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .H .kproto .pbar button { font: 500 12px var(--body); color: var(--ink); background: var(--pill); border: 0; border-radius: 999px; padding: 5px 11px; cursor: pointer }
-.H .kproto .pbar em { font: 600 10px var(--mono); letter-spacing: .6px; text-transform: uppercase; font-style: normal; color: #fff; background: #fb233b; border-radius: 999px; padding: 4px 8px }
+.H .kproto .pbar em { font: 600 10px var(--mono); letter-spacing: .6px; text-transform: uppercase; font-style: normal; color: #fff; background: color-mix(in srgb, #fb233b 80%, #000); border-radius: 999px; padding: 4px 8px }   /* a shade deeper than the accent so the white label reads */
 .H .kproto iframe { display: block; width: 100%; height: var(--ph, 760px); max-height: 82vh; border: 0; background: #fff }
 @media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
 /* an animated figure: a self-playing page in a fixed shape (3:2 unless the block says otherwise), framed like a picture */
@@ -833,6 +833,7 @@ html.themed body, html.themed .N, html.themed .next { transition: background .45
 <meta name="twitter:description" content="Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.">
 <meta name="twitter:image" content="https://iamkingsleey.com/assets/og-preview-3.jpg">
 <link rel="canonical" href="https://iamkingsleey.com/case">
+<style>html{scrollbar-gutter:stable}</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1282,7 +1283,7 @@ const R = {
         if (!src) return KM_EDIT ? `<div class="fr kbpic" data-kblk="${base}"><div class="kbdrop">Add a prototype<span>Click to choose one</span></div></div>` : '';
         const url = b.auto ? src + (src.includes('?') ? '&' : '?') + 'autoplay=1' : src, label = b.cap != null ? esc(b.cap) : '', h = Math.max(360, Math.min(1400, +b.h || 760));
         const addr = esc(b.addr || src.replace(/^.*\//, '').replace(/\.html?$/, '').replace(/[-_]/g, ' '));
-        return `<div class="fr kproto" data-kblk="${base}"><div class="pw"><div class="pbar"><i></i><i></i><i></i><span>${addr}</span><em>${b.auto ? 'Demo' : 'Try it'}</em><button type="button" data-kreplay aria-label="Start the prototype again">Restart</button></div>`
+        return `<div class="fr kproto" data-kblk="${base}"><div class="pw"><div class="pbar"><i></i><i></i><i></i><span>${addr}</span><em>${b.auto ? 'Demo' : 'Try it'}</em><button type="button" data-kreplay aria-label="Restart the prototype">Restart</button></div>`
           + `<iframe src="${esc(url)}" title="${addr} prototype" loading="lazy" style="--ph:${h}px"${KM_EDIT ? '' : ' allow="clipboard-read; clipboard-write"'}></iframe></div>`
           + (KM_EDIT ? `<button type="button" class="kchip" data-kproto="${base}">Change prototype</button>` : '') + cap([], 'Fig. ' + pad(++fig), label, base + '.cap') + `</div>`; }
       return '';
@@ -1593,9 +1594,9 @@ R.N = function (c) {
   // colour: the palette as strips side by side; point at or tap one and it opens wide with its values (stacked on a phone)
   if (b.pal.length >= 2) { const P = b.pal.slice(0, 6);
     h += `<section class="nb" data-ix="Colour"><div class="l"><span class="mono">${eb()}</span><h2>Colour</h2></div><div class="r"><p>${esc(b.colour ? (b.colour.p || [])[0] || '' : 'The palette, side by side.')}</p></div></section>
-      <section class="cstrips covers" id="ncol" role="list">${P.map((p, k) => { const [r, g, bb] = [1, 3, 5].map(i => parseInt(p.hex.slice(i, i + 2), 16)), lt = (r * 299 + g * 587 + bb * 114) / 1000 > 150;
+      <div class="cstrips covers" id="ncol" role="list">${P.map((p, k) => { const [r, g, bb] = [1, 3, 5].map(i => parseInt(p.hex.slice(i, i + 2), 16)), lt = (r * 299 + g * 587 + bb * 114) / 1000 > 150;
         return `<div class="cst${k === 0 ? ' on' : ''}${lt ? ' lt' : ''}" role="listitem" tabindex="0" data-k="${k}" style="background:${p.hex}"><span class="ctag mono">${esc(p.name)}</span>
-        <div class="clb"><b>${esc(p.name)}</b><span class="mono">${p.hex.toUpperCase()}<br>RGB ${r} ${g} ${bb}<br>HSL ${hslOf(p.hex).join(' ')}</span><button type="button" class="ccopy" data-hex="${p.hex.toUpperCase()}">Copy ${p.hex.toUpperCase()}</button></div></div>`; }).join('')}</section>`; }
+        <div class="clb"><b>${esc(p.name)}</b><span class="mono">${p.hex.toUpperCase()}<br>RGB ${r} ${g} ${bb}<br>HSL ${hslOf(p.hex).join(' ')}</span><button type="button" class="ccopy" data-hex="${p.hex.toUpperCase()}">Copy ${p.hex.toUpperCase()}</button></div></div>`; }).join('')}</div>`; }
   // type: the name steps through its weights
   { const T = b.type[0], fam = T.fam, VAR = { 'Bricolage Grotesque': [200, 800], 'Epilogue': [100, 900], 'Geist': [100, 900], 'Serif': [200, 900] }, [w0, w1] = VAR[fam] || [400, 400];
     const WS = [[200, 'Extralight'], [300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'Semibold'], [700, 'Bold'], [800, 'Extrabold']].filter(w => w[0] >= w0 && w[0] <= w1);
@@ -2048,6 +2049,6 @@ show();
 <style id="km-toggles">.km-tg{position:fixed;z-index:150;top:calc(48px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}#themeBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 40px)}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 84px)}#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}@media (min-width:900px){html:has(.cnav) .km-tg{top:calc(102px + env(safe-area-inset-top,0px))}}@media print{.km-tg{display:none}}</style><button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
 <script>(function(){var sb=document.getElementById("soundBtn"),si=document.getElementById("soundIco"),tb=document.getElementById("themeBtn"),ti=document.getElementById("themeIco");var ON='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',OFF='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',MOON='<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>',SUN='<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>';var on=true;try{on=localStorage.getItem("km-sound")!=="off"}catch(e){}function ps(){si.innerHTML=on?ON:OFF;sb.setAttribute("aria-pressed",on);sb.setAttribute("aria-label",on?"Mute sound":"Turn sound on");if(window.Popkit)Popkit.mute(!on)}sb.addEventListener("click",function(){on=!on;try{localStorage.setItem("km-sound",on?"on":"off")}catch(e){}ps();dispatchEvent(new CustomEvent("km-sound",{detail:on}));if(on&&window.Popkit)Popkit.play("pop")});function pt(){var d=document.documentElement.dataset.theme==="dark";ti.innerHTML=d?SUN:MOON;tb.setAttribute("aria-pressed",d);tb.setAttribute("aria-label",d?"Light mode":"Dark mode")}tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});ps();pt();addEventListener("load",ps)})();</script>
 <script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
-<script src="site.js?v=6c664017" defer></script>
+<script src="site.js?v=947be750" defer></script>
 </body>
 </html>

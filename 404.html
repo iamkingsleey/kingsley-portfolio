@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="/assets/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicon-180.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Not found · Kingsley M.</title>
 <meta name="robots" content="noindex">
@@ -18,13 +22,13 @@
 /* The 404 page (lab idea N2, "Gap in the dial"). GitHub Pages shows this file for any address that doesn't exist.
    The site's ruler with a stretch of ticks missing past Shop; the needle sits in the gap. Drag it to a station. */
 :root {
-  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #fb233b;
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #fb233b;
   --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --gut: max(48px, env(safe-area-inset-left, 0px));
   color-scheme: light;
 }
-html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
 @media (max-width: 899px) { :root { --gut: max(16px, env(safe-area-inset-left, 0px)) } }
 * { box-sizing: border-box }
 html, body { height: 100% }
@@ -68,7 +72,7 @@ body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9
 (function () {
   'use strict';
   // where the site lives: the root of its own domain, or a folder on GitHub Pages (filled in by the build)
-  var BASE = '/kingsley-portfolio/'; if (location.pathname.indexOf(BASE) !== 0) BASE = '/';
+  var BASE = '/'; if (location.pathname.indexOf(BASE) !== 0) BASE = '/';
   var STATIONS = [[94.0, 'About', 'about.html'], [96.0, 'Engineering', 'engineering.html'], [98.0, 'Home', 'index.html'], [100.0, 'Designs', 'designs.html'], [102.0, 'Shop', 'shop.html']];
   var $ = function (id) { return document.getElementById(id); };
   $('home').href = BASE + 'index.html';

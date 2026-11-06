@@ -47,7 +47,7 @@ _en = _rows('engineering')
 def _bench(s, rep):
     tools = [t for t in _en['tools'] if not t.get('hidden')]
     i = s.index('<section class="band" id="band">'); j = s.index('</section>', i) + 10
-    s = s[:i] + '<section class="band wbband" id="band" hidden><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>\n  <section class="wb" id="wb" aria-label="' + _en['title'].replace('"', '&quot;') + '"></section>' + s[j:]
+    s = s[:i] + '<section class="band wbband" id="band" hidden><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>\n  <section class="wb" id="wb" aria-label="' + _en['title'].replace('"', '&quot;') + '"></section><style>#wb:empty { min-height: 100vh }</style>' + s[j:]
     wb = open(f'{KFM}/workbench.html', encoding='utf-8').read().replace('__TOOLS__', json.dumps(tools, ensure_ascii=False).replace('</', '<\\/'))
     # the statement is commented out for now (it stays in the CMS); an empty stand-in keeps the page's script happy
     i = s.index('<section class="stmt" id="s-stmt">'); j = s.index('</section>', i) + 10

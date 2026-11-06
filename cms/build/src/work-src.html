@@ -11,7 +11,7 @@
   --bg: #ffffff;
   --ink: #000000;
   --text: #3b3b3b;
-  --muted: #8c8c8c;
+  --muted: #6f6f6f;
   --faint: #d4d4d4;
   --tile: #f3f3f3;
   --on-ink: #ffffff;
@@ -58,7 +58,7 @@ body.leaving .row, body.leaving .cap { opacity: .25; filter: blur(6px); transiti
 :root[data-theme="light"] .ov-t.fits .ov-c .fit { box-shadow: inset 0 0 0 1px rgb(0 0 0 / .14) }   /* the white tag keeps an edge on the light page */   /* the white selection already shows it's active */
 .ov-c .fit, .ov-t.fits .ov-c .fit { display: none } .ov-t.fits .ov-c .fit-x { margin: 0 6px 0 0; padding: 2px 7px; border-radius: 999px; background: #fff; color: #0a0a0a; font: 600 10px var(--mono); font-style: normal; letter-spacing: .3px; vertical-align: 2px }
 .chips button { font-size: 13px; font-weight: 500; padding: 6px 11px; border-radius: 999px; color: var(--muted); transition: background .25s, color .25s }
-.chips button sup { font: 600 9px var(--mono); margin-left: 3px; opacity: .7 }
+.chips button sup { font: 600 10px var(--mono); margin-left: 3px }
 .chips button:hover { color: var(--ink) }
 .chips button.on { background: var(--ink); color: var(--on-ink) }
 .count { font: 600 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 52px; text-align: right }
@@ -303,6 +303,7 @@ body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 
 @media (prefers-reduced-motion: reduce) { .ov-t.m-in .ov-im { animation: none } }
 .ov-t { position: relative } .ov-c { position: absolute; left: 12px; top: 12px; margin: 0; font-size: 0 !important; line-height: 0; z-index: 3; pointer-events: none } .ov-t .ov-c b, .ov-t .ov-c em { display: none }
 .ov-c b { font: 600 12px var(--mono); color: var(--muted); margin-right: 4px }
+.ov-t .ov-c .ov-n { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; font-size: 15px; line-height: 1.2 }   /* the title stays for screen readers; the grid itself shows only pictures */
 .ov-c em { display: block; font: 10.5px var(--mono); font-style: normal; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px }
 /* Side ruler (All view): a vertical dial for the whole grid. One tick per row, a long tick and label where each
    category starts, a fixed needle in the middle. It moves with the page; drag it or tap a label to travel. */
@@ -315,7 +316,7 @@ body.all .vrul { opacity: 1; pointer-events: auto; transition: opacity .4s .2s }
 @media (prefers-reduced-motion: reduce) { .row, .ov, .ov-t { transition: none } }
 
 /* ---------- Dark mode ---------- */
-html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --tile: #161616; --pill: #1c1c1c; --on-ink: #000000; --hover: #262626; --line: #222222; --edge: rgb(255 255 255 / .1); color-scheme: dark }
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #3a3a3a; --tile: #161616; --pill: #1c1c1c; --on-ink: #000000; --hover: #262626; --line: #222222; --edge: rgb(255 255 255 / .1); color-scheme: dark }
 html[data-theme="dark"] canvas.static { mix-blend-mode: screen }
 .themebtn svg { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round }
 
@@ -343,6 +344,7 @@ body.open .fxsw, body.all .fxsw { opacity: 0; pointer-events: none }
   background: var(--pill, #1a1a1a); color: var(--ink); font: 500 13px var(--body, Geist), system-ui, sans-serif; cursor: pointer; opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1), background .2s }
 .dback svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.2,.8,.2,1) }
 .dback:hover svg { transform: translateX(-2px) }
+body:not(.open) .dback { visibility: hidden; transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s .25s }   /* out of the keyboard's way while the grid is showing */
 body.open .dback { opacity: 1; transform: none; pointer-events: auto; transition-delay: .35s, .35s, 0s }
 @media (min-width: 900px) { body.open .station { left: calc(max(48px, env(safe-area-inset-left, 0px)) + 150px); transition: left .35s cubic-bezier(.2,.8,.2,1) } }
 @media (max-width: 899px) { .dback { left: 16px; top: calc(56px + env(safe-area-inset-top, 0px)) } }
@@ -533,7 +535,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video && !it.dark ? ' white' : '') + (it.cs ? ' cs' : '');
     s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${it.t}, ${it.cat}`);
-    if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; v.autoplay = !reduce; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); s.appendChild(v); }
+    if (it.video) { const v = document.createElement('video'); v.src = it.video; v.poster = it.poster; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none'; v.autoplay = false;   /* the row's videos load when the row is in view (the grid opens first), so they don't compete with the grid's pictures */ v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); s.appendChild(v); }
     else { const im = xo(new Image(), it.src); im.alt = ''; im.decoding = 'async'; im.dataset.src = it.src; s.appendChild(im); }   // the rest load after the page is up (thumbnails cover them)
     row.appendChild(s);
     return s;
@@ -1731,7 +1733,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   // ---------- See everything ----------
   // The row pulls back and a grid of every piece fades in; clicking one zooms back into the row on that piece.
   const ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'All work');
-  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video && !it.dark ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${it.video ? it.poster : it.src}"></span><span class="ov-c"><b>${pad(i)}</b> ${it.t}<em>${it.cat}</em></span></button>`).join('')}</div>`;
+  ov.innerHTML = `<div class="ov-grid">${items.map((it, i) => `<button class="ov-t${it.video && !it.dark ? ' white' : ''}" type="button" data-i="${i}" style="--d:${Math.min(i, 8) * 40}ms"><span class="ov-im" data-th="${thOf(it.video ? it.poster : it.src)}" data-bg="${it.video ? it.poster : it.src}"></span><span class="ov-c"><b>${pad(i)}</b> <span class="ov-n">${it.t}</span><em>${it.cat}</em></span></button>`).join('')}</div>`;
   document.body.appendChild(ov);
   let ovOpen = false;
   function openOverview() {

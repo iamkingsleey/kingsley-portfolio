@@ -118,7 +118,7 @@
     addEventListener('resize', back);
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
-    S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.append(band, S);
+    S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.prepend(band, S);   // first in the page, so the keyboard reaches the stations before the content
     // phones: the menu button and its list of stations
     const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'kmn-mb'; mb.setAttribute('aria-label', 'Open menu'); mb.setAttribute('aria-expanded', 'false'); mb.innerHTML = '<i></i><i></i><i></i>';
     const M = document.createElement('nav'); M.className = 'kmn-menu'; M.setAttribute('aria-label', 'Stations'); M.id = 'kmnMenu'; mb.setAttribute('aria-controls', 'kmnMenu');
@@ -132,7 +132,7 @@
       if (s === cur && !PARENT[file]) { menu(false); return; } leaving = true; go(s); setTimeout(() => menu(false), 600); }));
     addEventListener('keydown', e => { if (e.key === 'Escape' && document.documentElement.classList.contains('kmn-open')) { menu(false); mb.focus(); } });
     addEventListener('pageshow', e => { if (e.persisted) menu(false); });
-    document.body.append(M, mb);
+    document.body.prepend(mb, M);   // phones: the menu button comes first for the keyboard too
     // phones: the page's sound and theme buttons move into the menu (the menu's buttons press the page's own, so each page keeps its logic)
     const sB = document.getElementById('soundBtn'), tB = document.getElementById('themeBtn');
     if (sB || tB) {
@@ -651,6 +651,7 @@ addEventListener('wheel', e => {
     box-shadow: 0 10px 30px rgb(0 0 0 / .14); transition: opacity .3s, transform .45s cubic-bezier(.2,.8,.2,1) }
   .pt-pill.on { opacity: 1; transform: translate(-50%, 0) }
   .pt-pill b { font-weight: 500; color: #fb233b }
+  html[data-theme="dark"] .pt-pill b { color: color-mix(in srgb, #fb233b 78%, #000) }   /* on the white pill the accent goes a shade deeper so it reads */
   .pt-cue { position: fixed; z-index: 30; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: grid; justify-items: center; gap: 2px;
     font: 600 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .6px; text-transform: uppercase; color: var(--muted, #888); background: none; border: 0; cursor: pointer; transition: opacity .3s }
   .pt-cue svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: ptb 1.6s cubic-bezier(.45,0,.55,1) infinite }
@@ -666,6 +667,7 @@ addEventListener('wheel', e => {
   .pt-card { position: fixed; z-index: 152; left: max(48px, env(safe-area-inset-left, 0px)); top: calc(96px + env(safe-area-inset-top, 0px)); width: min(320px, calc(100vw - 32px)); padding: 18px 18px 18px; border-radius: 20px;
     background: var(--bg, #fff); color: var(--text, #333); box-shadow: 0 0 0 1px var(--edge, rgb(0 0 0 / .07)), 0 24px 60px rgb(0 0 0 / .18); font: 14px/1.5 Geist, system-ui, sans-serif;
     opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left; pointer-events: none; transition: opacity .2s, transform .3s cubic-bezier(.2,.8,.2,1) }
+  .pt-card:not(.on) { visibility: hidden; transition: opacity .2s, transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s .2s }   /* closed: out of the keyboard's way */
   .pt-card.on { opacity: 1; transform: none; pointer-events: auto }
   .pt-card .lb { font: 600 10.5px "Geist Mono", ui-monospace, monospace; letter-spacing: .7px; text-transform: uppercase; color: var(--muted, #888) }
   .pt-card .rr { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 12px; font-size: 12.5px; color: var(--muted, #888) }
@@ -756,7 +758,7 @@ addEventListener('wheel', e => {
     rec.addEventListener('click', e => { e.stopPropagation(); setOpen(!card.classList.contains('on')); });
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
-    document.body.append(rec, card);
+    document.body.prepend(rec, card);   // the first stop for the keyboard, as it is on screen (top left)
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();

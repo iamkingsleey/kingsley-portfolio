@@ -117,7 +117,7 @@
     addEventListener('resize', back);
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
-    S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.append(band, S);
+    S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.prepend(band, S);   // first in the page, so the keyboard reaches the stations before the content
     // phones: the menu button and its list of stations
     const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'kmn-mb'; mb.setAttribute('aria-label', 'Open menu'); mb.setAttribute('aria-expanded', 'false'); mb.innerHTML = '<i></i><i></i><i></i>';
     const M = document.createElement('nav'); M.className = 'kmn-menu'; M.setAttribute('aria-label', 'Stations'); M.id = 'kmnMenu'; mb.setAttribute('aria-controls', 'kmnMenu');
@@ -131,7 +131,7 @@
       if (s === cur && !PARENT[file]) { menu(false); return; } leaving = true; go(s); setTimeout(() => menu(false), 600); }));
     addEventListener('keydown', e => { if (e.key === 'Escape' && document.documentElement.classList.contains('kmn-open')) { menu(false); mb.focus(); } });
     addEventListener('pageshow', e => { if (e.persisted) menu(false); });
-    document.body.append(M, mb);
+    document.body.prepend(mb, M);   // phones: the menu button comes first for the keyboard too
     // phones: the page's sound and theme buttons move into the menu (the menu's buttons press the page's own, so each page keeps its logic)
     const sB = document.getElementById('soundBtn'), tB = document.getElementById('themeBtn');
     if (sB || tB) {

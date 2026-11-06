@@ -15,13 +15,13 @@
 /* The offline page (lab idea E1 + E3). The service worker (sw.js) keeps a copy of this file and shows it in place of
    any page that can't load. Everything it needs is in this one file, so it works with no connection at all. */
 :root {
-  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #8c8c8c; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #ff4a1c;
+  --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #c8c8c8; --pill: #f2f2f2; --line: #e4e4e4; --red: #ff4a1c;
   --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --gut: max(48px, env(safe-area-inset-left, 0px));
   color-scheme: light;
 }
-html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #7a7a7a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
+html[data-theme="dark"] { --bg: #0b0b0b; --ink: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #3a3a3a; --pill: #1c1c1c; --line: #242424; color-scheme: dark }
 @media (max-width: 899px) { :root { --gut: max(16px, env(safe-area-inset-left, 0px)) } }
 * { box-sizing: border-box }
 html, body { height: 100% }
