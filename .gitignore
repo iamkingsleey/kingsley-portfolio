@@ -18,3 +18,6 @@ cms/build/.last-build-ok
 /Edore/
 /Rootsauce/
 /Sharebuddy/
+
+# Original motion files: kept on this Mac only. The site uses the small copies in assets/designs.
+/motion/
