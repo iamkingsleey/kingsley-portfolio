@@ -170,12 +170,14 @@ TOGGLES = ('<style id="km-toggles">'
   'tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});'
   'new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});'
   'ps();pt();addEventListener("load",ps)})();</script>\n')
+try: _vol = max(0, min(300, int(float(_site.get('volume', 100)))))   # CMS → Settings → Sound volume, in percent
+except (TypeError, ValueError): _vol = 100
 _fb = _site.get('feedback') or {}
 _ib = _site.get('inbox') or {}
 SITEJS = ('<script>window.KM_SITE = ' + json.dumps({'available': _site.get('available', True) is not False, 'shop': bool(_site.get('shop')),
   'feedback': {'on': _fb.get('on', True) is not False, 'to': _fb.get('to') or 'iamkingsleey@gmail.com', 'after': _fb.get('after') or 3},
   'inbox': {'url': (_ib.get('url') or '').strip().rstrip('/'), 'email': _ib.get('email', True) is not False},
-  'click': _site.get('click') or 'auto', 'needle': _site.get('needle') or 'line', 'corners': _site.get('corners') or 'rounded'}) + ';'
+  'click': _site.get('click') or 'auto', 'volume': _vol, 'needle': _site.get('needle') or 'line', 'corners': _site.get('corners') or 'rounded'}) + ';'
   # corners (CMS → Settings → Corners): set on <html> before anything paints, so pictures and panels never flash sharp
   + 'document.documentElement.dataset.corners=window.KM_SITE.corners;'
   # kmNeedle: every dial draws its red needle through this, so the head (CMS → Settings → Dials) is the same everywhere.

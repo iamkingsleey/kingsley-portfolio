@@ -16,5 +16,6 @@
   "url": "",
   "email": true
  },
- "click": "auto"
+ "click": "auto",
+ "volume": 100
 }

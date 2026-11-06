@@ -854,6 +854,22 @@
     }
     if (!C.site.click) C.site.click = 'auto';
     v.append(form([{ title: 'Click sound', help: 'By action: on desktop the nav and going back tick, choices (chips, tabs, toggles) play select, and pictures pop. On phones choices play select and every other tap pops. Every click plays one sound only, and there are no hover sounds. Visitors can still mute it with the sound button. Publish to hear it on the live site.', fields: [{ k: 'click', label: 'Sound', type: 'select', options: [['auto', 'By action (default): tick for nav and back, select for choices, pop for pictures; phones mostly pop'], ['pop', 'Pop on everything'], ['detent', 'Tick (detent) on everything'], ['pulse', 'Pulse on everything'], ['deep', 'Deep on everything'], ['snap', 'Soft snap on everything']] }] }], C.site, 'site'));
+    { // Sound volume: one slider for every sound on the site, with test buttons that play the live site's own sounds
+      if (typeof C.site.volume !== 'number') C.site.volume = 100;
+      const out = el('b', { text: C.site.volume + '%' });
+      const rg = el('input', { type: 'range', min: '0', max: '300', step: '5', value: String(C.site.volume), style: 'width:100%' });
+      const kit = () => new Promise(res => { if (window.Popkit) return res(window.Popkit); const s = document.createElement('script'); s.src = '/site/popkit.js?' + Date.now(); s.onload = () => res(window.Popkit); s.onerror = () => res(null); document.head.append(s); });
+      const test = (lab, kind) => el('button', { class: 'btn ghost small', type: 'button', 'data-snd': kind, text: lab, onclick: () => {
+        window.KM_SITE = Object.assign(window.KM_SITE || {}, { click: C.site.click || 'auto', volume: C.site.volume });
+        const P = window.Popkit; if (!P) { kit().then(k => toast(k ? 'Sounds loaded: press again' : 'Could not load the site sounds')); return; }
+        P.volume(C.site.volume); P.play('pop'); } });   // the site picks the sound from data-snd: a tick, select or pop
+      kit();   // load the site's sound script now, so the first test press plays straight away
+      rg.addEventListener('input', () => { C.site.volume = +rg.value; out.textContent = rg.value + '%'; touch('site'); if (window.Popkit) Popkit.volume(C.site.volume); });
+      v.append(el('div', { class: 'group', style: 'margin-top:26px' }, el('h2', { text: 'Sound volume' }),
+        el('p', { class: 'help', text: 'How loud every sound on the site is: clicks, picture pops and dial ticks. 100% is the normal level; go higher if it feels faint. Press a test button to hear it at this level, then Save and Publish.' }),
+        el('div', { class: 'f' }, el('label', {}, 'Volume ', out), rg),
+        el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, test('Test nav tick', 'nav'), test('Test choice', 'select'), test('Test picture', 'image'))));
+    }
     if (!C.site.needle) C.site.needle = 'line';
     v.append(form([{ title: 'Dials', help: 'The head on the red needle, on every dial across the site (About, Engineering, the case study rulers and the logo and product pages).', fields: [{ k: 'needle', label: 'Needle head', type: 'select', options: [['line', 'Plain line (as now)'], ['dot', 'Dot'], ['triangle', 'Arrow'], ['diamond', 'Diamond'], ['cap', 'T cap']] }] }], C.site, 'site'));
     C.site.feedback = C.site.feedback || { on: true, to: 'iamkingsleey@gmail.com', after: 3 };

@@ -14,7 +14,8 @@
  */
 (function (root) {
   'use strict';
-  var ctx = null, master = null, muted = false, vol = 0.7;
+  var BASE = 1.05;   // overall level at 100% (was 0.7 under a heavier compressor)
+  var ctx = null, master = null, muted = false, vol = BASE;
   var LEAD = 0.012;
   // the detent and select recipes were made as quiet background ticks; as the main click sound they need lifting
   var boost = 1, LOUD = { detent: 2.6, select: 1.7, pop: 1.15 }, TICKLOUD = 1.9;   // every sound starts 12 ms ahead, so its opening is never cut off
@@ -24,8 +25,10 @@
       var AC = root.AudioContext || root.webkitAudioContext;
       if (!AC) return null;
       ctx = new AC();
+      // a limiter rather than a squashing compressor, so clicks keep their punch; volume comes from CMS → Settings → Sound volume
       var comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -14; comp.ratio.value = 4;
+      comp.threshold.value = -3; comp.ratio.value = 12; comp.knee.value = 0; comp.attack.value = 0.001; comp.release.value = 0.08;
+      var V = (root.KM_SITE || {}).volume; if (typeof V === 'number') vol = BASE * Math.max(0, V) / 100;
       master = ctx.createGain();
       master.gain.value = vol;
       master.connect(comp); comp.connect(ctx.destination);
@@ -106,7 +109,7 @@
       var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.ratio.value = 12; lim.attack.value = 0.001; lim.release.value = 0.05;
       pulseOut = ctx.createGain(); pulseOut.connect(lim); lim.connect(ctx.destination);
     }
-    pulseOut.gain.value = vol / 0.7;
+    pulseOut.gain.value = vol / BASE;
     var sr = ctx.sampleRate, j = 1 + (Math.random() * 2 - 1) * 0.1 * (o.vary / 100);
     var fc = 1300 * Math.pow(140 / 1300, o.weight / 100) * j, q = 0.55 + Math.pow(o.ring / 100, 1.5) * 4, bite = o.bite / 100;
     var ms = 8 + o.len / 100 * 52, amp = Math.pow(o.vol / 100, 1.5) * 1.6 * (1.1 + (1 - q / 4.6) * 0.6);
@@ -275,7 +278,7 @@
     play: play,
     bind: bind,
     sounds: Object.keys(sounds),
-    volume: function (v) { vol = Math.max(0, Math.min(1, v)); if (master) master.gain.value = vol; },
+    volume: function (pct) { vol = BASE * Math.max(0, Math.min(300, pct)) / 100; if (master) master.gain.value = vol; },   // percent, 100 = normal
     mute: function (m) { muted = !!m; },
     define: function (name, fn) { sounds[name] = function () { fn({ tone: tone, tick: tick, ctx: ctx }); }; }
   };
