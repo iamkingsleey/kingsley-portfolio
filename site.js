@@ -731,7 +731,7 @@ addEventListener('wheel', e => {
     const cv = [...document.querySelectorAll('a')].find(a => a.textContent.trim().toLowerCase() === 'resume');
     // the short route through the site: what to open first (nothing the landing page already says)
     card.innerHTML = `<span class="lb">For recruiters · the short route</span>
-      <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'UI/UX', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r || 'Any'}</button>`).join('')}</div>
+      <div class="rr" role="group" aria-label="Hiring for"><span>Hiring for</span>${['', 'Product', 'UI/UX', 'Brand', '3D', 'Motion'].map(r => `<button type="button" data-r="${r}">${r === 'Product' ? 'Case studies' : r || 'Any'}</button>`).join('')}</div>
       <div class="go"></div>
       <div class="ac">${cv ? `<a href="${cv.getAttribute('href')}" class="cv">Résumé</a>` : ''}<button type="button" class="bk">Book a call</button></div>`;
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
