@@ -131,7 +131,9 @@
     document.body.prepend(rec, card);   // the first stop for the keyboard, as it is on screen (top left)
     go.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (!a) return;
       try { sessionStorage.setItem(RK, JSON.stringify({ file: fileOf(a.getAttribute('href')), t: Date.now() })); } catch (_) {} });
-    const reopen = () => { if (!recFlag()) return; recClear(); setOpen(true); };   // back from a page the card opened: the card is open again
+    // back from a page the card opened: the card is open again, and stays open until they close it. The note is cleared a
+    // moment later, not at once: coming back from the browser's cache, Home reloads itself, and the fresh page has to find it too
+    const reopen = () => { if (!recFlag()) return; setOpen(true); setTimeout(recClear, 1500); };
     reopen(); addEventListener('pageshow', e => { if (e.persisted) reopen(); });
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
