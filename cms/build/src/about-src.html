@@ -381,7 +381,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   // ---------- 4 · what I do: five stations on one dial; the needle follows you and lifts each skill's tools ----------
   const TS = __TOOLSVG__;
   const TN = { figma: 'Figma', blender: 'Blender', illustrator: 'Adobe Illustrator', photoshop: 'Adobe Photoshop', aftereffect: 'Adobe After Effects', claude: 'Claude', chatgpt: 'ChatGPT' };
-  const SKL = [['Product', ['figma', 'claude']], ['Brand', ['illustrator', 'figma', 'photoshop']], ['Illustration', ['illustrator', 'figma']], ['3D', ['blender']], ['Engineering', ['claude', 'chatgpt', 'figma']]];
+  const SKL = [['Product', ['figma', 'claude']], ['Brand', ['illustrator', 'figma', 'photoshop']], ['Illustration', ['illustrator', 'figma']], ['3D', ['blender']], ['Motion', ['aftereffect', 'figma']], ['Engineering', ['claude', 'chatgpt', 'figma']]];
   const skrow = $('skrow'), skc = $('skc'), skx = skc.getContext('2d'), skt = $('skt');
   skrow.innerHTML = SKL.map((k, i) => `<span class="skw" data-i="${i}" role="button" tabindex="0">${k[0]}</span>`).join('');
   const skws = [...skrow.children];
