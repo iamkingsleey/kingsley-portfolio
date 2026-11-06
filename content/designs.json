@@ -1119,6 +1119,19 @@
       "desc": "A mockup from the RootSauce brand project: the mark on a sticky-note block."
     },
     {
+      "title": "RootSauce event pass",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-event-pass.jpg",
+          "ratio": 1.066
+        }
+      ],
+      "bg": "#0b0b0d",
+      "dark": true,
+      "desc": "A mockup from the RootSauce brand project: the \"Your Event Pass\" lanyard card, clipped to a jacket."
+    },
+    {
       "title": "OSCAFest’25, call for speakers",
       "category": "brand",
       "images": [
@@ -1178,6 +1191,32 @@
       "bg": "#5c666a",
       "dark": true,
       "desc": "A shot from the Ẹdorẹ brand project: the \"Holding Event, before night begins\" poster."
+    },
+    {
+      "title": "Ẹdorẹ logo colourways",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-logo-colourways.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#2624e1",
+      "dark": true,
+      "desc": "From the Ẹdorẹ brand project: the app icon and wordmark lockup across the brand's six colours."
+    },
+    {
+      "title": "Ẹdorẹ wordmark",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-wordmark.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#ffd94a",
+      "dark": false,
+      "desc": "From the Ẹdorẹ brand project: the wordmark, dots under each ẹ intact, on the brand yellow."
     },
     {
       "title": "ShareBuddy, getting started",
