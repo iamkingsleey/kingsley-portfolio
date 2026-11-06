@@ -15,7 +15,9 @@
 (function (root) {
   'use strict';
   var ctx = null, master = null, muted = false, vol = 0.7;
-  var LEAD = 0.012;   // every sound starts 12 ms ahead, so its opening is never cut off
+  var LEAD = 0.012;
+  // the detent and select recipes were made as quiet background ticks; as the main click sound they need lifting
+  var boost = 1, LOUD = { detent: 2.6, select: 1.7, pop: 1.15 }, TICKLOUD = 1.9;   // every sound starts 12 ms ahead, so its opening is never cut off
 
   function ensure() {
     if (!ctx) {
@@ -69,7 +71,7 @@
     osc.type = o.type || 'sine';
     osc.frequency.setValueAtTime(o.f0, t);
     if (o.f1) osc.frequency.exponentialRampToValueAtTime(o.f1, t + (o.glide || o.dur));
-    var peak = (o.gain || 0.3);
+    var peak = Math.min(0.95, (o.gain || 0.3) * boost);
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(peak, t + (o.attack || 0.004));
     g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
@@ -90,7 +92,7 @@
     src.buffer = noiseBuf;
     bp.type = 'bandpass'; bp.frequency.value = o.freq || 4000; bp.Q.value = o.q || 1.2;
     if (o.sweep) bp.frequency.exponentialRampToValueAtTime(o.sweep, t + o.dur);
-    g.gain.setValueAtTime(o.gain || 0.2, t);
+    g.gain.setValueAtTime(Math.min(0.95, (o.gain || 0.2) * boost), t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     src.connect(bp); bp.connect(g); g.connect(master);
     src.start(t); src.stop(t + o.dur + 0.02);
@@ -217,6 +219,12 @@
   var lastName = '', lastAt = 0, clickAt = 0, QUIET = { wake: 1 };
   var CLICKY = { click: 1, pointerdown: 1, pointerup: 1, mousedown: 1, mouseup: 1, touchstart: 1, touchend: 1, keydown: 1, keyup: 1 };
   var DRAG = { pointermove: 1, mousemove: 1, touchmove: 1, wheel: 1, scroll: 1, input: 1 };   // a hand moving something: its ticks may play
+  // A dial that follows the page as you scroll (About's band, the rulers) ticks from its animation loop, not from
+  // the scroll event itself, so ticks also play while the visitor has scrolled, swiped or dragged in the last moment.
+  var handAt = 0, hand = function () { handAt = Date.now(); };
+  ['wheel', 'touchmove'].forEach(function (ev) { root.addEventListener(ev, hand, { capture: true, passive: true }); });
+  root.addEventListener('pointermove', function (e) { if (e.buttons) hand(); }, { capture: true, passive: true });
+  root.addEventListener('keydown', function (e) { if (/^(Arrow|Page|Home|End| )/.test(e.key) || e.key === ' ') hand(); }, true);
   function play(name, opt) {
     // Every sound asked for by a click, tap or key press is chosen here from what was clicked, whatever name the
     // control asked for (open, close, success…). The only other sound is the detent tick while something is dragged.
@@ -230,15 +238,17 @@
     if (!QUIET[name]) {
       if (clicky) { if (now - lastAt < 220) return; clickAt = now; }   // one sound per click
       else {
-        if (!(e && DRAG[e.type])) return;                                  // nothing plays on its own (timers, animations, page load)
+        if (!(e && DRAG[e.type]) && now - handAt > 900) return;            // nothing plays on its own (timers, page load), only what a hand is moving
         if (ctx.state !== 'running') return;
         if (now - clickAt < 700) return;                                 // nothing from what a click set moving (a scroll, a dial gliding)
         if (now - lastAt < 220 && !(name === 'detent' && lastName === 'detent')) return;   // a run of ticks while dragging keeps going
       }
       lastName = name; lastAt = now;
     }
-    if (ctx.state !== 'running') { ctx.resume().then(function () { sounds[name](opt); }, function () {}); return; }   // still waking: play the whole sound once it is
-    sounds[name](opt);
+    var b = clicky ? (LOUD[name] || 1) : (name === 'detent' ? TICKLOUD : 1);
+    var go = function () { boost = b; try { sounds[name](opt); } finally { boost = 1; } };
+    if (ctx.state !== 'running') { ctx.resume().then(go, function () {}); return; }   // still waking: play the whole sound once it is
+    go();
   }
 
   // Wire up [data-sound] elements. Only trusted pointer/keyboard
