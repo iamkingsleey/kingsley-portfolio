@@ -117,7 +117,7 @@
       const js = (t.match(/<script src="(site-[\w-]+\.js\?v=\w+)"/) || [])[1]; if (js) fetch(js, { credentials: 'same-origin' }).catch(() => {});
       // Designs lists the pictures on its first screen (in the order its grid shows them): fetch their thumbnails, then
       // the sharp copies the grid will lay over them, the same size the grid picks for this screen
-      const first = [...t.matchAll(/<link rel="preload" as="image" href="([^"]+)" data-first>/g)].map(m => m[1]);
+      const first = [...t.matchAll(/<link rel="preload" as="image" href="([^"]+)"[^>]*\bdata-first>/g)].map(m => m[1]);
       if (first.length) {
         const w = (innerWidth < 900 ? (innerWidth - 76) / 2 : (innerWidth - 162) / 4) * (devicePixelRatio || 1), d = w <= 520 ? 'sm' : 'md';
         first.forEach(get); first.forEach(s => get(s.replace('/thumbs/', '/' + d + '/')));

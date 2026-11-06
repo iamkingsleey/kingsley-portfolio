@@ -369,9 +369,34 @@ def _grid_order():
 def _thumb(u):
     m = re.match(r'assets/(designs|uploads)/(?!(?:thumbs|sm|md)/)(.+)\.(?:jpe?g|png|webp)$', u or '')
     return f'assets/{m.group(1)}/thumbs/{m.group(2)}.webp' if m else None
-_first = [t for t in (_thumb(x.get('poster') if x.get('video') else x.get('src')) for x in _grid_order()[:12]) if t]
+# the first screen gets a 400px copy (assets/…/th2/) instead of the 300px thumbnail: on most screens that is already as sharp
+# as the tile, so the first screen is finished the moment it lands, and only big, dense screens fetch a sharper copy after it
+_TH2_N = 16
+def _th2(u):
+    m = re.match(r'assets/(designs|uploads)/(?!(?:thumbs|sm|md|th2)/)(.+)\.(?:jpe?g|png|webp)$', u or '')
+    if not m: return None
+    out = f'assets/{m.group(1)}/th2/{m.group(2)}.webp'
+    srcs = [f'{REPO}/{u}'] + [f'{REPO}/assets/{m.group(1)}/{m.group(2)}.{e}' for e in ('webp', 'jpg', 'jpeg', 'png')]
+    src = next((x for x in srcs if os.path.exists(x)), None)
+    if not src: return None
+    o = f'{REPO}/{out}'
+    if not os.path.exists(o) or os.path.getmtime(o) < os.path.getmtime(src):
+        try:
+            from PIL import Image as _I2
+            os.makedirs(os.path.dirname(o), exist_ok=True)
+            with _I2.open(src) as im:
+                im = im.convert('RGBA' if im.mode in ('RGBA', 'LA', 'P') else 'RGB'); im.thumbnail((400, 1600)); im.save(o, 'WEBP', quality=74, method=6)
+        except Exception as e:
+            print('th2 skipped', u, e); return None
+    return out
+_TH2 = {}
+for _x in _grid_order()[:_TH2_N]:
+    _u = _x.get('poster') if _x.get('video') else _x.get('src')
+    _t2 = _th2(_u)
+    if _t2: _TH2[_x['t']] = _t2
+_first = [t for t in ((_TH2.get(x['t']) or _thumb(x.get('poster') if x.get('video') else x.get('src'))) for x in _grid_order()[:12]) if t]
 d = d.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n</head>',
-              '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' + ''.join(f'<link rel="preload" as="image" href="{t}" data-first>\n' for t in _first) + '</head>', 1)
+              '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' + ''.join(f'<link rel="preload" as="image" href="{t}" fetchpriority="high" data-first>\n' for t in _first) + '</head>', 1)
 # ---- the All grid, built into the page. Designs used to draw its grid with script once the whole page had loaded, so on a
 # slow phone the screen stayed empty for seconds. Now the tiles are in the HTML, in the same order and with the same shapes the
 # page script uses; a few lines right after them size the grid and bring the first screen in, before the long script runs.
@@ -406,8 +431,10 @@ for _i, _x in enumerate(_grid_order()):
     _mob = ''
     if _x.get('live') and _x.get('srcm'):   # phones show live pieces in their portrait layout
         _mob = f' data-thm="{_th_of(_x["srcm"])}" data-bgm="{_x["srcm"]}" data-rm="{_ratio(_x["srcm"], _x.get("rm", .8))}"'
-    _ovt.append(f'<button class="ov-t{" white" if _x.get("video") and not _x.get("dark", True) else ""}" type="button" data-i="{_i}" style="--d:{min(_i, 8) * 40}ms;--r:{_r}"{_mob}>'
-                f'<span class="ov-im" data-th="{_th_of(_still)}" data-bg="{_still}"></span><span class="ov-c"><b>{_i + 1:02d}</b> <span class="ov-n">{_html.escape(_x["t"], quote=False)}</span><em>{_x["cat"]}</em></span></button>')
+    _t2 = '' if _mob else _TH2.get(_x['t'], '')
+    _f2 = ' data-th2' if _t2 else ''
+    _ovt.append(f'<button class="ov-t{" white" if _x.get("video") and not _x.get("dark", True) else ""}" type="button" data-i="{_i}" style="--d:{min(_i, 8) * 40}ms;--r:{_r}"{_mob}{_f2}>'
+                f'<span class="ov-im" data-th="{_t2 or _th_of(_still)}" data-bg="{_still}"></span><span class="ov-c"><b>{_i + 1:02d}</b> <span class="ov-n">{_html.escape(_x["t"], quote=False)}</span><em>{_x["cat"]}</em></span></button>')
 OV_STATIC = ('<div class="ov flat" id="ov" role="dialog" aria-label="All work"><div class="ov-grid">' + ''.join(_ovt) + '</div></div>\n'
   '<script>(function () {   /* the first screen of the grid, before the page script: size the tiles and bring them in */\n'
   "var ov = document.getElementById('ov'); if (!ov) return;\n"
@@ -423,11 +450,12 @@ OV_STATIC = ('<div class="ov flat" id="ov" role="dialog" aria-label="All work"><
   "var SIZED = /(^|\\/)assets\\/(designs\\/[^/]+|uploads\\/(?!(?:thumbs|sm|md)\\/)[\\w\\/.-]+)\\.webp$/, sized = function (u, d) { return u.replace(/assets\\/(designs|uploads)\\//, 'assets/$1/' + d + '/'); };\n"
   "var sharp = function (el, u) { var px = (el.offsetWidth || gw / cols || 400) * (devicePixelRatio || 1); return !SIZED.test(u) ? u : px <= 520 ? sized(u, 'sm') : px <= 760 ? sized(u, 'md') : u; };\n"
   "var spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = T[0].offsetTop, left0 = T[0].offsetLeft, lim = innerHeight * 1.4;\n"
-  "var geo = T.map(function (t) { return [t.offsetTop, t.offsetLeft, t.offsetWidth]; });\n"
+  "var geo = T.map(function (t) { return [t.offsetTop, t.offsetLeft, t.offsetWidth, t.offsetHeight]; }), onS = [];\n"
   "T.forEach(function (t, k) { var ot = geo[k][0], ol = geo[k][1], ow = geo[k][2]; if (ot > lim) return;\n"
   "  var im = t.firstChild, th = im.dataset.th, bg = im.dataset.bg;\n"
   "  if (th) { im.style.setProperty('--th', 'url(' + th + ')'); im.removeAttribute('data-th'); }\n"
-  "  if (ot < innerHeight && bg) { im.style.setProperty('--bg', 'url(' + sharp(t, bg) + ')'); im.removeAttribute('data-bg'); }   // the sharp copy for what's on screen, as the page script would pick it\n"
+  "  if (bg && t.hasAttribute('data-th2') && ow * (devicePixelRatio || 1) <= 400) { im.removeAttribute('data-bg'); bg = ''; }   // the 400px copy is already as sharp as this tile\n"
+  "  if (ot < innerHeight && bg) { im.removeAttribute('data-bg'); onS.push([t, sharp(t, bg), ow * Math.min(geo[k][3], innerHeight - ot)]); }   // the sharp copy for what's on screen, as the page script would pick it\n"
   "  t.dataset.pf = '1';\n"
   "  var go = function () { t.classList.remove('m-in'); requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('m-in'); }); }); };\n"
   "  if (!reduce) { var c = Math.round((ol - left0) / (ow + g)), row = Math.max(0, Math.round((ot - top0) / 300));\n"
@@ -438,6 +466,10 @@ OV_STATIC = ('<div class="ov flat" id="ov" role="dialog" aria-label="All work"><
   "  var i = new Image(); i.onload = i.onerror = ok; i.src = th;\n"
   "  if (!reduce) { if (i.complete) t._fly = go; else { t.style.setProperty('--fdl', '0s'); t._fly = go; } }\n"
   "});\n"
+  "// the sharp copies for what's on screen, biggest first (the thumbnails, asked for first in the page's head, show while these arrive)\n"
+  "onS.sort(function (a, b) { return b[2] - a[2]; });\n"
+  "var put = function (o, k) { var i = new Image(); if (!k) try { i.fetchPriority = 'high'; } catch (e) {} i.src = o[1]; o[0].firstChild.style.setProperty('--bg', 'url(' + o[1] + ')'); };   // asked for now, not when the page next lays itself out (after the long script)\n"
+  "onS.forEach(put);\n"
   "})();</script>\n")
 d = rep(d, '</div>\n\n<script>\n(function () {\n', '</div>\n\n' + OV_STATIC + '<script>\n(function () {\n')
 # theme: share the key with index.html; the page's own theme button stays
