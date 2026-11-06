@@ -59,6 +59,13 @@
     .pt-q { display: none }
   }`;
   document.head.append(st);
+  // the way back for a recruiter: a page opened from the "For recruiters" card leads back to Home with the card open again.
+  // The note is kept only while they stay on that page; going on somewhere else forgets it.
+  const RK = 'km-rec-back', fileOf = u => (u.split('#')[0].split('?')[0] || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html');
+  const recFlag = () => { try { const f = JSON.parse(sessionStorage.getItem(RK) || 'null'); return f && Date.now() - f.t < 36e5 ? f : null; } catch (_) { return null; } };
+  const recClear = () => { try { sessionStorage.removeItem(RK); } catch (_) {} };
+  const recKeep = () => { if (home) return; const f = recFlag(); if (f && f.file !== file) recClear(); };
+  recKeep(); addEventListener('pageshow', e => { if (e.persisted) recKeep(); });
   const start = () => {
     const S = document.querySelector('.kmn-scale'); if (!S) return;
     const btns = [...S.querySelectorAll('button')], nd = S.querySelector('.nd');
@@ -122,6 +129,10 @@
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
     document.body.prepend(rec, card);   // the first stop for the keyboard, as it is on screen (top left)
+    go.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (!a) return;
+      try { sessionStorage.setItem(RK, JSON.stringify({ file: fileOf(a.getAttribute('href')), t: Date.now() })); } catch (_) {} });
+    const reopen = () => { if (!recFlag()) return; recClear(); setOpen(true); };   // back from a page the card opened: the card is open again
+    reopen(); addEventListener('pageshow', e => { if (e.persisted) reopen(); });
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();

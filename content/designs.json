@@ -642,7 +642,8 @@
       ],
       "bg": "#f4f4f4",
       "dark": false,
-      "desc": "A single thread looped into a figure of eight, set as a type poster."
+      "desc": "A single thread looped into a figure of eight, set as a type poster.",
+      "hidden": true
     },
     {
       "title": "CHAOSS Africa Hacktoberfest",
@@ -668,7 +669,8 @@
       ],
       "bg": "#d8ddd2",
       "dark": false,
-      "desc": "A colourful reel with a black line winding through it, and a short line about straight lines learning to spin."
+      "desc": "A colourful reel with a black line winding through it, and a short line about straight lines learning to spin.",
+      "hidden": true
     },
     {
       "title": "GitCertified campaign",
@@ -694,7 +696,8 @@
       ],
       "bg": "#f1f1f1",
       "dark": false,
-      "desc": "Coloured stitches wound into a spiral: one thread, looped thousands of times."
+      "desc": "Coloured stitches wound into a spiral: one thread, looped thousands of times.",
+      "hidden": true
     },
     {
       "title": "Stitched, loop",
@@ -707,7 +710,8 @@
       ],
       "bg": "#f4f4f4",
       "dark": false,
-      "desc": "Round and round the same track until the lines read as one closed loop."
+      "desc": "Round and round the same track until the lines read as one closed loop.",
+      "hidden": true
     },
     {
       "title": "En passant",
@@ -720,7 +724,7 @@
       ],
       "bg": "#c2b7ac",
       "dark": false,
-      "desc": "A poster for a chess tourney: a pawn and a warped board on warm paper."
+      "desc": "A poster for a chess tourney: a pawn and a warped board on warm paper. Made with assets from MeshCraft, my Figma plugin for 3D wireframe shapes."
     },
     {
       "title": "Web design, 1993",
@@ -733,7 +737,8 @@
       ],
       "bg": "#c2b6cc",
       "dark": false,
-      "desc": "A poster about the first web page, with a tangle of coloured lines and mixed-case type."
+      "desc": "A poster about the first web page, with a tangle of coloured lines and mixed-case type.",
+      "hidden": true
     },
     {
       "title": "Stitched, dark",
@@ -746,7 +751,7 @@
       ],
       "bg": "#151314",
       "dark": true,
-      "desc": "A needle and thread drawing a flower of stitches on a dark dotted ground."
+      "desc": "A needle and thread drawing a flower of stitches on a dark dotted ground. The thread was made with LineCraft, my Figma plugin for line patterns."
     },
     {
       "title": "Stitched, arch",
@@ -1731,7 +1736,8 @@
       "dark": false,
       "desc": "A campaign poster for Bromuno’s Design Build Share: a halftone portrait framed by chunky rounded tiles.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "hidden": true
     },
     {
       "title": "Design Build Share, green",
@@ -1746,7 +1752,8 @@
       "dark": true,
       "desc": "A campaign poster for Bromuno’s Design Build Share, in green: orange-slice glasses and the same tile system.",
       "tools": "Figma",
-      "mix": true
+      "mix": true,
+      "hidden": true
     },
     {
       "title": "Kusnap, product card",

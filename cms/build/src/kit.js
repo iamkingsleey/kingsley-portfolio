@@ -202,9 +202,12 @@
   if (!('IntersectionObserver' in window)) return;
   const figs = [...document.querySelectorAll('.kframe iframe, .kproto iframe')]; if (!figs.length) return;
   const post = (f, on) => { try { f.contentWindow && f.contentWindow.postMessage({ km_play: on }, location.origin); } catch (_) {} };
+  // the frame's page is swapped in place (location.replace), never by changing its src: a new src adds an entry to the tab's
+  // history, so the browser's back button (and the page's own back control) stepped through the frames instead of leaving the page
+  const swap = (f, u) => { try { f.contentWindow.location.replace(u); } catch (_) { f.src = u; } };
   const near = new IntersectionObserver(es => es.forEach(e => { const f = e.target;
-    if (e.isIntersecting) { if (f.dataset.sleep) { f.src = f.dataset.sleep; delete f.dataset.sleep; } post(f, true); }
-    else if (!f.dataset.sleep && f.src && f.src !== 'about:blank') { post(f, false); f.dataset.sleep = f.getAttribute('src'); f.src = 'about:blank'; } }), { rootMargin: '150% 0px' });
+    if (e.isIntersecting) { if (f.dataset.sleep) { swap(f, f.dataset.sleep); delete f.dataset.sleep; } post(f, true); }
+    else if (!f.dataset.sleep && f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') { post(f, false); f.dataset.sleep = new URL(f.getAttribute('src'), location.href).href; swap(f, 'about:blank'); } }), { rootMargin: '150% 0px' });
   const seen = new IntersectionObserver(es => es.forEach(e => post(e.target, e.isIntersecting)), { rootMargin: '0px' });
   figs.forEach(f => { near.observe(f); seen.observe(f); });
 })();

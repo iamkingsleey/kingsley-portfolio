@@ -96,6 +96,10 @@
       // going back to another case study on this page only changes the hash, so no new page arrives to finish the readout
       if (o.back) addEventListener('hashchange', here, { once: true });
       leave();                                           // the readout holds at mid while the next page comes in
+      // a step back that doesn't leave the page (something inside it took the step): go to the place by its address instead
+      if (o.back && o.href) { var left = false; addEventListener('pagehide', function () { left = true; }, { once: true }); removeEventListener('hashchange', here);
+        addEventListener('hashchange', function h() { removeEventListener('hashchange', h); left = true; here(); }, { once: true });
+        setTimeout(function () { if (!left && going) location.href = o.href; }, 1200); }
       var u = null; try { u = new URL(o.href, location.href); } catch (e) {}
       if (!o.back && u && u.pathname === location.pathname && u.search === location.search) here();   // same page, new place (the next case)
     });

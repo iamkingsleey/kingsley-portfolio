@@ -479,9 +479,12 @@ addEventListener('wheel', e => {
   if (!('IntersectionObserver' in window)) return;
   const figs = [...document.querySelectorAll('.kframe iframe, .kproto iframe')]; if (!figs.length) return;
   const post = (f, on) => { try { f.contentWindow && f.contentWindow.postMessage({ km_play: on }, location.origin); } catch (_) {} };
+  // the frame's page is swapped in place (location.replace), never by changing its src: a new src adds an entry to the tab's
+  // history, so the browser's back button (and the page's own back control) stepped through the frames instead of leaving the page
+  const swap = (f, u) => { try { f.contentWindow.location.replace(u); } catch (_) { f.src = u; } };
   const near = new IntersectionObserver(es => es.forEach(e => { const f = e.target;
-    if (e.isIntersecting) { if (f.dataset.sleep) { f.src = f.dataset.sleep; delete f.dataset.sleep; } post(f, true); }
-    else if (!f.dataset.sleep && f.src && f.src !== 'about:blank') { post(f, false); f.dataset.sleep = f.getAttribute('src'); f.src = 'about:blank'; } }), { rootMargin: '150% 0px' });
+    if (e.isIntersecting) { if (f.dataset.sleep) { swap(f, f.dataset.sleep); delete f.dataset.sleep; } post(f, true); }
+    else if (!f.dataset.sleep && f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') { post(f, false); f.dataset.sleep = new URL(f.getAttribute('src'), location.href).href; swap(f, 'about:blank'); } }), { rootMargin: '150% 0px' });
   const seen = new IntersectionObserver(es => es.forEach(e => post(e.target, e.isIntersecting)), { rootMargin: '0px' });
   figs.forEach(f => { near.observe(f); seen.observe(f); });
 })();
@@ -745,6 +748,13 @@ addEventListener('wheel', e => {
     .pt-q { display: none }
   }`;
   document.head.append(st);
+  // the way back for a recruiter: a page opened from the "For recruiters" card leads back to Home with the card open again.
+  // The note is kept only while they stay on that page; going on somewhere else forgets it.
+  const RK = 'km-rec-back', fileOf = u => (u.split('#')[0].split('?')[0] || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html');
+  const recFlag = () => { try { const f = JSON.parse(sessionStorage.getItem(RK) || 'null'); return f && Date.now() - f.t < 36e5 ? f : null; } catch (_) { return null; } };
+  const recClear = () => { try { sessionStorage.removeItem(RK); } catch (_) {} };
+  const recKeep = () => { if (home) return; const f = recFlag(); if (f && f.file !== file) recClear(); };
+  recKeep(); addEventListener('pageshow', e => { if (e.persisted) recKeep(); });
   const start = () => {
     const S = document.querySelector('.kmn-scale'); if (!S) return;
     const btns = [...S.querySelectorAll('button')], nd = S.querySelector('.nd');
@@ -788,7 +798,7 @@ addEventListener('wheel', e => {
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '168 pieces · 4 case studies']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '161 pieces · 4 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       'UI/UX': [['designs.html#p-kusnap-account-verification', 'Kusnap, account verification', 'UI/UX, live prototype'], ['designs.html#p-kusnap-product-card', 'Kusnap, product card', 'UI/UX, design system'], ['designs.html', 'All UI/UX work', 'Interfaces and live prototypes on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html#p-etionary-properties-poster', 'Etionary Properties poster', 'Brand'], ['designs.html', 'All brand work', 'Identities and logos on Designs']],
@@ -808,6 +818,10 @@ addEventListener('wheel', e => {
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
     document.body.prepend(rec, card);   // the first stop for the keyboard, as it is on screen (top left)
+    go.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (!a) return;
+      try { sessionStorage.setItem(RK, JSON.stringify({ file: fileOf(a.getAttribute('href')), t: Date.now() })); } catch (_) {} });
+    const reopen = () => { if (!recFlag()) return; recClear(); setOpen(true); };   // back from a page the card opened: the card is open again
+    reopen(); addEventListener('pageshow', e => { if (e.persisted) reopen(); });
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();

@@ -394,6 +394,13 @@ for _x in _grid_order()[:_TH2_N]:
     _u = _x.get('poster') if _x.get('video') else _x.get('src')
     _t2 = _th2(_u)
     if _t2: _TH2[_x['t']] = _t2
+for _d in ('designs', 'uploads'):   # copies for pieces no longer on the first screen are cleared away
+    for _dp, _dn, _fn in os.walk(f'{REPO}/assets/{_d}/th2'):
+        for _n in _fn:
+            _rel = os.path.relpath(os.path.join(_dp, _n), REPO).replace(os.sep, '/')
+            if _rel not in _TH2.values():
+                try: os.remove(os.path.join(_dp, _n))
+                except OSError: pass
 _first = [t for t in ((_TH2.get(x['t']) or _thumb(x.get('poster') if x.get('video') else x.get('src'))) for x in _grid_order()[:12]) if t]
 d = d.replace('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n</head>',
               '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' + ''.join(f'<link rel="preload" as="image" href="{t}" fetchpriority="high" data-first>\n' for t in _first) + '</head>', 1)

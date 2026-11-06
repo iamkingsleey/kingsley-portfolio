@@ -59,6 +59,13 @@
     .pt-q { display: none }
   }`;
   document.head.append(st);
+  // the way back for a recruiter: a page opened from the "For recruiters" card leads back to Home with the card open again.
+  // The note is kept only while they stay on that page; going on somewhere else forgets it.
+  const RK = 'km-rec-back', fileOf = u => (u.split('#')[0].split('?')[0] || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html');
+  const recFlag = () => { try { const f = JSON.parse(sessionStorage.getItem(RK) || 'null'); return f && Date.now() - f.t < 36e5 ? f : null; } catch (_) { return null; } };
+  const recClear = () => { try { sessionStorage.removeItem(RK); } catch (_) {} };
+  const recKeep = () => { if (home) return; const f = recFlag(); if (f && f.file !== file) recClear(); };
+  recKeep(); addEventListener('pageshow', e => { if (e.persisted) recKeep(); });
   const start = () => {
     const S = document.querySelector('.kmn-scale'); if (!S) return;
     const btns = [...S.querySelectorAll('button')], nd = S.querySelector('.nd');
@@ -102,7 +109,7 @@
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '168 pieces · 4 case studies']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '161 pieces · 4 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       'UI/UX': [['designs.html#p-kusnap-account-verification', 'Kusnap, account verification', 'UI/UX, live prototype'], ['designs.html#p-kusnap-product-card', 'Kusnap, product card', 'UI/UX, design system'], ['designs.html', 'All UI/UX work', 'Interfaces and live prototypes on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html#p-etionary-properties-poster', 'Etionary Properties poster', 'Brand'], ['designs.html', 'All brand work', 'Identities and logos on Designs']],
@@ -122,6 +129,10 @@
     document.addEventListener('click', e => { if (!card.contains(e.target) && e.target !== rec) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
     document.body.prepend(rec, card);   // the first stop for the keyboard, as it is on screen (top left)
+    go.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (!a) return;
+      try { sessionStorage.setItem(RK, JSON.stringify({ file: fileOf(a.getAttribute('href')), t: Date.now() })); } catch (_) {} });
+    const reopen = () => { if (!recFlag()) return; recClear(); setOpen(true); };   // back from a page the card opened: the card is open again
+    reopen(); addEventListener('pageshow', e => { if (e.persisted) reopen(); });
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 30)); else setTimeout(start, 30);
 })();
