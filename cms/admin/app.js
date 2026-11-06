@@ -108,7 +108,7 @@
     paint(); return f;
   }
   // small thumbnails in a list item's header: the pictures it holds (itself, or the ones inside it), so you can tell them apart closed
-  const isPic = v => typeof v === 'string' && (/\.(png|jpe?g|webp|gif|avif|svg|mp4|webm|mov)(\?|$)/i.test(v) || /framerusercontent\.com\/images\//.test(v));
+  const isPic = v => typeof v === 'string' && (/\.(png|jpe?g|webp|gif|avif|svg|mp4|webm|mov)(\?|$)/i.test(v));
   function picsIn(v, out = [], depth = 0) {
     if (out.length >= 4 || depth > 4 || v == null) return out;
     if (isPic(v)) out.push(v);

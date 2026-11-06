@@ -34,11 +34,11 @@
         ]
       ],
       "run": [
-        "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
-        "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400",
-        "https://framerusercontent.com/images/5o5VAzJcjKpoxq1tizTDFrNp6E.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/H3RmiWd1n1HcnbkpLHsEl9QEhDg.jpg?scale-down-to=2400",
-        "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400"
+        "assets/cases/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.webp",
+        "assets/cases/LKxpCww3igmkH6ennCS0797hFo.webp",
+        "assets/cases/5o5VAzJcjKpoxq1tizTDFrNp6E.webp",
+        "assets/cases/H3RmiWd1n1HcnbkpLHsEl9QEhDg.webp",
+        "assets/cases/FdiWxIQDviQJ3NFhYTdQJlqzQo.webp"
       ],
       "sections": [
         {
@@ -366,34 +366,31 @@
       "statement": "Trust has to be visible before anyone pays.",
       "shots": [
         [
-          "https://framerusercontent.com/images/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.jpg?scale-down-to=2400",
+          "assets/cases/Vh8kOxr6VvwjtBfaBQwT4OFuIF0.webp",
           "Verification",
           "Mobile",
           "Verification for buyers, sellers and shops, built into the flow people already use."
         ],
         [
-          "https://framerusercontent.com/images/FgxCsJCq9a8xRFfEUh4QOwNUI1A.png?scale-down-to=2400",
+          "assets/cases/FgxCsJCq9a8xRFfEUh4QOwNUI1A.webp",
           "Verified badges",
           "Mobile",
           "A badge tells buyers who they are dealing with before any money moves."
         ],
         [
-          "https://framerusercontent.com/images/FdiWxIQDviQJ3NFhYTdQJlqzQo.png?scale-down-to=2400",
+          "assets/cases/FdiWxIQDviQJ3NFhYTdQJlqzQo.webp",
           "Phone check",
           "Mobile",
           "Step one: a one-time code confirms the phone number."
         ],
         [
-          "https://framerusercontent.com/images/LKxpCww3igmkH6ennCS0797hFo.jpg?scale-down-to=2400",
+          "assets/cases/LKxpCww3igmkH6ennCS0797hFo.webp",
           "ID check",
           "Mobile",
           "Step two: a government-issued ID confirms the person."
         ],
         [
-          {
-            "video": "https://framerusercontent.com/assets/620lxoE6IFy4pdnswVvtsK9ME.mp4",
-            "poster": "https://framerusercontent.com/images/RAlJC6f461SNisfvwOePlHmIbk.jpg?scale-down-to=2400"
-          },
+          "assets/cases/RAlJC6f461SNisfvwOePlHmIbk.webp",
           "Verifying a business shop",
           "Web",
           "Business-owned stores get their own check, on the web too."
@@ -489,17 +486,14 @@
         ]
       ],
       "run": [
-        "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.png?scale-down-to=2400",
-        {
-          "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
-          "poster": "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400"
-        },
-        "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/MDiSmbakazviy2RhiYiNIc2wTJ8.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/Dh1v5xcl358Lhb5eqXWdb7KbilI.png?scale-down-to=2400"
+        "assets/cases/2VQBcuP8R6qYsxvfFylFONy4OJ4.webp",
+        "assets/cases/lXd1fnCbuAAhb3hLiiOA4dJAc.webp",
+        "assets/cases/T6y2VeQi1sEmQTkF29Y4lQ9J9CM.webp",
+        "assets/cases/KdmPrFQIglF0Z8YXrFSAkokVn8.webp",
+        "assets/cases/x3EzkyAVBiPKSDnK6eLgHax2Jw.webp",
+        "assets/cases/YlzM5YRKJvZhE7meEgWO0kmUeFQ.webp",
+        "assets/cases/MDiSmbakazviy2RhiYiNIc2wTJ8.webp",
+        "assets/cases/Dh1v5xcl358Lhb5eqXWdb7KbilI.webp"
       ],
       "sections": [
         {
@@ -838,34 +832,31 @@
       "statement": "When people can see their money, they stop worrying about it.",
       "shots": [
         [
-          "https://framerusercontent.com/images/2VQBcuP8R6qYsxvfFylFONy4OJ4.png?scale-down-to=2400",
+          "assets/cases/2VQBcuP8R6qYsxvfFylFONy4OJ4.webp",
           "The wallet",
           "Mobile",
           "Payments, refunds and commissions in one wallet."
         ],
         [
-          "https://framerusercontent.com/images/lXd1fnCbuAAhb3hLiiOA4dJAc.png?scale-down-to=2400",
+          "assets/cases/lXd1fnCbuAAhb3hLiiOA4dJAc.webp",
           "Balances",
           "Mobile",
           "Total balance, what is ready to withdraw and what is still coming."
         ],
         [
-          "https://framerusercontent.com/images/KdmPrFQIglF0Z8YXrFSAkokVn8.png?scale-down-to=2400",
+          "assets/cases/KdmPrFQIglF0Z8YXrFSAkokVn8.webp",
           "Fund the wallet",
           "Mobile",
           "Top up by card, bank transfer or crypto."
         ],
         [
-          "https://framerusercontent.com/images/YlzM5YRKJvZhE7meEgWO0kmUeFQ.png?scale-down-to=2400",
+          "assets/cases/YlzM5YRKJvZhE7meEgWO0kmUeFQ.webp",
           "Withdraw",
           "Mobile",
           "Cash out to a bank account in a couple of taps."
         ],
         [
-          {
-            "video": "https://framerusercontent.com/assets/RT6N8U4Tv9rMXWehSUblQMOOQ.mp4",
-            "poster": "https://framerusercontent.com/images/x3EzkyAVBiPKSDnK6eLgHax2Jw.png?scale-down-to=2400"
-          },
+          "assets/cases/x3EzkyAVBiPKSDnK6eLgHax2Jw.webp",
           "Booking with the wallet",
           "Prototype",
           "Paying for a booking straight from the wallet."
@@ -1389,14 +1380,14 @@
         ]
       ],
       "run": [
-        "https://framerusercontent.com/images/OYrvmmJuOYmDHgJk0RMoHc5EA.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/L7Z51AV2C7wLjOw6cMNYvOdYM6A.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/cpe1idsCmwnKaMHqRL0VIK3a57I.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/8tL75vMng90RocoQDpUd3Kt0A.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/KPkA7Hz7qs4qUnMwDMgVd6UeSDs.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
-        "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400"
+        "assets/cases/OYrvmmJuOYmDHgJk0RMoHc5EA.webp",
+        "assets/cases/Ov705Xr8iKqITqIR0OTnHhNinAc.webp",
+        "assets/cases/L7Z51AV2C7wLjOw6cMNYvOdYM6A.webp",
+        "assets/cases/cpe1idsCmwnKaMHqRL0VIK3a57I.webp",
+        "assets/cases/8tL75vMng90RocoQDpUd3Kt0A.webp",
+        "assets/cases/KPkA7Hz7qs4qUnMwDMgVd6UeSDs.webp",
+        "assets/cases/FObXrrhatKsT3eK28KddZCy5As.webp",
+        "assets/cases/QSbUapmDGNcRihvlDpvNjNG4DOw.webp"
       ],
       "sections": [
         {
@@ -1446,7 +1437,7 @@
             "Coffee brown"
           ],
           "media": [
-            "https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400"
+            "assets/cases/27Zveq5FsLJIsOhH1lFvZRfcHo.webp"
           ]
         },
         {
@@ -1455,7 +1446,7 @@
             "Contemporary and vibrant, with imagery borrowed from pop culture to balance credibility with creativity."
           ],
           "media": [
-            "https://framerusercontent.com/images/bmcMRR4XGJRAqaZvHbK7g7KIR0s.png?scale-down-to=2400"
+            "assets/cases/bmcMRR4XGJRAqaZvHbK7g7KIR0s.webp"
           ]
         },
         {
@@ -1464,10 +1455,10 @@
             "The identity across professional and lifestyle pieces."
           ],
           "media": [
-            "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
-            "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400",
-            "https://framerusercontent.com/images/Wp7WvNxzYx9PZB2ANlhjaTFi90w.png?scale-down-to=2400",
-            "https://framerusercontent.com/images/5lyHlMlBcTBRaVekUNMK9Cg1ug.png?scale-down-to=2400"
+            "assets/cases/FObXrrhatKsT3eK28KddZCy5As.webp",
+            "assets/cases/QSbUapmDGNcRihvlDpvNjNG4DOw.webp",
+            "assets/cases/Wp7WvNxzYx9PZB2ANlhjaTFi90w.webp",
+            "assets/cases/5lyHlMlBcTBRaVekUNMK9Cg1ug.webp"
           ]
         }
       ],
@@ -1480,25 +1471,25 @@
           "An identity for an investment and management company."
         ],
         [
-          "https://framerusercontent.com/images/Iy8SMFRnxOxzLj1KpFkjpbM0.png?scale-down-to=2400",
+          "assets/cases/Iy8SMFRnxOxzLj1KpFkjpbM0.webp",
           "The logo",
           "Brand",
           "Business units held inside a bag: protected, together."
         ],
         [
-          "https://framerusercontent.com/images/FObXrrhatKsT3eK28KddZCy5As.png?scale-down-to=2400",
+          "assets/cases/FObXrrhatKsT3eK28KddZCy5As.webp",
           "In use",
           "Mockup",
           "The identity at work."
         ],
         [
-          "https://framerusercontent.com/images/QSbUapmDGNcRihvlDpvNjNG4DOw.png?scale-down-to=2400",
+          "assets/cases/QSbUapmDGNcRihvlDpvNjNG4DOw.webp",
           "In use",
           "Mockup",
           "And in everyday pieces."
         ],
         [
-          "https://framerusercontent.com/images/27Zveq5FsLJIsOhH1lFvZRfcHo.png?scale-down-to=2400",
+          "assets/cases/27Zveq5FsLJIsOhH1lFvZRfcHo.webp",
           "Colour and type",
           "Brand",
           "Greys, beige, golden sand and coffee brown, with a serif."
@@ -1540,12 +1531,12 @@
           "rows": [
             {
               "pics": [
-                "https://framerusercontent.com/images/bmcMRR4XGJRAqaZvHbK7g7KIR0s.png?scale-down-to=2400"
+                "assets/cases/bmcMRR4XGJRAqaZvHbK7g7KIR0s.webp"
               ]
             },
             {
               "pics": [
-                "https://framerusercontent.com/images/Ov705Xr8iKqITqIR0OTnHhNinAc.png?scale-down-to=2400",
+                "assets/cases/Ov705Xr8iKqITqIR0OTnHhNinAc.webp",
                 "assets/uploads/card-02.jpg"
               ],
               "focus": "lower",

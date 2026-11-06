@@ -1369,7 +1369,10 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
     typeBusy = false;
   }
   if (document.getElementById('loader')) document.addEventListener('loader:done', typeIntro, { once: true });
-  else setTimeout(typeIntro, 300);
+  else if (document.documentElement.classList.contains('km-boot')) {   // the page is still covered: clear the name now and type it once the page shows, so it never visibly erases
+    if (!reduce) typedEl.textContent = '';
+    document.addEventListener('km-shown', () => setTimeout(typeIntro, 120), { once: true });
+  } else setTimeout(typeIntro, 300);
 
   // ---------- Image trail on Home ----------
   // Moving the mouse over Home drops a card every few pixels along the path, cycling through every

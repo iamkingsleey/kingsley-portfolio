@@ -6,9 +6,6 @@ CS2 = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8')
 def _local2(o):   # Framer links -> assets/cases/<file> once tools/fetch-case-images.sh has downloaded them
     if isinstance(o, dict): return {k: _local2(v) for k, v in o.items()}
     if isinstance(o, list): return [_local2(v) for v in o]
-    if isinstance(o, str) and o.startswith('https://framerusercontent.com/'):
-        n = o.split('?')[0].rsplit('/', 1)[1]
-        return f'assets/cases/{n}' if os.path.exists(f'{REPO}/assets/cases/{n}') else o
     return o
 _KEEP = ('flow', 'marquee', 'coverFrame', 'team', 'timeline', 'platforms', 'overview', 'glance', 'fx', 'fxDefault', 'gallery', 'coverRows', 'coverMore', 'coverGrid', 'slug', 'title', 'kind', 'tag', 'fq', 'role', 'year', 'client', 'industry', 'did', 'headline', 'blurb', 'stat', 'cover', 'story', 'sections',
          'statement', 'exp', 'impact', 'impactNote', 'goal', 'problem', 'type', 'colors', 'run', 'typeView', 'off', 'briefRows', 'briefBlocks')   # off: parts hidden in the CMS

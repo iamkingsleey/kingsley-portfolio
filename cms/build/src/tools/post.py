@@ -18,7 +18,7 @@ def _walk(o):
     elif isinstance(o, str): _struct.add(o)
 for _n in ['cases.json', 'designs.json', 'about.json', 'engineering.json', 'projects.json']: _walk(_load(_n, {}))
 
-MED = re.compile(r'''(?:assets/|pv/|https://framerusercontent\.com/)[^"'()\s<>`]+?\.(?:jpe?g|png|webp|gif|svg|mp4|webm|mov|wav|mp3)(?:\?[^"'()\s<>`]*)?''', re.I)
+MED = re.compile(r'''(?:assets/|pv/)[^"'()\s<>`]+?\.(?:jpe?g|png|webp|gif|svg|mp4|webm|mov|wav|mp3)(?:\?[^"'()\s<>`]*)?''', re.I)
 CODE = re.compile(r'[{}<>;=\\|]|=>|://|^[#.(\[]|\.(?:html|js|css|json|jpe?g|png|svg|mp4)\b|var\(|\d(?:px|vh|vw|ms|s|deg|%)\b|rgb\(|^[A-Z_]+$|^[a-z]+[A-Z]')
 CSSY = re.compile(r'\b(?:transform|opacity|ease(?:-out|-in)?|cubic-bezier|translate|scale|rotate|clip-path|monospace|sans-serif|serif|inherit|none|auto|solid|flex|grid|block|absolute|relative)\b')
 KEYS = {'Escape', 'Enter', 'End', 'Tab', 'Untitled', 'Backspace', 'Space'}
@@ -207,37 +207,6 @@ for _d in _dz:
         _t = _im['src'].replace('assets/designs/', 'assets/designs/thumbs/', 1)   # the trail is small and blurred: the thumbnail is plenty
         _bg.append({'src': _t if _t != _im['src'] and os.path.exists(f'{REPO}/{_t}') else _im['src'], 'ratio': _im.get('ratio', 1)})
 HOMEBG = '<script>window.KM_HOMEBG = ' + json.dumps(_bg[:12]) + ';</script>\n<script src="homebg.js" defer></script>\n'
-# ---- case-study pictures that still live on Framer: Framer hands out 2400px PNGs (often 1-3 MB each), which kept the
-# case pages loading for seconds. The first build that can reach the internet saves each one here as a 2048px WebP in
-# assets/cases/, and the pages point at that copy. A picture that can't be fetched (offline, say) keeps its Framer link,
-# and is tried again next build. GIFs stay on Framer so they keep moving.
-_FR = re.compile(r'https://framerusercontent\.com/images/([A-Za-z0-9]+)\.(?:png|jpe?g|webp)(?:\?[^"\'`)\s\\]*)?')
-_LOCAL = {}
-try:
-    from PIL import Image as _Im0
-    import io as _io0, urllib.request as _ur0, concurrent.futures as _cf0
-    _ids = sorted(set(_FR.findall(open(f'{REPO}/content/cases.json', encoding='utf-8').read())))
-    os.makedirs(f'{REPO}/assets/cases', exist_ok=True)
-    def _grab(_id):
-        _dst = f'{REPO}/assets/cases/{_id}.webp'
-        if os.path.exists(_dst): return _id
-        _url = next(m.group(0) for m in _FR.finditer(open(f'{REPO}/content/cases.json', encoding='utf-8').read()) if m.group(1) == _id)
-        _url = re.sub(r'\?.*$', '', _url) + '?scale-down-to=2048'
-        try:
-            with _ur0.urlopen(_ur0.Request(_url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20) as _r: _b = _r.read()
-            _im = _Im0.open(_io0.BytesIO(_b)); _im = _im.convert('RGBA' if _im.mode in ('RGBA', 'LA', 'P') else 'RGB')
-            if max(_im.size) > 2048: _im.thumbnail((2048, 2048))
-            _im.save(_dst + '.part', 'WEBP', quality=82, method=6); os.replace(_dst + '.part', _dst); return _id
-        except Exception: return None
-    if _ids:
-        with _cf0.ThreadPoolExecutor(6) as _ex:
-            for _id in _ex.map(_grab, _ids):
-                if _id: _LOCAL[_id] = f'assets/cases/{_id}.webp'
-        _miss = len(_ids) - len(_LOCAL)
-        print(f'case pictures: {len(_LOCAL)} local' + (f', {_miss} still on Framer (offline?)' if _miss else ''))
-except ImportError: pass
-def _localize(html):
-    return _FR.sub(lambda m: _LOCAL.get(m.group(1), m.group(0)), html) if _LOCAL else html
 # ---- pictures: a WebP copy of every JPEG/PNG under assets/ (usually a third smaller, same look), plus a 1000px
 # "md" copy of each design for places that show them small (the Designs grid, the 3D page's cards). The pages then
 # point at the WebP; a picture without one (no Pillow on this machine, say) keeps its original. Copies are only
@@ -414,6 +383,12 @@ def _clean_links(h):
     h = h.replace('href="index.html#home"', 'href="./"')   # Home's address is the root
     h = re.sub(r'href="index\.html(["#?])', r'href="./\1', h)
     return re.sub(r'href="([a-z0-9-]+)\.html(["#?])', r'href="\1\2', h)
+BOOT = ('<style id="km-boot">html::after{content:"";position:fixed;inset:0;z-index:999;background:var(--bg,#0b0b0b);pointer-events:none;opacity:0;transition:opacity .2s ease}'
+        'html.km-boot::after{opacity:1;transition:none}</style>\n'
+        '<script>(function(d){d.classList.add("km-boot");var go=function(){if(!d.classList.contains("km-boot"))return;d.classList.remove("km-boot");document.dispatchEvent(new Event("km-shown"))};'
+        'var home=/^\\/?(index\\.html|home)?$/.test(location.pathname),ready=function(){return document.querySelector(".kmn-scale")&&(!home||document.querySelector(".pt-rec"))};'
+        'addEventListener("DOMContentLoaded",function(){var t0=Date.now(),w=function(){if(ready()||Date.now()-t0>600)requestAnimationFrame(function(){requestAnimationFrame(go)});else requestAnimationFrame(w)};w()});'
+        'setTimeout(go,3000);addEventListener("pageshow",function(e){if(e.persisted)go()})})(document.documentElement)</script>\n')
 for _p in PAGES:
     _f = f'{REPO}/{_p}'
     if not os.path.exists(_f): continue
@@ -435,7 +410,6 @@ for _p in PAGES:
         _s = _s.replace('</body>', '<script src="flow.js" defer></script>\n</body>', 1)   # Designs: pull down at the top to go Home (phones only; flow.js decides)
     if 'serviceWorker.register' not in _s: _s = _s.replace('</body>', SWREG + '</body>', 1)   # offline: show offline.html when a page can't load
     _s = _acc(_s)   # the accent colour from Settings
-    _s = _localize(_s)   # Framer pictures -> their saved WebP copies
     _s = _webpify(_s)
     if 'fonts.googleapis.com/css' in _s and 'fonts.gstatic.com' not in _s:   # the font files come from gstatic: connecting early saves a round trip
         _s = _s.replace('<link rel="preconnect" href="https://fonts.googleapis.com">', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>', 1)
@@ -462,7 +436,13 @@ for _p in PAGES:
         _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + _ICONS, 1)
     if _p not in ('index.html', 'designs.html') and 'scrollbar-gutter' not in _s:   # pages that scroll keep room for the scrollbar from the first paint, so nothing slides sideways when it appears (Windows)
         _s = _s.replace('</head>', '<style>html{scrollbar-gutter:stable}</style>\n</head>', 1)
+    # no flash of the unfinished page: until the page's scripts have put the nav, the recruiter card and the layout in place,
+    # a cover in the page's own colour sits over it (the loader and the tuning readout stay above it), then fades away.
+    # The scripts are asked for at the top of the page, so they arrive while the rest of it is still coming in.
     _s = _head_first(_s)
+    if 'id="km-boot"' not in _s:   # right at the top of <head>, before anything can paint
+        _bm = re.search(r'<script src="(site(?:-home|-designs)?\.js\?v=\w+)" defer></script>', _s)
+        _s = _s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + BOOT + (f'<link rel="preload" as="script" href="{_bm.group(1)}">\n' if _bm else ''), 1)
     open(_f, 'w', encoding='utf-8').write(_s)
 # search engines: what to crawl, and the pages a visitor can reach (the unlinked explorations stay out)
 _SITE = 'https://iamkingsleey.com/'

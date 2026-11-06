@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style id="km-boot">html::after{content:"";position:fixed;inset:0;z-index:999;background:var(--bg,#0b0b0b);pointer-events:none;opacity:0;transition:opacity .2s ease}html.km-boot::after{opacity:1;transition:none}</style>
+<script>(function(d){d.classList.add("km-boot");var go=function(){if(!d.classList.contains("km-boot"))return;d.classList.remove("km-boot");document.dispatchEvent(new Event("km-shown"))};var home=/^\/?(index\.html|home)?$/.test(location.pathname),ready=function(){return document.querySelector(".kmn-scale")&&(!home||document.querySelector(".pt-rec"))};addEventListener("DOMContentLoaded",function(){var t0=Date.now(),w=function(){if(ready()||Date.now()-t0>600)requestAnimationFrame(function(){requestAnimationFrame(go)});else requestAnimationFrame(w)};w()});setTimeout(go,3000);addEventListener("pageshow",function(e){if(e.persisted)go()})})(document.documentElement)</script>
+<link rel="preload" as="script" href="site-designs.js?v=4bc87260">
+
 <script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "", "email": true}, "needle": "line", "corners": "rounded"};document.documentElement.dataset.corners=window.KM_SITE.corners;window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();if(k==="dot"){c.arc(hx,hy,t*1.4+1.5,0,7)}else if(k==="diamond"){var d=t*1.6+2;c.moveTo(hx-d,hy);c.lineTo(hx,hy-d);c.lineTo(hx+d,hy);c.lineTo(hx,hy+d)}else if(k==="triangle"){var s=t*1.7+2;if(hz){c.moveTo(hx+s*1.3,hy);c.lineTo(hx-s*.4,hy-s);c.lineTo(hx-s*.4,hy+s)}else{c.moveTo(hx,hy-s*1.3);c.lineTo(hx-s,hy+s*.4);c.lineTo(hx+s,hy+s*.4)}}else if(k==="cap"){var L=t*2.6+3;if(hz)c.rect(hx-t,hy-L,t*1.6,L*2);else c.rect(hx-L,hy-t*.6,L*2,t*1.6)}c.closePath();c.fill()};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html").replace(/^home\.html$/,"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
 <style id="km-corners">html[data-corners="rounded"]{--km-r:14px}html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in,.d-frame,.d-pic,span.th,.keep,.gal .main){border-radius:var(--km-r)!important;overflow:hidden}html[data-corners="rounded"] .lb img{border-radius:var(--km-r)!important}html[data-corners="rounded"] figure.sw .m img{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.gal .thumbs button,#strip button,.d-gt){border-radius:8px!important;overflow:hidden}html[data-corners="rounded"] :is(#strip button,.d-gt) img{border-radius:inherit}html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}</style>
 
@@ -620,8 +624,7 @@ onS.forEach(put);
   const sized = (u, d) => u.replace(/assets\/(designs|uploads)\//, `assets/$1/${d}/`);
   const thOf = u => (u && SIZED.test(u)) ? sized(u, 'thumbs') : mdOf(u);
   const smOf = u => (u && SIZED.test(u)) ? sized(u, 'sm') : u;   // 640px, for the grid tiles
-  const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md')
-    : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
+  const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md') : u;
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video && !it.dark ? ' white' : '') + (it.cs ? ' cs' : '');
@@ -1289,7 +1292,11 @@ onS.forEach(put);
   const still = it => it.video ? it.poster : it.src;
 
   function render(i) {
-    const it = items[i], c = COPY[it.cat], nx = items[(i + 1) % N];
+    // inside a category (or a "Hiring for" role), the arrows and "next" stay in it, in the order the grid shows it
+    let pool = null; if (filt || roleNow) try { pool = [...ovGrid.children].filter(t => !t.hidden).map(t => +t.dataset.i); } catch (_) {}
+    const inPool = pool && pool.includes(i) ? pool : null;
+    const ni = inPool ? inPool[(inPool.indexOf(i) + 1) % inPool.length] : (i + 1) % N;
+    const it = items[i], c = COPY[it.cat], nx = items[ni];
     const media = it.live ? `<iframe class="d-live" src="${it.live}" title="${it.t}" style="background:#111 url(${mdOf(it.src)}) center/cover"></iframe>`
       : it.video ? `<video src="${it.sound || it.hd || it.video}" poster="${it.poster}" muted loop playsinline autoplay></video>${it.sound ? `<button type="button" class="d-snd" id="dsnd" aria-label="Sound on" aria-pressed="false"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">${SND_OFF}</svg></button>` : ''}` : `<img src="${it.src}" alt="${it.t}">`;
     document.body.classList.toggle('mini', true);
@@ -1301,7 +1308,8 @@ onS.forEach(put);
       // a collection: a project with several pictures (gal), or the pieces that share a collection (case). The picture gets arrows,
       // and a grid of the whole set sits right under it. A collection's own showcase page is no longer needed, so no "Read case study".
       const sibs = !it.gal && it.case ? items.map((y, k) => [y, k]).filter(([y]) => y.case === it.case && !y.cs) : [];
-      const SET = it.gal && it.gal.length > 1 ? it.gal.map((g, k) => ({ src: g.src, r: g.r, video: g.video, k, own: true })) : sibs.length > 1 ? sibs.map(([y, k]) => ({ src: still(y), r: y.r, k, t: y.t })) : null;
+      const fromPool = !(it.gal && it.gal.length > 1) && inPool && inPool.length > 1;   // a piece's own pictures stay its own; otherwise the arrows walk the category
+      const SET = it.gal && it.gal.length > 1 ? it.gal.map((g, k) => ({ src: g.src, r: g.r, video: g.video, k, own: true })) : fromPool ? inPool.map(k => ({ src: still(items[k]), r: items[k].r, k, t: items[k].t })) : sibs.length > 1 ? sibs.map(([y, k]) => ({ src: still(y), r: y.r, k, t: y.t })) : null;
       const at = SET ? (SET[0].own ? 0 : SET.findIndex(x => x.k === i)) : 0;
       const showRead = parent && !(SET && !SET[0].own && /showcase\.html/.test(parent.page || ''));
       // rows of about the same number of pictures each, so the grid reads even (8 → 4 + 4, 13 → 5 + 4 + 4)
@@ -1319,11 +1327,11 @@ onS.forEach(put);
           <div class="d-ib"><h3>Credits</h3><dl class="d-cred">${credits.map(([r, n]) => `<div><dt>${r}</dt><dd>${n}</dd></div>`).join('')}</dl></div>
         </div></div>
       </section>
-      ${SET ? `<section class="d-gal" aria-label="The whole set"><div class="d-gh"><h3>${SET[0].own ? 'All pictures' : 'In this collection'}</h3><span class="mono">${SET.length} pieces</span></div>
+      ${SET && !fromPool ? `<section class="d-gal" aria-label="The whole set"><div class="d-gh"><h3>${SET[0].own ? 'All pictures' : 'In this collection'}</h3><span class="mono">${SET.length} pieces</span></div>
         ${galRows(SET).map(row => `<div class="d-grow">${row.map(([x, n]) => `<button type="button" class="d-gt${n === at ? ' on' : ''}" data-n="${n}" style="--r:${x.r}" aria-label="${x.t || 'Picture ' + (n + 1)}"><img src="${x.src}" alt="" loading="lazy"></button>`).join('')}</div>`).join('')}</section>` : ''}
       <section class="d-sec" data-s="1">
         <div class="d-next next" id="dnext">
-          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+          <span class="d-label">Next on the dial · ${pad(ni)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
         </div>
       </section>`;
       if (SET) { let cur = at;
@@ -1350,7 +1358,7 @@ onS.forEach(put);
         v0.muted = !soundOn; v0.currentTime = 0; const pr = v0.play(); if (pr) pr.then(mark, () => { v0.muted = true; mark(); v0.play().catch(() => {}); }); mark();
         b.addEventListener('click', e => { e.stopPropagation(); v0.muted = !v0.muted; if (!v0.muted) { v0.currentTime = 0; v0.play().catch(() => {}); } mark(); });
       } else if (v0) { v0.muted = true; const pr = v0.play(); if (pr) pr.catch(() => {}); }
-      $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage((i + 1) % N) : swapDetail((i + 1) % N); });
+      $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage(ni) : swapDetail(ni); });
       $('fq').textContent = pad(i); $('nm').textContent = it.t;
       if (window.KMtrack) KMtrack('/designs/' + slugOf(it.t), it.t);   // analytics: which pieces people open
       $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';
@@ -1395,12 +1403,12 @@ onS.forEach(put);
       </section>
       <section class="d-sec" data-s="5">
         <div class="d-next next" id="dnext">
-          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+          <span class="d-label">Next on the dial · ${pad(ni)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
         </div>
       </section>`;
     const m = $('dmedia');
     const v = m.querySelector('video'); if (v) { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); }
-    $('dnext').addEventListener('click', () => { tap(); swapDetail((i + 1) % N); });
+    $('dnext').addEventListener('click', () => { tap(); swapDetail(ni); });
     palette(still(it));
     $('fq').textContent = pad(i); $('nm').textContent = it.t;
     $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';

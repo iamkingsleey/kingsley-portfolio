@@ -23,9 +23,6 @@ for PG, FQ, NM in [('about', 94, 'About'), ('engineering', 96, 'Engineering'), (
   </body>""", 1)
   assert '__' not in A_.replace('__proto__', ''), re.findall(r'__[A-Z]+__', A_)
   if PG == 'projects':   # each case study opens through the tuner
-    for _u in set(re.findall(r'https://framerusercontent\.com/[^"\'?\s]+(?:\?[^"\'\s]*)?', A_)):
-      _n = _u.split('?')[0].rsplit('/', 1)[1]
-      if os.path.exists(f'{REPO}/assets/cases/{_n}'): A_ = A_.replace(_u, f'assets/cases/{_n}')
     A_ = A_.replace('</body>', """<script>
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.ch.cs'); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault();
     var hp = a.getAttribute('href').split('#'), href = hp[0] + '?v=""" + BUILD + """#' + hp[1];

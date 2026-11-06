@@ -5,9 +5,6 @@ CS_ = json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases']
 def _local(o):   # Framer links -> assets/cases/<file> once tools/fetch-case-images.sh has downloaded them
     if isinstance(o, dict): return {k: _local(v) for k, v in o.items()}
     if isinstance(o, list): return [_local(v) for v in o]
-    if isinstance(o, str) and o.startswith('https://framerusercontent.com/'):
-        n = o.split('?')[0].rsplit('/', 1)[1]
-        return f'assets/cases/{n}' if os.path.exists(f'{REPO}/assets/cases/{n}') else o
     return o
 C_ = case_page(_local(CS_), KFM, True)
 C_ = rep(C_, '<html lang="en" data-theme="light">', '<html lang="en">')

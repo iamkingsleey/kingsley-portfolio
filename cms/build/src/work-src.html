@@ -529,8 +529,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const sized = (u, d) => u.replace(/assets\/(designs|uploads)\//, `assets/$1/${d}/`);
   const thOf = u => (u && SIZED.test(u)) ? sized(u, 'thumbs') : mdOf(u);
   const smOf = u => (u && SIZED.test(u)) ? sized(u, 'sm') : u;   // 640px, for the grid tiles
-  const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md')
-    : (u && /framerusercontent\.com\/images\//.test(u)) ? u.replace(/([?&])scale-down-to=\d+/, '$1scale-down-to=1024').replace(/^([^?]+)$/, '$1?scale-down-to=1024') : u;   // case-study covers come from Framer at 2400px; the grid asks for a 1024px copy
+  const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md') : u;
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video && !it.dark ? ' white' : '') + (it.cs ? ' cs' : '');
@@ -1200,7 +1199,11 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
   const still = it => it.video ? it.poster : it.src;
 
   function render(i) {
-    const it = items[i], c = COPY[it.cat], nx = items[(i + 1) % N];
+    // inside a category (or a "Hiring for" role), the arrows and "next" stay in it, in the order the grid shows it
+    let pool = null; if (filt || roleNow) try { pool = [...ovGrid.children].filter(t => !t.hidden).map(t => +t.dataset.i); } catch (_) {}
+    const inPool = pool && pool.includes(i) ? pool : null;
+    const ni = inPool ? inPool[(inPool.indexOf(i) + 1) % inPool.length] : (i + 1) % N;
+    const it = items[i], c = COPY[it.cat], nx = items[ni];
     const media = it.live ? `<iframe class="d-live" src="${it.live}" title="${it.t}" style="background:#111 url(${mdOf(it.src)}) center/cover"></iframe>`
       : it.video ? `<video src="${it.sound || it.hd || it.video}" poster="${it.poster}" muted loop playsinline autoplay></video>${it.sound ? `<button type="button" class="d-snd" id="dsnd" aria-label="Sound on" aria-pressed="false"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">${SND_OFF}</svg></button>` : ''}` : `<img src="${it.src}" alt="${it.t}">`;
     document.body.classList.toggle('mini', true);
@@ -1212,7 +1215,8 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       // a collection: a project with several pictures (gal), or the pieces that share a collection (case). The picture gets arrows,
       // and a grid of the whole set sits right under it. A collection's own showcase page is no longer needed, so no "Read case study".
       const sibs = !it.gal && it.case ? items.map((y, k) => [y, k]).filter(([y]) => y.case === it.case && !y.cs) : [];
-      const SET = it.gal && it.gal.length > 1 ? it.gal.map((g, k) => ({ src: g.src, r: g.r, video: g.video, k, own: true })) : sibs.length > 1 ? sibs.map(([y, k]) => ({ src: still(y), r: y.r, k, t: y.t })) : null;
+      const fromPool = !(it.gal && it.gal.length > 1) && inPool && inPool.length > 1;   // a piece's own pictures stay its own; otherwise the arrows walk the category
+      const SET = it.gal && it.gal.length > 1 ? it.gal.map((g, k) => ({ src: g.src, r: g.r, video: g.video, k, own: true })) : fromPool ? inPool.map(k => ({ src: still(items[k]), r: items[k].r, k, t: items[k].t })) : sibs.length > 1 ? sibs.map(([y, k]) => ({ src: still(y), r: y.r, k, t: y.t })) : null;
       const at = SET ? (SET[0].own ? 0 : SET.findIndex(x => x.k === i)) : 0;
       const showRead = parent && !(SET && !SET[0].own && /showcase\.html/.test(parent.page || ''));
       // rows of about the same number of pictures each, so the grid reads even (8 → 4 + 4, 13 → 5 + 4 + 4)
@@ -1230,11 +1234,11 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
           <div class="d-ib"><h3>Credits</h3><dl class="d-cred">${credits.map(([r, n]) => `<div><dt>${r}</dt><dd>${n}</dd></div>`).join('')}</dl></div>
         </div></div>
       </section>
-      ${SET ? `<section class="d-gal" aria-label="The whole set"><div class="d-gh"><h3>${SET[0].own ? 'All pictures' : 'In this collection'}</h3><span class="mono">${SET.length} pieces</span></div>
+      ${SET && !fromPool ? `<section class="d-gal" aria-label="The whole set"><div class="d-gh"><h3>${SET[0].own ? 'All pictures' : 'In this collection'}</h3><span class="mono">${SET.length} pieces</span></div>
         ${galRows(SET).map(row => `<div class="d-grow">${row.map(([x, n]) => `<button type="button" class="d-gt${n === at ? ' on' : ''}" data-n="${n}" style="--r:${x.r}" aria-label="${x.t || 'Picture ' + (n + 1)}"><img src="${x.src}" alt="" loading="lazy"></button>`).join('')}</div>`).join('')}</section>` : ''}
       <section class="d-sec" data-s="1">
         <div class="d-next next" id="dnext">
-          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+          <span class="d-label">Next on the dial · ${pad(ni)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
         </div>
       </section>`;
       if (SET) { let cur = at;
@@ -1261,7 +1265,7 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
         v0.muted = !soundOn; v0.currentTime = 0; const pr = v0.play(); if (pr) pr.then(mark, () => { v0.muted = true; mark(); v0.play().catch(() => {}); }); mark();
         b.addEventListener('click', e => { e.stopPropagation(); v0.muted = !v0.muted; if (!v0.muted) { v0.currentTime = 0; v0.play().catch(() => {}); } mark(); });
       } else if (v0) { v0.muted = true; const pr = v0.play(); if (pr) pr.catch(() => {}); }
-      $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage((i + 1) % N) : swapDetail((i + 1) % N); });
+      $('dnext').addEventListener('click', () => { tap(); nx.link ? goPage(ni) : swapDetail(ni); });
       $('fq').textContent = pad(i); $('nm').textContent = it.t;
       if (window.KMtrack) KMtrack('/designs/' + slugOf(it.t), it.t);   // analytics: which pieces people open
       $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';
@@ -1306,12 +1310,12 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
       </section>
       <section class="d-sec" data-s="5">
         <div class="d-next next" id="dnext">
-          <span class="d-label">Next on the dial · ${pad((i + 1) % N)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
+          <span class="d-label">Next on the dial · ${pad(ni)} · ${nx.cat}</span><span class="r"><h5>${nx.t} →</h5><span class="th"><img src="${still(nx)}" alt=""></span></span>
         </div>
       </section>`;
     const m = $('dmedia');
     const v = m.querySelector('video'); if (v) { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); }
-    $('dnext').addEventListener('click', () => { tap(); swapDetail((i + 1) % N); });
+    $('dnext').addEventListener('click', () => { tap(); swapDetail(ni); });
     palette(still(it));
     $('fq').textContent = pad(i); $('nm').textContent = it.t;
     $('bkF').textContent = '100.0'; $('bkN').textContent = 'Designs';

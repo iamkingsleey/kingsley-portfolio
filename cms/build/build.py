@@ -331,12 +331,6 @@ for p in pj:
     A.setdefault(p.get('category', '3d'), []).append(e)
 # case studies (content/cases.json) join the feed first in their category, tagged, and open case.html
 CASES = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden')]   # a case hidden in the CMS leaves the feed too
-def _loc(o):
-    if isinstance(o, str) and o.startswith('https://framerusercontent.com/'):
-        n = o.split('?')[0].rsplit('/', 1)[1]
-        return f'assets/cases/{n}' if os.path.exists(f'{REPO}/assets/cases/{n}') else o
-    return o
-for _c in CASES: _c['cover'] = _loc(_c['cover']) if isinstance(_c['cover'], str) else _c['cover']
 def case_cover(c):
     m = c['cover']
     if isinstance(m, str): return m
@@ -428,8 +422,6 @@ def _ratio(u, fallback):
 def _th_of(u):
     t = _thumb(u)
     if t and os.path.exists(f'{REPO}/{t}'): return t
-    if u and re.search(r'framerusercontent\.com/images/', u):
-        return re.sub(r'([?&])scale-down-to=\d+', r'\1scale-down-to=1024', u) if 'scale-down-to=' in u else u + '?scale-down-to=1024'
     return u
 _ovt = []
 for _i, _x in enumerate(_grid_order()):
