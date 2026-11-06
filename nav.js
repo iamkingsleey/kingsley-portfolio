@@ -99,12 +99,6 @@
     const tk = document.createElement('div'); tk.className = 'tk'; tk.style.left = '0'; tk.style.width = '100%'; T.append(tk);
     let leaving = false;
     addEventListener('pageshow', e => { if (e.persisted) { leaving = false; back(); } });   // coming back with the browser's back button
-    // the hover tick needs the mouse to really move on this page: after a page change the pointer is still resting on
-    // the nav, and the button that appears under it would otherwise tick a second sound right after the click
-    let handMoved = false;
-    let hx = null, hy = null;
-    addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; if (hx === null) { hx = e.clientX; hy = e.clientY; return; } if (Math.abs(e.clientX - hx) + Math.abs(e.clientY - hy) > 2) handMoved = true; }, { passive: true });
-    addEventListener('pageshow', e => { if (e.persisted) { handMoved = false; hx = hy = null; } });
     const bs = STATIONS.map((s, i) => {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = s.name; b.style.left = (i * SP) + 'px';
       b.title = s.fq.toFixed(1) + ' FM'; if (s === cur) { b.className = 'on'; b.setAttribute('aria-current', 'page'); }
@@ -112,7 +106,7 @@
       b.addEventListener('click', () => { snd('pop');   // one pop, right on the click (the page's own click sound is the same pop, so they merge into one)
         if (s !== cur) { leaving = true; place(i); go(s); } else go(s); });
       const look = () => bs.forEach(x => x.classList.toggle('pv', x === b));
-      b.addEventListener('pointerenter', e => { look(); if (e.pointerType === 'mouse' && handMoved) snd('detent'); });   /* a tap on a phone is just the pop; no tick when a new page simply lands under a still mouse */
+      b.addEventListener('pointerenter', look);   // hover only highlights; there is no hover sound
       b.addEventListener('focus', look);
       T.append(b); return b;
     });

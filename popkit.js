@@ -180,16 +180,19 @@
     }
   };
 
-  // One sound per action: the same sound asked for twice within a quarter second (say, a page-wide click
-  // handler and the button's own handler) plays once.
-  var lastName = '', lastAt = 0;
+  // One sound per action: once a sound plays, anything else asked for in the next 220 ms is dropped (a page-wide
+  // click handler and the button's own handler, a tick that follows a click). Only a run of detent ticks, as when
+  // dragging a dial, keeps going. Silent helpers (wake) don't count.
+  var lastName = '', lastAt = 0, QUIET = { wake: 1 };
   function play(name, opt) {
     // the site's click (every link and button, and the nav) plays the sound picked in CMS → Settings → Click sound
-    if (name === 'pop') { var c = (root.KM_SITE || {}).click || 'pulse'; if (c !== 'pop' && sounds[c]) name = c; }
+    if (name === 'pop') { var c = (root.KM_SITE || {}).click || 'pop'; if (c !== 'pop' && sounds[c]) name = c; }
     if (muted || !sounds[name] || !ensure()) return;
     var now = Date.now();
-    if (name === lastName && now - lastAt < 250 && name !== 'detent' && name !== 'hover') return;
-    lastName = name; lastAt = now;
+    if (!QUIET[name]) {
+      if (now - lastAt < 220 && !(name === 'detent' && lastName === 'detent')) return;
+      lastName = name; lastAt = now;
+    }
     sounds[name](opt);
   }
 

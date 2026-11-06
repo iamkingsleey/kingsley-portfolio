@@ -1068,7 +1068,6 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
       const over = toolEls.findIndex(el => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right; });
       if (over !== -1 && over !== lastTile) {
         const now = performance.now();
-        if (e.isTrusted && window.Popkit && now - lastSoundAt > 45) { Popkit.play('hover', { f: NOTES[over % NOTES.length] }); lastSoundAt = now; }
       }
       if (over !== -1) lastTile = over;
       toolEls.forEach((el, i) => {
