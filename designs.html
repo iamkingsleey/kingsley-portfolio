@@ -416,6 +416,9 @@ body.all.reelon .ov { opacity: 0 !important; pointer-events: none }
 .reelv .rm { display: flex; justify-content: space-between; gap: 16px; font: 600 11px/1.6 var(--mono, ui-monospace, monospace); letter-spacing: .06em; text-transform: uppercase; color: var(--ink) } .reelv .rm i { font-style: normal; color: var(--muted) }
 .reelv .rm .rn::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 99px; background: var(--ink); margin-right: 8px; vertical-align: 1px }
 .reelv.moving .rcap { opacity: 0 }
+.reelv .rlive { position: absolute; border: 0; margin: 0; opacity: 0; transition: opacity .35s; pointer-events: none; background: transparent; border-radius: 14px }   /* the live piece over the still in the middle */
+html[data-corners="sharp"] .reelv .rlive { border-radius: 0 }
+.reelv .rlive.on { opacity: 1 }
 @media (max-width: 900px) { .reelv { top: 150px } }
 </style>
 <link rel="preload" as="image" href="assets/designs/th2/kusnap-ds-upload.webp" fetchpriority="high" data-first>
@@ -1956,7 +1959,7 @@ onS.forEach(put);
       const post = (o, on) => { if (o.f && o.f.contentWindow) try { o.f.contentWindow.postMessage({ km_play: on }, location.origin); } catch (_) {} };
       const drop = o => { if (o.f) { o.f.remove(); o.f = null; } };
       const idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 600 }) : f => setTimeout(f, 80);
-      const mount = o => { const f = document.createElement('iframe'); f.className = 'ov-v ov-live'; f.title = items[o.i].t; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+      const mount = o => { const f = document.createElement('iframe'); f.className = 'ov-v ov-live'; f.title = items[o.i].t; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true'); f.inert = true;   // a live tile never takes focus or the keys (the reel's arrows kept landing in it)
         const done = () => { if (busy === f) { busy = 0; setTimeout(pump, 120); } };
         f.addEventListener('load', () => { setTimeout(() => f.classList.add('on'), 150); post(o, vis.has(o.t)); done(); }, { once: true }); setTimeout(done, 3000);
         busy = f; f.src = items[o.i].live; o.im.appendChild(f); o.f = f; };
@@ -2143,9 +2146,30 @@ onS.forEach(put);
       g.globalAlpha = 1;
       if (front) { const it = items[L[front.k]], top = cy - front.h / 2, left = front.x - front.w / 2; rt.textContent = it.t; rt.style.left = left + 'px'; rt.style.top = (top - 40) + 'px';
         rm.style.left = left + 'px'; rm.style.width = front.w + 'px'; rm.style.top = (top + front.h + 14) + 'px'; rm.querySelector('.rn').textContent = String(L[front.k] + 1).padStart(2, '0'); rm.querySelector('i').textContent = it.cat; } }
-    let raf = 0; const loop = () => { raf = 0; if (!on) return; if (!drag && vel) { tgt += vel; vel *= .9; if (Math.abs(vel) < .02) { vel = 0; tgt = Math.round(tgt); } } tgt = Math.max(0, Math.min(L.length - 1, tgt));
+    // the piece in the middle plays live (its own small page) once the reel comes to rest: it fades in over the still,
+    // pauses and fades out the moment the reel moves, and is taken down when another piece comes to the middle.
+    // Clicks and drags pass through it to the reel, so opening and scrolling work as before. One live page at a time.
+    const lv = { f: null, i: -1, rest: 0 };
+    const lvPost = v => { try { lv.f.contentWindow.postMessage({ km_play: v }, location.origin); } catch (_) {} };
+    const lvDrop = () => { if (!lv.f) return; const f = lv.f; lvPost(false); f.classList.remove('on'); lv.f = null; lv.i = -1; setTimeout(() => f.remove(), 400); };
+    const lvTick = mv => {
+      if (!on || reduce || !front || document.hidden || document.body.classList.contains('open')) { lvDrop(); return; }
+      const i = L[front.k], it = items[i]; if (!it || !it.live) { lvDrop(); return; }
+      if (lv.i !== i) lvDrop();
+      if (lv.f) { const st = lv.f.style, cy = cyOf(); st.left = (front.x - front.w / 2) + 'px'; st.top = (cy - front.h / 2) + 'px'; st.width = front.w + 'px'; st.height = front.h + 'px'; }
+      if (mv) { lv.rest = 0; if (lv.f && lv.f.classList.contains('on')) { lv.f.classList.remove('on'); lvPost(false); } return; }
+      if (!lv.rest) lv.rest = performance.now();
+      if (performance.now() - lv.rest < 450) return;                      // settled for a moment first, so passing pieces never load
+      if (!lv.f) { const f = document.createElement('iframe'); f.className = 'rlive'; f.title = it.t; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true'); f.inert = true;   // it can never take the keys or focus from the reel
+        f.addEventListener('load', () => { if (lv.f !== f) return; f.dataset.ready = '1'; if (document.activeElement === f) rv.focus({ preventScroll: true }); if (!rv.classList.contains('moving')) setTimeout(() => { if (lv.f === f && !rv.classList.contains('moving')) { f.classList.add('on'); lvPost(true); } }, 150); }, { once: true });
+        f.src = it.live; rv.appendChild(f); lv.f = f; lv.i = i; lvTick(false); }
+      else if (lv.f.dataset.ready && !lv.f.classList.contains('on')) { lv.f.classList.add('on'); lvPost(true); } };
+    document.addEventListener('visibilitychange', () => { if (document.hidden) lvDrop(); });
+    // a live piece's page can grab focus as it starts (into its own frame), which would take the arrow keys from the reel: hand them back
+    addEventListener('blur', () => setTimeout(() => { const a = document.activeElement; if (on && a && a.tagName === 'IFRAME' && !document.body.classList.contains('open')) rv.focus({ preventScroll: true }); }, 0));
+    let raf = 0; const loop = () => { raf = 0; if (!on) { lvDrop(); return; } if (!drag && vel) { tgt += vel; vel *= .9; if (Math.abs(vel) < .02) { vel = 0; tgt = Math.round(tgt); } } tgt = Math.max(0, Math.min(L.length - 1, tgt));
       pos += ((drag ? drag.p : tgt) - pos) * (reduce ? 1 : .14); const r = Math.round(pos); if (r !== last) { if (last >= 0) tick(); last = r; }
-      const mv = Math.abs(pos - r) > .04 || !!drag; if (wasMv && !mv && !reduce) land = performance.now(); wasMv = mv; rv.classList.toggle('moving', mv); rDraw(); raf = requestAnimationFrame(loop); };
+      const mv = Math.abs(pos - r) > .04 || !!drag; if (wasMv && !mv && !reduce) land = performance.now(); wasMv = mv; rv.classList.toggle('moving', mv); rDraw(); lvTick(mv); raf = requestAnimationFrame(loop); };
     // open the piece in the middle the way a tile opens: a case study or a link goes there, anything else opens in the small view
     const openAt = (k, cx, cy) => { const i = L[k], r = { left: front.x - front.w / 2 + cv.getBoundingClientRect().left, top: cv.getBoundingClientRect().top + cyOf() - front.h / 2, width: front.w, height: front.h };
       const dest = items[i].link || (items[i].cs && items[i].page);
@@ -2166,7 +2190,7 @@ onS.forEach(put);
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     let wt = 0; rv.addEventListener('wheel', e => { const dl = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (Math.abs(dl) < 1) return; e.preventDefault(); tgt = Math.max(0, Math.min(L.length - 1, tgt + dl / 220)); clearTimeout(wt); wt = setTimeout(() => { tgt = Math.round(tgt); }, 140); }, { passive: false });
     rv.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); tgt = Math.min(L.length - 1, Math.round(tgt) + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); tgt = Math.max(0, Math.round(tgt) - 1); } if (e.key === 'Enter' && front) { const r = cv.getBoundingClientRect(); openAt(front.k, r.left + front.x, r.top + cyOf()); } });
-    const set = (v, quiet) => { on = v === 'reel'; if (!on) Object.values(vids).forEach(x => x.pause()); document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+    const set = (v, quiet) => { on = v === 'reel'; if (!on) { Object.values(vids).forEach(x => x.pause()); lvDrop(); } document.body.classList.toggle('reelon', on); vt.classList.toggle('reel', on); vt.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
       try { localStorage.setItem('km-dview', v); } catch (_) {} if (on) { fit(); list(); if (!quiet) { const first = [...ovGrid.children].find(t => !t.hidden && t.getBoundingClientRect().bottom > 160); const k = first ? L.indexOf(+first.dataset.i) : 0; pos = tgt = Math.max(0, k); } if (!raf) raf = requestAnimationFrame(loop); setTimeout(() => rv.focus({ preventScroll: true }), 60); } };
     vt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if ((b.dataset.v === 'reel') !== on) { tap(); set(b.dataset.v); } }));
     window._kmReel = () => on;
