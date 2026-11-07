@@ -224,8 +224,9 @@ body.noanim .row, body.noanim .cap, body.noanim .top, body.noanim .dial, body.no
 .d-gt.on { opacity: 1; outline: 2px solid var(--ink); outline-offset: -2px }
 @media (max-width: 899px) { .d-ar { width: 36px; height: 36px } .d-gal { margin-top: 40px } .d-grow { gap: 8px } .d-gal { gap: 8px } }
 .d-next { border-top: 1px solid var(--line) }
-body::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 140px; z-index: 19; pointer-events: none; background: linear-gradient(var(--bg) 62%, transparent); opacity: 0; transition: opacity .3s }
+body::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 140px; z-index: 19; pointer-events: none; background: linear-gradient(var(--bg) calc(100% - 56px), transparent); opacity: 0; transition: opacity .3s, height .35s cubic-bezier(.2,.8,.2,1) }
 body.open::before, body.all::before { opacity: 1 }
+@media (min-width: 900px) { body.all.ovscr:not(.open)::before { height: 210px } }   /* once the grid scrolls, the fade reaches past the filter row, so the chips stay readable over pictures */
 @media (max-width: 899px) { body::before { height: calc(132px + env(safe-area-inset-top, 0px)); background: linear-gradient(var(--bg) 80%, transparent) } .kmn-top { display: none !important } }   /* the fade reaches below the filter row, so pictures never show behind the chips */
 .fly { position: fixed; z-index: 35; overflow: hidden; pointer-events: none; background: var(--tile) }
 .fly img { width: 100%; height: 100%; object-fit: cover; display: block }
@@ -2177,7 +2178,7 @@ html[data-corners="sharp"] .reelv .rlive { border-radius: 0 }
   const tileCache = new Map();
   // while the grid is moving the drum is drawn at a lighter resolution (a whole-screen picture is sent to the graphics chip every
   // frame, which at 2-3x was the drag on laptops); it redraws sharp as soon as the grid settles
-  let ovMoved = 0; ov.addEventListener('scroll', () => { ovMoved = performance.now(); }, { passive: true });
+  let ovMoved = 0; ov.addEventListener('scroll', () => { ovMoved = performance.now(); document.body.classList.toggle('ovscr', ov.scrollTop > 8); }, { passive: true });
   function ovWarp() {
     if (ovOpen || document.body.classList.contains('all')) {
       let nLoaded = 0; texCache.forEach(im => { if (im.complete) nLoaded++; });
