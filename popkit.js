@@ -88,7 +88,7 @@
     if (!noiseBuf) {
       noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate);
       var d = noiseBuf.getChannelData(0);
-      for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      for (var i = 0, r = 12345; i < d.length; i++) { r = (r * 1103515245 + 12345) & 0x7fffffff; d[i] = r / 0x3fffffff - 1; }   // seeded: the same tick on every page
     }
     var t = ctx.currentTime + LEAD + (o.at || 0);
     var src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
@@ -105,11 +105,12 @@
   // Heavy without anything sharp on top. Built from the click lab: weight, body, bite, length, volume, variation (0–100).
   var pulseOut = null;
   function pulse(o) {
-    if (!pulseOut) {
+    var out = rendering ? master : pulseOut;
+    if (!out) {
       var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.ratio.value = 12; lim.attack.value = 0.001; lim.release.value = 0.05;
-      pulseOut = ctx.createGain(); pulseOut.connect(lim); lim.connect(ctx.destination);
+      out = pulseOut = ctx.createGain(); pulseOut.connect(lim); lim.connect(ctx.destination);
     }
-    pulseOut.gain.value = vol / BASE;
+    if (!rendering) pulseOut.gain.value = vol / BASE;
     var sr = ctx.sampleRate, j = 1 + (Math.random() * 2 - 1) * 0.1 * (o.vary / 100);
     var fc = 1300 * Math.pow(140 / 1300, o.weight / 100) * j, q = 0.55 + Math.pow(o.ring / 100, 1.5) * 4, bite = o.bite / 100;
     var ms = 8 + o.len / 100 * 52, amp = Math.pow(o.vol / 100, 1.5) * 1.6 * (1.1 + (1 - q / 4.6) * 0.6);
@@ -123,7 +124,7 @@
     var hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 35; hp.Q.value = 0.5;
     var g = ctx.createGain(), end = t0 + ms / 1000;
     g.gain.setValueAtTime(amp, t0); g.gain.setValueAtTime(amp, t0 + ms / 2000); g.gain.exponentialRampToValueAtTime(0.0005, end);
-    src.connect(f1); f1.connect(f2); f2.connect(hp); hp.connect(g); g.connect(pulseOut);
+    src.connect(f1); f1.connect(f2); f2.connect(hp); hp.connect(g); g.connect(out);
     src.start(t0); src.stop(end + 0.01);
   }
   var PULSES = {
@@ -228,6 +229,30 @@
   ['wheel', 'touchmove'].forEach(function (ev) { root.addEventListener(ev, hand, { capture: true, passive: true }); });
   root.addEventListener('pointermove', function (e) { if (e.buttons) hand(); }, { capture: true, passive: true });
   root.addEventListener('keydown', function (e) { if (/^(Arrow|Page|Home|End| )/.test(e.key) || e.key === ' ') hand(); }, true);
+  // Every sound is rendered once into a fixed recording and played back from that. Built live, a sound's envelope
+  // runs on the audio clock, so when the audio had only just woken (the first click on a newly opened page) the start
+  // of the sound was skipped and it came out quieter, by a different amount each time. A recording always plays whole.
+  var cache = {}, rendering = false;
+  function render(name, b, key) {
+    var OAC = root.OfflineAudioContext; if (!OAC || cache[key]) return;
+    var sr = ctx ? ctx.sampleRate : 48000, off;
+    try { off = new OAC(1, Math.round(sr * 0.6), sr); } catch (e) { return; }
+    cache[key] = 'busy';
+    var c0 = ctx, m0 = master, l0 = LEAD, b0 = boost;
+    ctx = off; master = off.createGain(); master.connect(off.destination); LEAD = 0; boost = b; rendering = true;
+    try { sounds[name](); } catch (e) { cache[key] = null; }
+    finally { ctx = c0; master = m0; LEAD = l0; boost = b0; rendering = false; }
+    if (cache[key]) off.startRendering().then(function (buf) { cache[key] = buf; }, function () { cache[key] = null; });
+  }
+  // ready before the first click: the click sounds and the dial tick
+  function prerender() {
+    var c = (root.KM_SITE || {}).click;
+    render('detent', LOUD.detent, 'detent|' + LOUD.detent); render('select', LOUD.select, 'select|' + LOUD.select);
+    render('pop', LOUD.pop, 'pop|' + LOUD.pop); render('detent', TICKLOUD, 'detent|' + TICKLOUD);
+    if (c && c !== 'auto' && sounds[c]) render(c, LOUD[c] || 1, c + '|' + (LOUD[c] || 1));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prerender); else setTimeout(prerender, 0);
+
   function play(name, opt) {
     // Every sound asked for by a click, tap or key press is chosen here from what was clicked, whatever name the
     // control asked for (open, close, success…). The only other sound is the detent tick while something is dragged.
@@ -249,7 +274,13 @@
       lastName = name; lastAt = now;
     }
     var b = clicky ? (LOUD[name] || 1) : (name === 'detent' ? TICKLOUD : 1);
-    var go = function () { boost = b; try { sounds[name](opt); } finally { boost = 1; } };
+    var key = name + '|' + b;
+    var go = function () {
+      var buf = !opt && cache[key];
+      if (buf && buf !== 'busy') { var s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start(); return; }   // start now, from its first sample
+      boost = b; try { sounds[name](opt); } finally { boost = 1; }
+      if (!opt) render(name, b, key);
+    };
     if (ctx.state !== 'running') { ctx.resume().then(go, function () {}); return; }   // still waking: play the whole sound once it is
     go();
   }
