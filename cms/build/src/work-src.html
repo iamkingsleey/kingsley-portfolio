@@ -278,6 +278,7 @@ body.all .ov { visibility: visible; opacity: 1; transition: opacity .4s .15s, vi
 .ov-t { display: block; text-align: left; transform: scale(.86); opacity: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s }
 body.all .ov-t { transform: none; opacity: 1; transition-delay: calc(var(--d) + 120ms) }
 .ov-im { display: block; aspect-ratio: 4 / 5; opacity: 0 }   /* layout + hit area; the canvas draws the picture */
+.ov-im { --bg: none }   /* the tile's own picture; without this it read the page's background colour (also --bg), which blanked the grid on 1x screens */
 .ov.flat .ov-im { opacity: 1; background-image: var(--bg, none), var(--th, none); background-size: cover; background-position: center }   /* the 240px thumbnail first; the sharp picture is laid over it as the tile nears the screen */   /* fallback: the plain pictures, when the canvas can't draw them */
 .ovc { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0 }
 .ov-grid { position: relative; z-index: 1 }

@@ -42,6 +42,8 @@
   .kmn-scale .tk { position: absolute; top: 6px; height: 12px; background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 12px); opacity: .3 }
   .kmn-scale .nd { position: absolute; left: 50%; top: 2px; width: 2px; height: 30px; margin-left: -1px; background: ${RED}; border-radius: 1px; z-index: 2; transition: left .42s cubic-bezier(.22,1,.36,1) }
   .kmn-scale button { position: absolute; top: 34px; transform: translateX(-50%); padding: 4px 10px; border: 0; border-radius: 999px; background: none; color: var(--muted, #888); font: 500 13.5px Geist, system-ui, sans-serif; cursor: pointer; white-space: nowrap; transition: color .25s, background .25s }
+  .kmn-scale { cursor: grab; -webkit-user-select: none; user-select: none }   /* the scale can be dragged like a dial */
+  .kmn-scale.drag, .kmn-scale.drag * { cursor: grabbing !important }
   .kmn-scale button:hover, .kmn-scale button.pv { color: var(--ink, #111) }
   .kmn-scale button.on { color: var(--ink, #111) }   /* the red tick above is the only highlight */
   .kmn-scale button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px }   /* red is kept for the tick */
@@ -97,7 +99,7 @@
     const S = document.createElement('nav'); S.className = 'kmn-scale'; S.setAttribute('aria-label', 'Stations');
     const T = document.createElement('div'); T.className = 'tr';
     const tk = document.createElement('div'); tk.className = 'tk'; tk.style.left = '0'; tk.style.width = '100%'; T.append(tk);
-    let leaving = false;
+    let leaving = false, dr = null, dragged = 0;
     addEventListener('pageshow', e => { if (e.persisted) { leaving = false; back(); } });   // coming back with the browser's back button
     const bs = STATIONS.map((s, i) => {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = s.name; b.style.left = (i * SP) + 'px';
@@ -113,10 +115,36 @@
     // the scale stays still with every station across it; the red tick goes straight to the one you pick, in one smooth move
     const place = i => { const g = S.clientWidth / STATIONS.length; bs.forEach((b, k) => b.style.left = (g * (k + .5)) + 'px'); nd.style.left = (g * (i + .5)) + 'px'; };
     // once a station is picked, the tick stays there (the page-change overlay would otherwise count as the pointer leaving)
-    const back = () => { if (leaving) return; place(ci); bs.forEach(x => x.classList.remove('pv')); };
+    const back = () => { if (leaving || (dr && dr.on)) return; place(ci); bs.forEach(x => x.classList.remove('pv')); };
     addEventListener('resize', back);
     S.addEventListener('mouseleave', back); S.addEventListener('focusout', e => { if (!S.contains(e.relatedTarget)) back(); });
     const nd = document.createElement('i'); nd.className = 'nd';
+    // drag: the needle can also be pulled along the scale, like a real tuning dial (people reach for it). It ticks past each
+    // mark, the station under it lights up, and on release it snaps to the nearest station and tunes there, or glides back
+    // if it lands where it started. A press without a pull is still a plain click.
+    const gap = () => S.clientWidth / STATIONS.length;
+    const nearest = x => Math.max(0, Math.min(STATIONS.length - 1, Math.round(x / gap() - .5)));
+    S.addEventListener('pointerdown', e => { if (e.button > 0 || leaving) return; dr = { id: e.pointerId, x0: e.clientX, left: S.getBoundingClientRect().left, on: false, x: 0, t: null, at: 0 }; });
+    S.addEventListener('pointermove', e => {
+      if (!dr || e.pointerId !== dr.id) return;
+      if (!dr.on) { if (Math.abs(e.clientX - dr.x0) < 5) return; dr.on = true; try { S.setPointerCapture(e.pointerId); } catch (_) {} S.classList.add('drag'); nd.style.transition = 'none'; }
+      const g = gap(); dr.x = Math.max(g * .5, Math.min(g * (STATIONS.length - .5), e.clientX - dr.left));
+      nd.style.left = dr.x + 'px';
+      const k = nearest(dr.x); bs.forEach((b, j) => b.classList.toggle('pv', j === k));
+      const t = Math.round((dr.x - 6) / 12);                     // one detent per tick mark (at most one every 35 ms)
+      if (dr.t !== null && t !== dr.t) { const now = performance.now(); if (now - dr.at > 35) { dr.at = now; snd('detent'); } }
+      dr.t = t;
+    });
+    const drop = e => {
+      if (!dr || e.pointerId !== dr.id) return; const d = dr; dr = null;
+      if (!d.on) return;
+      S.classList.remove('drag'); nd.style.transition = ''; dragged = Date.now();   // the click that follows a drag is not a click
+      const k = nearest(d.x), s = STATIONS[k];
+      if (e.type === 'pointerup' && s !== cur) { snd('pop'); leaving = true; place(k); go(s); }
+      else { if (e.type === 'pointerup') snd('pop'); back(); }
+    };
+    S.addEventListener('pointerup', drop); S.addEventListener('pointercancel', drop);
+    S.addEventListener('click', e => { if (Date.now() - dragged < 400) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
     S.append(T, nd); const band = document.createElement('div'); band.className = 'kmn-band'; band.setAttribute('aria-hidden', 'true'); document.body.prepend(band, S);   // first in the page, so the keyboard reaches the stations before the content
     // phones: the menu button and its list of stations
     const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'kmn-mb'; mb.setAttribute('aria-label', 'Open menu'); mb.setAttribute('aria-expanded', 'false'); mb.innerHTML = '<i></i><i></i><i></i>';
