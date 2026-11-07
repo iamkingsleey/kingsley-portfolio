@@ -19,7 +19,7 @@
     if (!t) t = 'dark';   // dark unless the visitor picks light with a theme button (a pick is the only thing ever saved)
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js?v=b8d8c6f7"></script>
+<script src="tuner.js?v=157a1111"></script>
 <script>
   // Which piece this page shows (logo.html#badge) and its neighbours on the dial. Same order as project.html.
   (function () {
@@ -734,7 +734,7 @@ h1 .w.in > span { translate: 0 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202611070914';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202611070954';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {

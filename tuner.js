@@ -17,11 +17,11 @@
        element on the page (station readout, dials, rulers) jump to the body's own position while it is applied */
   var css = '' +
 
-    '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .2s cubic-bezier(.65,0,.35,1)}' +
+    '.tuner{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;margin:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;opacity:0;transition:opacity .12s cubic-bezier(.65,0,.35,1)}' +
     '.tuner::before{content:"";position:absolute;inset:0;background:rgb(11 11 11 / .6);background:color-mix(in srgb,var(--bg,#0b0b0b) 62%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}' +
     '.tuner.on{opacity:1}' +
     // leaving the screen it settles in place (a little smaller, fading), it never travels anywhere
-    '.tuner .tin{transition:transform .25s cubic-bezier(.2,.8,.2,1)}' +
+    '.tuner .tin{transition:transform .18s cubic-bezier(.2,.8,.2,1)}' +
     '.tuner.out .tin{transform:translate(-50%,-56%) scale(.94)}' +
     // the page's own readout (top left) waits until the centre one has gone, so the number never seems to jump there
     'html.tuning [data-readout]{opacity:0!important;transition:none}' +
@@ -65,7 +65,7 @@
     cx.globalAlpha = 1; cx.fillStyle = '#fb233b'; cx.fillRect(mid - 1.5, base - 40, 3, 42);
   }
   // ease: leaving speeds up (ease-in), arriving slows into the station (ease-out); together one smooth sweep
-  // sound: the same detent tick as the dials on About, one per notch the needle passes (at most one every 45 ms, so a
+  // sound: the same detent tick as the dials on About, one per notch the needle passes (at most one every 30 ms, so a
   // long sweep stays a ratchet, not a buzz). The first notch is the click itself, which already made its sound.
   var notch = null, notchAt = 0;
   function count(from, to, ms, ease, done) {
@@ -73,7 +73,7 @@
     if (notch === null) { notch = Math.round(from * 10); notchAt = t0; }
     (function f(now) {
       var k = ms ? Math.max(0, Math.min(1, (now - t0) / ms)) : 1, v = from + (to - from) * ease(k), n = Math.round(v * 10);
-      if (n !== notch) { notch = n; if (now - notchAt >= 45) { notchAt = now; if (root.Popkit && Popkit.notch) Popkit.notch(); } }
+      if (n !== notch) { notch = n; if (now - notchAt >= 30) { notchAt = now; if (root.Popkit && Popkit.notch) Popkit.notch(); } }
       draw(v);
       if (k < 1) requestAnimationFrame(f); else if (done) done();
     })(t0);
@@ -85,7 +85,7 @@
     if (going) return; going = true;
     var leave = function () { if (o.back) history.back(); else if (o.replace) location.replace(o.href); else location.href = o.href; };   // back: step back through the history, so the browser's own back agrees
     if (reduce) { leave(); return; }
-    var span = Math.abs(o.to - o.from), total = Math.min(520, 260 + span * 70), leg = Math.round(total * LEG);
+    var span = Math.abs(o.to - o.from), total = Math.min(300, 150 + span * 40), leg = Math.round(total * LEG);
     var mid = o.from + (o.to - o.from) * LEG;
     document.documentElement.classList.add('tuning');
     build(o.name); el.classList.remove('out', 'now'); el.querySelector('.tnm').textContent = o.name || ''; draw(o.from);
@@ -94,9 +94,9 @@
       try { sessionStorage.setItem(KEY, JSON.stringify({ v: mid, to: o.to, name: o.name, ms: total - leg, t: Date.now() })); } catch (e) {}
       var here = function () {                           // the new place is on this same page: finish the readout here
         try { sessionStorage.removeItem(KEY); } catch (e) {}
-        count(mid, o.to, Math.max(140, total - leg), easeOut, function () {
+        count(mid, o.to, Math.max(90, total - leg), easeOut, function () {
           if (!el) { going = false; return; } document.documentElement.classList.add('tuned'); el.classList.add('out'); el.classList.remove('on');
-          setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } going = false; }, 200); });
+          setTimeout(function () { document.documentElement.classList.remove('tuning', 'tuned'); if (el) { el.remove(); el = null; } going = false; }, 130); });
       };
       // going back to another case study on this page only changes the hash, so no new page arrives to finish the readout
       if (o.back) addEventListener('hashchange', here, { once: true });
@@ -123,9 +123,9 @@
       var me = el; me.classList.remove('now');
       document.documentElement.classList.add('tuned');   // the page sharpens…
       requestAnimationFrame(function () { me.classList.add('out'); me.classList.remove('on'); });   // the readout fades where it is
-      setTimeout(function () { if (going) return; document.documentElement.classList.remove('tuning', 'tuned'); me.remove(); if (el === me) el = null; }, 200);   // unless a tap already tuned away
+      setTimeout(function () { if (going) return; document.documentElement.classList.remove('tuning', 'tuned'); me.remove(); if (el === me) el = null; }, 130);   // unless a tap already tuned away
     };
-    var begin = function () { count(+arr.v, +arr.to, Math.max(140, +arr.ms || 200), easeOut, function () { counted = true; finish(); }); };
+    var begin = function () { count(+arr.v, +arr.to, Math.max(90, +arr.ms || 120), easeOut, function () { counted = true; finish(); }); };
     requestAnimationFrame(begin);
     var loaded = function () { ready = true; finish(); };
     if (document.readyState !== 'loading') loaded(); else addEventListener('DOMContentLoaded', loaded);   // the page itself, not every picture: only a slow connection holds the readout up
