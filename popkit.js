@@ -311,6 +311,15 @@
     sounds: Object.keys(sounds),
     volume: function (pct) { vol = BASE * Math.max(0, Math.min(300, pct)) / 100; if (master) master.gain.value = vol; },   // percent, 100 = normal
     mute: function (m) { muted = !!m; },
+    // the tuning dial between pages: a detent tick per notch. It moves because of a click, so it isn't held back by
+    // the one-sound-per-click rule; it stays silent while the audio isn't awake (a page that opened without a tap yet).
+    notch: function () {
+      if (muted || !ensure() || ctx.state !== 'running') return;
+      var key = 'detent|' + TICKLOUD, buf = cache[key];
+      if (buf && buf !== 'busy') { var s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start(); return; }
+      boost = TICKLOUD; try { sounds.detent(); } finally { boost = 1; }
+      render('detent', TICKLOUD, key);
+    },
     define: function (name, fn) { sounds[name] = function () { fn({ tone: tone, tick: tick, ctx: ctx }); }; }
   };
 })(window);

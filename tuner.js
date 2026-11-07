@@ -65,11 +65,16 @@
     cx.globalAlpha = 1; cx.fillStyle = '#fb233b'; cx.fillRect(mid - 1.5, base - 40, 3, 42);
   }
   // ease: leaving speeds up (ease-in), arriving slows into the station (ease-out); together one smooth sweep
+  // sound: the same detent tick as the dials on About, one per notch the needle passes (at most one every 45 ms, so a
+  // long sweep stays a ratchet, not a buzz). The first notch is the click itself, which already made its sound.
+  var notch = null, notchAt = 0;
   function count(from, to, ms, ease, done) {
     var t0 = performance.now();
+    if (notch === null) { notch = Math.round(from * 10); notchAt = t0; }
     (function f(now) {
-      var k = ms ? Math.max(0, Math.min(1, (now - t0) / ms)) : 1;
-      draw(from + (to - from) * ease(k));
+      var k = ms ? Math.max(0, Math.min(1, (now - t0) / ms)) : 1, v = from + (to - from) * ease(k), n = Math.round(v * 10);
+      if (n !== notch) { notch = n; if (now - notchAt >= 45) { notchAt = now; if (root.Popkit && Popkit.notch) Popkit.notch(); } }
+      draw(v);
       if (k < 1) requestAnimationFrame(f); else if (done) done();
     })(t0);
   }
