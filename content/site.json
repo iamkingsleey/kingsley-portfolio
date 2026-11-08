@@ -13,7 +13,7 @@
  "accent": "#FB233B",
  "needle": "line",
  "inbox": {
-  "url": "",
+  "url": "https://kingsley-inbox.kingsleymkpandiok.workers.dev",
   "email": true
  },
  "click": "auto",

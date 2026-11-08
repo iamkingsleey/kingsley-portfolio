@@ -264,8 +264,8 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
         <div class="st"><h3>Where should I reply?</h3><div class="two"><label class="fld"><span>Your name</span><input id="rqName" name="name" autocomplete="name"></label><label class="fld"><span>Email</span><input id="rqEmail" name="email" type="email" autocomplete="email"></label></div><div class="dp" id="rqWhen"></div></div>
         <div class="rq-nav"><button type="button" class="btn" id="rqBack" disabled>Back</button><span class="rq-msg" id="rqMsg" role="status" aria-live="polite"></span><button type="submit" class="btn pri" id="rqNext">Next</button></div>
       </form>
-      <div class="rq-done" id="rqDone" hidden><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7"/></svg></span><h3>Request ready</h3>
-        <p>Your email app should open with the request filled in, ready to send. If it doesn't, copy it and email it to <b>iamkingsleey@gmail.com</b>.</p>
+      <div class="rq-done" id="rqDone" hidden><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7"/></svg></span><h3 id="rqDoneH">Request ready</h3>
+        <p id="rqDoneP">Your email app should open with the request filled in, ready to send. If it doesn't, copy it and email it to <b>iamkingsleey@gmail.com</b>.</p>
         <div><button class="btn" type="button" id="rqCopy">Copy request</button><button class="btn" type="button" id="rqNew">Start over</button></div></div>
     </div>
   </section>
@@ -520,6 +520,12 @@ button { background: none; border: 0; padding: 0; cursor: pointer }
       fields: { Type: type, Budget: budget$(), 'Needed by': when ? longD(when) : 'No rush' }, website: ($('rq').website || {}).value || '' }) : false;
     if (sb) { sb.disabled = false; sb.textContent = sb.dataset.t; }
     if (!ok) location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('Asset request: ' + type + ' from ' + name)}&body=${encodeURIComponent(reqText)}`;
+    // sent straight to the inbox: say so, and drop the copy fallback
+    if (!$('rqDoneP').dataset.t) $('rqDoneP').dataset.t = $('rqDoneP').innerHTML;
+    $('rqDoneH').textContent = ok ? 'Request sent' : 'Request ready';
+    if (ok) { $('rqDoneP').textContent = ''; $('rqDoneP').append('Thanks, ' + name.split(' ')[0] + '. I’ll reply to ', Object.assign(document.createElement('b'), { textContent: mail }), ' soon.'); }
+    else $('rqDoneP').innerHTML = $('rqDoneP').dataset.t;
+    $('rqCopy').hidden = !!ok;
     $('rq').hidden = true; document.querySelector('.rq-top').hidden = true; $('rqDone').hidden = false;
   });
   $('rqCopy').addEventListener('click', () => { const done = () => { snd('pop'); $('rqCopy').textContent = 'Copied ✓'; setTimeout(() => { $('rqCopy').textContent = 'Copy request'; }, 1800); };

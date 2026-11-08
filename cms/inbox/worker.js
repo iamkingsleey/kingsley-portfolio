@@ -9,12 +9,15 @@
 //
 // Settings (wrangler.toml / the Cloudflare dashboard): a KV binding called INBOX, a secret called KEY, and ORIGINS: the
 // site addresses allowed to send, comma separated (e.g. https://iamkingsleey.com,https://iamkingsleey.github.io).
+// Optional, to get each message in your email as well: a secret RESEND_KEY (an API key from resend.com), TO (where it
+// goes, e.g. iamkingsleey@gmail.com) and FROM (an address on the domain you verified in Resend, e.g.
+// "Kingsley FM <shop@iamkingsleey.com>"). Replying to the email replies to the person who sent it.
 
 const MAX = { type: 40, name: 120, email: 200, subject: 200, message: 5000, page: 300, field: 600 };
 const clip = (v, n) => String(v ?? '').replace(/\u0000/g, '').slice(0, n).trim();
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url), origin = req.headers.get('Origin') || '';
     const allowed = String(env.ORIGINS || '').split(',').map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
     const cors = { 'Access-Control-Allow-Origin': allowed.length ? (allowed.includes(origin) ? origin : allowed[0]) : '*',
@@ -37,6 +40,7 @@ export default {
       if (!msg.message && !Object.keys(fields).length) return J({ error: 'Empty message.' }, 400);
       const key = 'msg:' + String(9e15 - Date.now()).padStart(16, '0') + ':' + msg.id;   // newest first when listed
       await env.INBOX.put(key, JSON.stringify(msg));
+      if (env.RESEND_KEY && env.TO && env.FROM) ctx.waitUntil(mail(env, msg));   // kept in the inbox either way
       return J({ ok: true, id: msg.id });
     }
 
@@ -62,3 +66,14 @@ export default {
     return J({ error: 'Not found.' }, 404);
   }
 };
+
+// the message as an email, through Resend (https://resend.com/docs/api-reference/emails/send-email)
+async function mail(env, m) {
+  const lines = [m.message, '', ...Object.entries(m.fields).map(([k, v]) => `${k}: ${v}`), '',
+    `From: ${m.name || 'No name'}${m.email ? ' <' + m.email + '>' : ''}`, `Page: ${m.page || '-'}${m.country ? ' · ' + m.country : ''}`, `Sent: ${m.at}`];
+  const body = { from: env.FROM, to: String(env.TO).split(',').map(s => s.trim()).filter(Boolean),
+    subject: `${m.type}: ${m.subject || (m.name ? 'from ' + m.name : 'new message')}`.slice(0, 200), text: lines.join('\n') };
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email)) body.reply_to = m.email;
+  try { const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { 'Authorization': 'Bearer ' + env.RESEND_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!r.ok) console.log('Resend', r.status, await r.text()); } catch (e) { console.log('Resend', String(e)); }
+}
