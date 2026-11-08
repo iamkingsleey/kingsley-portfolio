@@ -225,6 +225,9 @@ figure { margin: 0 }
 .next .th img { width: 100%; height: 100%; object-fit: cover; display: block }
 @media (max-width: 899px) { .next { grid-template-columns: minmax(0, 1fr) 120px; column-gap: 16px; padding-bottom: 120px } }
 </style>
+<script>window.goatcounter = { path: function () { return location.pathname.replace(/\/index\.html$/, "/") + location.hash; } };
+  window.KMtrack = function (path, title) { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };</script>
+<script data-goatcounter="https://iamkingsleey.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <meta name="description" content="Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Kingsley M.">
@@ -545,7 +548,7 @@ figure { margin: 0 }
   document.title = it.t + ' · Kingsley M.';
   var st = q('.station'); st.setAttribute('data-readout', '');
   q('.fq', st).textContent = K.FQ(K.cur).toFixed(1); q('.nm', st).textContent = it.t;
-  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202611081123';
+  var back = q('.back', st); back.removeAttribute('onclick'); back.href = 'designs.html?v=202611081153';
   back.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); go(100, 'Designs', back.href); });
   var n = q('.next');
   if (n) {
