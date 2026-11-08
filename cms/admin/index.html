@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CMS · Kingsley FM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
 <body>
 <aside class="side">
   <div class="brand"><b>Kingsley FM</b><span class="mono">CMS</span></div>
+  <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav"><span class="mlines" aria-hidden="true"><i></i><i></i></span><span class="mlabel">Menu</span><i class="mdot" aria-hidden="true"></i></button>
   <nav id="nav"></nav>
   <div class="side-foot"><div class="mono" id="sidefoot">Saved to this Mac</div>
     <div class="themesw" role="group" aria-label="Theme"><button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button></div></div>
@@ -41,6 +42,16 @@
       document.querySelectorAll('iframe').forEach(function (f) { try { f.contentDocument.documentElement.dataset.theme = t; } catch (e) {} }); };
     bs.forEach(function (b) { b.onclick = function () { document.documentElement.dataset.theme = b.dataset.t; try { localStorage.setItem('km-cms-theme', b.dataset.t); } catch (e) {} preview(b.dataset.t); sync(); }; });
     preview(document.documentElement.dataset.theme); sync(); })();
+</script>
+<script>
+  // phones: the sections open from the Menu button as a full-screen list; picking one closes it
+  (function () { var h = document.documentElement, m = document.getElementById('menu'), side = document.querySelector('.side');
+    var set = function (o) { h.classList.toggle('navopen', o); m.setAttribute('aria-expanded', String(o)); m.querySelector('.mlabel').textContent = o ? 'Close' : 'Menu'; };
+    m.onclick = function () { set(!h.classList.contains('navopen')); };
+    document.getElementById('nav').addEventListener('click', function (e) { if (e.target.closest('button')) { set(false); scrollTo(0, 0); } });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+    var bh = function () { if (!h.classList.contains('navopen')) h.style.setProperty('--bar-h', side.offsetHeight + 'px'); };
+    if (window.ResizeObserver) new ResizeObserver(bh).observe(side); bh(); })();
 </script>
 <script src="app.js"></script>
 </body>

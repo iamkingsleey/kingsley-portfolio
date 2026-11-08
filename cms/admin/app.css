@@ -40,7 +40,7 @@ nav button i { width: 6px; height: 6px; border-radius: 50%; background: var(--re
 .top { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 36px; background: var(--bar); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line) }
 .top h1 { font-size: 22px; margin-top: 2px }
 .acts { display: flex; align-items: center; gap: 10px }
-.dirty[hidden] { display: none } .dirty { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink) } .dirty::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red) }
+#dirty[hidden] { display: none } #dirty { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink) } #dirty::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red) }
 .btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--on-ink); font-weight: 500; text-decoration: none; white-space: nowrap }
 .btn.ghost { background: var(--pill); color: var(--ink) } .btn.small { height: 30px; padding: 0 12px; font-size: 13px }
 .btn.danger { background: var(--bad-bg); color: var(--bad) } .btn:disabled { opacity: .45; cursor: default }
@@ -87,10 +87,10 @@ nav button i { width: 6px; height: 6px; border-radius: 50%; background: var(--re
 .media .mb { display: grid; gap: 8px } .media .mbtn { display: flex; flex-wrap: wrap; gap: 6px }
 
 /* lists */
-.list { display: grid; gap: 10px }
+.list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px }
 .item { border: 1px solid var(--line); border-radius: 12px; background: var(--surface) }
 .item > header { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; cursor: pointer }
-.item > header b { flex: 1; color: var(--ink); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.item > header b { flex: 1; min-width: 0; color: var(--ink); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .item > header .ib { display: flex; gap: 2px }
 .item > header .ib button { width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--muted) } .item > header .ib button:hover { background: var(--pill); color: var(--ink) }
 .item > .body { display: grid; gap: 14px; padding: 4px 16px 18px; border-top: 1px solid var(--line); padding-top: 16px }
@@ -224,3 +224,55 @@ html.fullpage, html.fullpage body { overflow: hidden }
 .themesw button { height: 26px; padding: 0 10px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 11px var(--mono); cursor: pointer }
 .themesw button[aria-pressed="true"] { background: var(--bg); color: var(--ink) }
 html[data-theme="dark"] img.logo-inv { filter: invert(1) }
+
+/* ---------------------------------------------------------------- phones
+   The sidebar becomes a slim bar with a Menu button (the sections open full screen), the page title sits under it, and
+   Save / Publish move to a bar at the bottom, in reach of a thumb. Fields are 16px so iPhones don't zoom in on them. */
+.menu { display: none }
+@media (max-width: 760px) {
+  html, body { overflow-x: clip } body { display: block; font-size: 15px; width: 100%; height: auto; min-height: 100% } .main, .view { max-width: 100vw }
+  /* the bar: brand + Menu. Open, the same element fills the screen with the sections and the theme switch */
+  .side { position: sticky; top: 0; z-index: 25; height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 12px; padding: calc(10px + env(safe-area-inset-top)) 12px 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); background: var(--side) }
+  .brand { padding: 0 }
+  .menu { position: relative; display: inline-flex; align-items: center; gap: 9px; height: 40px; padding: 0 16px 0 14px; border: 0; border-radius: 999px; background: var(--pill); color: var(--ink); font-weight: 500; font-size: 14px }
+  .mlines { display: grid; gap: 4px; width: 14px } .mlines i { display: block; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .25s }
+  html.navopen .mlines i:first-child { transform: translateY(2.75px) rotate(45deg) } html.navopen .mlines i:last-child { transform: translateY(-2.75px) rotate(-45deg) }
+  .mdot { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); display: none } html.dirty .mdot { display: block }
+  .side nav, .side .side-foot { display: none }
+  html.navopen .side { position: fixed; inset: 0; height: 100%; grid-template-rows: auto minmax(0, 1fr) auto; align-items: start; overflow: hidden; border-bottom: 0 }
+  html.navopen .side nav { display: grid; grid-column: 1 / -1; align-content: start; align-self: stretch; overflow: auto; margin: 10px -12px 0 -16px; padding: 0 12px 16px; overscroll-behavior: contain }
+  html.navopen .side .side-foot { display: grid; grid-column: 1 / -1; margin: 0 -12px 0 -16px; padding: 14px 22px calc(4px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line) }
+  html.navopen, html.navopen body { overflow: hidden }
+  nav button { min-height: 48px; padding: 10px 14px; font-size: 16px; border-radius: 10px }
+  nav .grp { margin: 18px 14px 6px }
+  /* the page title under the bar; Save / Publish in a bar at the bottom */
+  .top { top: var(--bar-h, 61px); z-index: 20; padding: 12px 16px; background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none } .top h1 { font-size: 20px }
+  .top .acts { position: fixed; z-index: 21; left: 0; right: 0; bottom: 0; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--bar); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line) }
+  .top .acts .btn { flex: 1 1 0; min-width: 0; justify-content: center; height: 46px; padding: 0 12px; font-size: 15px; overflow: hidden } .top .acts #view { flex: 0 0 auto; padding: 0 14px }
+  .top .acts #dirty { display: none } html.dirty #save::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--red) }
+  .view { padding: 16px 16px calc(110px + env(safe-area-inset-bottom)) }
+  .lead { font-size: 14px; margin-bottom: 18px }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px } .card .cx { padding: 10px 11px 12px } .card b { font-size: 14px } .card:hover { transform: none }
+  .card.add { min-height: 140px }
+  .mgrid { grid-template-columns: 1fr }
+  .lib { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+  .lyt { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .bar { gap: 8px } .search { min-width: 0; width: 100%; height: 42px; font-size: 16px }
+  .main { overflow-x: clip } .bar > *, .tabs { min-width: 0 }
+  .tabs { flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch } .tabs::-webkit-scrollbar { display: none } .tabs button { flex: none; height: 34px }
+  .f input[type=text], .f input[type=number], .f input[type=url], .f select, .f textarea, .trow textarea { font-size: 16px; min-height: 44px }
+  .group { padding: 16px 16px 18px; gap: 14px; border-radius: 12px } .form { gap: 20px }
+  .media { grid-template-columns: 92px minmax(0, 1fr); gap: 12px }
+  .item > header { padding: 8px 8px 8px 14px; min-height: 52px } .item > header .ib button { width: 38px; height: 38px } .item > .body { padding: 14px 14px 16px }
+  .tuple { grid-template-columns: 1fr }
+  .trow { grid-template-columns: minmax(0, 1fr) 36px; gap: 8px } .trow .orig { grid-column: 1 / -1; padding-top: 0 }
+  .stats { grid-template-columns: 1fr 1fr; gap: 10px } .stat { padding: 14px 16px; border-radius: 12px } .stat b { font-size: 28px }
+  .panels { gap: 10px } .panel { padding: 16px }
+  .ibbar .search { max-width: none } .ibox { min-height: 0; border-radius: 12px } .ibp { padding: 18px 16px } .ibl { max-height: 50vh }
+  .headrow { flex-wrap: wrap } .headrow h2 { font-size: 19px }
+  .chh { flex-wrap: wrap; gap: 10px } .cr.media figure { width: 112px }
+  .pbar { flex-wrap: wrap } .pbar .fp-t { max-width: 55vw } .pageedit { height: 72vh; min-height: 420px }
+  .modal { padding: 0; place-items: end stretch } .sheet { width: 100%; max-height: 92vh; border-radius: 18px 18px 0 0 } .sheet > header { padding: 12px 16px } .x { width: 38px; height: 38px }
+  .mbody { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)) }
+  .toast { bottom: calc(84px + env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); text-align: center }
+}
