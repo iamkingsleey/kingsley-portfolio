@@ -941,7 +941,7 @@
     let days = vDash.days || 30;
     const range = el('div', { class: 'tabs' }), body = el('div', {}, el('div', { class: 'mono', text: 'Loading…' }));
     [[7, '7 days'], [30, '30 days'], [90, '90 days'], [365, 'Year']].forEach(([d, n]) => range.append(el('button', { type: 'button', class: d === days ? 'on' : '', text: n, onclick: () => { vDash.days = d; render(); } })));
-    v.append(el('div', { class: 'bar' }, el('span', { class: 'grow' }), range), body);
+    v.append(el('div', { class: 'bar' }, range), body);   // the period switch sits on the left, with the page
     let a; try { a = await api('/api/analytics?days=' + days); } catch (e) { body.innerHTML = ''; body.append(el('div', { class: 'err', text: e.message })); return; }
     body.innerHTML = '';
     if (!a.configured) {
