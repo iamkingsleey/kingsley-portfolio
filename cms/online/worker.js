@@ -269,7 +269,10 @@ async function save(req, env, name) {
   await draft(env);
   const v = await versions(env);
   if (!req.headers.get('X-Force') && base !== v[name]) return json({ error: 'changed', version: v[name] }, 409);
-  const body = { message: `CMS: save ${name}`, content: b64utf8(JSON.stringify(data, null, 1) + '\n'), branch: DRAFT, committer: who(env), author: who(env) };
+  // keep the file's own indentation (as on main, as the Mac CMS writes it), so a save only changes what was edited
+  const was = await rawText(env, `content/${name}.json`, 'main'), l2 = (was || '').split('\n')[1] || '';
+  const ind = l2.trim() ? Math.max(1, Math.min(4, l2.length - l2.replace(/^ +/, '').length)) : 1;
+  const body = { message: `CMS: save ${name}`, content: b64utf8(JSON.stringify(data, null, ind) + '\n'), branch: DRAFT, committer: who(env), author: who(env) };
   if (v[name]) body.sha = v[name];
   const r = await gh(env, `/contents/content/${name}.json`, { method: 'PUT', body: JSON.stringify(body) });
   if (r.status === 409 || r.status === 422) return json({ error: 'changed', version: (await versions(env))[name] }, 409);
