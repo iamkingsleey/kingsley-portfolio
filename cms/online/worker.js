@@ -173,8 +173,9 @@ async function sendLink(req, env, url) {
   const exp = Math.floor(Date.now() / 1000) + LINK_MINUTES * 60, link = `${url.origin}/admin/auth?t=${exp}.${await hmac(env, 'login.' + exp)}`;
   let r; try { r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { 'Authorization': 'Bearer ' + env.RESEND_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: env.FROM || 'Kingsley FM CMS <cms@iamkingsleey.com>', to: String(env.ADMIN_EMAIL).split(',').map(s => s.trim()).filter(Boolean),
-      subject: 'Sign in to your CMS', text: `Open this link to sign in to the Kingsley FM CMS:\n\n${link}\n\nIt works for ${LINK_MINUTES} minutes. If you didn't ask for it, ignore this email.`,
-      html: `<p>Open this link to sign in to the Kingsley FM CMS:</p><p><a href="${link}">Sign in to the CMS</a></p><p style="color:#777">It works for ${LINK_MINUTES} minutes. If you didn't ask for it, ignore this email.</p>` }) }); }
+      // a different subject each time, so Gmail doesn't hide the link behind "•••" as a repeat of the last email
+      subject: 'Sign in to your CMS · ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: env.TZ || 'Africa/Lagos' }), text: `Open this link to sign in to the Kingsley FM CMS:\n\n${link}\n\nIt works for ${LINK_MINUTES} minutes. If you didn't ask for it, ignore this email.`,
+      html: `<p>Open this link to sign in to the Kingsley FM CMS:</p><p><a href="${link}" style="display:inline-block;background:#000;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none">Sign in to the CMS</a></p><p style="color:#777">Or copy this address into your browser:<br><span style="word-break:break-all">${link}</span></p><p style="color:#777">It works for ${LINK_MINUTES} minutes. If you didn't ask for it, ignore this email.</p>` }) }); }
   catch (e) { return page('The email could not be sent', '<p>Resend could not be reached. Try again in a minute.</p>', 502); }
   if (!r.ok) return page('The email could not be sent', `<p>Resend answered ${r.status}. Check RESEND_KEY and FROM on the Worker.</p>`, 502);
   return Response.redirect(url.origin + '/admin/?sent=1', 303);
