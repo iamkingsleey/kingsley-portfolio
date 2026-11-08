@@ -20,7 +20,7 @@
    "name": "MeshCraft",
    "type": "Figma plugin",
    "what": "3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.",
-   "stat": "150+",
+   "stat": "160+",
    "statLabel": "users",
    "tech": "TypeScript · Figma API",
    "link": "https://www.figma.com/community/plugin/1668399347356779904/meshcraft",
