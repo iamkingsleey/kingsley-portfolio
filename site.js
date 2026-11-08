@@ -555,6 +555,10 @@ addEventListener('wheel', e => {
       for (let s = 1; s <= n; s++) drop(last[0] + dx * s / n, last[1] + dy * s / n, rad, amp / n * 1.2); }
     last = [gx, gy]; awake = performance.now(); still = 0;
   }
+  // a click: one deep drop, so a ring clearly travels out from the point you clicked. The water is shown at once
+  // (no fade in), otherwise the ring has mostly spread out before the surface appears.
+  let kick = false;
+  const splashAt = (gx, gy) => { drop(gx, gy, 7 + heat * 5, 9); still = 0; awake = performance.now(); kick = true; };
   const reset = () => { A.fill(0); B.fill(0); heat = 0; last = null; still = 0; };
 
   function fit() {   // DOM mode: place the canvas exactly over the picture, inside its own positioned parent, so it scrolls with it
@@ -618,7 +622,7 @@ addEventListener('wheel', e => {
   }, { passive: true });
   document.addEventListener('pointerdown', e => {
     if (mode !== 'dom' || !cur || !live || hoverEl !== cur) return; const r = cur.getBoundingClientRect();
-    drop((e.clientX - r.left) / r.width * GW, (e.clientY - r.top) / r.height * GH, 4 + heat * 6, 3); still = 0;
+    splashAt((e.clientX - r.left) / r.width * GW, (e.clientY - r.top) / r.height * GH);
   }, { passive: true });
 
   // ---------- for pages that draw their own pictures (the Designs reel) ----------
@@ -635,7 +639,7 @@ addEventListener('wheel', e => {
   }
   window.KMRipple = {
     drive(src, u, v) { if (!src || !useExt(src)) return; if (u < 0 || v < 0 || u > 1 || v > 1) { last = null; return; } inside = true; stir(u * GW, v * GH); },
-    splash(src, u, v) { if (!src || !useExt(src)) return; drop(u * GW, v * GH, 4 + heat * 6, 3); still = 0; awake = performance.now(); },
+    splash(src, u, v) { if (!src || !useExt(src)) return; splashAt(u * GW, v * GH); },
     leave() { if (mode === 'ext') { last = null; } },
     frameFor(src) { return mode === 'ext' && live && shown && cur === src ? cv : null; }
   };
@@ -662,6 +666,8 @@ addEventListener('wheel', e => {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, GW, GH, 0, gl.RGBA, gl.UNSIGNED_BYTE, px);
     gl.uniform1f(U('amt'), .03); gl.uniform1f(U('ca'), .08 + heat * .25);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (kick) { kick = false; shown = true;
+      if (mode === 'dom') { cv.style.transition = 'none'; cv.style.opacity = '1'; void cv.offsetWidth; cv.style.transition = 'opacity .25s'; } }
   })();
 })();
 ;
