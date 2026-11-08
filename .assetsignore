@@ -1,7 +1,8 @@
 # not published to the site (they stay in the repo)
 .git
 .github
-/cms
+/cms/*
+!/cms/admin
 /iteration-1
 /iteration-2
 /iteration-3

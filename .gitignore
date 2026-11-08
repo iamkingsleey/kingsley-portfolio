@@ -8,7 +8,6 @@ assets/*.mp3
 cms/.secrets.json
 cms/.history/
 cms/build/.gen/
-cms/build/.index.json
 __pycache__/
 /Oghosa/
 cms/build/last-build.log
@@ -24,3 +23,7 @@ cms/build/.last-build-ok
 
 # Awwwards submission screenshots: kept on this Mac only.
 /awwwards/
+
+# local Worker test files
+.wrangler/
+.dev.vars
