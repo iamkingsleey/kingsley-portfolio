@@ -70,8 +70,13 @@ async function draft(env) {
   if (r.ok) return (await r.json()).object.sha;
   if (r.status !== 404) throw new Error('GitHub said ' + r.status + ' (check GITHUB_TOKEN)');
   const main = await ghJson(env, '/git/ref/heads/main');
-  await ghJson(env, '/git/refs', { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${DRAFT}`, sha: main.object.sha }) });
-  return main.object.sha;
+  const c = await gh(env, '/git/refs', { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${DRAFT}`, sha: main.object.sha }) });
+  if (c.ok) return main.object.sha;
+  if (c.status === 422) {   // made a moment ago (the editor asks for several things at once): use it
+    const again = await gh(env, `/git/ref/heads/${DRAFT}`);
+    return again.ok ? (await again.json()).object.sha : main.object.sha;
+  }
+  throw new Error('GitHub said ' + c.status + ' when making the drafts branch');
 }
 // keep the drafts up to date with main (a publish, or a push from the Mac): fast-forward when there are no drafts,
 // else let GitHub merge main in. Returns the comparison, so callers can see what's waiting to publish.
