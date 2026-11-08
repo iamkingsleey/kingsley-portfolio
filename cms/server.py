@@ -139,7 +139,11 @@ def analytics(days):
         out['events'] = sorted([r for r in rows if r['event']], key=lambda r: -r['count'])
         out['daily'] = [{'day': (start + timedelta(days=i)).isoformat(), 'count': daily.get((start + timedelta(days=i)).isoformat(), 0)} for i in range(days)]
         for key in ['toprefs', 'locations', 'browsers', 'systems', 'sizes', 'campaigns']:
-            try: out[key] = [{'name': s.get('name') or '(direct)', 'id': s.get('id'), 'count': _count(s)} for s in gc_get(code, token, f'stats/{key}', {**p, 'limit': 20}).get('stats', [])]
+            # GoatCounter lists every bucket (screen sizes come back even at 0, often without a name): keep the ones with
+            # visits, named by their id when there's no name; only referrers with no name are "(direct)"
+            SIZES = {'phone': 'Phones', 'largephone': 'Large phones', 'tablet': 'Tablets', 'desktop': 'Computers', 'desktophd': 'Computers (HD)', 'unknown': 'Unknown'}
+            try: out[key] = [{'name': s.get('name') or SIZES.get(str(s.get('id')), '') or ('(direct)' if key == 'toprefs' else str(s.get('id') or 'Unknown')), 'id': s.get('id'), 'count': _count(s)}
+                             for s in gc_get(code, token, f'stats/{key}', {**p, 'limit': 20}).get('stats', []) if _count(s) > 0]
             except Exception as e: out[key] = []
     except urllib.error.HTTPError as e:
         out['error'] = f'GoatCounter said {e.code}: ' + (e.read().decode(errors='ignore')[:300] or e.reason)
