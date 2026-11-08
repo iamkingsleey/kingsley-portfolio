@@ -24,3 +24,16 @@ GIT_EMAIL = "kingsleymkpandiok@gmail.com"
 [[services]]
 binding = "INBOXW"
 service = "kingsley-inbox"
+
+# Preview builds (other branches, e.g. online-cms): same settings as the live site. Previews get their own address and
+# never touch iamkingsleey.com. The inbox binding reaches the live inbox Worker.
+[previews.vars]
+REPO = "iamkingsleey/kingsley-portfolio"
+ADMIN_EMAIL = "iamkingsleey@gmail.com"
+FROM = "Kingsley FM CMS <cms@iamkingsleey.com>"
+GIT_NAME = "Kingsley"
+GIT_EMAIL = "kingsleymkpandiok@gmail.com"
+
+[[previews.services]]
+binding = "INBOXW"
+service = "kingsley-inbox"
