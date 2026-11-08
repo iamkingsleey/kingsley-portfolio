@@ -19,8 +19,9 @@
   const cur = STATIONS.find(s => s.href === file) || STATIONS.find(s => s.name === PARENT[file]) || STATIONS[0];
   const ci = STATIONS.indexOf(cur), RED = '#fb233b', SP = 74;
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) try { Popkit.play(n); } catch (_) {} };
-  const go = s => {
+  const go = (s, how) => {
     if (s === cur && !PARENT[file]) { scrollTo({ top: 0, behavior: 'smooth' }); return; }   // already here: back to the top
+    if (window.KMtrack) try { KMtrack('/e/tune/' + s.name.toLowerCase(), s.name); KMtrack('/e/nav/' + (how || 'click'), { click: 'Clicked a station', drag: 'Dragged the dial', menu: 'Used the phone menu' }[how || 'click']); } catch (_) {}   // for Analytics
     const to = s.href === 'index.html' ? './' : s.href.replace(/\.html$/, '');   // clean addresses: /designs, not /designs.html
     if (window.Tuner) Tuner.go({ from: cur.fq, to: s.fq, name: s.name, href: to }); else location.href = to;
   };
@@ -140,7 +141,7 @@
       if (!d.on) return;
       S.classList.remove('drag'); nd.style.transition = ''; dragged = Date.now();   // the click that follows a drag is not a click
       const k = nearest(d.x), s = STATIONS[k];
-      if (e.type === 'pointerup' && s !== cur) { snd('pop'); leaving = true; place(k); go(s); }
+      if (e.type === 'pointerup' && s !== cur) { snd('pop'); leaving = true; place(k); go(s, 'drag'); }
       else { if (e.type === 'pointerup') snd('pop'); back(); }
     };
     S.addEventListener('pointerup', drop); S.addEventListener('pointercancel', drop);
@@ -156,7 +157,7 @@
     M.inert = true;
     mb.addEventListener('click', () => { const o = !document.documentElement.classList.contains('kmn-open'); snd(o ? 'open' : 'close'); menu(o); if (o) (mbs.find(b => b.classList.contains('on')) || mbs[0]).focus({ preventScroll: true }); });
     mbs.forEach(b => b.addEventListener('click', () => { const s = STATIONS[+b.dataset.i]; snd('pop');
-      if (s === cur && !PARENT[file]) { menu(false); return; } leaving = true; go(s); setTimeout(() => menu(false), 600); }));
+      if (s === cur && !PARENT[file]) { menu(false); return; } leaving = true; go(s, 'menu'); setTimeout(() => menu(false), 600); }));
     addEventListener('keydown', e => { if (e.key === 'Escape' && document.documentElement.classList.contains('kmn-open')) { menu(false); mb.focus(); } });
     addEventListener('pageshow', e => { if (e.persisted) menu(false); });
     document.body.prepend(mb, M);   // phones: the menu button comes first for the keyboard too

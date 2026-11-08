@@ -94,12 +94,16 @@ GC = (SITE.get('analytics') or {}).get('goatcounter', '').strip()
 GC = re.sub(r'^https?://|\.goatcounter\.com.*$', '', GC)
 ANALYTICS = ('' if not GC else
   '<script>window.goatcounter = { path: function () { return location.pathname.replace(/\\/index\\.html$/, "/") + location.hash; } };\n'
-  '  window.KMtrack = function (path, title) { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };</script>\n'
-  f'<script data-goatcounter="https://{GC}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n')
+  # an action sent before GoatCounter has loaded waits in a queue, then goes as soon as it loads
+  '  window.KMtrack = function (path, title) { var go = function () { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };\n'
+  '    if (window.goatcounter && window.goatcounter.count) go(); else (window.__kmq = window.__kmq || []).push(go); };</script>\n'
+  f'<script data-goatcounter="https://{GC}.goatcounter.com/count" async src="//gc.zgo.at/count.js" onload="(window.__kmq||[]).forEach(function(f){{f()}});window.__kmq=[]"></script>\n'
+  '<script src="track.js" defer></script>\n')   # visitor actions for the CMS Analytics page (cms/build/src/track.js)
 
 # the one navigation (cms/build/src/nav.js) on every page
 import shutil as _sh
 _sh.copy(f'{KFM}/nav.js', f'{REPO}/nav.js')
+_sh.copy(f'{KFM}/track.js', f'{REPO}/track.js')   # visitor actions for Analytics (cms/build/src/track.js)
 NAV = '<script src="nav.js" defer></script>\n'
 # iteration 4: Home's intro status (home.js), Home ↔ Designs by scrolling (flow.js), tips for getting around (protips.js)
 _sh.copy(f'{KFM}/kit.js', f'{REPO}/kit.js'); _sh.copy(f'{KFM}/feedback.js', f'{REPO}/feedback.js'); _sh.copy(f'{KFM}/home.js', f'{REPO}/home.js'); _sh.copy(f'{KFM}/flow.js', f'{REPO}/flow.js')
@@ -376,7 +380,10 @@ def _base():
     except Exception: name = ''
     if not name: name = os.path.basename(os.path.abspath(REPO))
     return '/' if name.endswith('.github.io') else f'/{name}/'
-open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_head_first(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())), _base()))
+_404 = _head_first(_acc(open(f'{KFM}/404.html', encoding='utf-8').read().replace('__BASE__', _base())), _base())
+if ANALYTICS and '</head>' in _404:   # count missing addresses too (the script path starts from the site's folder: this page shows at any depth)
+    _404 = _404.replace('</head>', ANALYTICS.replace('src="track.js"', f'src="{_base()}track.js"') + '</head>', 1)
+open(f'{REPO}/404.html', 'w', encoding='utf-8').write(_404)
 SWREG = "<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>\n"
 INDEX = {}
 # clean addresses: the site's own links drop ".html" (Cloudflare serves /designs for designs.html and redirects the

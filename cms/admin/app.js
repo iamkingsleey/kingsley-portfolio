@@ -955,18 +955,54 @@
     }
     if (a.error) body.append(el('div', { class: 'err', text: a.error }));
     const T = a.total || {}, pages = a.pages || [], sum = (pages.reduce((s, p) => s + p.count, 0));
-    const views = T.total ?? sum, top = pages[0];
-    body.append(el('div', { class: 'stats' },
-      el('div', { class: 'stat' }, el('span', { class: 'mono', text: 'Visits' }), el('b', { text: fmt(views) })),
-      el('div', { class: 'stat' }, el('span', { class: 'mono', text: 'Pages viewed' }), el('b', { text: fmt(pages.length) })),
-      el('div', { class: 'stat' }, el('span', { class: 'mono', text: 'Countries' }), el('b', { text: fmt((a.locations || []).length) })),
-      el('div', { class: 'stat' }, el('span', { class: 'mono', text: 'Designs opened' }), el('b', { text: fmt((a.events || []).reduce((s, e) => s + e.count, 0)) }))));
+    const views = T.total ?? sum, ev = a.events || [];
+    // visitor actions (cms/build/src/track.js) are events under /e/; the rest are designs opened
+    const E = pre => ev.filter(e => (e.path || '').startsWith(pre)), N = pre => E(pre).reduce((s, e) => s + e.count, 0);
+    const designs = ev.filter(e => !(e.path || '').startsWith('/e/')), nDesigns = designs.reduce((s, e) => s + e.count, 0);
+    const awwRows = [...(a.toprefs || []), ...(a.campaigns || [])].filter(r => /awwwards/i.test(r.name || '')), aww = awwRows.reduce((s, r) => s + r.count, 0);
+    const per = days === 365 ? 'year' : days + ' days', pv = a.prev;
+    const chg = (now, was) => { if (!pv || was == null) return null; if (!was) return el('small', { class: 'delta', text: now ? `New · nothing in the previous ${per}` : `Same as the previous ${per}` });
+      const d = Math.round((now - was) / was * 100); return el('small', { class: 'delta ' + (d > 0 ? 'up' : d < 0 ? 'down' : ''), text: `${d > 0 ? '+' : ''}${d}% vs previous ${per}` }); };
+    const stat = (label, n, was) => el('div', { class: 'stat' }, el('span', { class: 'mono', text: label }), el('b', { text: fmt(n) }), chg(n, was));
+    body.append(el('div', { class: 'stats' }, stat('Visits', views, pv && pv.total), stat('From Awwwards', aww), stat('Pages viewed', pages.length, pv && pv.pages),
+      stat('Countries', (a.locations || []).length, pv && pv.countries), stat('Designs opened', nDesigns, pv && pv.designs)));
     const P = el('div', { class: 'panels' });
     P.append(el('div', { class: 'panel wide' }, el('h3', { text: 'Visits per day' }), chart(a.daily || [])));
+    // recruiters: from landing to reaching out
+    const rec = N('/e/hire/recruiters'), reach = N('/e/hire/book-call') + N('/e/hire/email');
+    const step = (t, n, sub) => el('div', { class: 'fstep' }, el('div', { class: 'fbar' }, el('i', { style: `width:${views ? Math.max(n ? 2 : 0, Math.min(100, n / views * 100)).toFixed(1) : 0}%` })),
+      el('span', { text: t }), el('b', { text: fmt(n) }), el('small', { text: sub || (views ? (n / views * 100).toFixed(n && n / views < .1 ? 1 : 0) + '% of visits' : '') }));
+    const hire = [['Book a call', '/e/hire/book-call'], ['Email', '/e/hire/email'], ['Résumé', '/e/hire/resume'], ['LinkedIn', '/e/hire/linkedin'], ['Dribbble', '/e/hire/dribbble'], ['GitHub', '/e/hire/github']]
+      .map(([n, p]) => ({ name: n, count: N(p) })).filter(r => r.count).sort((x, y) => y.count - x.count);
+    P.append(el('div', { class: 'panel wide' }, el('h3', { text: 'Recruiters' }),
+      el('div', { class: 'funnel' }, step('Visits', views, ' '), step('Opened For recruiters', rec), step('Booked a call or emailed', reach)),
+      hire.length ? el('div', { class: 'chips' }, hire.map(r => el('span', {}, r.name, el('b', { text: fmt(r.count) })))) : el('div', { class: 'mono', style: 'margin-top:14px', text: 'No clicks on Book a call, email or your profiles yet' })));
+    P.append(el('div', { class: 'panel' }, el('h3', { text: 'Visits from Awwwards' }), el('div', { class: 'big', text: fmt(aww) }),
+      awwRows.length ? el('ul', { class: 'rank' }, awwRows.slice(0, 6).map(r => el('li', {}, el('span', { text: r.name }), el('b', { text: fmt(r.count) })))) : el('div', { class: 'mono', text: `None from awwwards.com in the last ${per} yet` })));
     P.append(rank('Where visitors come from', a.toprefs, x => x.name === '(direct)' || !x.name ? 'Direct · typed or bookmarked' : x.name));
+    // case studies: how far people get
+    const cs = {}; E('/e/case/').forEach(e => { const m = e.path.match(/^\/e\/case\/([^/]+)\/(\w+)/); if (!m) return; const c = cs[m[1]] = cs[m[1]] || { name: e.title || m[1], open: 0, impact: 0, end: 0, prototype: 0 }; if (m[2] in c) c[m[2]] += e.count; if (e.title) c.name = e.title; });
+    const csRows = Object.values(cs).sort((x, y) => y.open - x.open);
+    const pc = (n, o) => o ? ` · ${Math.round(n / o * 100)}%` : '';
+    P.append(el('div', { class: 'panel wide' }, el('h3', { text: 'Case studies · how far people read' }),
+      csRows.length ? el('div', { class: 'ctable' }, el('div', { class: 'cqh' }, ['Case study', 'Opened', 'Reached impact', 'Read to the end', 'Tried prototype'].map(t => el('span', { text: t }))),
+        csRows.map(c => el('div', { class: 'cqr' }, el('span', { text: c.name }), el('b', { text: fmt(c.open) }), el('span', { text: fmt(c.impact) + pc(c.impact, c.open) }), el('span', { text: fmt(c.end) + pc(c.end, c.open) }), el('span', { text: fmt(c.prototype) + pc(c.prototype, c.open) }))))
+        : el('div', { class: 'mono', text: 'No case study visits recorded yet' })));
+    // the dial
+    const tunes = E('/e/tune/').map(e => ({ name: e.title || e.path.slice(8), count: e.count })).sort((x, y) => y.count - x.count);
+    const st = rank('Most-tuned stations', tunes);
+    st.append(el('p', { class: 'anote', text: `Back button ${fmt(N('/e/nav/back'))} · Clicked a station ${fmt(N('/e/nav/click'))} · Dragged the dial ${fmt(N('/e/nav/drag'))} · Phone menu ${fmt(N('/e/nav/menu'))}` }));
+    P.append(st);
+    // light or dark, sound on or off
+    const dk = N('/e/session/theme-dark'), lt = N('/e/session/theme-light'), so = N('/e/session/sound-on'), sf = N('/e/session/sound-off'), share = (x, y) => x + y ? Math.round(x / (x + y) * 100) + '%' : '–';
+    P.append(el('div', { class: 'panel' }, el('h3', { text: 'Light or dark, sound on or off' }),
+      el('ul', { class: 'rank' }, [['Visits in dark mode', dk, share(dk, lt)], ['Visits in light mode', lt, share(lt, dk)], ['Visits with sound on', so, share(so, sf)], ['Visits with sound off', sf, share(sf, so)]]
+        .map(([n, c, p]) => el('li', {}, el('i', { style: `width:${c + 0 ? (parseInt(p) || 0) : 0}%` }), el('span', { text: n }), el('b', { text: `${fmt(c)} · ${p}` })))),
+      el('p', { class: 'anote', text: `Switched to light ${fmt(N('/e/theme/light'))} · to dark ${fmt(N('/e/theme/dark'))} · Muted sound ${fmt(N('/e/sound/muted'))} · Turned it on ${fmt(N('/e/sound/on'))}` })));
     P.append(rank('Countries', a.locations));
     P.append(rank('Most viewed pages', pages.map(p => ({ name: niceP(p.path), count: p.count }))));
-    P.append(rank('Designs opened', (a.events || []).map(e => ({ name: e.title || e.path, count: e.count }))));
+    P.append(rank('Designs opened', designs.map(e => ({ name: e.title || e.path, count: e.count }))));
+    P.append(rank('Missing pages people landed on', E('/e/404').map(e => ({ name: e.title || e.path.slice(6), count: e.count }))));
     P.append(rank('Devices', a.systems)); P.append(rank('Browsers', a.browsers));
     P.append(rank('Screen sizes', a.sizes)); if ((a.campaigns || []).length) P.append(rank('Campaigns', a.campaigns));
     body.append(P, el('p', { class: 'lead', style: 'margin-top:18px', html: `From GoatCounter · <a href="https://${a.code}.goatcounter.com" target="_blank">open the full dashboard ↗</a>` }));

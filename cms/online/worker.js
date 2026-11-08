@@ -361,11 +361,21 @@ async function analytics(env, days) {
   if (!code || !token) return { configured: false, code, hasToken: !!token };
   const day = 86400000, end = new Date(Date.now() + day), start = new Date(end - days * day), iso = d => d.toISOString().slice(0, 10);
   const q = { start: iso(start), end: iso(end) };
-  const gc = async (path, extra = {}) => { const r = await fetch(`https://${code}.goatcounter.com/api/v0/${path}?` + new URLSearchParams({ ...q, ...extra }), { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+  // GoatCounter allows only a few requests a second: at most 3 at a time, and one retry after a pause if it says slow down
+  let active = 0; const waiters = [];
+  const slot = () => active < 3 ? (active++, Promise.resolve()) : new Promise(res => waiters.push(res));
+  const free = () => { const n = waiters.shift(); if (n) n(); else active--; };
+  const gc = async (path, extra = {}, tries = 0) => { await slot(); let r; try { r = await gc1(path, extra); } finally { free(); }
+    if (r.status === 429 && tries < 2) { await new Promise(res => setTimeout(res, 1100)); return gc(path, extra, tries + 1); }
     if (!r.ok) { const e = new Error(`GoatCounter said ${r.status}: ${(await r.text()).slice(0, 300)}`); e.gc = true; throw e; } return r.json(); };
+  const gc1 = (path, extra) => fetch(`https://${code}.goatcounter.com/api/v0/${path}?` + new URLSearchParams({ ...q, ...extra }), { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
   const out = { configured: true, code, start: q.start, end: q.end };
   try {
-    const [total, hits] = await Promise.all([gc('stats/total'), gc('stats/hits', { limit: 100 })]);
+    const pq = { start: iso(new Date(start - days * day)), end: iso(start) };   // the period before, the same length
+    const [total, hits, ptotal, phits, ploc] = await Promise.all([gc('stats/total'), gc('stats/hits', { limit: 200 }),
+      gc('stats/total', pq).catch(() => null), gc('stats/hits', { ...pq, limit: 200 }).catch(() => null), gc('stats/locations', { ...pq, limit: 100 }).catch(() => null)]);
+    out.prev = ptotal && phits ? { total: ptotal.total, pages: (phits.hits || []).filter(h => !h.event).length, countries: ((ploc || {}).stats || []).filter(x => count(x) > 0).length,
+      designs: (phits.hits || []).filter(h => h.event && !String(h.path || '').startsWith('/e/')).reduce((s, h) => s + count(h), 0) } : null;
     out.total = total;
     const rows = [], daily = {};
     for (const h of hits.hits || []) {
@@ -376,7 +386,7 @@ async function analytics(env, days) {
     out.events = rows.filter(r => r.event).sort((a, b) => b.count - a.count);
     out.daily = Array.from({ length: days }, (_, i) => { const d = iso(new Date(+start + i * day)); return { day: d, count: daily[d] || 0 }; });
     const keys = ['toprefs', 'locations', 'browsers', 'systems', 'sizes', 'campaigns'];
-    const res = await Promise.all(keys.map(k => gc('stats/' + k, { limit: 20 }).catch(() => ({ stats: [] }))));
+    const res = await Promise.all(keys.map(k => gc('stats/' + k, { limit: k === 'toprefs' ? 50 : 20 }).catch(() => ({ stats: [] }))));
     keys.forEach((k, i) => { out[k] = (res[i].stats || []).filter(s => count(s) > 0)
       .map(s => ({ name: s.name || SIZES[String(s.id)] || (k === 'toprefs' ? '(direct)' : String(s.id || 'Unknown')), id: s.id, count: count(s) })); });
   } catch (e) { out.error = e.gc ? e.message : 'Could not reach GoatCounter: ' + e.message; }

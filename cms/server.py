@@ -115,7 +115,12 @@ def inbox_call(path, body=None):
 def gc_get(code, token, path, params):
     url = f'https://{code}.goatcounter.com/api/v0/{path}?' + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=20) as r: return json.loads(r.read().decode())
+    for tries in range(3):   # GoatCounter allows only a few requests a second: pause and try again if it says slow down
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r: return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or tries == 2: raise
+            time.sleep(1.1)
 
 def _count(x): return x.get('count', x.get('count_unique', 0)) or 0
 
@@ -129,7 +134,7 @@ def analytics(days):
     out = {'configured': True, 'code': code, 'start': p['start'], 'end': p['end']}
     try:
         out['total'] = gc_get(code, token, 'stats/total', p)
-        hits = gc_get(code, token, 'stats/hits', {**p, 'limit': 100})
+        hits = gc_get(code, token, 'stats/hits', {**p, 'limit': 200})
         rows, daily = [], {}
         for h in hits.get('hits', []):
             rows.append({'path': h.get('path', ''), 'title': h.get('title', ''), 'event': h.get('event', False), 'count': _count(h)})
@@ -138,12 +143,20 @@ def analytics(days):
         out['pages'] = sorted([r for r in rows if not r['event']], key=lambda r: -r['count'])
         out['events'] = sorted([r for r in rows if r['event']], key=lambda r: -r['count'])
         out['daily'] = [{'day': (start + timedelta(days=i)).isoformat(), 'count': daily.get((start + timedelta(days=i)).isoformat(), 0)} for i in range(days)]
+        # the period before, the same length, so each total can show its change
+        try:
+            pp = {'start': (start - timedelta(days=days)).isoformat(), 'end': start.isoformat()}
+            ph = gc_get(code, token, 'stats/hits', {**pp, 'limit': 200}).get('hits', [])
+            pl = gc_get(code, token, 'stats/locations', {**pp, 'limit': 100}).get('stats', [])
+            out['prev'] = {'total': (gc_get(code, token, 'stats/total', pp) or {}).get('total'), 'pages': len([h for h in ph if not h.get('event')]),
+                           'countries': len([x for x in pl if _count(x) > 0]), 'designs': sum(_count(h) for h in ph if h.get('event') and not str(h.get('path', '')).startswith('/e/'))}
+        except Exception: out['prev'] = None
         for key in ['toprefs', 'locations', 'browsers', 'systems', 'sizes', 'campaigns']:
             # GoatCounter lists every bucket (screen sizes come back even at 0, often without a name): keep the ones with
             # visits, named by their id when there's no name; only referrers with no name are "(direct)"
             SIZES = {'phone': 'Phones', 'largephone': 'Large phones', 'tablet': 'Tablets', 'desktop': 'Computers', 'desktophd': 'Computers (HD)', 'unknown': 'Unknown'}
             try: out[key] = [{'name': s.get('name') or SIZES.get(str(s.get('id')), '') or ('(direct)' if key == 'toprefs' else str(s.get('id') or 'Unknown')), 'id': s.get('id'), 'count': _count(s)}
-                             for s in gc_get(code, token, f'stats/{key}', {**p, 'limit': 20}).get('stats', []) if _count(s) > 0]
+                             for s in gc_get(code, token, f'stats/{key}', {**p, 'limit': 50 if key == 'toprefs' else 20}).get('stats', []) if _count(s) > 0]
             except Exception as e: out[key] = []
     except urllib.error.HTTPError as e:
         out['error'] = f'GoatCounter said {e.code}: ' + (e.read().decode(errors='ignore')[:300] or e.reason)

@@ -58,6 +58,11 @@ body.on .pill.go { display: inline-flex; animation: goin .3s cubic-bezier(.2, .9
 @media (max-width: 899px) { .top { top: calc(20px + env(safe-area-inset-top, 0px)) } .top b { font-size: 22px } .head { top: 17vh } .hint { display: none } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important } }
 </style>
+<script>window.goatcounter = { path: function () { return location.pathname.replace(/\/index\.html$/, "/") + location.hash; } };
+  window.KMtrack = function (path, title) { var go = function () { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };
+    if (window.goatcounter && window.goatcounter.count) go(); else (window.__kmq = window.__kmq || []).push(go); };</script>
+<script data-goatcounter="https://iamkingsleey.goatcounter.com/count" async src="//gc.zgo.at/count.js" onload="(window.__kmq||[]).forEach(function(f){f()});window.__kmq=[]"></script>
+<script src="/track.js" defer></script>
 </head>
 <body>
 <canvas id="cv" tabindex="0" role="slider" aria-label="Tune the dial to a station" aria-valuemin="88" aria-valuemax="108"></canvas>
