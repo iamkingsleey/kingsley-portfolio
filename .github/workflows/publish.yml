@@ -1,0 +1,54 @@
+# Publish from the online CMS (iamkingsleey.com/admin). The CMS saves your edits on the "cms" branch; this brings
+# them into main, rebuilds the pages (the same cms/build/build.py the Mac runs) and pushes. Cloudflare then deploys
+# main as it does for any push. Free: GitHub Actions costs nothing on a public repository.
+name: Publish
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: What changed
+        required: false
+        default: Update content
+permissions:
+  contents: write
+concurrency:
+  group: publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MSG: ${{ inputs.message || 'Update content' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet pillow
+      - name: Bring in the saved changes
+        run: |
+          git config user.name "Kingsley"
+          git config user.email "kingsleymkpandiok@gmail.com"
+          git fetch origin cms || { echo "No saved changes yet."; exit 0; }
+          if [ "$(git rev-list --count HEAD..origin/cms)" = "0" ]; then echo "Nothing new on the cms branch."; fi
+          git merge --no-ff --no-commit origin/cms || { echo "::error::The saved changes clash with something already live. Publish from the Mac CMS instead."; exit 1; }
+      - name: Keep the picture copies already made
+        # a fresh checkout gives every file the same age, so the build would remake every small copy; set them all to
+        # one old time, then mark only what this publish changed as new, so just those copies are (re)made
+        run: |
+          find assets -type f -print0 | xargs -0 touch -d '2000-01-01T00:00:00Z'
+          git diff --cached --name-only --diff-filter=AM -- assets | while read -r f; do [ -f "$f" ] && touch "$f"; done
+      - name: Build
+        run: |
+          python3 cms/build/build.py 2>&1 | tee build.log
+          grep -q "post ok" build.log || { echo "::error::The build did not finish. Nothing was published."; exit 1; }
+      - name: Publish
+        run: |
+          git add -A -- content assets cms Prototype live '*.html' '*.js' sitemap.xml robots.txt _redirects _headers
+          if git diff --cached --quiet && [ ! -f .git/MERGE_HEAD ]; then echo "Nothing to publish."; exit 0; fi
+          git commit -m "$MSG"
+          git push origin HEAD:main

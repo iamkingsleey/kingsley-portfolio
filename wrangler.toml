@@ -1,9 +1,39 @@
 # Cloudflare hosting: the site is served as static files straight from this repo.
 # Cloudflare deploys it on every push to main (from the CMS Publish button or git push).
+# The small script (cms/online/worker.js) only runs for /admin (the online CMS) and /site/ (its pictures); every other
+# address is a static file, served without it.
 name = "kingsley-portfolio"
 compatibility_date = "2026-10-01"
+main = "cms/online/worker.js"
 
 [assets]
 directory = "./"
+binding = "ASSETS"
 not_found_handling = "404-page"   # 404.html, as on GitHub Pages
 html_handling = "drop-trailing-slash"   # /designs serves designs.html; /designs.html and /index.html redirect to the clean address
+run_worker_first = ["/admin", "/admin/*", "/site", "/site/*"]
+
+[vars]
+REPO = "iamkingsleey/kingsley-portfolio"
+ADMIN_EMAIL = "iamkingsleey@gmail.com"
+FROM = "Kingsley FM CMS <cms@iamkingsleey.com>"
+GIT_NAME = "Kingsley"
+GIT_EMAIL = "kingsleymkpandiok@gmail.com"
+
+# the inbox Worker (cms/inbox), so the CMS can read your messages
+[[services]]
+binding = "INBOXW"
+service = "kingsley-inbox"
+
+# Preview builds (other branches, e.g. online-cms): same settings as the live site. Previews get their own address and
+# never touch iamkingsleey.com. The inbox binding reaches the live inbox Worker.
+[previews.vars]
+REPO = "iamkingsleey/kingsley-portfolio"
+ADMIN_EMAIL = "iamkingsleey@gmail.com"
+FROM = "Kingsley FM CMS <cms@iamkingsleey.com>"
+GIT_NAME = "Kingsley"
+GIT_EMAIL = "kingsleymkpandiok@gmail.com"
+
+[[previews.services]]
+binding = "INBOXW"
+service = "kingsley-inbox"
