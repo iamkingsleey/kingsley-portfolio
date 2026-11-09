@@ -43,14 +43,26 @@
    "type": "Blender add-on",
    "demo": "paper",
    "what": "Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.",
-   "stat": "180+",
+   "stat": "200+",
    "statLabel": "users",
    "tech": "Python · Blender API",
    "link": "https://extensions.blender.org/add-ons/origa/",
    "linkLabel": "Get it on Blender Extensions"
   },
   {
-   "fq": "101.3",
+   "fq": "101.2",
+   "name": "Tenant Pass",
+   "type": "Web app",
+   "demo": "stamp",
+   "what": "Rental applications without WhatsApp document dumps. Tenants apply from one link, verify their NIN, add guarantors and sign. Property managers get complete, verified applications.",
+   "stat": "",
+   "statLabel": "",
+   "tech": "Cloudflare Workers · D1",
+   "link": "https://tenant-pass-app.kaay.workers.dev",
+   "linkLabel": "Try the prototype"
+  },
+  {
+   "fq": "104.5",
    "name": "This portfolio",
    "type": "Design engineering",
    "what": "A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.",

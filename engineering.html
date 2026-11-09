@@ -2,33 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<style id="km-boot">html::after{content:"";position:fixed;inset:0;z-index:999;background:var(--bg,#0b0b0b);pointer-events:none;opacity:0;transition:opacity .2s ease}html.km-boot::after{opacity:1;transition:none}</style>
-<script>(function(d){d.classList.add("km-boot");var go=function(){if(!d.classList.contains("km-boot"))return;d.classList.remove("km-boot");document.dispatchEvent(new Event("km-shown"))};var home=/^\/?(index\.html|home)?$/.test(location.pathname),ready=function(){return document.querySelector(".kmn-scale")&&(!home||document.querySelector(".pt-rec"))};addEventListener("DOMContentLoaded",function(){var t0=Date.now(),w=function(){if(ready()||Date.now()-t0>600)requestAnimationFrame(function(){requestAnimationFrame(go)});else requestAnimationFrame(w)};w()});setTimeout(go,3000);addEventListener("pageshow",function(e){if(e.persisted)go()})})(document.documentElement)</script>
-<link rel="preload" as="script" href="site.js?v=ae33bce4">
-
-<script>window.KM_SITE = {"available": true, "shop": true, "feedback": {"on": true, "to": "iamkingsleey@gmail.com", "after": 3}, "inbox": {"url": "https://kingsley-inbox.kingsleymkpandiok.workers.dev", "email": true}, "click": "auto", "volume": 195, "needle": "line", "corners": "rounded"};document.documentElement.dataset.corners=window.KM_SITE.corners;window.kmNeedle=function(c,x,y,w,h){c.fillRect(x,y,w,h);var k=(window.KM_SITE||{}).needle||"line";if(k==="line")return;var hz=w>h,t=Math.min(w,h),hx=hz?x+w:x+w/2,hy=hz?y+h/2:y;c.beginPath();if(k==="dot"){c.arc(hx,hy,t*1.4+1.5,0,7)}else if(k==="diamond"){var d=t*1.6+2;c.moveTo(hx-d,hy);c.lineTo(hx,hy-d);c.lineTo(hx+d,hy);c.lineTo(hx,hy+d)}else if(k==="triangle"){var s=t*1.7+2;if(hz){c.moveTo(hx+s*1.3,hy);c.lineTo(hx-s*.4,hy-s);c.lineTo(hx-s*.4,hy+s)}else{c.moveTo(hx,hy-s*1.3);c.lineTo(hx-s,hy+s*.4);c.lineTo(hx+s,hy+s*.4)}}else if(k==="cap"){var L=t*2.6+3;if(hz)c.rect(hx-t,hy-L,t*1.6,L*2);else c.rect(hx-L,hy-t*.6,L*2,t*1.6)}c.closePath();c.fill()};window.kmSend=function(o){var u=(window.KM_SITE.inbox||{}).url;if(!u)return Promise.resolve(false);var b=Object.assign({page:(location.pathname.split("/").pop()||"index.html").replace(/^([a-z0-9-]+)$/i,"$1.html").replace(/^home\.html$/,"index.html")+location.hash},o);return fetch(u+"/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.ok}).catch(function(){return false})};</script>
-<style id="km-corners">html[data-corners="rounded"]{--km-r:14px}html[data-corners="rounded"] :is(.ov-im,.fly,.km-keep,figure.m,.pc .im,figure .im,.print,.lpanel,.sbig,figure.sw .m,.onair,figure.slot,figure.panel,figure.lay,.pn .in,.d-frame,.d-pic,span.th,.keep,.gal .main){border-radius:var(--km-r)!important;overflow:hidden}html[data-corners="rounded"] .lb img{border-radius:var(--km-r)!important}html[data-corners="rounded"] figure.sw .m img{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.gal .thumbs button,#strip button,.d-gt){border-radius:8px!important;overflow:hidden}html[data-corners="rounded"] :is(#strip button,.d-gt) img{border-radius:inherit}html[data-corners="rounded"] .call{border-radius:var(--km-r)!important}html[data-corners="rounded"] :is(.slot,figure.slot,figure.panel,figure.lay,.pn .in)>:is(img,video,canvas),html[data-corners="rounded"] :is(figure.slot,figure.panel) :is(img,video){border-radius:var(--km-r)!important}html[data-corners="rounded"] .kb{border-radius:var(--km-r)!important}html[data-corners="sharp"] :is(.kb,.wb .stage){border-radius:0!important}</style>
-
-<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/favicon-180.png">
 <script>
   // Theme: the visitor's saved pick, else dark. Shared by every page.
   (function () { var t; try { if (!localStorage.getItem('km-theme-v2')) { localStorage.removeItem('km-theme'); localStorage.setItem('km-theme-v2', '1'); } t = localStorage.getItem('km-theme'); } catch (e) {}   /* v2: forget the dark choice Designs used to save on its own (Nov 2026) */
     if (!t) t = 'dark';   // dark unless the visitor picks light with a theme button (a pick is the only thing ever saved)
     document.documentElement.dataset.theme = t; })();
 </script>
-<script src="tuner.js?v=157a1111"></script>
+<script src="tuner.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Engineering · Kingsley M.</title>
-<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-latin.woff2) format("woff2")}@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-mono-latin.woff2) format("woff2")}@font-face{font-family:"Jockey One";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/jockey-one-latin.woff2) format("woff2")}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jockey+One&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <style>
 /* About page: the signal tunes in to a face (lines across the whole screen), one statement, the career as a
    band you tune through, skills as a mixing desk, on air from Lagos and calling in to the station. Geist throughout; Jockey One only for the name. */
 :root {
   --bg: #ffffff; --ink: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #c8c8c8; --pill: #f2f2f2; --panel: #f3f3f3;
-  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #fb233b;
+  --line: #e4e4e4; --edge: rgb(0 0 0 / .08); --red: #ff4a1c;
   --body: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --display: "Jockey One", "Arial Narrow", Impact, sans-serif;
@@ -166,7 +156,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .call input, .call textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 0; font-size: 16px; color: var(--ink); outline: none; resize: none; transition: border-color .3s }
 .call input:focus, .call textarea:focus { border-color: var(--ink) }
 .call input:focus-visible, .call textarea:focus-visible { border-color: var(--ink); box-shadow: 0 1px 0 var(--ink) }   /* keyboard: a clear, thicker line under the field you're in */
-.call .cerr { margin: 0; color: #fb233b }
+.call .cerr { margin: 0; color: #ff4a1c }
 .call .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto }
 .call .send { height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500 }
 .call .links { display: flex; gap: 16px; flex-wrap: wrap } .call .links a { color: var(--muted); font-size: 13px; text-decoration: none } .call .links a:hover { color: var(--ink) }
@@ -218,30 +208,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 @media (max-width: 360px) { .skills { column-gap: 10px } .sktools { left: 46px; gap: 5px } .skscale canvas { width: 38px } }   /* the smallest phones: keep the tools inside the margin */
 @media (prefers-reduced-motion: reduce) { .rv { transition: none; translate: none; opacity: 1 } }
 </style>
-<script>window.goatcounter = { path: function () { return location.pathname.replace(/\/index\.html$/, "/") + location.hash; } };
-  window.KMtrack = function (path, title) { var go = function () { try { window.goatcounter.count({ path: path, title: title, event: true }); } catch (_) {} };
-    if (window.goatcounter && window.goatcounter.count) go(); else (window.__kmq = window.__kmq || []).push(go); };</script>
-<script data-goatcounter="https://iamkingsleey.goatcounter.com/count" async src="//gc.zgo.at/count.js" onload="(window.__kmq||[]).forEach(function(f){f()});window.__kmq=[]"></script>
-<script src="track.js" defer></script>
-<meta name="description" content="Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Kingsley M.">
-<meta property="og:title" content="Engineering · Kingsley M.">
-<meta property="og:description" content="Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.">
-<meta property="og:url" content="https://iamkingsleey.com/engineering">
-<meta property="og:image" content="https://iamkingsleey.com/assets/og-preview-3.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A collage of Kingsley's design work: 3D renders, product screens and the Oghosa brand">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Engineering · Kingsley M.">
-<meta name="twitter:description" content="Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.">
-<meta name="twitter:image" content="https://iamkingsleey.com/assets/og-preview-3.jpg">
-<link rel="canonical" href="https://iamkingsleey.com/engineering">
-<style>html{scrollbar-gutter:stable}</style>
 </head>
 <body>
-<div class="station" data-readout><a class="back" href="./" id="back"><span aria-hidden="true">‹</span><b>98.0</b> Home</a><span class="fq">96.0</span><span class="nm">Engineering</span></div>
+<div class="station" data-readout><a class="back" href="index.html#home" id="back"><span aria-hidden="true">‹</span><b>98.0</b> Home</a><span class="fq">96.0</span><span class="nm">Engineering</span></div>
 
   <!-- 1 · hero: the signal tunes in to a face -->
 <!-- hero, switched off for now: the page opens on the statement (inner comment markers written as <!~~ ~~> so this block stays one comment)
@@ -268,11 +237,11 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   <section class="band wbband" id="band" hidden><div class="bpin"><div class="bruler"><canvas id="brc"></canvas></div><div class="bcard" id="bcard"></div></div></section>
   <section class="wb" id="wb" aria-label="Things I’ve built"></section><style>#wb:empty { min-height: 100vh }</style>
 
-  <div class="foot"><span class="mono">Kingsley M. · 96.0 Engineering</span><a class="mono" href="./" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
+  <div class="foot"><span class="mono">Kingsley M. · 96.0 Engineering</span><a class="mono" href="index.html#home" id="back2" style="text-decoration:none">Back to 98.0 Home</a></div>
 </main>
 <div class="sdial"><canvas id="sdial" aria-label="Sections"></canvas></div>
 
-<script src="popkit.js?v=0c2c8784"></script>
+<script src="popkit.js"></script>
 <script>
   // One click sound for the whole site: Home's pop on every link, button, pill and chip (Home's sound switch decides)
   (function () { var SEL = 'a,button,[role="button"],.pill,.chip,.tile,.tool,summary,label';
@@ -285,9 +254,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 <script>
 (function () {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HEAD = 'assets/headshot.webp';
+  const HEAD = 'assets/headshot.jpg';
   const $ = id => document.getElementById(id);
-  const RED = '#fb233b', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const RED = '#ff4a1c', ink = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const snd = n => { let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} if (on && window.Popkit) Popkit.play(n); };   // Home's sound switch
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const narrow = innerWidth < 900;
@@ -332,8 +301,9 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
     ['88.1', 'LineCraft', 'Figma plugin', 'Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.', '240+', 'users', 'TypeScript · Figma API', '', '', 'https://www.figma.com/community/plugin/1666142410490475207/linecraft', 'Get it on Figma'],
     ['91.4', 'MeshCraft', 'Figma plugin', '3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.', '160+', 'users', 'TypeScript · Figma API', '', '', 'https://www.figma.com/community/plugin/1668399347356779904/meshcraft', 'Get it on Figma'],
     ['94.7', 'Protoreel', 'Playwright tool', 'Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.', '', '', 'Node · Playwright', '', '', 'https://github.com/iamkingsleey/protoreel', 'View on GitHub'],
-    ['97.9', 'Origa', 'Blender add-on', 'Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.', '180+', 'users', 'Python · Blender API', '', '', 'https://extensions.blender.org/add-ons/origa/', 'Get it on Blender Extensions'],
-    ['101.3', 'This portfolio', 'Design engineering', 'A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.', '', '', 'HTML · CSS · JavaScript']
+    ['97.9', 'Origa', 'Blender add-on', 'Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.', '200+', 'users', 'Python · Blender API', '', '', 'https://extensions.blender.org/add-ons/origa/', 'Get it on Blender Extensions'],
+    ['101.2', 'Tenant Pass', 'Web app', 'Rental applications without WhatsApp document dumps. Tenants apply from one link, verify their NIN, add guarantors and sign. Property managers get complete, verified applications.', '', '', 'Cloudflare Workers · D1', '', '', 'https://tenant-pass-app.kaay.workers.dev', 'Try the prototype'],
+    ['104.5', 'This portfolio', 'Design engineering', 'A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.', '', '', 'HTML · CSS · JavaScript']
   ];
   const band = $('band'), bcard = $('bcard'), brc = $('brc'), bx = brc.getContext('2d');
   band.style.height = (CH.length * 56 + 40) + 'vh';
@@ -474,7 +444,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 .wb .stage.chan .demo, .wb .stage.chan img { animation: chan .7s cubic-bezier(.5,0,.2,1) }
 .wb .stage.chan .live, .wb .stage.chan .fqr { animation: flick .35s steps(6) }
 .wb .stage.chan::after { content: ''; position: absolute; z-index: 4; left: 0; right: 0; top: calc(50% + 32px); height: 2px; margin-top: -1px; background: var(--ink); box-shadow: 0 0 18px 2px var(--ink), 0 0 2px 1px var(--red); animation: beam .7s cubic-bezier(.5,0,.2,1) forwards; pointer-events: none }
-@keyframes chan { 0% { transform: scaleY(1); filter: none; opacity: 1 } 14% { transform: scaleY(1); filter: blur(1px); opacity: .5 } 34% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 46% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 72% { transform: scaleY(1.06) translateY(-4%); filter: drop-shadow(4px 0 rgb(251 35 59 / .85)) drop-shadow(-4px 0 rgb(0 190 255 / .6)) } 86% { transform: scaleY(.98) translateY(1%); filter: drop-shadow(1.5px 0 rgb(251 35 59 / .6)) drop-shadow(-1.5px 0 rgb(0 190 255 / .4)) } 100% { transform: none; filter: none; opacity: 1 } }
+@keyframes chan { 0% { transform: scaleY(1); filter: none; opacity: 1 } 14% { transform: scaleY(1); filter: blur(1px); opacity: .5 } 34% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 46% { transform: scaleY(.006) scaleX(1.06); filter: brightness(4) } 72% { transform: scaleY(1.06) translateY(-4%); filter: drop-shadow(4px 0 rgb(255 74 28 / .85)) drop-shadow(-4px 0 rgb(0 190 255 / .6)) } 86% { transform: scaleY(.98) translateY(1%); filter: drop-shadow(1.5px 0 rgb(255 74 28 / .6)) drop-shadow(-1.5px 0 rgb(0 190 255 / .4)) } 100% { transform: none; filter: none; opacity: 1 } }
 @keyframes flick { 0%, 100% { opacity: 1 } 20% { opacity: .2 } 40% { opacity: .9 } 60% { opacity: .1 } 80% { opacity: .7 } }
 @keyframes beam { 0%, 20% { opacity: 0; transform: scaleX(.3) } 34% { opacity: 1; transform: scaleX(1) } 46% { opacity: 1; transform: scaleX(1) } 62% { opacity: 0; transform: scaleX(.02) } 100% { opacity: 0 } }
 @keyframes wbring { 0% { transform: scale(1); opacity: .8 } 100% { transform: scale(3.2); opacity: 0 } }
@@ -496,12 +466,57 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
 </style>
 <script>
 (() => {
-  const TOOLS = [{"fq": "88.1", "name": "LineCraft", "type": "Figma plugin", "what": "Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.", "stat": "240+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1666142410490475207/linecraft", "linkLabel": "Get it on Figma"}, {"fq": "91.4", "name": "MeshCraft", "type": "Figma plugin", "what": "3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.", "stat": "160+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1668399347356779904/meshcraft", "linkLabel": "Get it on Figma"}, {"fq": "94.7", "name": "Protoreel", "type": "Playwright tool", "what": "Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.", "stat": "", "statLabel": "", "tech": "Node · Playwright", "link": "https://github.com/iamkingsleey/protoreel", "linkLabel": "View on GitHub"}, {"fq": "97.9", "name": "Origa", "type": "Blender add-on", "demo": "paper", "what": "Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.", "stat": "180+", "statLabel": "users", "tech": "Python · Blender API", "link": "https://extensions.blender.org/add-ons/origa/", "linkLabel": "Get it on Blender Extensions"}, {"fq": "101.3", "name": "This portfolio", "type": "Design engineering", "what": "A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.", "stat": "", "statLabel": "", "tech": "HTML · CSS · JavaScript"}], host = document.getElementById('wb'); if (!host || !TOOLS.length) return;
+  const TOOLS = [{"fq": "88.1", "name": "LineCraft", "type": "Figma plugin", "what": "Generative line and pattern tools for vectors: zig zags today, chevrons, flowing and woven lines next. Every line stays editable.", "stat": "240+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1666142410490475207/linecraft", "linkLabel": "Get it on Figma"}, {"fq": "91.4", "name": "MeshCraft", "type": "Figma plugin", "what": "3D wireframe shapes drawn as plain vectors, so a sphere, a torus or a hyperboloid can be styled like anything else in Figma.", "stat": "160+", "statLabel": "users", "tech": "TypeScript · Figma API", "link": "https://www.figma.com/community/plugin/1668399347356779904/meshcraft", "linkLabel": "Get it on Figma"}, {"fq": "94.7", "name": "Protoreel", "type": "Playwright tool", "what": "Turns HTML interaction prototypes into clean social videos: scripted cursor, real timing, framed and exported in one go.", "stat": "", "statLabel": "", "tech": "Node · Playwright", "link": "https://github.com/iamkingsleey/protoreel", "linkLabel": "View on GitHub"}, {"fq": "97.9", "name": "Origa", "type": "Blender add-on", "demo": "paper", "what": "Shapes paper inside Blender from a plane mesh: fold, roll, curl, arch, crumple. Built for money first, with real banknote sizes, flying and rolled cash, and a Money Rain generator.", "stat": "200+", "statLabel": "users", "tech": "Python · Blender API", "link": "https://extensions.blender.org/add-ons/origa/", "linkLabel": "Get it on Blender Extensions"}, {"fq": "101.2", "name": "Tenant Pass", "type": "Web app", "demo": "stamp", "what": "Rental applications without WhatsApp document dumps. Tenants apply from one link, verify their NIN, add guarantors and sign. Property managers get complete, verified applications.", "stat": "", "statLabel": "", "tech": "Cloudflare Workers · D1", "link": "https://tenant-pass-app.kaay.workers.dev", "linkLabel": "Try the prototype"}, {"fq": "104.5", "name": "This portfolio", "type": "Design engineering", "what": "A site you tune like a radio. The dial, the tuner between pages and every transition, hand-built with no framework.", "stat": "", "statLabel": "", "tech": "HTML · CSS · JavaScript"}], host = document.getElementById('wb'); if (!host || !TOOLS.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const guess = t => t.demo || (/line/i.test(t.name) ? 'line' : /origa|paper|blender/i.test(t.name + t.type) ? 'paper' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
-  const col = () => { const s = getComputedStyle(document.documentElement); return { ink: s.getPropertyValue('--ink').trim() || '#000', muted: s.getPropertyValue('--muted').trim() || '#888', panel: s.getPropertyValue('--panel').trim() || '#eee', red: '#fb233b' }; };
+  const guess = t => t.demo || (/tenant|stamp/i.test(t.name) ? 'stamp' : /line/i.test(t.name) ? 'line' : /origa|paper|blender/i.test(t.name + t.type) ? 'paper' : /mesh|3d|wire/i.test(t.name + t.type) ? 'mesh' : /reel|video|playwright/i.test(t.name + t.type) ? 'reel' : 'dial');
+  const col = () => { const s = getComputedStyle(document.documentElement); return { ink: s.getPropertyValue('--ink').trim() || '#000', muted: s.getPropertyValue('--muted').trim() || '#888', panel: s.getPropertyValue('--panel').trim() || '#eee', red: '#ff4a1c' }; };
   const PT = { on: false, x: .5, y: .5, rot: 0, t0: 0 };   // the visitor's pointer over the stage
+  // Tenant Pass: a little stamping machine. Applications ride a belt, stop under a wireframe stamp, it thumps down, squashes
+  // and lifts off leaving a red tick, and the belt carries the next one in. Moving across speeds the belt up.
+  const stampDemo = (() => {
+    const clamp = x => Math.max(0, Math.min(1, x)), seg = (q, a, b) => clamp((q - a) / (b - a)), lerp = (a, b, k) => a + (b - a) * k;
+    const eo = x => 1 - Math.pow(1 - clamp(x), 3), eio = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+    const R3 = (p, o) => { let [x, y, z] = p; if (o.rx) { const c = Math.cos(o.rx), n = Math.sin(o.rx); [y, z] = [y * c - z * n, y * n + z * c]; } const t = o.t || [0, 0, 0]; return [x + t[0], y + t[1], z + t[2]]; };
+    const view = (W, H, yaw, pitch, sc, oy) => { const c = Math.cos(yaw), n = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+      return ([x, y, z]) => { const X = x * c + z * n, Z = -x * n + z * c, Y = y * cp - Z * sp; return [W / 2 + X * sc, H / 2 + oy - Y * sc]; }; };
+    const L = (g, P, pts, close) => { g.beginPath(); pts.forEach((p, i) => { const [x, y] = P(p); i ? g.lineTo(x, y) : g.moveTo(x, y); }); if (close) g.closePath(); g.stroke(); };
+    const sty = (g, c, a, w) => { g.strokeStyle = c; g.globalAlpha = a; g.lineWidth = w; };
+    const ring = (cx, cy, r, n = 40) => Array.from({ length: n + 1 }, (_, k) => [cx + Math.cos(k / n * Math.PI * 2) * r, cy + Math.sin(k / n * Math.PI * 2) * r]);
+    const tick3 = (Q, cx, cy, r) => [[-.42, .02], [-.12, -.28], [.44, .32]].map(([u, v]) => Q(cx + u * r, cy + v * r));
+    let c = 0, lt = null;
+    return (g, W, H, t, C) => {
+      const dt = lt === null ? 0 : Math.max(0, Math.min(64, t - lt)); lt = t; c += dt / (PT.on ? lerp(3600, 1100, PT.x) : 2600);
+      const n = Math.floor(c), f = c - n, p = 1.5 * (n + eio(seg(f, .45, 1)));
+      const sc = Math.min(W * .22, H * .4), P = view(W, H, -.5, .55, sc, H * .09);
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      // the belt, with slats that move with it
+      sty(g, C.ink, 1, 1.4); L(g, P, [[-2.4, -.5, .62], [2.4, -.5, .62]]); L(g, P, [[-2.4, -.5, -.62], [2.4, -.5, -.62]]);
+      sty(g, C.ink, .3, 1); L(g, P, [[-2.4, -.62, .62], [2.4, -.62, .62]]);
+      for (let k = -9; k <= 9; k++) { const x = k * .3 + (p % .3); if (Math.abs(x) > 2.4) continue; sty(g, C.ink, .14 * (1 - Math.abs(x) / 2.6), 1); L(g, P, [[x, -.5, .62], [x, -.5, -.62]]); }
+      // the applications on it
+      for (let i = 0; i < 4; i++) { const x = -3 + (((p + i * 1.5) % 6) + 6) % 6, a = clamp((2.5 - Math.abs(x)) / .6); if (a <= 0) continue;
+        const o = { rx: -Math.PI / 2, t: [x, -.49, 0] }, Q = (u, v, z = 0) => R3([u, v, z], o);
+        sty(g, C.ink, .16 * a, 1); for (let k = 1; k < 7; k++) { const u = -.42 + .84 * k / 7; L(g, P, [Q(u, -.5), Q(u, .5)]); }
+        sty(g, C.ink, a, 1.5); L(g, P, [Q(-.42, -.5), Q(.42, -.5), Q(.42, .5), Q(-.42, .5)], true);
+        sty(g, C.ink, .35 * a, 1); for (let k = 0; k < 4; k++) L(g, P, [Q(-.3, .32 - k * .13), Q(k % 2 ? .05 : .25, .32 - k * .13)]);
+        if (x > .01 || (Math.abs(x) < .01 && f > .19)) { sty(g, C.red, a, 1.8); L(g, P, ring(.06, -.22, .17, 32).map(([u, v]) => Q(u, v, .002))); sty(g, C.red, a, 2.2); L(g, P, tick3((u, v) => Q(u, v, .002), .06, -.22, .19)); } }
+      // the impact ring
+      const ip = seg(f, .18, .4); if (ip > 0 && ip < 1) { sty(g, C.red, (1 - ip) * .8, 1.4); L(g, P, ring(0, 0, .3 + ip * .6, 40).map(([x, z]) => [x, -.49, z])); }
+      // the stamp: drops fast, squashes on contact, lifts off
+      const drop = Math.pow(seg(f, .05, .18), 3), up = eo(seg(f, .26, .42)), yb = -.48 + .95 * (1 - drop) + .95 * up * (drop >= 1 ? 1 : 0);
+      const sq = f > .18 && f < .3 ? 1 - Math.sin(seg(f, .18, .3) * Math.PI) * .25 : 1, bh = .2 * sq, y1 = yb + bh;
+      sty(g, C.ink, 1, 1.5); [[yb], [y1]].forEach(([y]) => L(g, P, [[-.3, y, -.3], [.3, y, -.3], [.3, y, .3], [-.3, y, .3]], true)); [[-.3, -.3], [.3, -.3], [.3, .3], [-.3, .3]].forEach(([x, z]) => L(g, P, [[x, yb, z], [x, y1, z]]));
+      sty(g, C.red, 1, 1.6); L(g, P, [[-.24, yb, -.24], [.24, yb, -.24], [.24, yb, .24], [-.24, yb, .24]], true);   // the inked face
+      const h1 = y1 + .42;
+      sty(g, C.ink, 1, 1.3); L(g, P, ring(0, 0, .07, 24).map(([x, z]) => [x, y1, z])); L(g, P, ring(0, 0, .07, 24).map(([x, z]) => [x, h1, z]));
+      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; sty(g, C.ink, k % 3 ? .35 : 1, 1.2); L(g, P, [[Math.cos(a) * .07, y1, Math.sin(a) * .07], [Math.cos(a) * .07, h1, Math.sin(a) * .07]]); }
+      const kr = .17, ky = h1 + kr * .8; sty(g, C.ink, .35, 1);
+      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI; L(g, P, Array.from({ length: 25 }, (_, j) => { const b = j / 24 * Math.PI * 2; return [Math.cos(b) * Math.cos(a) * kr, ky + Math.sin(b) * kr, Math.cos(b) * Math.sin(a) * kr]; })); }
+      sty(g, C.ink, 1, 1.4); L(g, P, ring(0, 0, kr, 32).map(([x, z]) => [x, ky, z]));
+      g.globalAlpha = 1; };
+  })();
   const DEMOS = {
+    stamp: (g, W, H, t, C) => stampDemo(g, W, H, t, C),
     line(g, W, H, t, C) { g.lineWidth = 2; g.lineJoin = 'round'; const rows = 7, sharp = PT.on ? .25 + PT.x * 2.2 : 1;   // move across: flatter to sharper
       for (let r = 0; r < rows; r++) { const y0 = H * (.2 + r * .6 / (rows - 1)), amp = H * .045 * sharp * (1 + Math.sin(t * .0012 + r * .6) * .6), n = 9 + r, ph = t * .0006 * (r % 2 ? 1 : -1);
         g.globalAlpha = r === 3 ? 1 : .55; g.strokeStyle = r === 3 ? C.red : C.ink; g.beginPath(); for (let i = 0; i <= n * 2; i++) { const x = W * .12 + (W * .76) * i / (n * 2), y = y0 + (i % 2 ? -amp : amp) * Math.cos(ph + i * .2); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } g.globalAlpha = 1; },
@@ -602,7 +617,7 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
   dial.addEventListener('keydown', e => { const dir = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!dir) return; e.preventDefault(); user = true; tgt = FQ[Math.max(0, Math.min(FQ.length - 1, near(tgt) + dir))]; });
   // try it yourself: the drawing answers the pointer, and the stage leans towards it a little
   const hint = stage.querySelector('.hint'), fine = matchMedia('(pointer: fine)').matches; let spin = null;
-  const hintFor = () => { const k = guess(TOOLS[Math.max(0, cur)]); return { line: 'Move across to sharpen the zig zags', mesh: 'Drag to spin it', paper: 'Move across to roll the note', reel: (fine ? 'Click' : 'Tap') + ' to run it again', dial: 'Move across to tune' }[k] || ''; };
+  const hintFor = () => { const k = guess(TOOLS[Math.max(0, cur)]); return { line: 'Move across to sharpen the zig zags', mesh: 'Drag to spin it', paper: 'Move across to roll the note', reel: (fine ? 'Click' : 'Tap') + ' to run it again', stamp: 'Move across to speed up the belt', dial: 'Move across to tune' }[k] || ''; };
   window._wbHint = () => { if (stage.classList.contains('play')) hint.textContent = hintFor(); };
   stage.addEventListener('pointerenter', () => { if (TOOLS[Math.max(0, cur)].picture) return; stage.classList.add('play'); hint.textContent = hintFor(); });
   stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
@@ -643,9 +658,5 @@ main > .stmt:first-child { padding-top: calc(var(--sp) + 60px) }   /* first thin
       a.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey) return; e.preventDefault();
         if (window.Tuner) Tuner.go({ from: 96, to: 98, name: 'Home', href: a.getAttribute('href') }); else location.href = a.getAttribute('href'); }); });
   </script>
-  <style id="km-toggles">.km-tg{position:fixed;z-index:150;top:calc(48px + env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;background:var(--pill,#f2f2f2);color:var(--ink,#000);cursor:pointer;transition:background .2s}.km-tg:hover{background:color-mix(in srgb,var(--ink,#000) 12%,var(--bg,#fff))}#themeBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 40px)}#soundBtn.km-tg{right:calc(max(24px,env(safe-area-inset-right,0px)) + 84px)}#themeBtn.km-tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}#soundBtn.km-tg svg{width:15px;height:15px;fill:currentColor}@media (max-width:899px){.km-tg{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto;width:36px;height:36px}#themeBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 46px)}#soundBtn.km-tg{right:calc(max(16px,env(safe-area-inset-right,0px)) + 88px)}}@media (min-width:900px){html:has(.cnav) .km-tg{top:calc(102px + env(safe-area-inset-top,0px))}}@media print{.km-tg{display:none}}</style><button class="km-tg" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="km-tg" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>
-<script>(function(){var sb=document.getElementById("soundBtn"),si=document.getElementById("soundIco"),tb=document.getElementById("themeBtn"),ti=document.getElementById("themeIco");var ON='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.2a3.5 3.5 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',OFF='<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',MOON='<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/>',SUN='<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>';var on=true;try{on=localStorage.getItem("km-sound")!=="off"}catch(e){}function ps(){si.innerHTML=on?ON:OFF;sb.setAttribute("aria-pressed",on);sb.setAttribute("aria-label",on?"Mute sound":"Turn sound on");if(window.Popkit)Popkit.mute(!on)}sb.addEventListener("click",function(){on=!on;try{localStorage.setItem("km-sound",on?"on":"off")}catch(e){}ps();dispatchEvent(new CustomEvent("km-sound",{detail:on}));if(on&&window.Popkit)Popkit.play("pop")});function pt(){var d=document.documentElement.dataset.theme==="dark";ti.innerHTML=d?SUN:MOON;tb.setAttribute("aria-pressed",d);tb.setAttribute("aria-label",d?"Light mode":"Dark mode")}tb.addEventListener("click",function(){var t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem("km-theme",t)}catch(e){}pt()});new MutationObserver(pt).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});ps();pt();addEventListener("load",ps)})();</script>
-<script>if('serviceWorker' in navigator && location.protocol !== 'file:' && !/[?&]cms=1/.test(location.search)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
-<script src="site.js?v=ae33bce4" defer></script>
-</body>
+  </body>
 </html>
