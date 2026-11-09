@@ -53,7 +53,7 @@
    "fq": "101.2",
    "name": "Tenant Pass",
    "type": "Web app",
-   "demo": "stamp",
+   "demo": "apply",
    "what": "Rental applications without WhatsApp document dumps. Tenants apply from one link, verify their NIN, add guarantors and sign. Property managers get complete, verified applications.",
    "stat": "",
    "statLabel": "",
