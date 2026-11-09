@@ -7,6 +7,8 @@ import json, urllib.parse, re, os, time
 BUILD = time.strftime('%Y%m%d%H%M')   # cache-buster for designs.html links
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+STATE = os.path.join(HERE, '.build-state')   # 'building' while pages are half written, 'done' at the end: git refuses to commit in between (.githooks/pre-commit)
+open(STATE, 'w').write('building')
 REPO = os.path.abspath(os.path.join(HERE, '..', '..'))   # the site's folder
 KFM = os.path.join(HERE, 'src')                           # page templates
 GEN = os.path.join(HERE, '.gen'); os.makedirs(GEN, exist_ok=True)   # pages made from templates + content, before the last step
@@ -529,3 +531,4 @@ if _shop_on:
   open(f'{REPO}/shop.html', 'w', encoding='utf-8').write(_sh_src)
 exec(open(f'{KFM}/tools/post.py').read())   # your text and picture changes, analytics, and the list the CMS edits
 print('ok', len(s), len(d))
+open(STATE, 'w').write('done')

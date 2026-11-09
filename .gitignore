@@ -27,3 +27,4 @@ cms/build/.last-build-ok
 # local Worker test files
 .wrangler/
 .dev.vars
+cms/build/.build-state

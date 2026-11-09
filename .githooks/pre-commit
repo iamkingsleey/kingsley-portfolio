@@ -1,0 +1,26 @@
+#!/bin/sh
+# Stops a commit that would send half-built pages to the live site.
+# The build writes every page twice (made from the templates, then finished by the last step), so a commit made
+# while it runs can catch pages without their favicons, fonts, settings and analytics. Two checks:
+root=$(git rev-parse --show-toplevel)
+state="$root/cms/build/.build-state"
+if [ -f "$state" ] && [ "$(cat "$state")" != "done" ]; then
+  echo ""
+  echo "  Not committed: the site is still building (or the last build stopped partway)."
+  echo "  Wait until the build prints 'ok', or run:  python3 cms/build/build.py"
+  echo ""
+  exit 1
+fi
+bad=""
+for f in $(git diff --cached --name-only --diff-filter=AM -- '*.html'); do
+  case "$f" in */*|404.html|offline.html) continue ;; esac
+  git show ":$f" | grep -q 'id="km-boot"' || bad="$bad $f"
+done
+if [ -n "$bad" ]; then
+  echo ""
+  echo "  Not committed: these pages are only half built:$bad"
+  echo "  Run:  python3 cms/build/build.py   then add and commit again."
+  echo ""
+  exit 1
+fi
+exit 0
