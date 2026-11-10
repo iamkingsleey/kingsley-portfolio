@@ -41,7 +41,7 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0b0b; --fg: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #5c5c5c; --line: #242424; --soft: #1c1c1c; --panel: #121212; --chip: #1c1c1c; --on-chip: #c9c9c9; --stage: #121212; --brand: #4598E2; --sell: #67BC40; --ok: #67BC40; --bad: #ED8080; --warn: #D9C88E; color-scheme: dark } }
 :root[data-theme="dark"] { --bg: #0b0b0b; --fg: #ffffff; --text: #c9c9c9; --muted: #8a8a8a; --faint: #5c5c5c; --line: #242424; --soft: #1c1c1c; --panel: #121212; --chip: #1c1c1c; --on-chip: #c9c9c9; --stage: #121212; --brand: #4598E2; --sell: #67BC40; --ok: #67BC40; --bad: #ED8080; --warn: #D9C88E; color-scheme: dark }
 /* Kusnap screens: the product UI was designed light only, so every stage that shows it keeps the light Kusnap tokens even when the page is dark */
-.heroart, .astage, .an-stage, .side, .bstage, .estage, .xstage, .kc-stage, .fc .ba > div { --bg: #ffffff; --fg: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #9a9a9a; --line: #e4e4e4; --soft: #f2f2f2; --panel: #f4f4f4; --chip: #f2f2f2; --on-chip: #3b3b3b; --stage: #f4f4f4; --brand: #0776D8; --sell: #34A500; --ok: #2A8400; --bad: #AF0000; --warn: #8E7416; color-scheme: light; color: var(--fg) }
+.heroart, .astage, .an-stage, .side, .bstage, .estage, .xstage, .kc-stage, .lcstage, .fc .ba > div { --bg: #ffffff; --fg: #000000; --text: #3b3b3b; --muted: #6f6f6f; --faint: #9a9a9a; --line: #e4e4e4; --soft: #f2f2f2; --panel: #f4f4f4; --chip: #f2f2f2; --on-chip: #3b3b3b; --stage: #f4f4f4; --brand: #0776D8; --sell: #34A500; --ok: #2A8400; --bad: #AF0000; --warn: #8E7416; color-scheme: light; color: var(--fg) }
 * { box-sizing: border-box }
 body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased }
 .wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
@@ -244,7 +244,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .bctl .g + .g { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line) }
 .bctl .bnote { margin-top: 20px }
 .bnote { font-size: 13px; color: var(--muted) }
-@media (max-width: 920px) { .bx { grid-template-columns: 1fr } .bstage { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 32px } }
+@media (max-width: 920px) { .bx { grid-template-columns: minmax(0, 1fr) } .bstage { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 32px } }
 
 /* ===== 05 elevation ===== */
 .ev { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) }
@@ -557,6 +557,291 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .ix li button { display: block; width: 100%; height: 30px; padding: 0; border: 0; background: none; text-align: left; font: 500 14px/30px var(--body); letter-spacing: -.01em; color: var(--muted); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: color .25s, opacity .25s }
 .ix li button:hover, .ix li button.on { color: var(--fg); opacity: 1 }
 .ix li button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px }
+/* ---- how the product card changed (before, after, release) ---- */
+.lcstage { position: relative; background: var(--stage); border-radius: 16px; padding: 72px 32px 40px; color: var(--fg) }
+@media (max-width: 640px) { .lcstage { padding: 64px 16px 20px } }
+.k-like.k-like-old { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 4px 2px }
+.k-cond { padding: 4px 6px; border-radius: 4px; background: #fff; font: 500 10px/1.33 Inter, sans-serif; letter-spacing: .1px; color: #64748B }
+/* F · how a component ships, told through the product card */
+.lc { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; padding: 4px 0 6px }
+.lc { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)) }
+.lc::before { content: ""; position: absolute; left: calc(50% / var(--n, 5)); right: calc(50% / var(--n, 5)); top: 18px; height: 2px; background: #e4e7eb }
+.lc .fill { position: absolute; left: calc(50% / var(--n, 5)); top: 18px; height: 2px; background: #000; width: 0; transition: width .45s cubic-bezier(.23,1,.32,1) }
+.lc button { position: relative; border: 0; background: none; padding: 0 4px; display: grid; justify-items: center; gap: 10px; cursor: pointer; font: inherit; color: #6f6f6f; text-align: center }
+.lc .n { width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 1.5px #d5d9de; display: grid; place-items: center; font: 500 11px/1 var(--mono); color: #6f6f6f; transition: background .25s ease-out, color .25s ease-out, box-shadow .25s ease-out }
+.lc button.done .n { background: #000; color: #fff; box-shadow: none }
+.lc button[aria-pressed="true"] .n { background: #000; color: #fff; box-shadow: 0 0 0 4px rgb(0 0 0 / .08) }
+.lc b { font: 500 13px/1.3 var(--body); letter-spacing: -.005em; transition: color .2s ease-out }
+.lc button[aria-pressed="true"] b { color: #000 }
+.lc button:focus-visible { outline: 2px solid #000; outline-offset: 4px; border-radius: 8px }
+@media (max-width: 640px) { .lc b { display: none } .lc button[aria-pressed="true"] b { display: block; position: absolute; top: 40px; white-space: nowrap } .lc { padding-bottom: 28px } .lc button:first-of-type[aria-pressed="true"] b { left: 0 } .lc button:last-child[aria-pressed="true"] b { right: 0 } }
+.lc-body { margin-top: 20px; background: #fff; border-radius: 16px; overflow: hidden }
+.lc-vis { min-height: 360px; display: flex; align-items: flex-start; justify-content: center; gap: 24px; padding: 32px 20px; flex-wrap: wrap }
+.lc-vis .k-pc { width: 250px; zoom: .88; flex: none }
+.lc-vis .old .k-info .k-np { gap: 2px }
+.lc-vis figure { margin: 0; display: grid; gap: 12px; justify-items: center; transition: opacity .3s ease-out }
+.lc-vis figcaption { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #6f6f6f }
+.lc-vis .gone { opacity: .35 } .lc-vis .arrow { font: 400 22px/1 var(--body); color: #9a9a9a; align-self: flex-start; margin-top: 142px }
+.miss { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 240px }
+.miss span { padding: 3px 7px; border-radius: 6px; background: #FFF4F4; color: #AF0000; font: 500 11px/1.3 var(--mono) }
+.lc-txt { padding: 22px 24px 24px; border-top: 1px solid #eef1f4; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px }
+.lc-txt p { max-width: 62ch }
+.lc-txt h4 { margin: 0; font: 600 20px/1.2 var(--body); letter-spacing: -.02em; color: #000 }
+.lc-txt p { margin: 0; font-size: 15px; line-height: 1.6; color: #334155 }
+.lc-txt h5 { margin: 0 0 8px; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f }
+.lc-txt ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.6; color: #334155 }
+.log { margin-top: 12px; background: #fff; border-radius: 16px; padding: 4px 18px }
+.log h5 { margin: 14px 0 4px; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f }
+.log div { display: grid; grid-template-columns: 110px 76px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 12px 0; border-top: 1px solid #eef1f4; font-size: 13.5px; color: #334155 }
+.log h5 + div { border-top: 0 }
+.log .v { font: 500 12px var(--mono); color: #000 } .log .t { justify-self: start; padding: 2px 7px; border-radius: 6px; font: 500 11px var(--mono) }
+.t-add { background: #DDF9D0; color: #1F6300 } .t-chg { background: #ECF5FC; color: #044782 } .t-dep { background: #FFF4F4; color: #830000 }
+@media (max-width: 560px) { .lc-vis { flex-direction: column; align-items: center; flex-wrap: nowrap; gap: 16px; padding: 20px 16px 28px } .lc-vis .k-pc { zoom: .92 } .lc-vis .arrow { display: none } .lcstage .lc-vis .vseg { display: inline-flex } .lc-vis figure[data-side] figcaption { display: none } .lc-vis[data-side="a"] figure[data-side="b"], .lc-vis[data-side="b"] figure[data-side="a"] { display: none } .lc-vis figure { justify-items: center } .lc-txt { padding: 18px 20px 20px } .lc-txt p { font-size: 14.5px } .notes div { grid-template-columns: 1fr; gap: 4px } }
+@media (max-width: 920px) { .lc-txt { grid-template-columns: 1fr } .lc-vis { min-height: 0 } .log div { grid-template-columns: minmax(0, 1fr) auto } .log div > :nth-child(3) { grid-column: 1 / -1 } }
+.lc-vis figure { position: relative }
+.lc-vis .vseg { display: none }
+.lc-vis .lc-pin { position: absolute; z-index: 3; width: 22px; height: 22px; margin: -11px 0 0 -11px; padding: 0; border: 0; border-radius: 50%; background: #fff; color: #FB233B; box-shadow: inset 0 0 0 1.5px #FB233B, 0 0 0 3px #fff; display: grid; place-items: center; font: 600 11px/1 var(--mono); cursor: pointer; transition: transform .2s cubic-bezier(.23,1,.32,1), background .2s ease-out, color .2s ease-out }
+.lc-vis .lc-pin::after { content: ''; position: absolute; inset: -10px }
+.lc-vis .lc-pin.on { background: #FB233B; color: #fff }
+.lc-vis .lc-pin.on { transform: scale(1.18) }
+.lc-vis .lc-hl { outline: 2px solid #FB233B; outline-offset: 3px; border-radius: 6px }
+.lc-vis .lc-hlo { outline: 2px dashed #9a9a9a; outline-offset: 3px; border-radius: 6px }
+.lc-states { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 260px }
+.lc-states span { padding: 3px 7px; border-radius: 6px; background: #ECF5FC; color: #044782; font: 500 11px/1.3 var(--mono) }
+.lc-txt .why5, .lc-txt .notes { grid-column: 1 / -1; margin-top: 20px }
+.why5 { display: grid; gap: 14px }
+.wtabs { display: flex; flex-wrap: wrap; gap: 6px }
+.wtabs button { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px 0 6px; border: 0; border-radius: 99px; background: #f2f4f7; color: #3b3b3b; font: 500 13px/1 var(--body); cursor: pointer; transition: background .2s ease-out, color .2s ease-out }
+.wtabs button i { width: 20px; height: 20px; border-radius: 50%; background: #fff; color: #6f6f6f; display: grid; place-items: center; font: 600 10.5px/1 var(--mono); font-style: normal }
+.wtabs button[aria-selected="true"] { background: #000; color: #fff } .wtabs button[aria-selected="true"] i { background: #FB233B; color: #fff }
+.wtabs button:focus-visible { outline: 2px solid #000; outline-offset: 2px }
+.wtxt { margin: 0; max-width: 62ch; font: 400 16px/1.6 var(--body); color: #334155; min-height: 3.2em } .wtxt b { font-weight: 600; color: #000 }
+.notes h5 { margin: 0 0 4px } .notes div { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid #eef1f4; font-size: 13.5px; color: #334155 }
+.notes h5 + div { border-top: 0 } .notes .t { justify-self: start; padding: 2px 7px; border-radius: 6px; font: 500 11px var(--mono) }
+@media (max-width: 560px) { .wtabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px } .wtabs::-webkit-scrollbar { display: none } .wtabs button { flex: none } .wtxt { font-size: 15px; min-height: 4.8em } .lc-vis .lc-pin { width: 18px; height: 18px; margin: -9px 0 0 -9px; font-size: 10px; box-shadow: inset 0 0 0 1.5px #FB233B, 0 0 0 2px #fff } }
+/* ---- system sections: type, spacing, token layers, API, handoff, field, rules (scoped to .lx) ---- */
+/* ---------- lab: new sections for the Kusnap design system (same page style; stages stay light) ---------- */
+.lx .stg { --bg: #ffffff; --fg: #000000; --text: #3b3b3b; --muted: #6f6f6f; --line: #e4e4e4; --soft: #f2f2f2; position: relative; background: #f4f4f4; color: #000; border-radius: 16px; padding: 72px 32px 40px; overflow: hidden }
+.lx .stg > .lv { position: absolute; left: 20px; top: 20px; display: flex; align-items: center; gap: 8px; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #000 }
+.lx .stg > .lv i { width: 8px; height: 8px; border-radius: 50%; background: #FB233B; box-shadow: 0 0 0 4px rgb(251 35 59 / .18) }
+.lx .stg > .lv span { color: #6f6f6f }
+.lx .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 0 .5px rgb(1 24 43 / .04) }
+.lx .k-ink { font-family: Inter, system-ui, sans-serif; color: #0F172A }
+.lx .lx-mono { font: 500 11.5px/1.4 var(--mono); color: #3b3b3b }
+.lx .lx-cap { margin-top: 14px; color: var(--muted); font-size: 13.5px }
+.lx .ctl { display: grid; gap: 18px; align-content: start }
+.lx .ctl .g + .g { padding-top: 18px; border-top: 1px solid var(--line) }
+.lx .ctl .lab { display: block; margin-bottom: 10px; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.lx .split { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px }
+@media (max-width: 920px) { .lx .split { grid-template-columns: 1fr } }
+.lx .panel { background: var(--panel); border-radius: 16px; padding: 24px }
+
+/* A · type */
+.lx .ty { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: 16px; align-items: stretch }
+.lx .ty .spec { display: grid; align-content: space-between; gap: 24px; padding: 28px }
+.lx .ty .aa { font: 600 clamp(96px, 12vw, 160px)/.9 Inter, sans-serif; letter-spacing: -.04em; color: #0F172A }
+.lx .ty .w { display: flex; gap: 14px; flex-wrap: wrap; font-family: Inter, sans-serif; font-size: 15px; color: #334155 } .lx .ty .w b { font-weight: inherit; color: #0F172A }
+.lx .ty .rows { padding: 8px 24px }
+.lx .ty .row { display: grid; grid-template-columns: 130px 104px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 16px 0; border-top: 1px solid #eef1f4 }
+.lx .ty .row:first-child { border-top: 0 }
+.lx .ty .row .smp { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.lx .ty .row .lx-mono:nth-child(2) { color: #6f6f6f }
+@media (max-width: 920px) { .lx .ty { grid-template-columns: 1fr } .lx .ty .row { grid-template-columns: 1fr auto; gap: 4px 12px } .lx .ty .row .smp { grid-column: 1 / -1 } }
+
+/* B · spacing and radius */
+.lx .sp-rows { display: grid; gap: 14px; padding: 28px }
+.lx .sp-r { display: grid; grid-template-columns: 40px minmax(0, 1fr) 128px; gap: 14px; align-items: center }
+.lx .sp-r .bar { height: 14px; border-radius: 3px; background: rgb(7 118 216 / .18); box-shadow: inset 0 0 0 1px rgb(7 118 216 / .45) }
+.lx .sp-r .lx-mono:last-child { color: #6f6f6f; text-align: right }
+.lx .rad { display: grid; gap: 20px; padding: 28px; align-content: start }
+.lx .rad .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
+.lx .rad .tile { border: 0; background: #f4f6f8; padding: 14px 10px 12px; border-radius: 12px; display: grid; gap: 10px; justify-items: center; cursor: pointer; transition: background .15s ease-out }
+.lx .rad .tile i { width: 44px; height: 44px; background: #fff; border: 1.5px solid #0776D8; display: block }
+.lx .rad .tile[aria-pressed="true"] { background: #e7f1fb }
+.lx .rad .prev { display: grid; place-items: center; gap: 14px; padding: 24px; background: #f8fafb; border-radius: 12px }
+.lx .rad .prev .box { width: 220px; height: 120px; background: #fff; border: 1px solid #e2e8f0; display: grid; place-items: center; transition: border-radius .25s cubic-bezier(.23,1,.32,1) }
+@media (max-width: 920px) { .lx .sp-r { grid-template-columns: 40px minmax(0, 1fr) } .lx .sp-r .lx-mono:last-child { grid-column: 1 / -1; text-align: left; margin-top: -6px } }
+
+/* C · token layers */
+.lx .tl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; position: relative }
+.lx .tl .col { display: grid; gap: 8px; align-content: start }
+.lx .tl .col h4 { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f; margin: 0 0 6px }
+.lx .tl .col h4 b { color: #000; font-weight: 500 }
+.lx .tk { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #fff; border-radius: 10px; font: 500 12px/1.3 var(--mono); color: #3b3b3b; border: 1px solid transparent; transition: border-color .2s ease-out, opacity .2s ease-out, transform .2s cubic-bezier(.23,1,.32,1) }
+.lx .tk i { flex: none; width: 18px; height: 18px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgb(1 24 43 / .08) }
+.lx .tk small { margin-left: auto; color: #9a9a9a; font: inherit }
+.lx .tl.dim .tk { opacity: .35 } .lx .tl .tk.on { opacity: 1; border-color: #0776D8; transform: translateX(2px) }
+.lx .tl svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible }
+.lx .tl svg.wires path { fill: none; stroke: #0776D8; stroke-width: 1.5; stroke-dasharray: 3 4; opacity: .8 }
+.lx .tl-out { display: flex; align-items: center; gap: 18px; justify-content: center; margin-top: 28px; flex-wrap: wrap }
+@media (max-width: 920px) { .lx .tl { grid-template-columns: 1fr } .lx .tl svg.wires { display: none } }
+
+/* D · component API */
+.lx :is(.api, .ap2, .ap4) .stage-btn { display: grid; place-items: center; min-height: 200px; background: #fff; border-radius: 16px }
+.lx :is(.api, .ap2, .ap4) pre { min-width: 0; max-width: 100%; margin: 16px 0 0; padding: 16px 18px; border-radius: 12px; background: #0F172A; color: #e2e8f0; font: 500 12.5px/1.65 var(--mono); overflow-x: auto; white-space: pre }
+.lx :is(.api, .ap2, .ap4) pre .k { color: #83BBEC } .lx :is(.api, .ap2, .ap4) pre .s { color: #9AD280 } .lx :is(.api, .ap2, .ap4) pre .p { color: #F6BFBF }
+.lx .props { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px }
+.lx .props th, .lx .props td { text-align: left; padding: 10px 8px; border-top: 1px solid #eef1f4; vertical-align: top }
+.lx .props th { font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f; border-top: 0 }
+.lx .props td:first-child { font: 500 12px var(--mono); color: #000; white-space: nowrap }
+.lx .props td .opt { display: inline-block; margin: 0 4px 4px 0; padding: 2px 7px; border-radius: 6px; background: #f2f4f7; font: 500 11.5px var(--mono); color: #3b3b3b }
+.lx .props td .opt.on { background: #0776D8; color: #fff }
+.lx .props-wrap { overflow-x: auto; color: #3b3b3b; background: #fff; border-radius: 16px; padding: 8px 16px 12px; margin-top: 16px }
+
+/* E · figma to code */
+.lx .f2c { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch }
+.lx .f2c .cell { background: #fff; border-radius: 12px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0 }
+.lx .f2c .cell .lx-mono { overflow-wrap: anywhere } .lx .f2c .cell h5 { margin: 0; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f }
+.lx .f2c .lx-sw { height: 36px; border-radius: 8px; background: #0776D8 }
+.lx .chk { display: grid; gap: 0; margin-top: 16px; background: #fff; border-radius: 16px; padding: 6px 18px }
+.lx .chk div { display: grid; grid-template-columns: 22px 120px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid #eef1f4; font-size: 13.5px; color: #334155 }
+.lx .chk div:first-child { border-top: 0 }
+.lx .chk .ok { width: 18px; height: 18px; border-radius: 50%; background: #DDF9D0; color: #1F6300; display: grid; place-items: center; font-size: 11px; font-weight: 700 }
+.lx .chk .lx-mono { color: #6f6f6f }
+@media (max-width: 920px) { .lx .f2c { grid-template-columns: 1fr 1fr } .lx .chk div { grid-template-columns: 22px minmax(0, 1fr); } .lx .chk div > :nth-child(3), .lx .chk div > :nth-child(4) { grid-column: 2 } }
+
+/* G · do / don't */
+.lx .dd { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.lx .dd .stg { padding-top: 64px } .lx .dd .yes > .lv i { background: #34A500; box-shadow: 0 0 0 4px rgb(52 165 0 / .18) }
+.lx .dd .demo2 { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 40px 16px; background: #fff; border-radius: 12px }
+.lx .dd .verdict { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; font-size: 14px; line-height: 1.5; color: #334155 }
+.lx .dd .verdict i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 700 12px/1 var(--body); font-style: normal }
+.lx .dd .yes i { background: #DDF9D0; color: #1F6300 } .lx .dd .no i { background: #FFF4F4; color: #AF0000 }
+.lx .dd .no .demo2 { box-shadow: inset 0 0 0 1.5px #ED8080 }
+@media (max-width: 920px) { .lx .dd { grid-template-columns: 1fr } }
+
+/* H · input pattern */
+.lx .fld-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
+.lx .fld { background: #fff; border-radius: 12px; padding: 18px; display: grid; gap: 8px; align-content: start; font-family: Inter, sans-serif }
+.lx .fld label { font: 500 14px/1.43 Inter, sans-serif; color: #0F172A }
+.lx .fld .in { height: 44px; border-radius: 7px; border: 1px solid #CBD5E1; padding: 0 12px; display: flex; align-items: center; font: 400 14px/1.43 Inter, sans-serif; color: #0F172A; background: #fff }
+.lx .fld .in.ph { color: #94A3B8 }
+.lx .fld.focus .in { border-color: #0776D8; box-shadow: 0 0 0 3px #C1DDF5 }
+.lx .fld.err .in { border-color: #DB0000 } .lx .fld.err .msg { color: #830000 }
+.lx .fld.dis .in { background: #F1F5F9; border-color: #E2E8F0; color: #94A3B8 } .lx .fld.dis label { color: #94A3B8 }
+.lx .fld .msg { font: 500 12px/1.33 Inter, sans-serif; color: #64748B }
+.lx .fld .tg { justify-self: start; font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #6f6f6f }
+.lx .fld .tks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px } .lx .fld .tks span { padding: 2px 6px; border-radius: 6px; background: #f2f4f7; font: 500 10.5px var(--mono); color: #3b3b3b }
+@media (max-width: 920px) { .lx .fld-grid { grid-template-columns: 1fr 1fr } }
+@media (max-width: 520px) { .lx .fld-grid { grid-template-columns: 1fr } .lx .f2c { grid-template-columns: 1fr } .lx .rad .tiles { grid-template-columns: 1fr 1fr } .lx .stg { padding: 64px 16px 24px } }
+
+.lx .props td, .lx .props th { color: #3b3b3b } .lx .props th { color: #6f6f6f } .lx .props td:first-child { color: #000 }
+/* ---- lab: API presentation directions ---- */
+.lx .apv-pick { display: grid; gap: 10px; margin-bottom: 20px }
+.lx .apv-note { margin: 0 0 14px; color: var(--muted); font-size: 14px }
+.lx .ap1-sw { position: absolute; right: 18px; top: 16px; z-index: 4 }
+.lx .ap1-under { margin-top: 16px; display: grid; gap: 10px; justify-items: center }
+.lx .ap1-under .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center }
+.lx .ap1-under .chips span { padding: 5px 9px; border-radius: 7px; background: #fff; font: 500 11.5px/1.3 var(--mono); color: #3b3b3b }
+.lx .ap1-under pre { margin: 0; width: 100% }
+.lx .ap2 { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: stretch }
+.lx .fg { background: #fff; color: #000; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 0 1px #e6e6e6; font: 400 12px/1.4 Inter, sans-serif }
+.lx .fg-h { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid #ededed }
+.lx .fg-h i { font-style: normal; color: #9747FF; font-size: 14px } .lx .fg-h b { font-weight: 600; font-size: 12.5px } .lx .fg-h span { margin-left: auto; color: #8a8a8a; font-size: 11px }
+.lx .fg-row { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 10px; align-items: center; padding: 6px 0 }
+.lx .fg-row label { color: #6f6f6f; font-size: 11.5px }
+.lx .fg-row select { -webkit-appearance: none; appearance: none; width: 100%; height: 30px; border: 1px solid transparent; border-radius: 6px; background: #f5f5f5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.3'/%3E%3C/svg%3E") no-repeat right 10px center; padding: 0 28px 0 10px; font: 500 12px/1 Inter, sans-serif; color: #000; cursor: pointer }
+.lx .fg-row select:hover { border-color: #e2e2e2 } .lx .fg-row select:focus-visible { outline: 2px solid #0D99FF; outline-offset: 0 }
+.lx .ap2-r { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center }
+.lx .ap3 { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 40px; align-items: center; min-height: 340px }
+.lx .ap3-w { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible }
+.lx .ap3-w path { fill: none; stroke: #FB233B; stroke-width: 1.25 } .lx .ap3-w circle { fill: #FB233B }
+.lx .ap3-b { position: relative; z-index: 2 } .lx .ap3-b .kb { zoom: 1.6 }
+.lx .ap3-c { display: grid; gap: 56px; position: relative; z-index: 2 } .lx .ap3-c.l { text-align: right; justify-items: end } .lx .ap3-c.r { justify-items: start }
+.lx .co { display: grid; gap: 4px; max-width: 220px } .lx .co i { display: none; width: 20px; height: 20px; border-radius: 50%; background: #FB233B; color: #fff; font: 600 10.5px/20px var(--mono); text-align: center; font-style: normal }
+.lx .co b { font: 500 13px/1.3 var(--mono); color: #000 } .lx .co span { font-size: 13px; line-height: 1.5; color: #475569 }
+.lx .ap4 { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 0 } .lx .ap4 .stage-btn { width: 100% } .lx .ap4 pre { width: 100%; min-height: 3.4em }
+.lx .ap4 pre .cur { display: inline-block; width: 7px; height: 1.1em; vertical-align: -2px; background: #83BBEC; animation: blink 1s steps(1) infinite }
+.lx .ap4-re { margin-top: 14px; border: 0; background: #fff; color: #000; font: 500 12.5px/1 var(--body); height: 32px; padding: 0 14px; border-radius: 99px; cursor: pointer }
+.lx .kb.plain { background: #F1F5F9; color: #64748B; box-shadow: none }
+@media (max-width: 920px) { .lx .ap2 { grid-template-columns: 1fr } }
+@media (max-width: 760px) { .lx .ap3 { grid-template-columns: 1fr; gap: 24px; justify-items: center; min-height: 0 } .lx .ap3-w { display: none } .lx .ap3-b { order: -1 } .lx .ap3-c, .lx .ap3-c.l { gap: 16px; text-align: left; justify-items: stretch; width: 100% }
+  .lx .co { grid-template-columns: 24px minmax(0, 1fr); gap: 2px 10px; max-width: none } .lx .co i { display: block; grid-row: 1 / 3 } .lx .ap3-b .kb { zoom: 1.3 } .lx .ap1-sw { position: static; justify-self: center; margin-bottom: 12px } .lx .stg:has(.ap1-sw) { display: grid } }
+.bspec[hidden], .bcode[hidden], .lx .hv[hidden] { display: none !important }
+.bstage { min-width: 0 }
+.bstage .bsw { position: absolute; right: 18px; top: 16px; z-index: 4 }
+.bcode { width: 100%; margin: 20px 0 0; padding: 14px 16px; border-radius: 12px; background: #0F172A; color: #e2e8f0; font: 500 12.5px/1.65 var(--mono); overflow-x: auto; white-space: pre; min-width: 0; max-width: 100% }
+.bcode .k { color: #83BBEC } .bcode .s { color: #9AD280 } .bcode .p { color: #F6BFBF }
+@media (max-width: 640px) { .bstage .bsw { right: auto; left: 16px; top: 48px } .bstage { padding-top: 100px !important } }
+/* ---- lab: handoff directions ---- */
+.lx .hv1 { display: grid; gap: 18px; padding: 8px 0 }
+.lx .hv1-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; background: #fff; border-radius: 14px; padding: 22px 20px }
+.lx .hv1-row div { display: grid; gap: 6px } .lx .hv1-row small { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a }
+.lx .hv1-row span { display: inline-flex; align-items: center; gap: 7px; font: 500 12.5px/1.3 var(--mono); color: #000 } .lx .hv1-row em { font-style: normal; color: #b0b0b0 }
+.lx .hv1-row .dot { width: 12px; height: 12px; border-radius: 4px; background: #0776D8 }
+.lx .hv-ok { margin: 0; text-align: center; font-size: 14px; color: #334155 } .lx .hv-ok b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: #DDF9D0; color: #1F6300; font-size: 11px }
+.lx .hv2 { display: grid; justify-items: center; gap: 22px; padding: 8px 0 }
+.lx .hv2-b { display: grid; place-items: center; width: 100%; min-height: 160px; background: #fff; border-radius: 14px }
+.lx .hv2-l { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; width: 100%; margin: 0 }
+.lx .hv2-l div { padding: 0 14px; border-left: 1px solid #e4e4e4 } .lx .hv2-l div:first-child { border-left: 0 }
+.lx .hv2-l dt { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; margin-bottom: 8px } .lx .hv2-l dd { margin: 0; font: 500 13px/1.4 var(--mono); color: #000; overflow-wrap: anywhere }
+.lx .hv3 { display: grid; justify-items: center; gap: 14px; padding: 8px 0 }
+.lx .hv3-box { position: relative; width: 100%; max-width: 520px; height: 180px; border-radius: 14px; overflow: hidden }
+.lx .hv3-box > .kds { position: absolute; inset: 0; display: grid; place-items: center } .lx .hv3-a { background: #fff } .lx .hv3-c { background: repeating-linear-gradient(135deg, #fbfbfb 0 8px, #f3f4f6 8px 16px); clip-path: inset(0 0 0 var(--x)) }
+.lx .hv3-box .kb { zoom: 1.5 }
+.lx .hv3-line { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: #FB233B }
+.lx .hv3 input[type=range] { width: 100%; max-width: 520px; accent-color: #FB233B }
+.lx .hv3-k { display: flex; justify-content: space-between; width: 100%; max-width: 520px; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #6f6f6f }
+.lx .hv4 { background: #fff; border-radius: 14px; padding: 18px 20px 8px; overflow-x: auto }
+.lx .hv4-t { margin: 0 0 12px; color: #3b3b3b; overflow-wrap: anywhere }
+.lx .hv4-tb { width: 100%; border-collapse: collapse; font: 500 12.5px/1.4 var(--mono) }
+.lx .hv4-tb th { text-align: left; padding: 8px 10px; font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; border-bottom: 1px solid #eef1f4 }
+.lx .hv4-tb td { padding: 10px; border-bottom: 1px solid #eef1f4; color: #3b3b3b } .lx .hv4-tb tr:last-child td { border-bottom: 0 } .lx .hv4-tb td:first-child { font-family: var(--body); font-weight: 500; color: #000 }
+@media (max-width: 640px) { .lx .hv1-row { flex-direction: column; align-items: flex-start } .lx .hv1-row em { transform: rotate(90deg); margin-left: 4px } .lx .hv2-l { grid-template-columns: 1fr 1fr; gap: 14px 0 } .lx .hv2-l div:nth-child(3) { border-left: 0 } .lx .hv3-box { height: 140px } .lx .hv3-box .kb { zoom: 1.2 } }
+.lx .hv5 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 12px }
+.lx .hv5-b { display: grid; place-items: center; min-height: 220px; background: #fff; border-radius: 14px }
+.lx .hv5-p { background: #fff; border-radius: 14px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0 }
+.lx .hv5-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px } .lx .hv5-h b { font: 600 13px/1 var(--body); color: #000 } .lx .hv5-h span { font: 500 11px/1 var(--mono); color: #8a8a8a }
+.lx .hv5-p pre, .lx .hv6 pre { margin: 0; padding: 14px; border-radius: 10px; background: #0F172A; color: #e2e8f0; font: 500 12px/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; min-height: 7em }
+.lx .hv5-p pre .k { color: #83BBEC } .lx .hv5-p pre .s { color: #9AD280 } .lx .hv5-p pre .p { color: #F6BFBF }
+.lx .hv6 { display: grid; gap: 14px; justify-items: center }
+.lx .hv6-d { position: relative; width: 100%; min-height: 260px; background: #fff; border-radius: 14px; display: grid; place-items: center }
+.lx .hv6-b .kb { zoom: 1.8 }
+.lx .rl { position: absolute; left: 50%; top: 50%; font: 500 11px/1 var(--mono); color: #FB233B; white-space: nowrap }
+.lx .rl b { font-weight: 500; background: #fff; padding: 2px 4px }
+.lx .rl-h { transform: translate(calc(-50% - 168px), -50%); display: flex; align-items: center; gap: 8px; flex-direction: row-reverse } .lx .rl-h i { width: 9px; height: 79px; border: 1.25px solid #FB233B; border-right: 0 }
+.lx .rl-p { transform: translate(-50%, 58px); display: grid; justify-items: center; gap: 6px } .lx .rl-p i { width: 43px; height: 9px; border: 1.25px solid #FB233B; border-top: 0; margin-left: -168px }
+.lx .rl-r { transform: translate(130px, -70px) } .lx .rl-c { transform: translate(-50%, -84px) }
+.lx .hv7 { display: grid; justify-items: center; gap: 14px; padding: 40px 0 }
+.lx .hv7-sw { width: 64px; height: 64px; border-radius: 16px; background: #0776D8; box-shadow: inset 0 0 0 1px rgb(1 24 43 / .08) }
+.lx .hv7-t { display: grid; justify-items: center; gap: 8px; min-height: 52px } .lx .hv7-t small { font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a }
+.lx .hv7-t span { font: 500 clamp(18px, 3vw, 26px)/1.2 var(--mono); color: #000; letter-spacing: -.02em; transition: opacity .25s ease-out, transform .25s cubic-bezier(.23,1,.32,1) } .lx .hv7-t.out span, .lx .hv7-t.out small { opacity: 0; transform: translateY(6px) }
+.lx .hv7-t small { transition: opacity .25s ease-out }
+.lx .hv7-s { margin: 0; color: #475569; font-size: 14px }
+.lx .hv8 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch }
+.lx .hv8-b { display: grid; place-items: center; min-height: 240px; background: #fff; border-radius: 14px }
+.lx .hv8-l { list-style: none; margin: 0; padding: 18px 20px; background: #fff; border-radius: 14px; display: grid; gap: 4px; align-content: center }
+.lx .hv8-l li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 0; font-size: 14px; color: #000; opacity: .35; transition: opacity .3s ease-out }
+.lx .hv8-l li.ok { opacity: 1 } .lx .hv8-l li i { width: 18px; height: 18px; border-radius: 50%; background: #eef1f4; color: transparent; display: grid; place-items: center; font: 700 10px/1 var(--body); font-style: normal; transition: background .25s ease-out, color .25s ease-out }
+.lx .hv8-l li.ok i { background: #DDF9D0; color: #1F6300 } .lx .hv8-l li small { font: 500 11.5px/1 var(--mono); color: #6f6f6f }
+@media (max-width: 760px) { .lx .hv5, .lx .hv8 { grid-template-columns: 1fr } .lx .hv6-b .kb { zoom: 1.3 } .lx .rl-h { transform: translate(calc(-50% - 120px), -50%) } .lx .rl-h i { height: 57px } .lx .rl-r { transform: translate(60px, -64px) } .lx .rl-c { transform: translate(-50%, -96px) } .lx .rl-p { transform: translate(-50%, 44px) } .lx .rl-p i { width: 31px; margin-left: -120px } }
+/* handoff: the Buttons layout, with a black inspect panel */
+.hx-in { background: #0b0b0b; color: #c9c9c9; padding: 24px; display: grid; gap: 16px; align-content: start; min-width: 0 }
+.hx-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px } .hx-h b { font: 600 15px/1 var(--body); color: #fff } .hx-h span { font: 500 11px/1 var(--mono); color: #8a8a8a; letter-spacing: .04em }
+.hx-in .seg { background: #1c1c1c; justify-self: start } .hx-in .seg button { color: #9a9a9a } .hx-in .seg button[aria-pressed="true"] { background: #fff; color: #000; box-shadow: none }
+.hx-in pre { margin: 0; padding: 16px; border-radius: 12px; background: #161616; box-shadow: inset 0 0 0 1px #262626; color: #e2e8f0; font: 500 12.5px/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; min-height: 7.4em }
+.hx-in pre .k { color: #83BBEC } .hx-in pre .s { color: #9AD280 } .hx-in pre .p { color: #F6BFBF }
+.hx-p { margin: 0; display: grid; gap: 0 } .hx-p div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-top: 1px solid #222 }
+.hx-p dt { font: 500 11px/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #8a8a8a } .hx-p dd { margin: 0; display: flex; align-items: center; gap: 8px; font: 500 12.5px/1.5 var(--mono); color: #e6e6e6; min-width: 0 }
+.hx-p dd i { flex: none; width: 12px; height: 12px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .15) }
+.hx .bstage { border-right: 0 }
+.lx .panel.hx { padding: 0; background: #121212 } .lx .panel.hx .hx-in { background: transparent }
+.lx .hx .hx-st { padding: 64px 20px 40px }
+@media (max-width: 640px) { .hx-in { padding: 20px 18px } .hx .hx-st { padding-top: 72px !important } }
+/* ---- small screens: nothing clipped, toggles clear of the live tags ---- */
+@media (max-width: 640px) {
+  .xstage .actl, .kc-stage .actl { left: 16px !important; right: auto !important; top: 48px !important }
+  .xr .xstage { padding-top: 112px !important }
+  .kc .kc-stage { padding-top: 96px !important }
+  .lx .rad, .lx .sp-rows { padding: 20px }
+  .lx .rad .prev { padding: 18px 12px }
+  .lx .rad .prev .box { width: 100%; max-width: 220px }
+  .lx .rad .tile i { width: 36px; height: 36px }
+  .lx .ty .row .smp { white-space: normal; overflow: visible }
+  .lx .props th:nth-child(4), .lx .props td:nth-child(4) { display: none }
+  .lx .props th, .lx .props td { padding: 9px 6px }
+}
+@media (max-width: 380px) { .an-stage .sc { zoom: .86 } .an-stage { padding-inline: 12px } }
 /* ---- navigation variants ---- */
 /* phones: the header dial is replaced. md-none = normal scroll, md-bottom = the dial docked at the bottom */
 .mdock { display: none }
@@ -835,18 +1120,47 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
     <div class="sides" id="sidesEl"></div>
   </section>
 
+  <section class="ch lx" id="type"><div class="chh"><h2>Inter, in five sizes</h2><span class="num"></span><p>Kusnap is set in Inter. A short scale carries everything from the price to the smallest chip.</p></div>
+    <div class="stg">
+      <div class="ty"><div class="card spec"><div class="aa">Aa</div><div class="w"><span style="font-weight:400">Regular <b>400</b></span><span style="font-weight:500">Medium <b>500</b></span><span style="font-weight:600">Semibold <b>600</b></span><span style="font-weight:700">Bold <b>700</b></span></div></div>
+        <div class="card rows" id="tyRows"></div></div></div></section>
+
+  <section class="ch lx" id="space"><div class="chh"><h2>Spacing and corners</h2><span class="num"></span><p>The spacing the components actually use, and four corner sizes. Pick a radius to see where it lives.</p></div>
+    <div class="stg">
+      <div class="split"><div class="card sp-rows" id="spRows"></div>
+        <div class="card rad"><div class="tiles" id="radTiles"></div><div class="prev"><div class="box" id="radBox"><button class="kb buy s" type="button" tabindex="-1" id="radBtn">Buy Now</button></div><span class="lx-mono" id="radUse"></span></div></div></div></div></section>
+
   <section class="ch" id="palette">
     <div class="chh"><div class="num">03</div><h2>A palette named for the market</h2><p>Seven palettes of ten steps, each named for its job. Drag the dial to tune through them.</p></div>
     <div class="pal" id="pal"></div>
   </section>
 
+  <section class="ch lx" id="layers"><div class="chh"><h2>Three layers of tokens</h2><span class="num"></span><p>A raw colour gets a job, and the job gets used by a component. Change the state and watch the Buy button take a different path.</p></div>
+    <div class="stg">
+      <div class="tl" id="tl"><svg class="wires" id="wires" aria-hidden="true"></svg>
+        <div class="col" id="tlP"><h4><b>01</b> Primitive · the colour</h4></div>
+        <div class="col" id="tlS"><h4><b>02</b> Semantic · the job</h4></div>
+        <div class="col" id="tlC"><h4><b>03</b> Component · where it’s used</h4></div></div>
+      <div class="tl-out"><div class="seg" id="tlState" role="group" aria-label="Button state"></div><button class="kb buy s" id="tlBtn" type="button" tabindex="-1">Buy Now</button></div></div></section>
+
   <section class="ch" id="buttons">
     <div class="chh"><div class="num">04</div><h2>Every way to say “Buy”</h2><p>One component: five types, five states, three sizes. Change it to see the tokens it uses.</p></div>
     <div class="panel bx">
-      <div class="bstage"><div class="kds" id="bOut"></div><div class="bspec" id="bSpec"></div></div>
+      <div class="bstage"><div class="seg bsw" id="bSw" role="group" aria-label="View"><button type="button" data-w="d" aria-pressed="true">Design</button><button type="button" data-w="c" aria-pressed="false">Code</button></div><div class="kds" id="bOut"></div><div class="bspec" id="bSpec"></div><pre class="bcode" id="bCode" hidden></pre></div>
       <div class="bctl" id="bCtl"></div>
     </div>
   </section>
+
+  <section class="ch lx" id="f2c"><div class="chh"><h2>Handed to developers</h2><span class="num"></span><p>What a developer sees when they inspect the button: one set of names, ready for React, Tailwind or CSS.</p></div>
+    <div class="panel bx hx">
+      <div class="bstage hx-st"><div class="kds"><button class="kb buy s" type="button" tabindex="-1">Buy Now</button></div></div>
+      <div class="hx-in">
+        <div class="hx-h"><b>Inspect</b><span>Button · Buy · Small</span></div>
+        <div class="seg" id="hv5T" role="tablist" aria-label="Code format"><button type="button" data-t="0" aria-pressed="true">React</button><button type="button" data-t="1" aria-pressed="false">Tailwind</button><button type="button" data-t="2" aria-pressed="false">CSS</button></div>
+        <pre id="hv5C"></pre>
+        <dl class="hx-p"><div><dt>Fill</dt><dd><i style="background:#0776D8"></i>action.primary</dd></div><div><dt>Label</dt><dd>Inter · 14 / 500 · white</dd></div><div><dt>Size</dt><dd>44 tall · 24 sides</dd></div><div><dt>Radius</dt><dd>radius.lg · 12</dd></div><div><dt>Shadow</dt><dd>inset 0 −2 1 · #025095</dd></div></dl>
+      </div>
+    </div></section>
 
   <section class="ch" id="elevation">
     <div class="chh"><div class="num">05</div><h2>How high things sit</h2><p>Eight levels decide what feels close. Tune the dial to lift the card.</p></div>
@@ -883,6 +1197,9 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
     </div>
   </section>
 
+  <section class="ch lx" id="field"><div class="chh"><h2>A field in four states</h2><span class="num"></span><p>The text field from seller sign-up, with the token behind each state.</p></div>
+    <div class="stg"><div class="fld-grid" id="flds"></div></div></section>
+
   <section class="ch" id="assembled">
     <div class="chh"><div class="num">08</div><h2>A whole page, assembled</h2><p>The Kusnap shopping cart, built only from the parts above. Pick a part to see what it’s made of.</p></div>
     <div class="panel kc" id="kc">
@@ -895,8 +1212,22 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
     </div>
   </section>
 
+  <section class="ch lx" id="rules"><div class="chh"><h2>Do and don’t</h2><span class="num"></span><p>Short rules that come with every component, shown with the real thing.</p></div>
+    <div class="dd">
+      <div class="stg yes"><div class="lv"><i></i>Do</div><div class="demo2 kds"><button class="kb buy s" type="button" tabindex="-1">Buy Now</button><button class="kb sec s" type="button" tabindex="-1">Contact Seller</button></div><p class="verdict"><i>✓</i>One primary action per view. Everything else steps back to secondary.</p></div>
+      <div class="stg no"><div class="lv"><i></i>Don’t</div><div class="demo2 kds"><button class="kb buy s" type="button" tabindex="-1">Buy Now</button><button class="kb buy s" type="button" tabindex="-1">Contact Seller</button></div><p class="verdict"><i>✕</i>Two blue buttons side by side, so the buyer can’t tell which one moves the order forward.</p></div>
+      <div class="stg yes"><div class="lv"><i></i>Do</div><div class="demo2 kds"><button class="kb sell s" type="button" tabindex="-1">Sell on Kusnap</button></div><p class="verdict"><i>✓</i>Stall green only for selling, so sellers learn to look for it.</p></div>
+      <div class="stg no"><div class="lv"><i></i>Don’t</div><div class="demo2 kds"><button class="kb sell s" type="button" tabindex="-1">Buy Now</button></div><p class="verdict"><i>✕</i>Green on a buyer action. It blurs which side of the market a button is for.</p></div>
+    </div></section>
+
+  <section class="ch" id="changes">
+    <div class="chh"><div class="num">09</div><h2>How the product card changed</h2><p>Verification and boosted listings had no home on the old card, and buyers opened the product page just to check stock. Follow the card from the gap to the library.</p></div>
+    <div class="lcstage"><div class="lc" id="lc"></div>
+      <div class="lc-body"><div class="lc-vis kds" id="lcVis"></div><div class="lc-txt" id="lcTxt"></div></div></div>
+  </section>
+
   <section class="ch" id="findings">
-    <div class="chh"><div class="num">09</div><h2>An accessibility pass on the tokens</h2><p>I measured the text and background pairs in the Figma file against WCAG AA, which needs 4.5:1 for text this size. Two fall short. Each fix is a proposal: change one token, and every screen follows.</p></div>
+    <div class="chh"><div class="num">10</div><h2>An accessibility pass on the tokens</h2><p>I measured the text and background pairs in the Figma file against WCAG AA, which needs 4.5:1 for text this size. Two fall short. Each fix is a proposal: change one token, and every screen follows.</p></div>
     <div class="fnd" id="fnd"></div>
   </section>
 
@@ -1018,6 +1349,9 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
     const inner = B.icon === 'right' ? `${lab}${ic}` : `${ic}${lab}`;
     $('bOut').innerHTML = `<button class="kb ${t.cls} ${B.size} ${B.icon === 'alone' ? 'alone' : ''} ${B.state !== 'default' && B.state !== 'disabled' ? 'st-' + B.state : ''}" ${B.state === 'disabled' ? 'disabled' : ''} ${B.icon === 'alone' ? `aria-label="${t.label}"` : ''}>${inner}</button>`;
     $('bSpec').innerHTML = [...t.tok[B.state], `height · ${SZ[B.size][1]}`, `padding · ${SZ[B.size][2]}`, 'radius.lg · 12', 'subtitle · 14 medium'].map(T).join('');
+    { const P = { buy: ['buy'], sell: ['sell'], sec: ['secondary'], soft: ['destructive', 'soft'], solid: ['destructive'] }[B.type], at = (k, v) => ` <span class="p">${k}</span>=<span class="s">"${v}"</span>`;
+      const a = at('type', P[0]) + (P[1] ? at('tone', P[1]) : '') + (B.size !== 's' ? at('size', { m: 'md', l: 'lg' }[B.size]) : '') + (B.state !== 'default' ? at('state', B.state) : '') + ({ none: at('icon', 'none'), left: '', right: at('icon', 'trailing'), alone: at('icon', 'only') }[B.icon]);
+      $('bCode').innerHTML = B.icon === 'alone' ? `<span class="k">&lt;Button</span>${a}${at('label', t.label)} <span class="k">/&gt;</span>` : `<span class="k">&lt;Button</span>${a}<span class="k">&gt;</span>${t.label}<span class="k">&lt;/Button&gt;</span>`; }
     $('bCtl').innerHTML = opts('type', Object.keys(BT), 'Type', Object.fromEntries(Object.entries(BT).map(([k, v]) => [k, v.name]))) +
       `<div class="g"><span class="lab">State</span><div class="seg" role="group" aria-label="State">${['default', 'hover', 'focused', 'selected', 'disabled'].map(v => `<button data-k="state" data-v="${v}" aria-pressed="${B.state === v}" ${t.states.includes(v) ? '' : 'disabled style="opacity:.35;cursor:not-allowed"'}>${v}</button>`).join('')}</div></div>` +
       opts('size', ['s', 'm', 'l'], 'Size', { s: 'Small · 44', m: 'Medium · 52', l: 'Large · 60' }) + opts('icon', ['none', 'left', 'right', 'alone'], 'Icon') +
@@ -1025,7 +1359,112 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
     document.querySelectorAll('#bCtl button[data-k]').forEach(b => b.onclick = () => { if (b.disabled) return; B[b.dataset.k] = b.dataset.v; drawB(); });
   }
   drawB();
+  { let bv = 'd'; const sw = $('bSw'); const setBv = v => { bv = v; sw.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); $('bSpec').hidden = v !== 'd'; $('bCode').hidden = v !== 'c'; };
+    sw.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setBv(b.dataset.w); }); setBv('d'); }
 
+  // ---------------- system sections (type, spacing, layers, API, handoff, field)
+  {
+  // A · type: the sizes the components use
+  const TY = [['title', '18 · 600', 'font:600 18px/1.45 Inter', '₦460,000.00 · Order summary'], ['subtitle', '14 · 500', 'font:500 14px/1.43 Inter', 'Black JBL Headset · Buy Now'], ['body', '14 · 400', 'font:400 14px/1.5 Inter;color:#334155', '5 units left. Delivered in 2–4 days.'], ['caption', '12 · 500', 'font:500 12px/1.33 Inter;color:#64748B', 'Seller verified · Lagos, Nigeria'], ['tag', '10 · 500 / 700', 'font:500 10px/1.33 Inter;letter-spacing:.1px;color:#64748B', 'IN STOCK · REFURBISHED · −25%']];
+  $('tyRows').innerHTML = TY.map(([n, s, css, t]) => `<div class="row"><span class="lx-mono">type.${n}</span><span class="lx-mono">${s}</span><span class="smp" style="${css};color:${/color/.test(css) ? '' : '#0F172A'}">${t}</span></div>`).join('');
+
+  // B · spacing in use, and radius
+  const SP = [[4, 'between chips'], [8, 'card text, icons'], [12, 'button, top'], [16, 'card padding'], [24, 'button, sides'], [28, 'purchase card'], [44, 'button height']];
+  $('spRows').innerHTML = SP.map(([v, u]) => `<div class="sp-r"><span class="lx-mono" style="color:#000">${v}</span><span class="bar" style="width:${Math.round(v / 44 * 100)}%"></span><span class="lx-mono">${u}</span></div>`).join('');
+  const RAD = [['sm', 4, 'chips, the discount tag'], ['md', 7, 'inputs and small controls'], ['lg', 12, 'buttons, the purchase card'], ['xl', 16, 'the product card']];
+  $('radTiles').innerHTML = RAD.map(([n, v], i) => `<button class="tile" type="button" aria-pressed="${i === 2}" data-i="${i}"><i style="border-radius:${v}px"></i><span class="lx-mono">radius.${n}<br><span style="color:#6f6f6f">${v}px</span></span></button>`).join('');
+  const setRad = i => { const [n, v, use] = RAD[i]; $('radTiles').querySelectorAll('.tile').forEach((t, j) => t.setAttribute('aria-pressed', j === i)); $('radBox').style.borderRadius = v + 'px'; $('radBtn').style.borderRadius = v + 'px'; $('radUse').textContent = `radius.${n} · ${v}px · ${use}`; };
+  $('radTiles').addEventListener('click', e => { const t = e.target.closest('.tile'); if (t) setRad(+t.dataset.i); }); setRad(2);
+
+  // C · token layers (names and values from the Figma library)
+  const P = [['snap.200', '#C1DDF5'], ['snap.300', '#83BBEC'], ['snap.500', '#0776D8'], ['snap.600', '#065EAD'], ['snap.800', '#032F56'], ['white', '#FFFFFF']];
+  const S = [['action.primary', 'snap.500'], ['action.primary.hover', 'snap.600'], ['action.primary.pressed', 'snap.800'], ['action.primary.disabled', 'snap.300'], ['focus.ring', 'snap.200'], ['text.onAction', 'white']];
+  const ST = { default: ['action.primary', 'text.onAction'], hover: ['action.primary.hover', 'text.onAction'], focused: ['action.primary', 'focus.ring'], pressed: ['action.primary.pressed', 'text.onAction'], disabled: ['action.primary.disabled', 'text.onAction'] };
+  const C = [['button.buy.bg', 0], ['button.buy.label', 1]];
+  const hex = n => (P.find(p => p[0] === n) || [])[1];
+  $('tlP').insertAdjacentHTML('beforeend', P.map(([n, h]) => `<div class="tk" data-p="${n}"><i style="background:${h}"></i>${n}<small>${h}</small></div>`).join(''));
+  $('tlS').insertAdjacentHTML('beforeend', S.map(([n, p]) => `<div class="tk" data-s="${n}"><i style="background:${hex(p)}"></i>${n}</div>`).join(''));
+  $('tlC').insertAdjacentHTML('beforeend', C.map(([n]) => `<div class="tk" data-c="${n}">${n}<small></small></div>`).join(''));
+  $('tlState').innerHTML = Object.keys(ST).map((k, i) => `<button type="button" aria-pressed="${i === 0}" data-k="${k}">${k}</button>`).join('');
+  let st = 'default';
+  const wire = () => { const tl = $('tl'), R = tl.getBoundingClientRect(), W = $('wires'); if (getComputedStyle(W).display === 'none') return;
+    const on = [...tl.querySelectorAll('.tk.on')]; let d = '';
+    const pt = (el, side) => { const q = el.getBoundingClientRect(); return [side ? q.right - R.left : q.left - R.left, q.top + q.height / 2 - R.top]; };
+    ST[st].forEach((s, i) => { const c = tl.querySelector(`[data-c="${C[i][0]}"]`), se = tl.querySelector(`[data-s="${s}"]`), p = tl.querySelector(`[data-p="${S.find(x => x[0] === s)[1]}"]`);
+      const a = pt(p, 1), b = pt(se, 0), b2 = pt(se, 1), c2 = pt(c, 0), m1 = (a[0] + b[0]) / 2, m2 = (b2[0] + c2[0]) / 2;
+      d += `M${a[0]},${a[1]} C${m1},${a[1]} ${m1},${b[1]} ${b[0]},${b[1]} M${b2[0]},${b2[1]} C${m2},${b2[1]} ${m2},${c2[1]} ${c2[0]},${c2[1]} `; });
+    W.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`); W.innerHTML = `<path d="${d}"/>`; };
+  const setSt = k => { st = k; const tl = $('tl'); tl.classList.add('dim'); tl.querySelectorAll('.tk').forEach(t => t.classList.remove('on'));
+    ST[k].forEach((s, i) => { const p = S.find(x => x[0] === s)[1]; tl.querySelector(`[data-s="${s}"]`).classList.add('on'); tl.querySelector(`[data-p="${p}"]`).classList.add('on'); const c = tl.querySelector(`[data-c="${C[i][0]}"]`); c.classList.add('on'); c.querySelector('small').textContent = '→ ' + s; });
+    $('tlState').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
+    const b = $('tlBtn'); b.className = 'kb buy s' + (k === 'hover' ? ' st-hover' : k === 'focused' ? ' st-focused' : k === 'pressed' ? ' st-selected' : ''); b.disabled = k === 'disabled';
+    requestAnimationFrame(wire); };
+  $('tlState').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSt(b.dataset.k); }); addEventListener('resize', wire); setSt('default');
+
+  { // handoff: inspect
+    document.querySelector('.hx-st .kb').innerHTML = FIG.cart + 'Buy Now';
+    const FMT = [`<span class="k">&lt;Button</span> <span class="p">type</span>=<span class="s">"buy"</span> <span class="p">size</span>=<span class="s">"sm"</span><span class="k">&gt;</span>\n  Buy Now\n<span class="k">&lt;/Button&gt;</span>`, `bg-action-primary text-white\nh-11 px-6 rounded-xl\nshadow-button`, `background: var(--kusnap-action-primary);\nheight: 44px; padding: 0 24px;\nborder-radius: 12px;`];
+    const t5 = i => { $('hv5T').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.t === i)); $('hv5C').innerHTML = FMT[i]; };
+    $('hv5T').addEventListener('click', e => { const b = e.target.closest('button'); if (b) t5(+b.dataset.t); }); t5(0);
+  }
+
+  // H · text field states
+  const FL = [['Default', '', 'Store name', 'ph', 'As it will appear to buyers', ['border.input · slate.400']], ['Focus', 'focus', 'Ade’s Gadgets', '', 'As it will appear to buyers', ['border.focus · snap.500', 'focus.ring · snap.200']], ['Error', 'err', 'Ade’s Gadgets!!', '', 'Use letters, numbers and spaces only', ['feedback.error · alert.500', 'feedback.error.text · alert.700']], ['Disabled', 'dis', 'Store name', '', 'Verify your phone number first', ['bg.subtle · slate.200', 'border.divider · slate.300']]];
+  $('flds').innerHTML = FL.map(([n, c, v, ph, m, t]) => `<div class="fld ${c}"><span class="tg">${n}</span><label>Store name</label><div class="in ${ph}">${v}</div><span class="msg">${m}</span><div class="tks">${t.map(x => `<span>${x}</span>`).join('')}</div></div>`).join('');
+  }
+  // ---------------- how the product card changed
+  {
+  // F · how a component ships: the product card, from gap to library
+  const NEW = () => `<div class="k-pc"><div class="k-pc-img"><div class="k-ph"><img src="${PHOTO}" alt="" width="238" height="238"><div class="k-like">${FIG.favorite}0</div><div class="k-boost">Boosted${FIG.bolt}</div></div><div class="k-flags"><div class="k-off">-25%</div><div class="k-ver">${FIG.verified}</div></div></div><div class="k-info"><div class="k-np"><p class="k-nm">Black JBL Headset</p><p class="k-pr">₦460,000.00</p><p class="k-was">₦0.00</p></div><div class="k-sub"><p class="k-units">5 units left</p><div class="k-chips"><span class="k-chip"><i class="k-dot"></i>In Stock</span><span class="k-chip">Refurbished</span><span class="k-chip">${FIG.view}1K views</span></div></div></div></div>`;
+  const OLD = () => `<div class="k-pc old"><div class="k-pc-img"><div class="k-ph"><img src="${PHOTO}" alt="" width="238" height="238"><div class="k-like k-like-old">${FIG.favorite}0</div></div><div class="k-flags"><div class="k-cond">Refurbished</div></div></div><div class="k-info"><div class="k-np"><p class="k-nm">Black JBL Headset</p><p class="k-pr">₦460,000.00</p></div><div class="k-sub"><div class="k-chips"><span class="k-chip">${FIG.view}1K views</span></div></div></div></div>`;
+  const SHORT = ['Verified', 'Boosted', 'Stock', 'Condition', 'Likes'];
+  const WHY = [['.k-ver', 'Verified tick', 'Verification launched to stop fake sellers. The tick shows the seller passed it, before a buyer opens the listing.', null],
+    ['.k-boost', 'Boosted tag', 'Sellers could now boost a listing, so the card needed a clear, honest sign of which ones were boosted.', null],
+    ['.k-units', 'Stock and units left', 'Buyers opened the product page just to check stock. On the card, it saves that tap.', null],
+    ['.k-chips .k-chip:nth-child(2)', 'Condition joins the facts', 'New, used or refurbished moved off the photo, beside stock and views, so the facts read in one row.', '.k-cond'],
+    ['.k-like', 'Likes on a dark pill', 'The count sat straight on the photo and got lost on light images. The pill keeps it readable.', '.k-like-old']];
+  const LOG = [['Added', 't-add', 'Verified tick, for sellers who passed verification'], ['Added', 't-add', 'Boosted tag, so boosted listings stand out'], ['Added', 't-add', 'Stock status and units left on the card'], ['Changed', 't-chg', 'Condition moved from the photo to the facts row'], ['Changed', 't-chg', 'Like count on a dark pill'], ['Retired', 't-dep', 'The old product card, replaced on every screen']];
+  const fig = (cap, card, id, cls, side) => `<figure${id ? ` id="${id}"` : ''}${cls ? ` class="${cls}"` : ''}${side ? ` data-side="${side}"` : ''}><figcaption>${cap}</figcaption>${card}</figure>`;
+  const pair = (a, b) => `<div class="seg vseg" role="group" aria-label="Show"><button type="button" data-s="a">${a}</button><button type="button" data-s="b">${b}</button></div>`;
+  const LC = [
+    ['Spotted', 'A gap on the card', 'Verification and boosted listings launched, but the old card had nowhere to show them. Condition sat on the photo, likes were hard to read, and stock meant a trip to the product page.',
+      () => fig('The old card', OLD() + '<div class="miss"><span>no verified tick</span><span>no boost</span><span>stock unknown</span></div>')],
+    ['Redesigned', 'Five changes, one reason each', 'A buyer now knows at a glance: can I trust this seller, and can I buy it today?',
+      () => pair('Before', 'After') + fig('Before', OLD(), 'baOld', '', 'a') + '<span class="arrow" aria-hidden="true">→</span>' + fig('After', NEW(), 'baNew', 'after', 'b'), 'why'],
+    ['Reviewed with devs', 'Every state, agreed before it was built', 'I walked the engineers through each state before they built it, and we agreed the sizes and the tokens behind every part.',
+      () => fig('States agreed', NEW() + '<div class="lc-states"><span>verified · not</span><span>boosted · not</span><span>in stock · out of stock</span><span>units left</span></div>')],
+    ['Tried on one screen', 'Live on one screen first', 'The new card went live on a single screen first, so we could see it with real listings before it replaced the old card everywhere.',
+      () => fig('Live on one screen', NEW())],
+    ['Added to the library', 'Published as a Figma library update', 'Once it held up, the card went into the Figma library with notes, so every designer knew what changed. One card for web, Android and iOS.',
+      () => fig('In the library', NEW()), 'log'],
+    ['Old card retired', 'One card to maintain', 'The old card was retired. Every screen now uses the new one, so there is one product card to keep up to date instead of two.',
+      () => pair('Retired', 'Everywhere') + fig('Retired', OLD(), '', 'gone', 'a') + '<span class="arrow" aria-hidden="true">→</span>' + fig('Everywhere', NEW(), '', '', 'b')]];
+  const N = LC.length;
+  $('lc').style.setProperty('--n', N);
+  $('lc').innerHTML = '<span class="fill" id="lcFill"></span>' + LC.map(([n], i) => `<button type="button" aria-pressed="${i === 0}" data-i="${i}" aria-label="Step ${i + 1}: ${n}"><span class="n">${i + 1}</span><b>${n}</b></button>`).join('');
+  let curWhy = 0;
+  const pins = () => { const box = $('baNew'); if (!box) return; const B = box.getBoundingClientRect(); box.querySelectorAll('.lc-pin').forEach(x => x.remove());
+    WHY.forEach(([sel], i) => { const el = box.querySelector(sel); if (!el) return; const r = el.getBoundingClientRect(); const pin = document.createElement('button'); pin.type = 'button'; pin.className = 'lc-pin'; pin.textContent = i + 1; pin.dataset.w = i; pin.setAttribute('aria-label', WHY[i][1]);
+      const right = i === 1, top = i === 1 || i === 4; pin.style.left = (i === 3 ? r.left - B.left + r.width / 2 : right ? r.right - B.left : r.left - B.left - 14) + 'px'; pin.style.top = (i === 3 ? r.top - B.top - 10 : top ? r.top - B.top : r.top - B.top + r.height / 2) + 'px'; box.append(pin); });
+    setWhy(curWhy); };
+  const setWhy = i => { curWhy = i; const box = $('baNew'), old = $('baOld'); if (!box) return; $('lcTxt').querySelectorAll('.wtabs button').forEach((b, j) => b.setAttribute('aria-selected', j === i)); const w = $('wTxt'); if (w) w.innerHTML = `<b>${WHY[i][1]}.</b> ${WHY[i][2]}`; const tb = $('lcTxt').querySelector(`.wtabs button[data-w="${i}"]`); if (tb) { const wr = tb.parentNode; wr.scrollTo({ left: Math.max(0, tb.offsetLeft - (wr.clientWidth - tb.offsetWidth) / 2), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
+    WHY.forEach(([sel, , , o], j) => { const el = box.querySelector(sel); if (el) el.classList.toggle('lc-hl', j === i); const oe = o && old.querySelector(o); if (oe) oe.classList.toggle('lc-hlo', j === i); }); box.querySelectorAll('.lc-pin').forEach((p, j) => p.classList.toggle('on', j === i)); };
+  const setLc = i => { $('lc').querySelectorAll('button').forEach((b, j) => { b.setAttribute('aria-pressed', j === i); b.classList.toggle('done', j < i); }); $('lcFill').style.width = (i / (N - 1) * (100 - 100 / N)) + '%';
+    const [, h, p, vis, extra] = LC[i];
+    $('lcVis').innerHTML = vis(); setSide('b');
+    let x = '';
+    if (extra === 'why') x = `<div class="why5"><div class="wtabs" role="tablist">${SHORT.map((t, j) => `<button type="button" role="tab" aria-selected="${j === curWhy}" data-w="${j}"><i>${j + 1}</i>${t}</button>`).join('')}</div><p class="wtxt" id="wTxt" aria-live="polite"></p></div>`;
+    if (extra === 'log') x = `<div class="notes"><h5>Figma library update notes</h5>${LOG.map(([t, c, d]) => `<div><span class="t ${c}">${t}</span><span>${d}</span></div>`).join('')}</div>`;
+    $('lcTxt').innerHTML = `<h4>${h}</h4><p>${p}</p>${x}`;
+    if (extra === 'why') requestAnimationFrame(pins); };
+  const setSide = k => { const v = $('lcVis'); v.dataset.side = k; v.querySelectorAll('.vseg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === k)); requestAnimationFrame(pins); };
+  $('lcVis').addEventListener('click', e => { const b = e.target.closest('.vseg button'); if (b) setSide(b.dataset.s); const pn = e.target.closest('.lc-pin'); if (pn) setWhy(+pn.dataset.w); });
+  $('lc').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLc(+b.dataset.i); });
+  $('lcTxt').addEventListener('click', e => { const b = e.target.closest('.wtabs button'); if (!b) return; if ($('lcVis').dataset.side === 'a' && matchMedia('(max-width: 560px)').matches) setSide('b'); setWhy(+b.dataset.w); });
+  addEventListener('resize', pins); document.fonts && document.fonts.ready.then(pins);
+  setLc(1);
+
+  }
   // ---------------- 05 elevation, exactly the Figma effect styles
   const EV = [['100', '0 1px 0 0.5px rgb(1 24 43 / .04)', 'Resting cards'], ['200', '0 3px 1px -1px rgb(1 24 43 / .07)', 'Pressed and raised controls'], ['300', '0 4px 6px -2px rgb(1 24 43 / .20)', 'Dropdowns and menus'], ['400', '0 8px 16px -4px rgb(1 24 43 / .22)', 'Popovers'], ['500', '0 12px 20px -8px rgb(1 24 43 / .24)', 'Sticky bars, bottom sheets'], ['600', '0 24px 48px -8px rgb(1 24 43 / .10)', 'Modals'], ['700', '0 40px 72px -16px rgb(1 24 43 / .12)', 'Large dialogs'], ['800', '0 56px 112px -20px rgb(1 24 43 / .10)', 'Full-screen overlays']];
   let ev = 0;
@@ -1185,15 +1624,15 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
       <div class="fc-fix"><div>${T(tk)}</div><p>${fix}</p></div></div>`; }).join('');
 
   // ================= the tuning dial: same idea as the site's nav and Engineering page =================
-  const CH = [['overview', 'Overview'], ['anatomy', 'Anatomy'], ['palette', 'Palette'], ['buttons', 'Buttons'], ['elevation', 'Elevation'], ['xray', 'Details'], ['assembled', 'Assembled'], ['findings', 'Accessibility']];
+  const CH = [['overview', 'Overview'], ['anatomy', 'Anatomy'], ['type', 'Type'], ['space', 'Spacing'], ['palette', 'Palette'], ['layers', 'Token layers'], ['buttons', 'Buttons'], ['f2c', 'Handoff'], ['elevation', 'Elevation'], ['xray', 'Details'], ['field', 'Text field'], ['assembled', 'Assembled'], ['rules', 'Do and don’t'], ['changes', 'Changes'], ['findings', 'Accessibility']];
   const FQ = CH.map((c, i) => +(88.1 + i * 1.2).toFixed(1)), LO = FQ[0] - .6, HI = FQ[FQ.length - 1] + .6;
   const SECS = CH.map(c => document.getElementById(c[0]));
   const near = v => FQ.reduce((b, f, i) => Math.abs(f - v) < Math.abs(FQ[b] - v) ? i : b, 0);
   // chapter labels and live tags
   SECS.forEach((s, i) => { const n = s && s.querySelector('.chh .num'); if (n) n.textContent = FQ[i].toFixed(1) + ' FM'; });
-  [['#overview .heroart', 'Product card', 0], ['.an-stage', 'Anatomy', 1], ['.bstage', 'Button', 3], ['.estage', 'Elevation', 4], ['.xstage', 'Product details', 5], ['.kc-stage', 'Shopping cart', 6]].forEach(([sel, t, i]) => { const el = document.querySelector(sel); if (el) el.insertAdjacentHTML('afterbegin', `<span class="live"><i></i>Live · ${t}<em>${FQ[i].toFixed(1)} FM</em></span>`); });
+  [['#overview .heroart', 'Product card', 0], ['.an-stage', 'Anatomy', 1], ['#type .stg', 'Type', 2], ['#space .stg', 'Spacing', 3], ['#layers .stg', 'Token layers', 5], ['.bstage', 'Button', 6], ['.hx-st', 'Handoff', 7], ['.estage', 'Elevation', 8], ['.xstage', 'Product details', 9], ['#field .stg', 'Text field', 10], ['.kc-stage', 'Shopping cart', 11], ['.lcstage', 'Product card', 13]].forEach(([sel, t, i]) => { const el = document.querySelector(sel); if (el) el.insertAdjacentHTML('afterbegin', `<span class="live"><i></i>Live · ${t}<em>${FQ[i].toFixed(1)} FM</em></span>`); });
   document.querySelector('.kc-stage') && (document.querySelector('.kc-stage').style.paddingTop = '60px');
-  document.querySelector('.bstage') && (document.querySelector('.bstage').style.paddingTop = '64px');
+  document.querySelector('.bstage') && matchMedia('(min-width: 641px)').matches && (document.querySelector('.bstage').style.paddingTop = '64px');
   const HEAD = 96;
   const tops = () => SECS.map(e => e.getBoundingClientRect().top + scrollY);
   const scrollV = () => { const T0 = tops(), y = scrollY + HEAD + 2; if (scrollY + innerHeight >= document.documentElement.scrollHeight - 4) return FQ[FQ.length - 1];
