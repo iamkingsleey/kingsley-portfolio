@@ -4,7 +4,7 @@
 #  3. adds analytics (content/site.json) and the navigation (nav.js) to every page
 import json, re, os, html as _html
 PAGES = ['index.html', 'shop.html', 'about.html', 'engineering.html', 'projects.html', 'designs.html', 'case.html', 'brand.html',
-         'logo.html', 'product.html', 'project.html', 'showcase.html']
+         'logo.html', 'product.html', 'project.html', 'showcase.html', 'kusnap-design-system.html']
 def _load(name, d):
     try: return json.load(open(f'{REPO}/content/{name}', encoding='utf-8'))
     except FileNotFoundError: return d

@@ -14,7 +14,7 @@
   ].filter(s => !s.gate || (window.KM_SITE || {})[s.gate]);
   const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html').replace(/^home\.html$/, 'index.html')).toLowerCase();
   // pages that live under a station: a case study under Projects, a design's own page under Designs
-  const PARENT = { 'case.html': 'Designs', 'brand.html': 'Designs',   // case studies sit under Designs while Projects is off
+  const PARENT = { 'case.html': 'Designs', 'brand.html': 'Designs', 'kusnap-design-system.html': 'Designs',   // case studies sit under Designs while Projects is off
     'logo.html': 'Designs', 'product.html': 'Designs', 'project.html': 'Designs', 'showcase.html': 'Designs' };
   const cur = STATIONS.find(s => s.href === file) || STATIONS.find(s => s.name === PARENT[file]) || STATIONS[0];
   const ci = STATIONS.indexOf(cur), RED = '#ff4a1c', SP = 74;

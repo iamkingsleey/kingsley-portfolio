@@ -529,6 +529,10 @@ if _shop_on:
   _sh_src = rep(_sh_src, '__SHOP__', json.dumps(_shop, ensure_ascii=False))
   _sh_src = rep(_sh_src, '<script>\n(function () {', '<script src="popkit.js"></script>\n' + CLICK + '<script>\n(function () {')
   open(f'{REPO}/shop.html', 'w', encoding='utf-8').write(_sh_src)
+# ================================================================ kusnap-design-system.html: the Kusnap design system, a page of its own (cms/build/src/kusnap-ds-src.html)
+_kds = open(f'{KFM}/kusnap-ds-src.html', encoding='utf-8').read()
+_kds = rep(_kds, '<meta charset="utf-8">\n', '<meta charset="utf-8">\n' + THEME_BOOT + TUNER)
+open(f'{REPO}/kusnap-design-system.html', 'w', encoding='utf-8').write(_kds)
 exec(open(f'{KFM}/tools/post.py').read())   # your text and picture changes, analytics, and the list the CMS edits
 print('ok', len(s), len(d))
 open(STATE, 'w').write('done')
