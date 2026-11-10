@@ -532,6 +532,7 @@ if _shop_on:
 # ================================================================ kusnap-design-system.html: the Kusnap design system, a page of its own (cms/build/src/kusnap-ds-src.html)
 _kds = open(f'{KFM}/kusnap-ds-src.html', encoding='utf-8').read()
 _kds = rep(_kds, '<meta charset="utf-8">\n', '<meta charset="utf-8">\n' + THEME_BOOT + TUNER)
+_kds = rep(_kds, '<script>\n(() => {', '<script src="popkit.js"></script>\n' + CLICK + '<script>\n(() => {')   # the site's sounds: dial ticks and the one click pop
 open(f'{REPO}/kusnap-design-system.html', 'w', encoding='utf-8').write(_kds)
 exec(open(f'{KFM}/tools/post.py').read())   # your text and picture changes, analytics, and the list the CMS edits
 print('ok', len(s), len(d))

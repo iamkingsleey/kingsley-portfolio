@@ -217,9 +217,11 @@
     };
     build(); addEventListener('resize', build);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let last = -1, settle = 0;
+    let last = -1, settle = 0, raf = 0, idle = 0;
+    const wake = () => { idle = 0; if (!raf) raf = requestAnimationFrame(frame); };
     const frame = t => {
-      if (!S.getClientRects().length) { requestAnimationFrame(frame); return; }   // phones: the scale is hidden behind the menu button
+      raf = 0;
+      if (!S.getClientRects().length) { setTimeout(wake, 400); return; }   // phones: the scale is hidden behind the menu button (check now and then, not every frame)
       const sr = S.getBoundingClientRect(), nr = nd.getBoundingClientRect(), tr = tk.getBoundingClientRect();
       const n = nr.left + nr.width / 2 - tr.left;                 // the needle, in the ticks' own space
       const moving = Math.abs(n - last) > .2; last = n;
@@ -232,9 +234,12 @@
         o.i.style.height = Math.max(6, h).toFixed(1) + 'px';
         o.i.style.opacity = (.22 + bump * .45 + Math.max(0, wave) * .2).toFixed(3);
       }
-      requestAnimationFrame(frame);
+      if (!moving && settle < .004) idle++; else idle = 0;
+      if (idle < 20) raf = requestAnimationFrame(frame);   // once the needle has been still a moment the ticks rest, until something moves it again
     };
-    requestAnimationFrame(frame);
+    ['pointerover', 'pointermove', 'pointerleave', 'focusin', 'click', 'transitionrun', 'transitionend'].forEach(ev => S.addEventListener(ev, wake, { passive: true }));
+    addEventListener('resize', wake); addEventListener('scroll', wake, { passive: true }); addEventListener('pageshow', wake);
+    wake();
   };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', () => setTimeout(start, 0)); else setTimeout(start, 0);
 })();

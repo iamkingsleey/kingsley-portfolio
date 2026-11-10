@@ -470,6 +470,7 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .xstage .actl { left: auto; right: 18px }
 .live { position: absolute; left: 20px; top: 22px; z-index: 3; display: flex; align-items: center; gap: 8px; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg) }
 .live i { width: 8px; height: 8px; border-radius: 99px; background: var(--red); box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 25%, transparent); animation: blink 1.6s ease-in-out infinite }
+.live i { animation-play-state: paused } .live.vis i { animation-play-state: running }   /* only the tags on screen blink */
 .live em { font-style: normal; color: var(--muted); margin-left: 6px }
 @keyframes blink { 50% { opacity: .35 } }
 /* annotations in the accent red, like the site's needle */
@@ -538,6 +539,7 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .ix ol { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid }
 .ix li button { display: block; width: 100%; height: 30px; padding: 0; border: 0; background: none; text-align: left; font: 500 14px/30px var(--body); letter-spacing: -.01em; color: var(--muted); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: color .25s, opacity .25s }
 .ix li button:hover, .ix li button.on { color: var(--fg); opacity: 1 }
+.ix .tr { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none } .ix.drag .tr, .ix.drag .tr * { cursor: grabbing !important } .ix.drag li button { transition: none }
 .ix li button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px }
 /* ---- how the product card changed (before, after, release) ---- */
 .lcstage { position: relative; background: var(--stage); border-radius: 16px; padding: 72px 32px 40px; color: var(--fg) }
@@ -1285,7 +1287,7 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
     let x = .5, tx = .5, drag = false, auto = !REDUCE, t0 = performance.now(), sel = -1;
     const set = v => { x = Math.max(0, Math.min(1, v)); sc.style.setProperty('--x', (x * 100).toFixed(2) + '%'); sc.setAttribute('aria-valuenow', Math.round(x * 100)); };
     const at = e => { const r = sc.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
-    const focus = i => { sel = i; auto = false; tx = 0; btns.forEach((b, k) => b.classList.toggle('on', k === i));
+    const focus = i => { sel = i; auto = false; tx = 0; kickA(); btns.forEach((b, k) => b.classList.toggle('on', k === i));
       if (i < 0) { ring.classList.remove('on'); wfc.querySelectorAll('.lbl').forEach(l => l.style.opacity = ''); return; }
       const r = rectOf(wfc, L[i][2]), pad = 4; Object.assign(ring.style, { left: r.x - pad + 'px', top: r.y - pad + 'px', width: r.w + pad * 2 + 'px', height: r.h + pad * 2 + 'px' }); ring.classList.add('on'); ring.querySelector('b').textContent = L[i][0];
       wfc.querySelectorAll('.lbl').forEach(l => l.style.opacity = L[i][2].includes(l.dataset.c) ? '1' : '.15'); };
@@ -1294,8 +1296,10 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
     sc.addEventListener('pointermove', e => { if (drag) set(at(e)); });
     const up = () => { drag = false; }; sc.addEventListener('pointerup', up); sc.addEventListener('pointercancel', up);
     sc.addEventListener('keydown', e => { const d = { ArrowRight: .05, ArrowLeft: -.05 }[e.key]; if (!d) return; e.preventDefault(); e.stopPropagation(); auto = false; tx = null; set(x + d); });
-    const loop = t => { if (!sc.isConnected) return; requestAnimationFrame(loop); if (auto) set(.5 + Math.sin((t - t0) / 1600) * .42); else if (tx !== null && !drag) set(x + (tx - x) * .15); };
-    set(.5); requestAnimationFrame(loop);  })();
+    let aRaf = 0, vis = false; function kickA() { if (!aRaf && vis) aRaf = requestAnimationFrame(loop); }   // idle when off screen or settled
+    new IntersectionObserver(es => { vis = es[0].isIntersecting; kickA(); }).observe(sc);
+    const loop = t => { aRaf = 0; if (!sc.isConnected) return; if (auto) set(.5 + Math.sin((t - t0) / 1600) * .42); else if (tx !== null && !drag) { set(x + (tx - x) * .15); if (Math.abs(tx - x) < .001) { set(tx); tx = null; } } if (auto || tx !== null) kickA(); };
+    set(.5);  })();
 
   // ---------------- 02 two sides
   const strip = p => `<div class="strip">${STEPS.map(s => { const h = hexOf(p, s); return `<i style="background:${h};color:${lum(h) > .4 ? '#01182B' : '#fff'}"><span>${s}</span></i>`; }).join('')}</div>`;
@@ -1456,18 +1460,18 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
   // the elevation tuner: a vertical dial, like the Engineering page
   (() => { const box = $('elist'); box.innerHTML = `<div class="lab">Tune the elevation</div><div class="etn" id="etn" role="slider" tabindex="0" aria-label="Elevation level" aria-valuemin="100" aria-valuemax="800" style="margin-top:18px"><div class="tk"></div>${EV.map(([n, , use], i) => `<button class="st" type="button" tabindex="-1" data-i="${i}"><b>elevation.${n}</b><small>${use}</small></button>`).join('')}<span class="ndl"></span></div><div class="eread" id="eread"></div>`;
     const el = $('etn'), tk = el.querySelector('.tk'), nd = el.querySelector('.ndl'), labs = [...el.querySelectorAll('.st')], PADY = 14, M = EV.length - 1;
-    const pos = f => PADY + f / M * (el.clientHeight - PADY * 2), val = e => { const r = el.getBoundingClientRect(); return Math.max(0, Math.min(M, (e.clientY - r.top - PADY) / (r.height - PADY * 2) * M)); };
-    let fv = ev, down = false, ticks = [];
-    const build = () => { tk.innerHTML = ''; ticks = []; for (let k = 0; k <= M * 5; k++) { const t = document.createElement('i'), f = k / 5; t.style.top = pos(f) + 'px'; tk.append(t); ticks.push([t, f, k % 5 === 0]); } labs.forEach((b, i) => { b.style.top = pos(i) + 'px'; b.onclick = () => { ev = i; drawE(); }; }); };
-    window._etn = i => { labs.forEach((b, k) => b.classList.toggle('on', k === i)); $('eread').textContent = 'box-shadow: ' + EV[i][1]; el.setAttribute('aria-valuenow', EV[i][0]); };
-    const loop = () => { requestAnimationFrame(loop); if (!down) fv += (ev - fv) * (REDUCE ? 1 : .2); else { const n = Math.round(fv); if (n !== ev) { ev = n; drawE(); } } const np = pos(fv); nd.style.top = np + 'px';
-      ticks.forEach(([t, f, mj]) => { const d = (pos(f) - np) / 40, b = Math.exp(-d * d); t.style.width = ((mj ? 18 : 8) + b * 14) + 'px'; t.style.opacity = (.22 + b * .7 + (mj ? .2 : 0)).toFixed(2); }); };
-    el.addEventListener('pointerdown', e => { if (e.target.closest('.st')) return; down = true; el.classList.add('drag'); fv = val(e); try { el.setPointerCapture(e.pointerId); } catch (_) {} });
-    el.addEventListener('pointermove', e => { if (down) fv = val(e); });
+    let EH = 0; const pos = f => PADY + f / M * (EH - PADY * 2), val = e => { const r = el.getBoundingClientRect(); return Math.max(0, Math.min(M, (e.clientY - r.top - PADY) / (r.height - PADY * 2) * M)); };
+    let fv = ev, down = false, ticks = [], eRaf = 0; const kick = () => { if (!eRaf) eRaf = requestAnimationFrame(loop); };
+    const build = () => { EH = el.clientHeight; tk.innerHTML = ''; ticks = []; for (let k = 0; k <= M * 5; k++) { const t = document.createElement('i'), f = k / 5; t.style.top = pos(f) + 'px'; tk.append(t); ticks.push([t, f, k % 5 === 0]); } labs.forEach((b, i) => { b.style.top = pos(i) + 'px'; b.onclick = () => { ev = i; drawE(); }; }); kick(); };
+    window._etn = i => { kick(); labs.forEach((b, k) => b.classList.toggle('on', k === i)); $('eread').textContent = 'box-shadow: ' + EV[i][1]; el.setAttribute('aria-valuenow', EV[i][0]); };
+    const loop = () => { eRaf = 0; if (!down) { fv += (ev - fv) * (REDUCE ? 1 : .2); if (Math.abs(ev - fv) < .002) fv = ev; } else { const n = Math.round(fv); if (n !== ev) { ev = n; drawE(); } } const np = pos(fv); nd.style.top = np + 'px';
+      ticks.forEach(([t, f, mj]) => { const d = (pos(f) - np) / 40, b = Math.exp(-d * d); t.style.width = ((mj ? 18 : 8) + b * 14) + 'px'; t.style.opacity = (.22 + b * .7 + (mj ? .2 : 0)).toFixed(2); }); if (down || fv !== ev) kick(); };
+    el.addEventListener('pointerdown', e => { if (e.target.closest('.st')) return; kick(); down = true; el.classList.add('drag'); fv = val(e); try { el.setPointerCapture(e.pointerId); } catch (_) {} });
+    el.addEventListener('pointermove', e => { if (down) { fv = val(e); kick(); } });
     const up = () => { if (!down) return; down = false; el.classList.remove('drag'); ev = Math.round(fv); drawE(); };
     el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
     el.addEventListener('keydown', e => { const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!d) return; e.preventDefault(); ev = Math.max(0, Math.min(M, ev + d)); drawE(); });
-    build(); new ResizeObserver(build).observe(el); loop(); })();
+    build(); new ResizeObserver(build).observe(el); })();
   drawE();
 
   // ---------------- 06 x-ray of the buy box
@@ -1609,6 +1613,7 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
   // chapter labels and live tags
   SECS.forEach((s, i) => { const n = s && s.querySelector('.chh .num'); if (n) n.textContent = FQ[i].toFixed(1) + ' FM'; });
   [['#overview .heroart', 'Product card', 0], ['.an-stage', 'Anatomy', 1], ['#type .stg', 'Type', 2], ['#space .stg', 'Spacing', 3], ['#layers .stg', 'Token layers', 5], ['.bstage', 'Button', 6], ['.hx-st', 'Handoff', 7], ['.estage', 'Elevation', 8], ['.xstage', 'Product details', 9], ['#field .stg', 'Text field', 10], ['.kc-stage', 'Shopping cart', 11], ['.lcstage', 'Product card', 13]].forEach(([sel, t, i]) => { const el = document.querySelector(sel); if (el) el.insertAdjacentHTML('afterbegin', `<span class="live"><i></i>Live · ${t}<em>${FQ[i].toFixed(1)} FM</em></span>`); });
+  setTimeout(() => { const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('vis', e.isIntersecting))); document.querySelectorAll('.live').forEach(l => io.observe(l)); }, 0);
   document.querySelector('.kc-stage') && (document.querySelector('.kc-stage').style.paddingTop = '60px');
   document.querySelector('.bstage') && matchMedia('(min-width: 641px)').matches && (document.querySelector('.bstage').style.paddingTop = '64px');
   const HEAD = 96;
@@ -1664,11 +1669,14 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
   const layout = () => { RUL.build(); VD.build(); };
   layout(); let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(layout, 80); });
   document.fonts && document.fonts.ready.then(layout);
-  (function frame() { requestAnimationFrame(frame);
+  let fRaf = 0, fTxt = ''; const kickF = () => { if (!fRaf) fRaf = requestAnimationFrame(frame); };   // idle until the page scrolls or the dial is dragged
+  addEventListener('scroll', kickF, { passive: true }); addEventListener('resize', kickF);
+  function frame() { fRaf = 0;
     const tv = dragV !== null ? dragV : scrollV(); dv += (tv - dv) * (dragV !== null || REDUCE ? 1 : .16); if (Math.abs(tv - dv) < .002) dv = tv;
     const on = near(dv); RUL.draw(dv); if (document.body.classList.contains('nav-station')) VD.draw(dv);
-    $('rdF').textContent = dv.toFixed(1); $('rdN').textContent = CH[on][1]; $('knF').textContent = dv.toFixed(1) + ' FM'; $('knN').textContent = CH[on][1];
-    IND.style.transform = `rotate(${ang(dv)}deg)`; KD.setAttribute('aria-valuetext', CH[on][1]); })();
+    const txt = dv.toFixed(1) + '|' + on; if (txt !== fTxt) { fTxt = txt; $('rdF').textContent = dv.toFixed(1); $('rdN').textContent = CH[on][1]; $('knF').textContent = dv.toFixed(1) + ' FM'; $('knN').textContent = CH[on][1]; KD.setAttribute('aria-valuetext', CH[on][1]); }
+    IND.style.transform = `rotate(${ang(dv)}deg)`; if (dragV !== null || dv !== tv) kickF(); }
+  kickF(); document.fonts && document.fonts.ready.then(kickF);
 
   // ================= colour tuner =================
   (() => { const box = $('pal'), N = 70; let sel = 4, fv = 4, pdown = false;
@@ -1677,11 +1685,11 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
       <div class="pread"><div class="lab">Token</div><div class="tn" id="ptn" title="Copy token name"></div><div class="hx" id="phx"></div><p id="pds"></p><div class="cr" id="pcr"></div></div>
       <div class="ptr" id="ptr" role="slider" tabindex="0" aria-label="Tune through the Kusnap palette" aria-valuemin="0" aria-valuemax="69"><div class="bar2">${PAL.map(p => p[3].map(h => `<i style="background:${h}"></i>`).join('')).join('')}</div><div class="tk"></div>${PAL.map((p, i) => `<button class="st" type="button" tabindex="-1" data-i="${i}">${p[1]}</button>`).join('')}<span class="ndl"></span></div>`;
     const tr = $('ptr'), tk = tr.querySelector('.tk'), nd = tr.querySelector('.ndl'), labs = [...tr.querySelectorAll('.st')], PADX = 6;
-    const pos = i => PADX + i / (N - 1) * (tr.clientWidth - PADX * 2);
+    let TW = 0; const pos = i => PADX + i / (N - 1) * (TW - PADX * 2);
     const val = e => { const r = tr.getBoundingClientRect(); return Math.max(0, Math.min(N - 1, (e.clientX - r.left - PADX) / (r.width - PADX * 2) * (N - 1))); };
     let ticks = [];
-    const build = () => { tk.innerHTML = ''; ticks = []; for (let i = 0; i < N; i++) { const t = document.createElement('i'); t.style.left = pos(i) + 'px'; tk.append(t); ticks.push(t); }
-      labs.forEach((b, i) => { b.style.left = pos(i * 10) + 'px'; b.onclick = () => { sel = i * 10 + 4; fv = sel; show(); }; }); };
+    const build = () => { TW = tr.clientWidth; tk.innerHTML = ''; ticks = []; for (let i = 0; i < N; i++) { const t = document.createElement('i'); t.style.left = pos(i) + 'px'; tk.append(t); ticks.push(t); }
+      labs.forEach((b, i) => { b.style.left = pos(i * 10) + 'px'; b.onclick = () => { sel = i * 10 + 4; fv = sel; show(); kick(); }; }); kick(); };
     const show = () => { const p = PAL[Math.floor(sel / 10)], s = sel % 10, h = p[3][s], tok = `kusnap.${p[0]}.${STEPS[s]}`;
       $('psw').style.backgroundColor = h; $('pfam').innerHTML = p[3].map((c, k) => `<i class="${k === s ? 'on' : ''}" style="background:${c}"></i>`).join('');
       $('ptn').textContent = tok; $('phx').textContent = h + (s === 4 ? ' · base' : ''); $('pds').textContent = p[2];
@@ -1689,17 +1697,18 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
       $('pcr').innerHTML = `<div><span>White text on it</span><i>${w.toFixed(2)}:1 · ${tag(w)}</i></div><div><span>Black text on it</span><i>${b.toFixed(2)}:1 · ${tag(b)}</i></div>`;
       labs.forEach((l, i) => l.classList.toggle('on', i === Math.floor(sel / 10))); tr.setAttribute('aria-valuenow', sel); tr.setAttribute('aria-valuetext', tok + ', ' + h); };
     const draw = () => { const np = pos(fv); nd.style.left = np + 'px'; ticks.forEach((t, i) => { const d = (pos(i) - np) / 40, bump = Math.exp(-d * d), major = i % 10 === 0; t.style.height = ((major ? 18 : 9) + bump * 12) + 'px'; t.style.opacity = (.22 + bump * .7 + (major ? .2 : 0)).toFixed(2); }); };
-    let shown = -1; const loop = () => { requestAnimationFrame(loop); if (!pdown) fv += (sel - fv) * (REDUCE ? 1 : .2); const n = Math.round(fv); if (pdown && n !== sel) sel = n; if (sel !== shown) { shown = sel; show(); } draw(); };
-    tr.addEventListener('pointerdown', e => { if (e.target.closest('.st')) return; pdown = true; tr.classList.add('drag'); fv = val(e); try { tr.setPointerCapture(e.pointerId); } catch (_) {} });
-    tr.addEventListener('pointermove', e => { if (pdown) fv = val(e); });
-    const up = () => { if (!pdown) return; pdown = false; tr.classList.remove('drag'); sel = Math.round(fv); };
+    let shown = -1, cRaf = 0; function kick() { if (!cRaf) cRaf = requestAnimationFrame(loop); }   // runs only while the needle moves
+    const loop = () => { cRaf = 0; if (!pdown) { fv += (sel - fv) * (REDUCE ? 1 : .2); if (Math.abs(sel - fv) < .002) fv = sel; } const n = Math.round(fv); if (pdown && n !== sel) sel = n; if (sel !== shown) { shown = sel; show(); } draw(); if (pdown || fv !== sel) kick(); };
+    tr.addEventListener('pointerdown', e => { if (e.target.closest('.st')) return; kick(); pdown = true; tr.classList.add('drag'); fv = val(e); try { tr.setPointerCapture(e.pointerId); } catch (_) {} });
+    tr.addEventListener('pointermove', e => { if (pdown) { fv = val(e); kick(); } });
+    const up = () => { if (!pdown) return; pdown = false; tr.classList.remove('drag'); sel = Math.round(fv); kick(); };
     tr.addEventListener('pointerup', up); tr.addEventListener('pointercancel', up);
-    tr.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowUp: 10, ArrowDown: -10 }[e.key]; if (!d) return; e.preventDefault(); sel = Math.max(0, Math.min(N - 1, sel + d)); });
+    tr.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowUp: 10, ArrowDown: -10 }[e.key]; if (!d) return; e.preventDefault(); sel = Math.max(0, Math.min(N - 1, sel + d)); kick(); });
     let toast; $('ptn').onclick = async () => { const t = $('ptn').textContent; try { await navigator.clipboard.writeText(t); } catch (_) {} clearTimeout(toast); let el = document.querySelector('.copied'); if (!el) { el = document.createElement('div'); el.className = 'copied'; document.body.appendChild(el); } el.textContent = 'Copied ' + t; el.hidden = false; toast = setTimeout(() => el.hidden = true, 1400); };
-    build(); new ResizeObserver(build).observe(tr); loop(); })();
+    build(); new ResizeObserver(build).observe(tr); })();
 
   // ---------------- the station dial is the chosen navigation
-  document.body.classList.add('nav-station'); requestAnimationFrame(layout);
+  document.body.classList.add('nav-station'); requestAnimationFrame(() => { layout(); kickF(); });
 
 
   // ---------------- the chapter dial (desktop): the compact ruler from the case study
@@ -1709,9 +1718,12 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
     const tk = ix.querySelector('.tk'), nd = ix.querySelector('.nd'), bs = [...ix.querySelectorAll('li button')], ROW = 30, STEP = 6, n = CH.length, H = n * ROW, ticks = [];
     for (let y = 3; y <= H - 3; y += STEP) { const e = document.createElement('i'); e.style.top = y + 'px'; tk.append(e); ticks.push({ e, y, major: Math.abs(((y - ROW / 2) % ROW + ROW) % ROW) < .5 }); }
     bs.forEach((b, i) => b.addEventListener('click', () => { const y = SECS[i].getBoundingClientRect().top + scrollY - 96; scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }));
-    let cur = -1, ny = ROW / 2, target = ROW / 2, raf = 0;
+    let cur = -1, ny = ROW / 2, target = ROW / 2, raf = 0, lastTk = null, sndT = 0;
+    let soundOn = true; try { soundOn = localStorage.getItem('km-sound') !== 'off'; } catch (_) {} addEventListener('km-sound', e => { soundOn = e.detail; });
+    const tickSnd = () => { if (!soundOn || !window.Popkit || getComputedStyle(ix).display === 'none') return; const t = performance.now(); if (t - sndT < 38) return; sndT = t; try { Popkit.play('detent'); } catch (_) {} };
     const draw = () => { raf = 0; ny += (target - ny) * .2; if (Math.abs(target - ny) < .2) ny = target; else raf = requestAnimationFrame(draw);
       nd.style.top = ny.toFixed(1) + 'px';
+      const tkI = Math.round((ny - 3) / STEP); if (lastTk !== null && tkI !== lastTk) tickSnd(); lastTk = tkI;   // one soft tick for every mark the needle passes
       ticks.forEach(t => { const d = (t.y - ny) / 26, bump = Math.exp(-d * d); t.e.style.width = ((t.major ? 12 : 5) + bump * 6).toFixed(1) + 'px'; t.e.style.opacity = ((t.major ? .5 : .16) + bump * .4).toFixed(3); }); };
     const read = () => { const line = innerHeight * .35, tops = SECS.map(x => x.getBoundingClientRect().top);
       let k = 0; for (let i = 0; i < n; i++) if (tops[i] <= line) k = i;
@@ -1719,6 +1731,20 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
       target = (k + (k + 1 < n ? f : 0)) * ROW + ROW / 2;
       if (k !== cur) { cur = k; bs.forEach((x, i) => { x.classList.toggle('on', i === k); if (i === k) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); }); }
       if (!raf) raf = requestAnimationFrame(draw); };
+
+    { // drag the dial: the page follows the needle
+      const tr = ix.querySelector('.tr'); let dg = null, moved = false;
+      const goTo = y => { const pos = Math.max(0, Math.min(n - 1, y / ROW - .5)), k = Math.floor(pos), f = pos - k, line = innerHeight * .35;
+        const top = i => SECS[i].getBoundingClientRect().top + scrollY;
+        const a = top(k), b = k + 1 < n ? top(k + 1) : a; scrollTo({ top: Math.max(0, a + (b - a) * f - line + 1), behavior: 'instant' }); };
+      tr.addEventListener('pointerdown', e => { if (e.button > 0) return; dg = { y0: e.clientY, top: tr.getBoundingClientRect().top }; moved = false; });
+      tr.addEventListener('pointermove', e => { if (!dg) return; if (!moved && Math.abs(e.clientY - dg.y0) < 4) return;
+        if (!moved) { moved = true; ix.classList.add('drag'); try { tr.setPointerCapture(e.pointerId); } catch (_) {} }
+        e.preventDefault(); goTo(e.clientY - tr.getBoundingClientRect().top); });
+      const up = () => { if (!dg) return; dg = null; ix.classList.remove('drag'); };
+      tr.addEventListener('pointerup', up); tr.addEventListener('pointercancel', up); tr.addEventListener('lostpointercapture', up);
+      tr.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);   // a drag is not a click
+    }
     addEventListener('scroll', read, { passive: true }); addEventListener('resize', read); read(); ny = target; draw(); }
 
   // ---------------- back pill: where the visitor came from (kit.js keeps the trail), as on the case studies

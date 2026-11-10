@@ -362,6 +362,7 @@ button { font: inherit; color: inherit; cursor: pointer }
   opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .25s, opacity .25s }
 .ix li button:hover { color: var(--ink); opacity: 1 }
 .ix li button.on { color: var(--ink); opacity: 1 }
+.ix .tr { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none } .ix.drag .tr, .ix.drag .tr * { cursor: grabbing !important } .ix.drag li button { transition: none }
 .ix li button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
 /* the page stays centred on the screen; with the index showing, pictures stop short of it on both sides so the column stays symmetric */
 @media (min-width: 1200px) { .H .tx { width: min(var(--tx), calc(100vw - 2 * 340px)) } }
@@ -1757,6 +1758,20 @@ function setupIndex() {
     const tkI = Math.round((ny - 4) / STEP); if (lastTk !== null && tkI !== lastTk && ix.classList.contains('on') && !ix.classList.contains('dim')) snd('detent'); lastTk = tkI;   // one soft tick for every mark the needle passes
     ticks.forEach(t => { const d = (t.y - ny) / (SM ? 26 : 34), bump = Math.exp(-d * d);
       t.e.style.width = ((t.major ? (SM ? 12 : 16) : (SM ? 5 : 7)) + bump * (SM ? 6 : 8)).toFixed(1) + 'px'; t.e.style.opacity = ((t.major ? .5 : .16) + bump * .4).toFixed(3); }); };
+
+  { // drag the dial: the page follows the needle
+    const tr = ix.querySelector('.tr'); let dg = null, moved = false;
+    const goTo = y => { const pos = Math.max(0, Math.min(n - 1, y / ROW - .5)), k = Math.floor(pos), f = pos - k, line = innerHeight * .35;
+      const top = i => secs[i].getBoundingClientRect().top + scrollY;
+      const a = top(k), b = k + 1 < n ? top(k + 1) : a; scrollTo({ top: Math.max(0, a + (b - a) * f - line + 1), behavior: 'instant' }); };
+    tr.addEventListener('pointerdown', e => { if (e.button > 0) return; dg = { y0: e.clientY, top: tr.getBoundingClientRect().top }; moved = false; });
+    tr.addEventListener('pointermove', e => { if (!dg) return; if (!moved && Math.abs(e.clientY - dg.y0) < 4) return;
+      if (!moved) { moved = true; ix.classList.add('drag'); try { tr.setPointerCapture(e.pointerId); } catch (_) {} }
+      e.preventDefault(); goTo(e.clientY - tr.getBoundingClientRect().top); });
+    const up = () => { if (!dg) return; dg = null; ix.classList.remove('drag'); };
+    tr.addEventListener('pointerup', up); tr.addEventListener('pointercancel', up); tr.addEventListener('lostpointercapture', up);
+    tr.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);   // a drag is not a click
+  }
   addEventListener('scroll', read, { passive: true }); addEventListener('resize', read);
   ixOff = () => { removeEventListener('scroll', read); removeEventListener('resize', read); cancelAnimationFrame(raf); };
   read(); ny = target; draw();

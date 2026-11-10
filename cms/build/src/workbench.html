@@ -217,15 +217,18 @@
   addEventListener('pointerup', () => { spin = null; if (!fine) PT.on = false; });
   new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(host);
   let C = col(); new MutationObserver(() => { C = col(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  const fit = c => { const W = c.clientWidth, H = c.clientHeight, d = Math.min(2, devicePixelRatio || 1); if (c.width !== Math.round(W * d) || c.height !== Math.round(H * d)) { c.width = Math.round(W * d); c.height = Math.round(H * d); } const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H); return [g, W, H]; };
+  const SZ = new Map(), szRO = new ResizeObserver(es => es.forEach(e => SZ.set(e.target, [e.target.clientWidth, e.target.clientHeight])));   // canvas sizes, measured on resize, not every frame
+  const fit = c => { let z = SZ.get(c); if (!z) { z = [c.clientWidth, c.clientHeight]; SZ.set(c, z); szRO.observe(c); } const W = z[0], H = z[1], d = Math.min(2, devicePixelRatio || 1); if (c.width !== Math.round(W * d) || c.height !== Math.round(H * d)) { c.width = Math.round(W * d); c.height = Math.round(H * d); } const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H); return [g, W, H]; };
+  let wbF = '', dcKey = ''; document.fonts && document.fonts.ready.then(() => { dcKey = ''; });
   (function frame(t) { requestAnimationFrame(frame); if (!vis) return;
     v += (tgt - v) * (drag ? .5 : reduce ? 1 : .14); if (Math.abs(tgt - v) < .002) v = tgt;
     const i = near(v), off = Math.abs(v - FQ[i]), a = Math.min(1, off / .5);
     if (Math.abs(v - FQ[i]) < .05 && lastSt !== i + 1) { if (user && window.Popkit) Popkit.play('detent'); lastSt = i + 1; } else if (Math.abs(v - FQ[i]) > .2) lastSt = 0;
-    show(i); fqr.textContent = v.toFixed(1) + ' FM'; tx.classList.toggle('fade', a > .6); stage.classList.toggle('static', a > .3);
-    dial.setAttribute('aria-valuenow', v.toFixed(1)); dial.setAttribute('aria-valuetext', TOOLS[i].name + ', ' + TOOLS[i].fq + ' FM');
+    show(i); const fs = v.toFixed(1); tx.classList.toggle('fade', a > .6); stage.classList.toggle('static', a > .3);
+    if (fs !== wbF) { wbF = fs; fqr.textContent = fs + ' FM'; dial.setAttribute('aria-valuenow', fs); dial.setAttribute('aria-valuetext', TOOLS[i].name + ', ' + TOOLS[i].fq + ' FM'); }   // only when it changes
     // the ruler: fixed, with a red needle that moves; ticks brighten near the needle
-    { const [g, W, H] = fit(dc), hz = horiz(), np = posOf(v), step = hz ? 5 : 2;
+    const dk = v.toFixed(3) + '|' + (SZ.get(dc) || []).join('x') + '|' + C.ink + '|' + horiz(); if (dk !== dcKey) { dcKey = dk;   // the ruler only redraws when the needle, size or theme changes
+      const [g, W, H] = fit(dc), hz = horiz(), np = posOf(v), step = hz ? 5 : 2;
       for (let f10 = Math.ceil(lo * 10 / step) * step; f10 <= hi * 10; f10 += step) { const pos = posOf(f10 / 10), major = f10 % 10 === 0, half = f10 % 5 === 0, nr = Math.max(0, 1 - Math.abs(pos - np) / 90), len = (major ? 18 : half ? 12 : 7) + nr * 10;
         g.globalAlpha = .28 + nr * .6; g.fillStyle = C.ink; if (hz) g.fillRect(pos, H - 30 - len, 1, len); else g.fillRect(0, pos, len, 1);
         if (major && f10 % 20 === 0) { g.globalAlpha = .45; g.font = '500 10px "Geist Mono", ui-monospace, monospace'; g.fillStyle = C.muted; if (hz) { g.textAlign = 'center'; g.fillText(String(f10 / 10), pos, H - 12); } else { g.textAlign = 'left'; g.fillText(String(f10 / 10), 34, pos + 4); } } }
