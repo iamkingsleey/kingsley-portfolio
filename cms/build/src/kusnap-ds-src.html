@@ -219,17 +219,21 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .bx { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) }
 .bstage { min-height: 360px; display: grid; place-items: center; background: var(--stage); border-right: 1px solid var(--line); position: relative; padding: 40px 20px }
 .bstage .kds { display: grid; place-items: center; width: 100%; min-height: 200px; border-radius: 20px; background: #fff; box-shadow: 0 1px 0 .5px rgb(1 24 43 / .04) }
-.bspec { position: absolute; left: 20px; right: 20px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center }
+.bspec { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; margin-top: 20px }
+.bstage { display: flex; flex-direction: column; align-items: center; justify-content: center }
 .bctl { padding: 24px; display: grid; gap: 0; align-content: start }
 .bctl .g > .lab { display: block; margin-bottom: 12px }
 .bctl .g + .g { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line) }
 .bctl .bnote { margin-top: 20px }
 .bnote { font-size: 13px; color: var(--muted) }
-@media (max-width: 920px) { .bx { grid-template-columns: 1fr } .bstage { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 80px } }
+@media (max-width: 920px) { .bx { grid-template-columns: 1fr } .bstage { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 32px } }
 
 /* ===== 05 elevation ===== */
 .ev { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) }
 .estage { min-height: 520px; background: var(--stage); border-right: 1px solid var(--line); display: grid; place-items: center; position: relative; overflow: hidden }
+/* room above the card for the label and the full lift (44px at elevation.800), room below for its floor shadow */
+.estage { padding: 120px 20px 56px }
+@media (max-width: 640px) { .estage { padding: 112px 16px 48px } }
 .estage .floor { position: absolute; left: 50%; bottom: 70px; width: 300px; height: 40px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgb(1 24 43 / .10), transparent); transition: transform .5s cubic-bezier(.2,.8,.2,1), opacity .5s }
 .estage .lift { transition: transform .5s cubic-bezier(.2,.8,.2,1) }
 .estage .lift .k-pc-img { transition: box-shadow .5s cubic-bezier(.2,.8,.2,1) }
