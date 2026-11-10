@@ -520,6 +520,20 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .etn:focus-visible { outline: 2px solid var(--fg); outline-offset: 6px; border-radius: 8px }
 .eread { margin-top: 18px; font: 500 12px/1.5 var(--mono); color: var(--muted) }
 
+/* the chapter dial, the same compact ruler as the Kusnap case study (cases-src .ix.sm) */
+.ix { display: none }
+@media (min-width: 1100px) {
+  body.nav-station .vdial { display: none !important }
+  body.nav-station .ix { display: block; position: fixed; z-index: 8; left: max(24px, env(safe-area-inset-left, 0px)); top: 50%; translate: 0 -50%; width: 200px }
+}
+.ix .tr { position: relative }
+.ix .tk { position: absolute; left: 0; top: 0; bottom: 0; width: 24px; pointer-events: none }
+.ix .tk i { position: absolute; left: 0; height: 1px; background: var(--fg); border-radius: 1px }
+.ix .nd { position: absolute; left: -5px; width: 22px; height: 1.5px; margin-top: -.75px; background: var(--red); border-radius: 1px; pointer-events: none }
+.ix ol { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid }
+.ix li button { display: block; width: 100%; height: 30px; padding: 0; border: 0; background: none; text-align: left; font: 500 14px/30px var(--body); letter-spacing: -.01em; color: var(--muted); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: color .25s, opacity .25s }
+.ix li button:hover, .ix li button.on { color: var(--fg); opacity: 1 }
+.ix li button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px }
 /* ---- navigation variants ---- */
 /* phones: the header dial is replaced. md-none = normal scroll, md-bottom = the dial docked at the bottom */
 .mdock { display: none }
@@ -1219,6 +1233,26 @@ body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }
 
   // ---------------- the station dial is the chosen navigation
   document.body.classList.add('nav-station'); requestAnimationFrame(layout);
+
+
+  // ---------------- the chapter dial (desktop): the compact ruler from the case study
+  { const ix = document.createElement('nav'); ix.className = 'ix'; ix.setAttribute('aria-label', 'Chapters');
+    ix.innerHTML = `<div class="tr"><div class="tk"></div><i class="nd"></i><ol>${CH.map((c, i) => `<li><button type="button" data-k="${i}">${c[1]}</button></li>`).join('')}</ol></div>`;
+    document.body.append(ix);
+    const tk = ix.querySelector('.tk'), nd = ix.querySelector('.nd'), bs = [...ix.querySelectorAll('li button')], ROW = 30, STEP = 6, n = CH.length, H = n * ROW, ticks = [];
+    for (let y = 3; y <= H - 3; y += STEP) { const e = document.createElement('i'); e.style.top = y + 'px'; tk.append(e); ticks.push({ e, y, major: Math.abs(((y - ROW / 2) % ROW + ROW) % ROW) < .5 }); }
+    bs.forEach((b, i) => b.addEventListener('click', () => { const y = SECS[i].getBoundingClientRect().top + scrollY - 96; scrollTo({ top: y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }));
+    let cur = -1, ny = ROW / 2, target = ROW / 2, raf = 0;
+    const draw = () => { raf = 0; ny += (target - ny) * .2; if (Math.abs(target - ny) < .2) ny = target; else raf = requestAnimationFrame(draw);
+      nd.style.top = ny.toFixed(1) + 'px';
+      ticks.forEach(t => { const d = (t.y - ny) / 26, bump = Math.exp(-d * d); t.e.style.width = ((t.major ? 12 : 5) + bump * 6).toFixed(1) + 'px'; t.e.style.opacity = ((t.major ? .5 : .16) + bump * .4).toFixed(3); }); };
+    const read = () => { const line = innerHeight * .35, tops = SECS.map(x => x.getBoundingClientRect().top);
+      let k = 0; for (let i = 0; i < n; i++) if (tops[i] <= line) k = i;
+      const a = tops[k], b = k + 1 < n ? tops[k + 1] : a + 1, f = tops[0] > line ? 0 : Math.max(0, Math.min(1, (line - a) / Math.max(1, b - a)));
+      target = (k + (k + 1 < n ? f : 0)) * ROW + ROW / 2;
+      if (k !== cur) { cur = k; bs.forEach((x, i) => { x.classList.toggle('on', i === k); if (i === k) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); }); }
+      if (!raf) raf = requestAnimationFrame(draw); };
+    addEventListener('scroll', read, { passive: true }); addEventListener('resize', read); read(); ny = target; draw(); }
 
   // ---------------- phones: no dial (normal scroll) or the dial docked at the bottom
   const MD = ['none', 'bottom'], rdEl = document.querySelector('.bar .rd'), rulEl = $('rul'), barW = document.querySelector('.bar .wrap'), dock = $('mdock');
