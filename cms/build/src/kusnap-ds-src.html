@@ -419,6 +419,15 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px }
 .pills span { font: 500 12.5px/1 var(--body); color: var(--text); background: var(--soft); padding: 9px 13px; border-radius: 99px }
 .heroart { border-radius: 16px; min-height: 480px }
+/* the intro, sized and spaced like the Kusnap case study's (cases-src .H.v2 .hd) */
+.hero { gap: 0 }
+.hero .hhd { max-width: 840px }
+.hero h1 { font: 700 clamp(34px, 4vw, 52px)/1.04 var(--body); letter-spacing: -.045em; max-width: 22ch }
+.hero p.lede { font-size: 18px; line-height: 1.6; max-width: none; margin-top: 24px }
+.pills { gap: 6px; margin-top: 24px }
+.pills span { padding: 5px 11px; font: 400 12.5px/1.5 var(--body); background: var(--pill, var(--soft)); text-transform: lowercase }
+.hero .heroart { margin-top: clamp(80px, 9vw, 128px) }
+.hero .facts { margin-top: 40px }
 .heroart .grid { display: none }
 .heroart .tag { font-family: var(--mono); box-shadow: none; border-color: var(--line) }
 .cta { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 18px; margin-top: 22px; border-radius: 99px; background: var(--fg); color: var(--bg); text-decoration: none; font: 500 14px/1 var(--body); transition: transform .16s ease-out }
@@ -747,7 +756,7 @@ body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }
 .bar .rd span#rdN { display: inline; font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap }
 .bar .rd .bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; margin-left: 2px }
 .bar .rd .bars i { width: 2.5px; border-radius: 1px; background: var(--ink) } .bar .rd .bars i:nth-child(1) { height: 4px } .bar .rd .bars i:nth-child(2) { height: 7px } .bar .rd .bars i:nth-child(3) { height: 11px }
-main.wrap { padding-top: 120px }
+main.wrap { padding-top: 0 } main.wrap > .hero:first-child { padding-top: 236px }
 body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
 @media (min-width: 1100px) { body.nav-station main.wrap { padding-left: 290px } }
 @media (max-width: 900px) {
@@ -755,7 +764,7 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
   .bar .wrap { gap: 14px }
   .bar .rd { min-width: 0 } .bar .rd span#rdN { overflow: hidden; text-overflow: ellipsis; min-width: 0 } .bar .rd b { font-size: 22px }
   .bar::before { height: calc(84px + env(safe-area-inset-top, 0px)) }
-  main.wrap { padding-top: 70px } }
+  main.wrap > .hero:first-child { padding-top: 136px } }
 </style>
 
 </head>

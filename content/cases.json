@@ -344,7 +344,7 @@
       {
        "t": "frame",
        "src": "Prototype/kusnap-system.html",
-       "ratio": "16 / 7",
+       "ratio": "3 / 1",
        "mratio": "4 / 5",
        "cap": "From token to screen: one colour, one button, one card, one page, all from the same system.",
        "title": "A Kusnap colour token, the Buy button it fills, the product card and the shopping cart page built from them"
