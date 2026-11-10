@@ -633,7 +633,7 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 /* B · spacing and radius */
 .lx .sp-rows { display: grid; gap: 14px; padding: 28px }
 .lx .sp-r { display: grid; grid-template-columns: 40px minmax(0, 1fr) 128px; gap: 14px; align-items: center }
-.lx .sp-r .bar { height: 14px; border-radius: 3px; background: rgb(7 118 216 / .18); box-shadow: inset 0 0 0 1px rgb(7 118 216 / .45) }
+.lx .sp-r .sp-bar { height: 14px; border-radius: 3px; background: rgb(7 118 216 / .18); box-shadow: inset 0 0 0 1px rgb(7 118 216 / .45) }
 .lx .sp-r .lx-mono:last-child { color: #6f6f6f; text-align: right }
 .lx .rad { display: grid; gap: 20px; padding: 28px; align-content: start }
 .lx .rad .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
@@ -1048,6 +1048,8 @@ body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }
 .bar .rd .bars i { width: 2.5px; border-radius: 1px; background: var(--ink) } .bar .rd .bars i:nth-child(1) { height: 4px } .bar .rd .bars i:nth-child(2) { height: 7px } .bar .rd .bars i:nth-child(3) { height: 11px }
 main.wrap { padding-top: 0 } main.wrap > .hero:first-child { padding-top: 236px }
 body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
+body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /* 15 chapters: never slide under the header on short screens */
+@media (max-height: 660px) { body.nav-station .ix { display: none } }
 @media (min-width: 1100px) { body.nav-station main.wrap { padding-left: 290px } }
 @media (max-width: 900px) {
   .bar { left: 16px; top: calc(18px + env(safe-area-inset-top, 0px)); right: 72px }
@@ -1346,7 +1348,7 @@ body.nav-station .ix { left: max(48px, env(safe-area-inset-left, 0px)) }
 
   // B · spacing in use, and radius
   const SP = [[4, 'between chips'], [8, 'card text, icons'], [12, 'button, top'], [16, 'card padding'], [24, 'button, sides'], [28, 'purchase card'], [44, 'button height']];
-  $('spRows').innerHTML = SP.map(([v, u]) => `<div class="sp-r"><span class="lx-mono" style="color:#000">${v}</span><span class="bar" style="width:${Math.round(v / 44 * 100)}%"></span><span class="lx-mono">${u}</span></div>`).join('');
+  $('spRows').innerHTML = SP.map(([v, u]) => `<div class="sp-r"><span class="lx-mono" style="color:#000">${v}</span><span class="sp-bar" style="width:${Math.round(v / 44 * 100)}%"></span><span class="lx-mono">${u}</span></div>`).join('');
   const RAD = [['sm', 4, 'chips, the discount tag'], ['md', 7, 'inputs and small controls'], ['lg', 12, 'buttons, the purchase card'], ['xl', 16, 'the product card']];
   $('radTiles').innerHTML = RAD.map(([n, v], i) => `<button class="tile" type="button" aria-pressed="${i === 2}" data-i="${i}"><i style="border-radius:${v}px"></i><span class="lx-mono">radius.${n}<br><span style="color:#6f6f6f">${v}px</span></span></button>`).join('');
   const setRad = i => { const [n, v, use] = RAD[i]; $('radTiles').querySelectorAll('.tile').forEach((t, j) => t.setAttribute('aria-pressed', j === i)); $('radBox').style.borderRadius = v + 'px'; $('radBtn').style.borderRadius = v + 'px'; $('radUse').textContent = `radius.${n} · ${v}px · ${use}`; };
