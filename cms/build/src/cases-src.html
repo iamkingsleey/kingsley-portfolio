@@ -322,6 +322,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 .H .kproto iframe { display: block; width: 100%; height: var(--ph, 760px); max-height: 82vh; border: 0; background: #fff }
 @media (max-width: 700px) { .H .kproto iframe { height: min(var(--ph, 760px), 78vh) } .H .kproto .pbar span { display: none } }
 /* an animated figure: a self-playing page in a fixed shape (3:2 unless the block says otherwise), framed like a picture */
+.H .klink { margin-top: 28px } .H .klink a { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 500 15px/1 var(--body); text-decoration: none; transition: transform .15s ease } .H .klink a i { font-style: normal; transition: transform .2s cubic-bezier(.2,.8,.2,1) } .H .klink a:hover i { transform: translateX(3px) } .H .klink a:active { transform: scale(.97) } .H .klink a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
 .H .kframe .fw { position: relative; aspect-ratio: var(--far, 3 / 2); border-radius: var(--km-r, 14px); overflow: hidden; background: var(--fbg, #f1f3f6); isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black) }
 .pmb { display: none } @media (max-width: 720px) { .pdk { display: none } .pmb { display: block } }
 .H .kframe iframe { position: absolute; left: -1px; top: -1px; display: block; width: calc(100% + 2px); height: calc(100% + 2px); border: 0; background: var(--fbg, #f1f3f6) }
@@ -1237,6 +1238,8 @@ const R = {
             + `${x.no || x.yes ? `<div class="da-sw">${x.no ? `<div><span class="da-l">Not</span><span class="da-no">${esc(x.no)}</span></div>` : ''}${x.yes ? `<div><span class="da-l">Chose</span><span class="da-yes">${esc(x.yes)}</span></div>` : ''}</div>` : ''}`
             + `${x.why ? `<p class="da-why">${esc(x.why)}</p>` : ''}${x.cost ? `<p class="da-cost"><i>Cost</i><span>${esc(x.cost)}</span></p>` : ''}</div></details>`).join('')}</div>`; }
       // an animated figure: a page that plays on its own (no browser bar, no Restart), in a fixed shape
+      // a link out of the case (a button in the text column): { t: 'link', href, v }
+      if (t === 'link') { const href = String(b.href || '').trim(); return href && b.v ? `<p class="klink"><a href="${esc(href)}">${esc(b.v)}<i aria-hidden="true">→</i></a></p>` : ''; }
       if (t === 'frame') { const src = String(b.src || '').trim(); if (!src) return ''; const label = b.cap != null ? esc(b.cap) : '';
         return `<div class="fr kframe" data-kblk="${base}"><div class="fw" style="--far:${esc(b.ratio || '3 / 2')}${b.mratio ? ';--fmr:' + esc(b.mratio) : ''}"${b.mratio ? ' data-mr' : ''}${b.dark ? ' data-dk' : ''}><iframe src="${esc(src)}" title="${esc(b.title || b.cap || '')}" loading="lazy"></iframe></div>${cap([], 'Fig. ' + pad(++fig), label, base + '.cap')}</div>`; }
       if (t === 'proto') { const src = String(b.src || '').trim().replace(/^assets\/protos\//, 'Prototype/');   // prototypes moved to the Prototype folder

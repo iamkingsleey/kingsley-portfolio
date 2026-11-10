@@ -784,7 +784,7 @@ addEventListener('wheel', e => {
     // role match: picking a role shows only that kind of work, the two strongest pieces and then all of it on Designs
     // (the choice is remembered by kit.js, so Designs opens on the same work; its chips and picker bring the rest back)
     const ROUTES = {
-      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '161 pieces · 4 case studies']],
+      '':      [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html', 'All designs', '162 pieces · 5 case studies']],
       Product: [['case.html#kusnap', 'Kusnap case study', 'Product, early stage to 80,000+ users'], ['case.html#bulvds', 'Bulvds case study', 'Product design'], ['designs.html', 'All product work', 'Case studies on Designs']],
       'UI/UX': [['designs.html#p-kusnap-account-verification', 'Kusnap, account verification', 'UI/UX, live prototype'], ['designs.html#p-kusnap-product-card', 'Kusnap, product card', 'UI/UX, design system'], ['designs.html', 'All UI/UX work', 'Interfaces and live prototypes on Designs']],
       Brand:   [['brand.html#oghosa', 'Oghosa case study', 'Brand identity'], ['designs.html#p-etionary-properties-poster', 'Etionary Properties poster', 'Brand'], ['designs.html', 'All brand work', 'Identities and logos on Designs']],

@@ -332,8 +332,33 @@
      ]
     },
     {
+     "h": "System",
+     "eb": "07 · System",
+     "title": "The system behind it",
+     "media": [],
+     "blocks": [
+      {
+       "t": "text",
+       "v": "Every screen in this case study comes from one design system: 70 colour tokens and 500+ components, shared by web, Android and iOS. One colour becomes a button, the button becomes a card, and the card becomes a screen."
+      },
+      {
+       "t": "frame",
+       "src": "Prototype/kusnap-system.html",
+       "ratio": "16 / 7",
+       "mratio": "4 / 5",
+       "cap": "From token to screen: one colour, one button, one card, one page, all from the same system.",
+       "title": "A Kusnap colour token, the Buy button it fills, the product card and the shopping cart page built from them"
+      },
+      {
+       "t": "link",
+       "href": "kusnap-design-system",
+       "v": "View the design system"
+      }
+     ]
+    },
+    {
      "h": "Impact",
-     "eb": "07 · Results",
+     "eb": "08 · Results",
      "title": "The impact",
      "media": [],
      "stats": [
@@ -451,6 +476,31 @@
     "title": "Kusnap at a glance: a bento of shoppers, categories, seller cards with verified ticks, delivery and contact details, assembling tile by tile"
    },
    "preview": "assets/uploads/kusnap-preview-2.jpg"
+  },
+  {
+   "slug": "kusnap-design-system",
+   "title": "Kusnap Design System",
+   "kind": "Product",
+   "tag": "Design system",
+   "role": "Head of Design",
+   "year": "2020 – 2026",
+   "client": "Kusnap Africa Limited",
+   "headline": "One system for a market<br>of buyers and sellers",
+   "blurb": "The shared language behind every Kusnap listing, wallet and checkout: 70 colour tokens and 500+ components used across web, Android and iOS. Scan a product card, tune the palette, and see how the system holds up on accessibility.",
+   "stat": [
+    "500+",
+    "components"
+   ],
+   "cover": "assets/uploads/kusnap-ds-cover.webp",
+   "preview": "assets/uploads/kusnap-ds-cover.webp",
+   "page": "kusnap-design-system.html",
+   "fq": "89.7",
+   "platforms": "Web, Android and iOS",
+   "statement": "",
+   "problem": "",
+   "goal": "",
+   "impactNote": "",
+   "sections": []
   },
   {
    "slug": "bulvds",

@@ -2,7 +2,7 @@
 #   case.html#<slug>  product case studies in the Story layout (a narrative column, a ruler of chapters down the side)
 #   brand.html#<slug> brand case studies in the Showcase layout (pictures nearly edge to edge, colour floods, type by weight)
 # Run from build.py (shares rep, REPO, KFM, THEME_BOOT, TUNER, CLICK).
-CS2 = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden')]
+CS2 = [c for c in json.load(open(f'{REPO}/content/cases.json', encoding='utf-8'))['cases'] if not c.get('hidden') and c.get('page', 'case.html') in ('case.html', 'brand.html')]   # a case with its own page (e.g. the Kusnap design system) is listed on Projects and Designs but not drawn here
 def _local2(o):   # Framer links -> assets/cases/<file> once tools/fetch-case-images.sh has downloaded them
     if isinstance(o, dict): return {k: _local2(v) for k, v in o.items()}
     if isinstance(o, list): return [_local2(v) for v in o]
