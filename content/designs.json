@@ -1,6 +1,34 @@
 {
   "projects": [
     {
+      "title": "Naira roll with a rubber band",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/naira-roll-with-rubber-band.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#82b7c9",
+      "dark": false,
+      "desc": "A roll of ₦1,000 notes held tight with a rubber band, floating on soft blue. A 3D render.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "Dollar roll with a rubber band",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/dollar-roll-with-rubber-band.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#b8ccbf",
+      "dark": false,
+      "desc": "A roll of $100 bills bound with a green rubber band, floating on pale mint. A 3D render.",
+      "case": "3d-collection"
+    },
+    {
       "title": "Paper plane with coin",
       "category": "3d",
       "images": [
