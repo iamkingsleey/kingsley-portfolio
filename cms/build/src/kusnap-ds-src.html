@@ -452,8 +452,8 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .facts b { font-weight: 500; font-size: 15px; line-height: 1.4 }
 @media (max-width: 860px) { .facts { grid-template-columns: 1fr 1fr } .facts div, .facts div + div { padding: 16px 12px 16px 0; border-left: 0; border-bottom: 1px solid var(--line) } .heroart { min-height: 440px } }
 /* chapter heads, like "Things I've built" */
-.ch { border-top: 0; padding-block: 56px }
-.chh { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t n" "p p"; align-items: end; gap: 12px 24px; padding-bottom: 22px; border-bottom: 1px solid var(--line); margin-bottom: 32px }
+.ch { border-top: 0; padding-block: clamp(60px, 6vw, 88px) }   /* room to breathe between chapters */
+.chh { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t n" "p p"; align-items: end; gap: 12px 24px; padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: clamp(36px, 4vw, 56px) }
 .chh h2 { grid-area: t; font: 600 clamp(30px, 4vw, 48px)/1.04 var(--body); letter-spacing: -.045em }
 .chh .num { grid-area: n; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); -webkit-text-stroke: 0; padding-bottom: 6px; white-space: nowrap }
 .chh p { grid-area: p; color: var(--text); font-size: 15px; max-width: 70ch }
