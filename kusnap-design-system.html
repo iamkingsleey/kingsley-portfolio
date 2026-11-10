@@ -444,7 +444,8 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .hero p.lede { font-size: 18px; line-height: 1.6; max-width: none; margin-top: 24px }
 .pills { gap: 6px; margin-top: 24px }
 .pills span { padding: 5px 11px; font: 400 12.5px/1.5 var(--body); background: var(--pill, var(--soft)); text-transform: lowercase }
-.hero .heroart { margin-top: clamp(80px, 9vw, 128px) }
+.hero .heroart { margin-top: clamp(80px, 9vw, 128px); padding-block: 96px 80px }
+@media (max-width: 640px) { .hero .heroart { padding-block: 72px 64px } }
 .hero .facts { margin-top: 40px }
 .heroart .grid { display: none }
 .heroart .tag { font-family: var(--mono); box-shadow: none; border-color: var(--line) }
