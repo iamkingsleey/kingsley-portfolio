@@ -830,6 +830,31 @@ h1, h2, h3, h4 { letter-spacing: -.035em }
 .lx .panel.hx { padding: 0; background: #121212 } .lx .panel.hx .hx-in { background: transparent }
 .lx .hx .hx-st { padding: 64px 20px 40px }
 @media (max-width: 640px) { .hx-in { padding: 20px 18px } .hx .hx-st { padding-top: 72px !important } }
+/* ---- how the product card changed: the card beside its Figma library update note */
+.lnote { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 48px; align-items: start; max-width: 900px; margin: 0 auto; color: #0b0b0b }
+.lnote .ln-c { display: grid; gap: 16px; justify-items: center }
+.lnote .ln-seg { display: inline-flex; padding: 3px; border-radius: 99px; background: #fff; box-shadow: 0 0 0 1px #e3e3e3 }
+.lnote .ln-seg button { height: 30px; padding: 0 14px; border: 0; border-radius: 99px; background: transparent; font: 500 13px/1 var(--body); color: #6b6b6b; cursor: pointer; transition: background-color .2s ease-out, color .2s ease-out }
+.lnote .ln-seg button[aria-pressed="true"] { background: #0b0b0b; color: #fff }
+.lnote .ln-cd { display: grid } .lnote .ln-cd > * { grid-area: 1 / 1; transition: opacity .35s ease-out } .lnote .ln-cd .od { opacity: 0; pointer-events: none } .lnote .ln-cd.show-old .od { opacity: 1 } .lnote .ln-cd.show-old .nw { opacity: 0 }
+.lnote .k-pc { width: 250px } .lnote .old .k-info .k-np { gap: 2px }
+.lnote .k-pc :is(.k-ver, .k-boost, .k-units, .k-chip, .k-like) { transition: opacity .3s ease-out, box-shadow .3s ease-out }
+.lnote .k-pc.ln-focus :is(.k-ver, .k-boost, .k-units, .k-chip, .k-like, .k-off, .k-was):not(.ln-on) { opacity: .28 } .lnote .k-pc.ln-focus .k-ph img { opacity: .55; transition: opacity .3s ease-out }
+.lnote .k-pc .ln-on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #E44040; border-radius: 4px }
+.lnote .ln-note { background: #fff; border-radius: 18px; padding: 22px 22px 18px; box-shadow: 0 1px 0 .5px rgb(0 0 0 / .04); min-width: 0 }
+.lnote .ln-h { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #eee }
+.lnote .ln-h .av { width: 36px; height: 36px; border-radius: 10px; background: #0b0b0b; display: grid; place-items: center; flex: none }
+.lnote .ln-h b { display: block; font: 600 15px/1.3 var(--body) } .lnote .ln-h span { font: 500 12px/1.3 var(--mono); color: #6b6b6b }
+.lnote .ln-h em { margin-left: auto; font: 500 11px/1 var(--mono); font-style: normal; letter-spacing: .06em; padding: 6px 9px; border-radius: 99px; background: #f1f1f1; color: #3b3b3b; white-space: nowrap }
+.lnote ul { list-style: none; margin: 0; padding: 6px 0 0 }
+.lnote li { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 3px 12px; padding: 12px 8px; margin: 0 -8px; border-radius: 10px; cursor: pointer; transition: background-color .2s ease-out; -webkit-tap-highlight-color: transparent }
+.lnote li.ret { cursor: default } .lnote li:not(.ret):hover, .lnote li.on { background: #f6f6f6 } .lnote li:focus-visible { outline: 2px solid #0b0b0b; outline-offset: 2px }
+.lnote li .t { grid-row: span 2; align-self: start; justify-self: start; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 5px 7px; border-radius: 6px }
+.lnote .t-add { background: #e3f6e9; color: #15803d } .lnote .t-chg { background: #fff3d6; color: #8a5a00 } .lnote .t-dep { background: #f1f1f1; color: #6b6b6b }
+.lnote li b { font: 600 14.5px/1.35 var(--body) } .lnote li > span:last-child { font: 400 13.5px/1.5 var(--body); color: #4a4a4a }
+.lnote .ln-f { display: flex; flex-wrap: wrap; gap: 6px 10px; padding-top: 14px; margin-top: 6px; border-top: 1px solid #eee; font: 500 11.5px/1.4 var(--mono); color: #6b6b6b } .lnote .ln-f b { color: #0b0b0b; font-weight: 500 }
+@media (max-width: 760px) { .lnote { grid-template-columns: minmax(0, 1fr); gap: 24px; justify-items: center } .lnote .ln-note { width: 100%; max-width: 460px; padding: 18px 16px 14px } .lnote li { grid-template-columns: 66px minmax(0, 1fr) } }
+@media (max-width: 380px) { .lnote .k-pc { zoom: .92 } }
 /* ---- small screens: nothing clipped, toggles clear of the live tags ---- */
 @media (max-width: 640px) {
   .xstage .actl, .kc-stage .actl { left: 16px !important; right: auto !important; top: 48px !important }
@@ -1225,9 +1250,8 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
     </div></section>
 
   <section class="ch" id="changes">
-    <div class="chh"><div class="num">09</div><h2>How the product card changed</h2><p>Verification and boosted listings had no home on the old card, and buyers opened the product page just to check stock. Follow the card from the gap to the library.</p></div>
-    <div class="lcstage"><div class="lc" id="lc"></div>
-      <div class="lc-body"><div class="lc-vis kds" id="lcVis"></div><div class="lc-txt" id="lcTxt"></div></div></div>
+    <div class="chh"><div class="num">09</div><h2>How the product card changed</h2><p>Verification and boosted listings had no home on the old card, and buyers opened the product page just to check stock. Here is the fix, written up as the Figma library update it shipped in.</p></div>
+    <div class="lcstage"><div class="lnote" id="lnote"></div></div>
   </section>
 
   <section class="ch" id="findings">
@@ -1428,58 +1452,33 @@ body.nav-station .ix { top: max(176px, calc(50% - 225px)); translate: none }   /
   const FL = [['Default', '', 'Store name', 'ph', 'As it will appear to buyers', ['border.input · slate.400']], ['Focus', 'focus', 'Ade’s Gadgets', '', 'As it will appear to buyers', ['border.focus · snap.500', 'focus.ring · snap.200']], ['Error', 'err', 'Ade’s Gadgets!!', '', 'Use letters, numbers and spaces only', ['feedback.error · alert.500', 'feedback.error.text · alert.700']], ['Disabled', 'dis', 'Store name', '', 'Verify your phone number first', ['bg.subtle · slate.200', 'border.divider · slate.300']]];
   $('flds').innerHTML = FL.map(([n, c, v, ph, m, t]) => `<div class="fld ${c}"><span class="tg">${n}</span><label>Store name</label><div class="in ${ph}">${v}</div><span class="msg">${m}</span><div class="tks">${t.map(x => `<span>${x}</span>`).join('')}</div></div>`).join('');
   }
-  // ---------------- how the product card changed
+  // ---------------- how the product card changed, told as the Figma library update it shipped in
   {
-  // F · how a component ships: the product card, from gap to library
   const NEW = () => `<div class="k-pc"><div class="k-pc-img"><div class="k-ph"><img src="${PHOTO}" alt="" width="238" height="238"><div class="k-like">${FIG.favorite}0</div><div class="k-boost">Boosted${FIG.bolt}</div></div><div class="k-flags"><div class="k-off">-25%</div><div class="k-ver">${FIG.verified}</div></div></div><div class="k-info"><div class="k-np"><p class="k-nm">Black JBL Headset</p><p class="k-pr">₦460,000.00</p><p class="k-was">₦0.00</p></div><div class="k-sub"><p class="k-units">5 units left</p><div class="k-chips"><span class="k-chip"><i class="k-dot"></i>In Stock</span><span class="k-chip">Refurbished</span><span class="k-chip">${FIG.view}1K views</span></div></div></div></div>`;
   const OLD = () => `<div class="k-pc old"><div class="k-pc-img"><div class="k-ph"><img src="${PHOTO}" alt="" width="238" height="238"><div class="k-like k-like-old">${FIG.favorite}0</div></div><div class="k-flags"><div class="k-cond">Refurbished</div></div></div><div class="k-info"><div class="k-np"><p class="k-nm">Black JBL Headset</p><p class="k-pr">₦460,000.00</p></div><div class="k-sub"><div class="k-chips"><span class="k-chip">${FIG.view}1K views</span></div></div></div></div>`;
-  const SHORT = ['Verified', 'Boosted', 'Stock', 'Condition', 'Likes'];
-  const WHY = [['.k-ver', 'Verified tick', 'Verification launched to stop fake sellers. The tick shows the seller passed it, before a buyer opens the listing.', null],
-    ['.k-boost', 'Boosted tag', 'Sellers could now boost a listing, so the card needed a clear, honest sign of which ones were boosted.', null],
-    ['.k-units', 'Stock and units left', 'Buyers opened the product page just to check stock. On the card, it saves that tap.', null],
-    ['.k-chips .k-chip:nth-child(2)', 'Condition joins the facts', 'New, used or refurbished moved off the photo, beside stock and views, so the facts read in one row.', '.k-cond'],
-    ['.k-like', 'Likes on a dark pill', 'The count sat straight on the photo and got lost on light images. The pill keeps it readable.', '.k-like-old']];
-  const LOG = [['Added', 't-add', 'Verified tick, for sellers who passed verification'], ['Added', 't-add', 'Boosted tag, so boosted listings stand out'], ['Added', 't-add', 'Stock status and units left on the card'], ['Changed', 't-chg', 'Condition moved from the photo to the facts row'], ['Changed', 't-chg', 'Like count on a dark pill'], ['Retired', 't-dep', 'The old product card, replaced on every screen']];
-  const fig = (cap, card, id, cls, side) => `<figure${id ? ` id="${id}"` : ''}${cls ? ` class="${cls}"` : ''}${side ? ` data-side="${side}"` : ''}><figcaption>${cap}</figcaption>${card}</figure>`;
-  const pair = (a, b) => `<div class="seg vseg" role="group" aria-label="Show"><button type="button" data-s="a">${a}</button><button type="button" data-s="b">${b}</button></div>`;
-  const LC = [
-    ['Spotted', 'A gap on the card', 'Verification and boosted listings launched, but the old card had nowhere to show them. Condition sat on the photo, likes were hard to read, and stock meant a trip to the product page.',
-      () => fig('The old card', OLD() + '<div class="miss"><span>no verified tick</span><span>no boost</span><span>stock unknown</span></div>')],
-    ['Redesigned', 'Five changes, one reason each', 'A buyer now knows at a glance: can I trust this seller, and can I buy it today?',
-      () => pair('Before', 'After') + fig('Before', OLD(), 'baOld', '', 'a') + '<span class="arrow" aria-hidden="true">→</span>' + fig('After', NEW(), 'baNew', 'after', 'b'), 'why'],
-    ['Reviewed with devs', 'Every state, agreed before it was built', 'I walked the engineers through each state before they built it, and we agreed the sizes and the tokens behind every part.',
-      () => fig('States agreed', NEW() + '<div class="lc-states"><span>verified · not</span><span>boosted · not</span><span>in stock · out of stock</span><span>units left</span></div>')],
-    ['Tried on one screen', 'Live on one screen first', 'The new card went live on a single screen first, so we could see it with real listings before it replaced the old card everywhere.',
-      () => fig('Live on one screen', NEW())],
-    ['Added to the library', 'Published as a Figma library update', 'Once it held up, the card went into the Figma library with notes, so every designer knew what changed. One card for web, Android and iOS.',
-      () => fig('In the library', NEW()), 'log'],
-    ['Old card retired', 'One card to maintain', 'The old card was retired. Every screen now uses the new one, so there is one product card to keep up to date instead of two.',
-      () => pair('Retired', 'Everywhere') + fig('Retired', OLD(), '', 'gone', 'a') + '<span class="arrow" aria-hidden="true">→</span>' + fig('Everywhere', NEW(), '', '', 'b')]];
-  const N = LC.length;
-  $('lc').style.setProperty('--n', N);
-  $('lc').innerHTML = '<span class="fill" id="lcFill"></span>' + LC.map(([n], i) => `<button type="button" aria-pressed="${i === 0}" data-i="${i}" aria-label="Step ${i + 1}: ${n}"><span class="n">${i + 1}</span><b>${n}</b></button>`).join('');
-  let curWhy = 0;
-  const pins = () => { const box = $('baNew'); if (!box) return; const B = box.getBoundingClientRect(); box.querySelectorAll('.lc-pin').forEach(x => x.remove());
-    WHY.forEach(([sel], i) => { const el = box.querySelector(sel); if (!el) return; const r = el.getBoundingClientRect(); const pin = document.createElement('button'); pin.type = 'button'; pin.className = 'lc-pin'; pin.textContent = i + 1; pin.dataset.w = i; pin.setAttribute('aria-label', WHY[i][1]);
-      const right = i === 1, top = i === 1 || i === 4; pin.style.left = (i === 3 ? r.left - B.left + r.width / 2 : right ? r.right - B.left : r.left - B.left - 14) + 'px'; pin.style.top = (i === 3 ? r.top - B.top - 10 : top ? r.top - B.top : r.top - B.top + r.height / 2) + 'px'; box.append(pin); });
-    setWhy(curWhy); };
-  const setWhy = i => { curWhy = i; const box = $('baNew'), old = $('baOld'); if (!box) return; $('lcTxt').querySelectorAll('.wtabs button').forEach((b, j) => b.setAttribute('aria-selected', j === i)); const w = $('wTxt'); if (w) w.innerHTML = `<b>${WHY[i][1]}.</b> ${WHY[i][2]}`; const tb = $('lcTxt').querySelector(`.wtabs button[data-w="${i}"]`); if (tb) { const wr = tb.parentNode; wr.scrollTo({ left: Math.max(0, tb.offsetLeft - (wr.clientWidth - tb.offsetWidth) / 2), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
-    WHY.forEach(([sel, , , o], j) => { const el = box.querySelector(sel); if (el) el.classList.toggle('lc-hl', j === i); const oe = o && old.querySelector(o); if (oe) oe.classList.toggle('lc-hlo', j === i); }); box.querySelectorAll('.lc-pin').forEach((p, j) => p.classList.toggle('on', j === i)); };
-  const setLc = i => { $('lc').querySelectorAll('button').forEach((b, j) => { b.setAttribute('aria-pressed', j === i); b.classList.toggle('done', j < i); }); $('lcFill').style.width = (i / (N - 1) * (100 - 100 / N)) + '%';
-    const [, h, p, vis, extra] = LC[i];
-    $('lcVis').innerHTML = vis(); setSide('b');
-    let x = '';
-    if (extra === 'why') x = `<div class="why5"><div class="wtabs" role="tablist">${SHORT.map((t, j) => `<button type="button" role="tab" aria-selected="${j === curWhy}" data-w="${j}"><i>${j + 1}</i>${t}</button>`).join('')}</div><p class="wtxt" id="wTxt" aria-live="polite"></p></div>`;
-    if (extra === 'log') x = `<div class="notes"><h5>Figma library update notes</h5>${LOG.map(([t, c, d]) => `<div><span class="t ${c}">${t}</span><span>${d}</span></div>`).join('')}</div>`;
-    $('lcTxt').innerHTML = `<h4>${h}</h4><p>${p}</p>${x}`;
-    if (extra === 'why') requestAnimationFrame(pins); };
-  const setSide = k => { const v = $('lcVis'); v.dataset.side = k; v.querySelectorAll('.vseg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === k)); requestAnimationFrame(pins); };
-  $('lcVis').addEventListener('click', e => { const b = e.target.closest('.vseg button'); if (b) setSide(b.dataset.s); const pn = e.target.closest('.lc-pin'); if (pn) setWhy(+pn.dataset.w); });
-  $('lc').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLc(+b.dataset.i); });
-  $('lcTxt').addEventListener('click', e => { const b = e.target.closest('.wtabs button'); if (!b) return; if ($('lcVis').dataset.side === 'a' && matchMedia('(max-width: 560px)').matches) setSide('b'); setWhy(+b.dataset.w); });
-  addEventListener('resize', pins); document.fonts && document.fonts.ready.then(pins);
-  setLc(1);
-
+  const WHY = [['.k-ver', 'Added', 't-add', 'Verified tick', 'Verification launched to stop fake sellers. The tick tells a buyer the seller passed it, before they open the listing.'],
+    ['.k-boost', 'Added', 't-add', 'Boosted tag', 'Sellers could now pay to boost a listing. The tag keeps it honest about which ones are boosted.'],
+    ['.k-units', 'Added', 't-add', 'Stock on the card', 'Buyers opened the product page just to check stock. Now the card answers it and saves the tap.'],
+    ['.k-chips .k-chip:nth-child(2)', 'Changed', 't-chg', 'Condition joins the facts', 'New, used or refurbished moved off the photo and sits beside stock and views, so the facts read in one row.'],
+    ['.k-like', 'Changed', 't-chg', 'Likes on a dark pill', 'The count sat straight on the photo and got lost on light images. The pill keeps it readable.']];
+  $('lnote').innerHTML = `<div class="ln-c"><div class="ln-seg" role="group" aria-label="Show"><button type="button" data-s="old" aria-pressed="false">Before</button><button type="button" data-s="new" aria-pressed="true">After</button></div>
+    <div class="ln-cd kds" id="lnCd"><div class="nw">${NEW()}</div><div class="od" aria-hidden="true">${OLD()}</div></div></div>
+    <div class="ln-note"><div class="ln-h"><span class="av"><svg width="16" height="16" viewBox="0 0 38 57" aria-hidden="true"><path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1ABCFE"/><path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 1 1-19 0z" fill="#0ACF83"/><path d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z" fill="#FF7262"/><path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#F24E1E"/><path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#A259FF"/></svg></span><div><b>Product card</b><span>Kusnap library update</span></div><em>v2.0</em></div>
+      <ul>${WHY.map(([, t, c, h, w], i) => `<li data-i="${i}" tabindex="0"><span class="t ${c}">${t}</span><b>${h}</b><span>${w}</span></li>`).join('')}
+        <li class="ret"><span class="t t-dep">Retired</span><b>The old card</b><span>Replaced on every screen, so there is one card to keep up to date on web, Android and iOS.</span></li></ul>
+      <div class="ln-f"><b>Before it shipped</b><span>Reviewed every state with devs</span><span aria-hidden="true">·</span><span>Tried on one screen first</span></div></div>`;
+  const cd = $('lnCd'), pc = cd.querySelector('.nw .k-pc'), segs = [...$('lnote').querySelectorAll('.ln-seg button')], lis = [...$('lnote').querySelectorAll('li[data-i]')];
+  const side = k => { cd.classList.toggle('show-old', k === 'old'); segs.forEach(b => b.setAttribute('aria-pressed', b.dataset.s === k)); };
+  segs.forEach(b => b.addEventListener('click', () => side(b.dataset.s)));
+  // a row lights up its part of the card (and brings the new card back if the old one is showing)
+  const pick = i => { lis.forEach(l => l.classList.toggle('on', +l.dataset.i === i)); pc.classList.toggle('ln-focus', i != null);
+    WHY.forEach(([sel], j) => { const el = pc.querySelector(sel); if (el) el.classList.toggle('ln-on', j === i); }); if (i != null) side('new'); };
+  const hover = matchMedia('(hover: hover)').matches;
+  lis.forEach(l => { const i = +l.dataset.i;
+    if (hover) { l.addEventListener('mouseenter', () => pick(i)); l.addEventListener('mouseleave', () => pick(null)); }
+    l.addEventListener('click', () => pick(l.classList.contains('on') && !hover ? null : i));
+    l.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(l.classList.contains('on') ? null : i); } });
+    l.addEventListener('blur', () => { if (!hover) return; pick(null); }); });
   }
   // ---------------- 05 elevation, exactly the Figma effect styles
   const EV = [['100', '0 1px 0 0.5px rgb(1 24 43 / .04)', 'Resting cards'], ['200', '0 3px 1px -1px rgb(1 24 43 / .07)', 'Pressed and raised controls'], ['300', '0 4px 6px -2px rgb(1 24 43 / .20)', 'Dropdowns and menus'], ['400', '0 8px 16px -4px rgb(1 24 43 / .22)', 'Popovers'], ['500', '0 12px 20px -8px rgb(1 24 43 / .24)', 'Sticky bars, bottom sheets'], ['600', '0 24px 48px -8px rgb(1 24 43 / .10)', 'Modals'], ['700', '0 40px 72px -16px rgb(1 24 43 / .12)', 'Large dialogs'], ['800', '0 56px 112px -20px rgb(1 24 43 / .10)', 'Full-screen overlays']];
