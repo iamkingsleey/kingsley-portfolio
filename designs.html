@@ -2408,6 +2408,15 @@ onS.forEach(put);
   const vrEnd = () => { vrDrag = null; };
   vrul.addEventListener('pointerup', vrEnd); vrul.addEventListener('pointercancel', vrEnd);
   vrul.addEventListener('wheel', e => { e.preventDefault(); ov.scrollTop += e.deltaY; }, { passive: false });
+  // the dial's quiet detent as each row of the grid crosses the middle of the screen while scrolling (sound only: the side ruler stays hidden)
+  { let gRow = null, gRaf = 0, gT = 0;
+    const gTick = () => { gRaf = 0; if (!ovOpen || openIdx >= 0) { gRow = null; return; }
+      const r = Math.round(vrModel().fr); if (gRow !== null && r !== gRow) { const t = performance.now();
+        let on = true; try { on = localStorage.getItem('km-sound') !== 'off'; } catch (_) {}
+        if (on && t - gT > 45 && window.Popkit) { gT = t; try { Popkit.play('detent'); } catch (_) {} } }   // at most one tick every 45ms, so a fast flick stays a soft run, never a buzz
+      gRow = r; };
+    const gScroll = () => { if (!gRaf) gRaf = requestAnimationFrame(gTick); };
+    ov.addEventListener('scroll', gScroll, { passive: true }); addEventListener('scroll', gScroll, { passive: true }); }
   $('allBtn').addEventListener('click', () => ovOpen ? (tap(), closeOverview(-1)) : openOverview());
   // Designs opens straight on All: every piece in the grid. (The single-row view with its dial is retired; the code stays so it can come back.)
   ov.style.transition = 'none'; ovOpen = true; document.body.classList.add('all'); $('allBtn').setAttribute('aria-pressed', 'true');
