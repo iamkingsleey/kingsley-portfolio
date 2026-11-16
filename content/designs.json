@@ -1585,6 +1585,21 @@
       "mix": true
     },
     {
+      "title": "CHAOSS, DEI Badging landing page",
+      "category": "ui",
+      "images": [
+        {
+          "src": "assets/designs/chaoss-dei-badging-landing.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#8d9b4c",
+      "dark": false,
+      "desc": "The landing page for the CHAOSS DEI Badging Initiative, which awards badges to open source projects and events that commit to diversity, equity and inclusion.",
+      "tools": "Figma",
+      "mix": true
+    },
+    {
       "title": "Kusnap, site header",
       "category": "ui",
       "images": [
