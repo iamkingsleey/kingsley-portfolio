@@ -511,6 +511,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Glowing padlock, portrait",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/glowing-padlock-portrait.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#0a0a0a",
+      "dark": true,
+      "desc": "The glowing orange padlock again, framed upright: its chain rising out of frame over dark ground."
+    },
+    {
       "title": "Ẹdorẹ event poster, group",
       "category": "brand",
       "images": [
