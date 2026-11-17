@@ -439,7 +439,7 @@ for _p in PAGES:
         _u = 'https://iamkingsleey.com/' + _slug
         _d = 'Kingsley M., brand and product designer. I design where money meets trust: wallets, checkouts and the brands around them.'
         # the preview card already shows the name and the tagline, so the words under it say something new
-        _od = 'Product, brand and 3D design. Digital illustration.'
+        _od = 'Product, brand and 3D design. Design engineering. Digital illustration.'
         _ot = 'Multidisciplinary designer' if _p == 'index.html' else _t
         _og = (f'<meta name="description" content="{_d}">\n'
                f'<meta property="og:type" content="website">\n<meta property="og:site_name" content="Kingsley M.">\n'

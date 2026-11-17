@@ -376,6 +376,7 @@ async function analytics(env, days) {
       gc('stats/total', pq).catch(() => null), gc('stats/hits', { ...pq, limit: 200 }).catch(() => null), gc('stats/locations', { ...pq, limit: 100 }).catch(() => null)]);
     out.prev = ptotal && phits ? { total: ptotal.total, pages: (phits.hits || []).filter(h => !h.event).length, countries: ((ploc || {}).stats || []).filter(x => count(x) > 0).length,
       designs: (phits.hits || []).filter(h => h.event && !String(h.path || '').startsWith('/e/')).reduce((s, h) => s + count(h), 0) } : null;
+    try { const pr = await gc('stats/toprefs', { ...pq, limit: 50 }); out.prevRefs = (pr.stats || []).filter(x => count(x) > 0).map(x => ({ name: x.name || '(direct)', count: count(x) })); } catch (_) { out.prevRefs = null; }
     out.total = total;
     const rows = [], daily = {};
     for (const h of hits.hits || []) {

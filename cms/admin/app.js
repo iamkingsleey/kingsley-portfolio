@@ -961,10 +961,13 @@
     const designs = ev.filter(e => !(e.path || '').startsWith('/e/')), nDesigns = designs.reduce((s, e) => s + e.count, 0);
     const awwRows = [...(a.toprefs || []), ...(a.campaigns || [])].filter(r => /awwwards/i.test(r.name || '')), aww = awwRows.reduce((s, r) => s + r.count, 0);
     const per = days === 365 ? 'year' : days + ' days', pv = a.prev;
+    // social: every name a platform turns up under in the referrers (a ?ref= tag on the link becomes the referrer, so "linkedin" is a tagged visit)
+    const soc = socialOf(a.toprefs), socN = soc.rows.reduce((x, r) => x + r.count, 0), socT = soc.rows.reduce((x, r) => x + r.tagged, 0);
+    const socPrev = a.prevRefs ? socialOf(a.prevRefs).rows.reduce((x, r) => x + r.count, 0) : null;
     const chg = (now, was) => { if (!pv || was == null) return null; if (!was) return el('small', { class: 'delta', text: now ? `New · nothing in the previous ${per}` : `Same as the previous ${per}` });
       const d = Math.round((now - was) / was * 100); return el('small', { class: 'delta ' + (d > 0 ? 'up' : d < 0 ? 'down' : ''), text: `${d > 0 ? '+' : ''}${d}% vs previous ${per}` }); };
     const stat = (label, n, was) => el('div', { class: 'stat' }, el('span', { class: 'mono', text: label }), el('b', { text: fmt(n) }), chg(n, was));
-    body.append(el('div', { class: 'stats' }, stat('Visits', views, pv && pv.total), stat('From Awwwards', aww), stat('Pages viewed', pages.length, pv && pv.pages),
+    body.append(el('div', { class: 'stats' }, stat('Visits', views, pv && pv.total), stat('From Awwwards', aww), stat('From social', socN, socPrev), stat('Pages viewed', pages.length, pv && pv.pages),
       stat('Countries', (a.locations || []).length, pv && pv.countries), stat('Designs opened', nDesigns, pv && pv.designs)));
     const P = el('div', { class: 'panels' });
     P.append(el('div', { class: 'panel wide' }, el('h3', { text: 'Visits per day' }), chart(a.daily || [])));
@@ -979,7 +982,21 @@
       hire.length ? el('div', { class: 'chips' }, hire.map(r => el('span', {}, r.name, el('b', { text: fmt(r.count) })))) : el('div', { class: 'mono', style: 'margin-top:14px', text: 'No clicks on Book a call, email or your profiles yet' })));
     P.append(el('div', { class: 'panel' }, el('h3', { text: 'Visits from Awwwards' }), el('div', { class: 'big', text: fmt(aww) }),
       awwRows.length ? el('ul', { class: 'rank' }, awwRows.slice(0, 6).map(r => el('li', {}, el('span', { text: r.name }), el('b', { text: fmt(r.count) })))) : el('div', { class: 'mono', text: `None from awwwards.com in the last ${per} yet` })));
-    P.append(rank('Where visitors come from', a.toprefs, x => x.name === '(direct)' || !x.name ? 'Direct · typed or bookmarked' : x.name));
+    const smax = Math.max(1, ...soc.rows.map(r => r.count));
+    P.append(el('div', { class: 'panel wide' }, el('h3', { text: 'From social' }),
+      el('div', { class: 'big' }, fmt(socN), el('span', { class: 'bigsub', text: ` visits · ${views ? Math.round(socN / views * 100) : 0}% of all visits` })),
+      el('ul', { class: 'rank soc' }, soc.rows.map(r => el('li', { class: r.count ? '' : 'zero' }, el('i', { style: `width:${(r.count / smax * 100).toFixed(1)}%` }),
+        el('span', { class: 'nm' }, el('em', { class: 'gl', text: r.g }), r.n), el('small', { text: r.count ? `${fmt(r.tagged)} tagged · ${fmt(r.app)} from the app` : 'None yet' }), el('b', { text: fmt(r.count) })))),
+      socN ? el('div', { class: 'ssplit' }, el('div', { class: 'sbar' }, el('i', { class: 'a', style: `width:${(socT / socN * 100).toFixed(1)}%` }), el('i', { class: 'b', style: `width:${((socN - socT) / socN * 100).toFixed(1)}%` })),
+        el('div', { class: 'slegend' }, el('span', {}, el('em', { class: 'a' }), `Came through your tagged links · ${fmt(socT)}`), el('span', {}, el('em', { class: 'b' }), `The app said where they came from · ${fmt(socN - socT)}`))) : '',
+      el('p', { class: 'anote', text: 'X, LinkedIn and Instagram often hide where a visit came from, so some of their visitors land in Direct. Your tagged links fix that from the day you start using them.' })));
+    P.append(el('div', { class: 'panel' }, el('h3', { text: 'Your tagged links' }),
+      el('ul', { class: 'tlinks' }, SOCIAL.map(p => { const u = 'https://iamkingsleey.com/?ref=' + p.id, b = el('button', { type: 'button', text: 'Copy' });
+        b.onclick = async () => { try { await navigator.clipboard.writeText(u); b.textContent = 'Copied'; b.classList.add('done'); } catch (_) { b.textContent = 'Select it'; } setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, 1400); };
+        return el('li', {}, el('span', { class: 'p', text: p.n }), el('code', { text: 'iamkingsleey.com/?ref=' + p.id }), b); })),
+      el('p', { class: 'anote', text: "Use each one in that platform's bio and posts. Visitors see your normal homepage and link preview; the tag only tells Analytics where they came from." })));
+    const refRows = [...soc.rows.filter(r => r.count).map(r => ({ name: r.n, count: r.count })), ...soc.other].sort((x, y) => y.count - x.count);
+    P.append(rank('Where visitors come from', refRows, x => x.name === '(direct)' || !x.name ? 'Direct · typed or bookmarked' : x.name));
     // case studies: how far people get
     const cs = {}; E('/e/case/').forEach(e => { const m = e.path.match(/^\/e\/case\/([^/]+)\/(\w+)/); if (!m) return; const c = cs[m[1]] = cs[m[1]] || { name: e.title || m[1], open: 0, impact: 0, end: 0, prototype: 0 }; if (m[2] in c) c[m[2]] += e.count; if (e.title) c.name = e.title; });
     const csRows = Object.values(cs).sort((x, y) => y.open - x.open);
@@ -1008,6 +1025,19 @@
     body.append(P, el('p', { class: 'lead', style: 'margin-top:18px', html: `From GoatCounter · <a href="https://${a.code}.goatcounter.com" target="_blank">open the full dashboard ↗</a>` }));
   }
   const fmt = n => (n || 0).toLocaleString('en-GB');
+  // the platforms on the Analytics page's "From social", and every name each turns up under in GoatCounter's referrers
+  const SOCIAL = [
+    { id: 'linkedin', n: 'LinkedIn', g: 'in', m: /^((www\.)?linkedin\.com|lnkd\.in|com\.linkedin\.android|linkedin)$/i },
+    { id: 'x', n: 'X', g: 'X', m: /^(t\.co|(www\.|mobile\.)?(x|twitter)\.com|x|twitter)$/i },
+    { id: 'instagram', n: 'Instagram', g: 'IG', m: /^((www\.|l\.)?instagram\.com|instagram|ig)$/i },
+    { id: 'medium', n: 'Medium', g: 'M', m: /^((\w+\.)?medium\.com|medium)$/i },
+    { id: 'youtube', n: 'YouTube', g: 'YT', m: /^((www\.|m\.)?youtube\.com|youtu\.be|youtube)$/i },
+    { id: 'dribbble', n: 'Dribbble', g: 'Dr', m: /^((www\.)?dribbble\.com|dribbble)$/i },
+    { id: 'github', n: 'GitHub', g: 'GH', m: /^((www\.)?github\.com|github)$/i }];
+  const socialOf = refs => { const rows = SOCIAL.map(p => ({ ...p, tagged: 0, app: 0, count: 0 })), other = [];
+    (refs || []).forEach(r => { const n = String(r.name || '').trim().replace(/\/.*$/, ''), x = rows.find(p => p.m.test(n)); if (!x) return other.push(r);
+      if (n.includes('.')) x.app += r.count; else x.tagged += r.count; x.count += r.count; });
+    return { rows: rows.sort((x, y) => y.count - x.count), other }; };
   const niceP = p => { const m = { '/': 'Home', '/index.html': 'Home', '/about.html': 'About', '/engineering.html': 'Engineering', '/projects.html': 'Projects', '/designs.html': 'Designs' }; if (m[p]) return m[p]; const h = (p || '').match(/(case|brand)\.html#(.+)/); return h ? 'Case study · ' + h[2] : p; };
   function rank(t, rows, name) {
     rows = rows || []; const max = Math.max(1, ...rows.map(r => r.count));

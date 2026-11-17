@@ -151,6 +151,8 @@ def analytics(days):
             out['prev'] = {'total': (gc_get(code, token, 'stats/total', pp) or {}).get('total'), 'pages': len([h for h in ph if not h.get('event')]),
                            'countries': len([x for x in pl if _count(x) > 0]), 'designs': sum(_count(h) for h in ph if h.get('event') and not str(h.get('path', '')).startswith('/e/'))}
         except Exception: out['prev'] = None
+        try: out['prevRefs'] = [{'name': x.get('name') or '(direct)', 'count': _count(x)} for x in gc_get(code, token, 'stats/toprefs', {**pp, 'limit': 50}).get('stats', []) if _count(x) > 0]
+        except Exception: out['prevRefs'] = None
         for key in ['toprefs', 'locations', 'browsers', 'systems', 'sizes', 'campaigns']:
             # GoatCounter lists every bucket (screen sizes come back even at 0, often without a name): keep the ones with
             # visits, named by their id when there's no name; only referrers with no name are "(direct)"
