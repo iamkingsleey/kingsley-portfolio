@@ -43,6 +43,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Orange padlock with chain",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/orange-padlock-with-chain.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#acacac",
+      "dark": false,
+      "desc": "An orange padlock hanging side-on from a looped chain, on soft grey."
+    },
+    {
       "title": "Dollar bills on red stairs",
       "category": "3d",
       "images": [
@@ -111,6 +124,19 @@
       "dark": false,
       "desc": "An open safe spilling coins, part of a set of 3D objects for fintech brands.",
       "case": "3d-collection"
+    },
+    {
+      "title": "Ceramic vases, window light",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/ceramic-vases-terracotta.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#320f04",
+      "dark": true,
+      "desc": "Three ceramic vases in window light against a terracotta wall."
     },
     {
       "title": "Pawn in an archway",
@@ -182,6 +208,19 @@
       "desc": "A gift box opening to a coin and a paper plane, lit soft and grey."
     },
     {
+      "title": "Glowing padlock",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/glowing-padlock.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#141414",
+      "dark": true,
+      "desc": "An orange padlock glowing from inside, its chain rising out of frame, on dark ground."
+    },
+    {
       "title": "Silver coins and glass cursor",
       "category": "3d",
       "case": "3d-collection",
@@ -194,49 +233,6 @@
       "bg": "#727272",
       "dark": true,
       "desc": "Dark silver coins coiling towards a glass cursor. Modelled and lit in Blender."
-    },
-    {
-      "title": "Naira and dollar on red stairs",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/naira-and-dollar-on-red-stairs.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#31120f",
-      "dark": true,
-      "desc": "A rolled ₦1,000 note with two $100 bills, one standing and one curling, on the same red stairs.",
-      "case": "3d-collection"
-    },
-    {
-      "title": "Stacked coins with cursor",
-      "category": "3d",
-      "case": "3d-collection",
-      "images": [
-        {
-          "src": "assets/designs/stacked-coins-with-mouse.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#bfb4a1",
-      "dark": false,
-      "desc": "An arch of orange coins with a blue cursor resting on top. Modelled and lit in Blender."
-    },
-    {
-      "title": "Wine glass",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/uploads/glass-of-wine1.jpg",
-          "ratio": 1
-        }
-      ],
-      "bg": "#13100f",
-      "dark": true,
-      "desc": "A card holder covered in bright stickers, for a playful payments brand.",
-      "credits": [],
-      "case": "3d-collection"
     },
     {
       "title": "Casa Verde signage",
@@ -336,6 +332,49 @@
       "desc": "A logo project: MentSource stickers, the wordmark and the MS monogram."
     },
     {
+      "title": "Naira and dollar on red stairs",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/naira-and-dollar-on-red-stairs.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#31120f",
+      "dark": true,
+      "desc": "A rolled ₦1,000 note with two $100 bills, one standing and one curling, on the same red stairs.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "Stacked coins with cursor",
+      "category": "3d",
+      "case": "3d-collection",
+      "images": [
+        {
+          "src": "assets/designs/stacked-coins-with-mouse.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#bfb4a1",
+      "dark": false,
+      "desc": "An arch of orange coins with a blue cursor resting on top. Modelled and lit in Blender."
+    },
+    {
+      "title": "Wine glass",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/uploads/glass-of-wine1.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#13100f",
+      "dark": true,
+      "desc": "A card holder covered in bright stickers, for a playful payments brand.",
+      "credits": [],
+      "case": "3d-collection"
+    },
+    {
       "title": "Badge",
       "category": "3d",
       "images": [
@@ -362,6 +401,19 @@
       "dark": true,
       "desc": "A gold medal with red ribbons on a blue stage.",
       "case": "3d-collection"
+    },
+    {
+      "title": "Coins on a ribbon",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/coins-on-a-ribbon.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#d9cfe2",
+      "dark": false,
+      "desc": "Gold coins riding a twisting ribbon of yellow, orange and purple."
     },
     {
       "title": "Badge in a box",
@@ -433,6 +485,32 @@
       "case": "3d-collection"
     },
     {
+      "title": "Ẹdorẹ event poster, group",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-holding-event-group.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#5a6467",
+      "dark": true,
+      "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
+    },
+    {
+      "title": "Red padlock on grey",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/red-padlock-on-grey.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#aea8aa",
+      "dark": false,
+      "desc": "A red padlock on a bar wrapped in red rope, with a rope crossing behind, on grey."
+    },
+    {
       "title": "Tennis ball and rackets",
       "category": "3d",
       "images": [
@@ -487,88 +565,6 @@
       "dark": true,
       "desc": "A copper star badge with lilac ribbons on a warm yellow ground.",
       "case": "3d-collection"
-    },
-    {
-      "title": "Ẹdorẹ event poster, group",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/edore-holding-event-group.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#5a6467",
-      "dark": true,
-      "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
-    },
-    {
-      "title": "Tennis on court",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/tennis-and-racket.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#338189",
-      "dark": true,
-      "desc": "A tennis ball and racket on court.",
-      "case": "3d-collection"
-    },
-    {
-      "title": "Red padlock",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/red-lock-with-robe.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#b52f23",
-      "dark": true,
-      "desc": "A red padlock with a rope, an image of security that still feels friendly.",
-      "case": "3d-collection"
-    },
-    {
-      "title": "Orange padlock",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
-          "ratio": 0.8
-        }
-      ],
-      "bg": "#ccbfc1",
-      "dark": false,
-      "desc": "A bright orange padlock with a rope, from the same security set.",
-      "case": "3d-collection"
-    },
-    {
-      "title": "Rolled ₦1,000 note",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/rolled-1000-naira-note.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#122319",
-      "dark": true,
-      "desc": "A ₦1,000 note rolled and banded, lying in a pool of green light.",
-      "case": "3d-collection"
-    },
-    {
-      "title": "White piggy bank",
-      "category": "3d",
-      "images": [
-        {
-          "src": "assets/designs/white-piggy-bank.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#111111",
-      "dark": true,
-      "desc": "A white piggy bank with stickers, glowing in a dark blue room."
     },
     {
       "title": "Code on a laptop",
@@ -636,6 +632,101 @@
       "desc": "A character portrait: round glasses, a bow and a bright puffer jacket."
     },
     {
+      "title": "Tennis on court",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/tennis-and-racket.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#338189",
+      "dark": true,
+      "desc": "A tennis ball and racket on court.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "Ceramic vases, warm shadow",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/ceramic-vases-warm-shadow.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#030200",
+      "dark": true,
+      "desc": "The ceramic vases again, deeper in shadow, with the window’s light falling across them."
+    },
+    {
+      "title": "RootSauce coffee cup",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/rootsauce-coffee-cup.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#1a150e",
+      "dark": true,
+      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
+    },
+    {
+      "title": "Red padlock",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/red-lock-with-robe.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#b52f23",
+      "dark": true,
+      "desc": "A red padlock with a rope, an image of security that still feels friendly.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "Orange padlock",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/bright-orange-padlock-with-robe.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#ccbfc1",
+      "dark": false,
+      "desc": "A bright orange padlock with a rope, from the same security set.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "Rolled ₦1,000 note",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/rolled-1000-naira-note.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#122319",
+      "dark": true,
+      "desc": "A ₦1,000 note rolled and banded, lying in a pool of green light.",
+      "case": "3d-collection"
+    },
+    {
+      "title": "White piggy bank",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/white-piggy-bank.jpg",
+          "ratio": 1.5
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A white piggy bank with stickers, glowing in a dark blue room."
+    },
+    {
       "title": "Tennis, from above",
       "category": "3d",
       "images": [
@@ -650,6 +741,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Glowing padlock with chain",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/glowing-padlock-with-chain.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#afa8aa",
+      "dark": false,
+      "desc": "The glowing orange padlock from the side, hanging from a chain over dark ground."
+    },
+    {
       "title": "Star trophy",
       "category": "3d",
       "images": [
@@ -661,19 +765,6 @@
       "bg": "#111111",
       "dark": true,
       "desc": "A gold star trophy on a white plinth, its shadow thrown on the wall."
-    },
-    {
-      "title": "RootSauce coffee cup",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/rootsauce-coffee-cup.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#1a150e",
-      "dark": true,
-      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
     },
     {
       "title": "Vault and piggy bank",
