@@ -306,6 +306,22 @@
       "desc": "A logo project: MentSource stickers, the wordmark and the MS monogram."
     },
     {
+      "title": "OSCAFest’25, keynote speaker",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-keynote.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The keynote speaker announcement for OSCAFest’25: Brian Douglas, Head of DX at Continue.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
       "title": "Ẹdorẹ event poster, group",
       "category": "brand",
       "images": [
@@ -631,6 +647,22 @@
       "bg": "#111111",
       "dark": true,
       "desc": "A gold star trophy on a white plinth, its shadow thrown on the wall."
+    },
+    {
+      "title": "OSCAFest’25, early bird sold out",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-sold-out.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The early bird sold-out post for OSCAFest’25, a ticket over the festival’s wormhole grid.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
     },
     {
       "title": "Vault and piggy bank",
@@ -1754,6 +1786,22 @@
       "mix": true
     },
     {
+      "title": "OSCAFest’25, Beyond Borders",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-beyond-borders.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The theme poster for OSCAFest’25: Beyond Borders, 14 to 16 August in Lagos, Nigeria.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
+    },
+    {
       "title": "Pricing plans, dark",
       "category": "ui",
       "images": [
@@ -2143,6 +2191,22 @@
       "tools": "Figma · Code",
       "case": "kusnap",
       "mix": true
+    },
+    {
+      "title": "OSCAFest’25, tell your story",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-story.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "A post inviting attendees to share their OSCAFest’25 story.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "OSCA"
     },
     {
       "title": "ShareBuddy, circles and Buddy",
