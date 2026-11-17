@@ -138,6 +138,8 @@ async function admin(req, env, url, ctx) {
   }
   if (p === '/admin/logout') return new Response(null, { status: 302, headers: { Location: '/admin/', 'Set-Cookie': 'km_admin=; Path=/admin; Max-Age=0; HttpOnly; Secure; SameSite=Lax' } });
 
+  if (p === '/admin/favicon.png') { const f = await asset(env, url, '/cms/admin/favicon.png');   // the tab icon shows on the sign-in page too
+    return f.ok ? new Response(f.body, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=86400' } }) : new Response('Not found', { status: 404 }); }
   if (!(await signedIn(req, env))) {
     if (p.startsWith('/admin/api/')) return json({ error: 'You were signed out. Reload the page to sign in again.' }, 401);
     return loginPage(url.searchParams.has('sent'));
@@ -187,7 +189,7 @@ h1{font-size:22px;font-weight:500;margin:0 0 8px}p{color:#bdbdbd;margin:0 0 18px
 .btn{display:inline-block;appearance:none;border:0;border-radius:999px;background:#fff;color:#000;font:500 14px inherit;font-family:inherit;padding:11px 18px;cursor:pointer;text-decoration:none}
 .btn:active{transform:scale(.97)}</style><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">`;
 function page(title, body, status = 200) {
-  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${title} · CMS</title>${STYLE}<div class="c"><div class="m">Kingsley FM · CMS</div><h1>${title}</h1>${body}</div>`,
+  return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/png" href="/admin/favicon.png"><title>${title} · CMS</title>${STYLE}<div class="c"><div class="m">Kingsley FM · CMS</div><h1>${title}</h1>${body}</div>`,
     { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
 const loginPage = sent => sent
