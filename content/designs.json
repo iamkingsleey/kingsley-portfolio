@@ -488,6 +488,22 @@
       "case": "3d-collection"
     },
     {
+      "title": "Komunion logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/komunion-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A client logo for Komunion, an African DJ and club culture brand.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "Komunion"
+    },
+    {
       "title": "Tennis on court",
       "category": "3d",
       "images": [
@@ -825,6 +841,22 @@
       "bg": "#dbc8c8",
       "dark": false,
       "desc": "Stitched lines bent into an arch above a short note on unfinished ideas. The lines were made with LineCraft, my Figma plugin for line patterns."
+    },
+    {
+      "title": "Ẹdorẹ, Community Connect Live",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-community-connect-live.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#2624e1",
+      "dark": true,
+      "desc": "From the Ẹdorẹ brand project: the Community, Connect, Live campaign, with the brand's chat-bubble type.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "Ẹdorẹ"
     },
     {
       "title": "Time:Out, Femicodes",
@@ -1617,6 +1649,22 @@
       "mix": true
     },
     {
+      "title": "Zaatam logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/zaatam-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#0d0d0e",
+      "dark": true,
+      "desc": "A logo project: the Zaatam Solutio wordmark and mark, white on black.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "Zaatam"
+    },
+    {
       "title": "CHAOSS, DEI Badging landing page",
       "category": "ui",
       "images": [
@@ -2026,6 +2074,22 @@
       "mix": true
     },
     {
+      "title": "Ẹdorẹ cups and campaign",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-cups-and-campaign.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#2624e1",
+      "dark": true,
+      "desc": "From the Ẹdorẹ brand project: branded cups and the Community, Connect, Live campaign.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "Ẹdorẹ"
+    },
+    {
       "title": "Dashboard on a laptop",
       "category": "ui",
       "images": [
@@ -2337,6 +2401,22 @@
       "tools": "Figma · Code",
       "case": "kusnap",
       "mix": true
+    },
+    {
+      "title": "MentSource logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/mentsource-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A logo project: the full-colour MentSource logo, the MS monogram above the wordmark.",
+      "tools": "Figma",
+      "mix": true,
+      "client": "MentSource"
     },
     {
       "title": "ShareBuddy, split it your way",
