@@ -84,6 +84,19 @@
       "case": "3d-collection"
     },
     {
+      "title": "Tennis by the wall",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/tennis-by-the-wall.jpg",
+          "ratio": 1.3333
+        }
+      ],
+      "bg": "#2e2b26",
+      "dark": true,
+      "desc": "Tennis balls and a racket on a blue court line, against a dark brick wall."
+    },
+    {
       "title": "Badge, purple",
       "category": "3d",
       "images": [
@@ -358,6 +371,19 @@
       "bg": "#bfb4a1",
       "dark": false,
       "desc": "An arch of orange coins with a blue cursor resting on top. Modelled and lit in Blender."
+    },
+    {
+      "title": "Tennis balls in a row",
+      "category": "3d",
+      "images": [
+        {
+          "src": "assets/designs/tennis-balls-in-a-row.jpg",
+          "ratio": 0.8
+        }
+      ],
+      "bg": "#040519",
+      "dark": true,
+      "desc": "Tennis balls lined up along a court line, shrinking into the distance on deep blue."
     },
     {
       "title": "Wine glass",
