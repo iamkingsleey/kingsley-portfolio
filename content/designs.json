@@ -252,6 +252,21 @@
       "desc": "A mockup from the Casa Verde brand project: the mark on a wall sign, built for better living."
     },
     {
+      "title": "Komunion logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/komunion-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A client logo for Komunion, an African DJ and club culture brand.",
+      "tools": "Figma",
+      "client": "Komunion"
+    },
+    {
       "title": "ShareBuddy \"Share with Buddies\"",
       "category": "brand",
       "images": [
@@ -293,19 +308,6 @@
       "case": "oghosa"
     },
     {
-      "title": "MentSource stickers",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/mentsource-stickers.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#e7e0e6",
-      "dark": false,
-      "desc": "A logo project: MentSource stickers, the wordmark and the MS monogram."
-    },
-    {
       "title": "OSCAFest’25, keynote speaker",
       "category": "brand",
       "images": [
@@ -318,21 +320,20 @@
       "dark": true,
       "desc": "The keynote speaker announcement for OSCAFest’25: Brian Douglas, Head of DX at Continue.",
       "tools": "Figma",
-      "mix": true,
       "client": "OSCA"
     },
     {
-      "title": "Ẹdorẹ event poster, group",
+      "title": "MentSource stickers",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/edore-holding-event-group.jpg",
-          "ratio": 0.8
+          "src": "assets/designs/mentsource-stickers.jpg",
+          "ratio": 1.0
         }
       ],
-      "bg": "#5a6467",
-      "dark": true,
-      "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
+      "bg": "#e7e0e6",
+      "dark": false,
+      "desc": "A logo project: MentSource stickers, the wordmark and the MS monogram."
     },
     {
       "title": "Badge",
@@ -488,20 +489,17 @@
       "case": "3d-collection"
     },
     {
-      "title": "Komunion logo",
+      "title": "Ẹdorẹ event poster, group",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/komunion-logo.jpg",
-          "ratio": 1
+          "src": "assets/designs/edore-holding-event-group.jpg",
+          "ratio": 0.8
         }
       ],
-      "bg": "#ffffff",
-      "dark": false,
-      "desc": "A client logo for Komunion, an African DJ and club culture brand.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "Komunion"
+      "bg": "#5a6467",
+      "dark": true,
+      "desc": "A shot from the Ẹdorẹ brand project: the campaign poster, group edition."
     },
     {
       "title": "Tennis on court",
@@ -665,20 +663,17 @@
       "desc": "A gold star trophy on a white plinth, its shadow thrown on the wall."
     },
     {
-      "title": "OSCAFest’25, early bird sold out",
+      "title": "RootSauce coffee cup",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/oscafest-sold-out.jpg",
-          "ratio": 1
+          "src": "assets/designs/rootsauce-coffee-cup.jpg",
+          "ratio": 1.5
         }
       ],
-      "bg": "#111111",
+      "bg": "#1a150e",
       "dark": true,
-      "desc": "The early bird sold-out post for OSCAFest’25, a ticket over the festival’s wormhole grid.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "OSCA"
+      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
     },
     {
       "title": "Vault and piggy bank",
@@ -855,7 +850,6 @@
       "dark": true,
       "desc": "From the Ẹdorẹ brand project: the Community, Connect, Live campaign, with the brand's chat-bubble type.",
       "tools": "Figma",
-      "mix": true,
       "client": "Ẹdorẹ"
     },
     {
@@ -1111,19 +1105,6 @@
       "tools": "Illustrator"
     },
     {
-      "title": "RootSauce coffee cup",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/rootsauce-coffee-cup.jpg",
-          "ratio": 1.5
-        }
-      ],
-      "bg": "#1a150e",
-      "dark": true,
-      "desc": "A mockup from the RootSauce brand project, an open source ecosystem agency helping organisations build, grow and sustain open source."
-    },
-    {
       "title": "Tote bag design",
       "category": "brand",
       "images": [
@@ -1150,19 +1131,18 @@
       "desc": "From the Kuba brand identity project: the wordmark on black."
     },
     {
-      "title": "OSCAFest’25, call for speakers",
+      "title": "OSCAFest’25, early bird sold out",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/oscafest-call-for-speakers.jpg",
+          "src": "assets/designs/oscafest-sold-out.jpg",
           "ratio": 1
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "The call for speakers for Open Source Festival 2025 and KCD Nigeria.",
+      "desc": "The early bird sold-out post for OSCAFest’25, a ticket over the festival’s wormhole grid.",
       "tools": "Figma",
-      "mix": true,
       "client": "OSCA"
     },
     {
@@ -1191,6 +1171,21 @@
       "dark": true,
       "desc": "From the Oghosa brand project: the icon across the brand’s light and dark colours.",
       "case": "oghosa"
+    },
+    {
+      "title": "Zaatam logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/zaatam-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#0d0d0e",
+      "dark": true,
+      "desc": "A logo project: the Zaatam Solutio wordmark and mark, white on black.",
+      "tools": "Figma",
+      "client": "Zaatam"
     },
     {
       "title": "RootSauce \"Open Research\"",
@@ -1233,6 +1228,21 @@
       "desc": "From the Etionary Properties brand project: the logo, beside the brand guide cover."
     },
     {
+      "title": "OSCAFest’25, call for speakers",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-call-for-speakers.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The call for speakers for Open Source Festival 2025 and KCD Nigeria.",
+      "tools": "Figma",
+      "client": "OSCA"
+    },
+    {
       "title": "Varsity jacket design",
       "category": "brand",
       "images": [
@@ -1244,6 +1254,21 @@
       "bg": "#055cdc",
       "dark": true,
       "desc": "A cobalt varsity jacket carrying the wordmark on the chest."
+    },
+    {
+      "title": "Ẹdorẹ cups and campaign",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/edore-cups-and-campaign.jpg",
+          "ratio": 1.6
+        }
+      ],
+      "bg": "#2624e1",
+      "dark": true,
+      "desc": "From the Ẹdorẹ brand project: branded cups and the Community, Connect, Live campaign.",
+      "tools": "Figma",
+      "client": "Ẹdorẹ"
     },
     {
       "title": "Casa Verde identity",
@@ -1311,7 +1336,6 @@
       "dark": true,
       "desc": "A figure walking toward the Beyond Borders type at the end of a hallway.",
       "tools": "Figma",
-      "mix": true,
       "client": "OSCA"
     },
     {
@@ -1339,6 +1363,21 @@
       "bg": "#015ee9",
       "dark": true,
       "desc": "A fashion label wordmark set on cobalt blue, with a ring built into the O."
+    },
+    {
+      "title": "MentSource logo",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/mentsource-logo.jpg",
+          "ratio": 1
+        }
+      ],
+      "bg": "#ffffff",
+      "dark": false,
+      "desc": "A logo project: the full-colour MentSource logo, the MS monogram above the wordmark.",
+      "tools": "Figma",
+      "client": "MentSource"
     },
     {
       "title": "Ẹdorẹ logo colourways",
@@ -1381,6 +1420,21 @@
       "desc": "From the Kuba brand identity project: the logo on the brand blue."
     },
     {
+      "title": "OSCAFest’25, thank you",
+      "category": "brand",
+      "images": [
+        {
+          "src": "assets/designs/oscafest-thank-you.jpg",
+          "ratio": 1.0
+        }
+      ],
+      "bg": "#111111",
+      "dark": true,
+      "desc": "The thank-you post for OSCAFest’25, with the festival’s sponsors.",
+      "client": "OSCA",
+      "tools": "Figma"
+    },
+    {
       "title": "Etionary brand guide, pattern",
       "category": "brand",
       "images": [
@@ -1407,73 +1461,19 @@
       "desc": "A logo project: the Ticketbird mark, a ticket stub shaped into a bird."
     },
     {
-      "title": "Oghosa business card",
+      "title": "OSCAFest’25, Beyond Borders",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/oghosa-business-card.jpg",
-          "ratio": 1.512
-        }
-      ],
-      "bg": "#7f7b75",
-      "dark": true,
-      "desc": "From the Oghosa brand project: the business card.",
-      "case": "oghosa"
-    },
-    {
-      "title": "RootSauce event pass",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/rootsauce-event-pass.jpg",
-          "ratio": 1.066
-        }
-      ],
-      "bg": "#0b0b0d",
-      "dark": true,
-      "desc": "A mockup from the RootSauce brand project: the \"Your Event Pass\" lanyard card, clipped to a jacket."
-    },
-    {
-      "title": "Ẹdorẹ wordmark",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/edore-wordmark.jpg",
-          "ratio": 1.6
-        }
-      ],
-      "bg": "#ffd94a",
-      "dark": false,
-      "desc": "From the Ẹdorẹ brand project: the wordmark, dots under each ẹ intact, on the brand yellow."
-    },
-    {
-      "title": "Bottle design",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/bottle-design.jpg",
-          "ratio": 1.0
-        }
-      ],
-      "bg": "#9a9a9a",
-      "dark": false,
-      "desc": "The identity wrapped around a bottle, with the blue tape motif."
-    },
-    {
-      "title": "OSCAFest’25, thank you",
-      "category": "brand",
-      "images": [
-        {
-          "src": "assets/designs/oscafest-thank-you.jpg",
-          "ratio": 1.0
+          "src": "assets/designs/oscafest-beyond-borders.jpg",
+          "ratio": 1
         }
       ],
       "bg": "#111111",
       "dark": true,
-      "desc": "The thank-you post for OSCAFest’25, with the festival’s sponsors.",
-      "mix": true,
-      "client": "OSCA",
-      "tools": "Figma"
+      "desc": "The theme poster for OSCAFest’25: Beyond Borders, 14 to 16 August in Lagos, Nigeria.",
+      "tools": "Figma",
+      "client": "OSCA"
     },
     {
       "title": "ShareBuddy, getting started",
@@ -1649,20 +1649,18 @@
       "mix": true
     },
     {
-      "title": "Zaatam logo",
+      "title": "Oghosa business card",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/zaatam-logo.jpg",
-          "ratio": 1
+          "src": "assets/designs/oghosa-business-card.jpg",
+          "ratio": 1.512
         }
       ],
-      "bg": "#0d0d0e",
+      "bg": "#7f7b75",
       "dark": true,
-      "desc": "A logo project: the Zaatam Solutio wordmark and mark, white on black.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "Zaatam"
+      "desc": "From the Oghosa brand project: the business card.",
+      "case": "oghosa"
     },
     {
       "title": "CHAOSS, DEI Badging landing page",
@@ -1834,20 +1832,17 @@
       "mix": true
     },
     {
-      "title": "OSCAFest’25, Beyond Borders",
+      "title": "RootSauce event pass",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/oscafest-beyond-borders.jpg",
-          "ratio": 1
+          "src": "assets/designs/rootsauce-event-pass.jpg",
+          "ratio": 1.066
         }
       ],
-      "bg": "#111111",
+      "bg": "#0b0b0d",
       "dark": true,
-      "desc": "The theme poster for OSCAFest’25: Beyond Borders, 14 to 16 August in Lagos, Nigeria.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "OSCA"
+      "desc": "A mockup from the RootSauce brand project: the \"Your Event Pass\" lanyard card, clipped to a jacket."
     },
     {
       "title": "Pricing plans, dark",
@@ -2074,20 +2069,17 @@
       "mix": true
     },
     {
-      "title": "Ẹdorẹ cups and campaign",
+      "title": "Ẹdorẹ wordmark",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/edore-cups-and-campaign.jpg",
+          "src": "assets/designs/edore-wordmark.jpg",
           "ratio": 1.6
         }
       ],
-      "bg": "#2624e1",
-      "dark": true,
-      "desc": "From the Ẹdorẹ brand project: branded cups and the Community, Connect, Live campaign.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "Ẹdorẹ"
+      "bg": "#ffd94a",
+      "dark": false,
+      "desc": "From the Ẹdorẹ brand project: the wordmark, dots under each ẹ intact, on the brand yellow."
     },
     {
       "title": "Dashboard on a laptop",
@@ -2269,7 +2261,6 @@
       "dark": true,
       "desc": "A post inviting attendees to share their OSCAFest’25 story.",
       "tools": "Figma",
-      "mix": true,
       "client": "OSCA"
     },
     {
@@ -2403,20 +2394,17 @@
       "mix": true
     },
     {
-      "title": "MentSource logo",
+      "title": "Bottle design",
       "category": "brand",
       "images": [
         {
-          "src": "assets/designs/mentsource-logo.jpg",
-          "ratio": 1
+          "src": "assets/designs/bottle-design.jpg",
+          "ratio": 1.0
         }
       ],
-      "bg": "#ffffff",
+      "bg": "#9a9a9a",
       "dark": false,
-      "desc": "A logo project: the full-colour MentSource logo, the MS monogram above the wordmark.",
-      "tools": "Figma",
-      "mix": true,
-      "client": "MentSource"
+      "desc": "The identity wrapped around a bottle, with the blue tape motif."
     },
     {
       "title": "ShareBuddy, split it your way",
