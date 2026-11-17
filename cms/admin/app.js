@@ -991,10 +991,10 @@
         el('div', { class: 'slegend' }, el('span', {}, el('em', { class: 'a' }), `Came through your tagged links · ${fmt(socT)}`), el('span', {}, el('em', { class: 'b' }), `The app said where they came from · ${fmt(socN - socT)}`))) : '',
       el('p', { class: 'anote', text: 'X, LinkedIn and Instagram often hide where a visit came from, so some of their visitors land in Direct. Your tagged links fix that from the day you start using them.' })));
     P.append(el('div', { class: 'panel' }, el('h3', { text: 'Your tagged links' }),
-      el('ul', { class: 'tlinks' }, SOCIAL.map(p => { const u = 'https://iamkingsleey.com/?ref=' + p.id, b = el('button', { type: 'button', text: 'Copy' });
+      el('ul', { class: 'tlinks' }, SOCIAL.map(p => { const u = 'https://iamkingsleey.com/' + p.id, b = el('button', { type: 'button', text: 'Copy' });
         b.onclick = async () => { try { await navigator.clipboard.writeText(u); b.textContent = 'Copied'; b.classList.add('done'); } catch (_) { b.textContent = 'Select it'; } setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, 1400); };
-        return el('li', {}, el('span', { class: 'p', text: p.n }), el('code', { text: 'iamkingsleey.com/?ref=' + p.id }), b); })),
-      el('p', { class: 'anote', text: "Use each one in that platform's bio and posts. Visitors see your normal homepage and link preview; the tag only tells Analytics where they came from." })));
+        return el('li', {}, el('span', { class: 'p', text: p.n }), el('code', { text: 'iamkingsleey.com/' + p.id }), b); })),
+      el('p', { class: 'anote', text: "Use each one in that platform's bio and posts. Each opens your homepage with your normal link preview, and tells Analytics where the visit came from." })));
     const refRows = [...soc.rows.filter(r => r.count).map(r => ({ name: r.n, count: r.count })), ...soc.other].sort((x, y) => y.count - x.count);
     P.append(rank('Where visitors come from', refRows, x => x.name === '(direct)' || !x.name ? 'Direct · typed or bookmarked' : x.name));
     // case studies: how far people get

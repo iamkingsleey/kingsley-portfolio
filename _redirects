@@ -1,2 +1,10 @@
 # Home lives at the root; old /home links redirect there (path rules only; hostname rules live in Cloudflare's Redirect Rules)
 /home / 301
+# short links for profiles and posts: they open Home and tell Analytics where the visit came from (Home then tidies the address bar)
+/linkedin /?ref=linkedin 302
+/x /?ref=x 302
+/instagram /?ref=instagram 302
+/medium /?ref=medium 302
+/youtube /?ref=youtube 302
+/dribbble /?ref=dribbble 302
+/github /?ref=github 302

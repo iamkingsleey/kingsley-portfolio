@@ -8,6 +8,8 @@
    Every page loads this (cms/build/src/tools/post.py). KMtrack (in the analytics snippet) queues until GoatCounter loads. */
 (() => {
   if (window.__kmTrack) return; window.__kmTrack = true;
+  // a short link (/medium → /?ref=medium, _redirects) names where the visit came from: once GoatCounter has loaded and read it, the tag leaves the address bar
+  if (/[?&](ref|utm_source)=/.test(location.search)) { let n = 0; const tidy = () => { if (window.goatcounter && window.goatcounter.count) return setTimeout(() => { try { history.replaceState(history.state, '', location.pathname + location.hash); } catch (_) {} }, 1200); if (++n < 50) setTimeout(tidy, 200); }; tidy(); }
   const T = (path, title) => { try { if (window.KMtrack) KMtrack(path, title || path); } catch (_) {} };
   const seen = new Set(), T1 = (p, t) => { if (!seen.has(p)) { seen.add(p); T(p, t); } };
   const file = ((location.pathname.split('/').pop() || 'index.html').replace(/^([a-z0-9-]+)$/i, '$1.html')).toLowerCase();
