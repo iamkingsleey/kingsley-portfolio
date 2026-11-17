@@ -2203,6 +2203,21 @@
       "desc": "An isometric POS terminal drops in, prints a receipt and gets a magnifier over its keys."
     },
     {
+      "title": "Time:Out, early bird motion",
+      "category": "motion",
+      "images": [
+        {
+          "src": "assets/designs/time-out-early-bird-motion.jpg",
+          "ratio": 0.8,
+          "video": "assets/designs/time-out-early-bird-motion.mp4",
+          "hd": "assets/designs/time-out-early-bird-motion-hd.mp4"
+        }
+      ],
+      "bg": "#eb2a3b",
+      "dark": true,
+      "desc": "The early bird poster for Time:Out Motion, animated: the venue signs, Bricks 414, Coldharbour Lane and SW9 8LF, drop in one by one before “Ticket is live” lands."
+    },
+    {
       "title": "Figma motion exploration",
       "category": "motion",
       "images": [
