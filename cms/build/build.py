@@ -361,7 +361,18 @@ def _grid_order():
     for i in range(n):
         if k < len(extra) and int((k + .5) * step) == i: out.append(extra[k]); k += 1
         elif base: out.append(base.pop(0))
-    return out + base + extra[k:]
+    return _spread(out + base + extra[k:])
+# pieces from one series (same first word: "Time:Out, red", "Time:Out, night"…) never sit within 8 places of each other; the page's script
+# (work-src.html, spread) does exactly the same, so this list and the page agree
+def _spread(out, gap=8):
+    key = lambda x: re.split(r'[\s,]+', (x.get('t') or '').strip().lower())[0]   # the first word: Time:Out, Ẹdorẹ, Tennis, Kusnap…
+    out = list(out)
+    for i in range(len(out)):
+        near = {key(y) for y in out[max(0, i - gap):i]}
+        if key(out[i]) not in near: continue
+        for m in range(i + 1, len(out)):
+            if key(out[m]) not in near: out[i], out[m] = out[m], out[i]; break
+    return out
 def _thumb(u):
     m = re.match(r'assets/(designs|uploads)/(?!(?:thumbs|sm|md)/)(.+)\.(?:jpe?g|png|webp)$', u or '')
     return f'assets/{m.group(1)}/thumbs/{m.group(2)}.webp' if m else None

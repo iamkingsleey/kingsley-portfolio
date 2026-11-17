@@ -506,13 +506,19 @@ html[data-corners="sharp"] .reelv .rlive { border-radius: 0 }
   // the newer kinds (illustrations, posters) are mixed through the rest instead of sitting in a block of their own:
   // spread evenly, in a fixed shuffled order so the page looks the same on every visit
   const MIX = ['Illustration', 'Poster', 'UI/UX'];
+  // pieces from one series (same first word: "Time:Out, red", "Time:Out, night"…) never sit within 8 places of each other: each one that
+  // would is swapped with the next piece that wouldn't (build.py's _spread does the same, so the first screen agrees)
+  const spread = (list, gap = 8) => { const key = x => String((x && x.t) || '').trim().toLowerCase().split(/[\s,]+/)[0], out = list.slice();
+    for (let i = 0; i < out.length; i++) { const near = new Set(out.slice(Math.max(0, i - gap), i).map(key)); if (!near.has(key(out[i]))) continue;
+      for (let m = i + 1; m < out.length; m++) if (!near.has(key(out[m]))) { [out[i], out[m]] = [out[m], out[i]]; break; } }
+    return out; };
   const mixIn = list => {
     const isX = x => MIX.includes(x.cat) || x.mix, base = list.filter(x => !isX(x)), extra = list.filter(isX);   // (a piece can also ask to be mixed in: "mix": true)
     let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     for (let i = extra.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [extra[i], extra[j]] = [extra[j], extra[i]]; }
     const n = base.length + extra.length, out = [], step = n / Math.max(1, extra.length); let k = 0;
     for (let i = 0; i < n; i++) out.push(k < extra.length && Math.floor((k + .5) * step) === i ? extra[k++] : base.shift());
-    return out.concat(base, extra.slice(k));
+    return spread(out.concat(base, extra.slice(k)));
   };
   const items = mixIn(CATS.flatMap(c => A[c.k].map(x => {
     const pj = PROJECTS[x.t] || {};
@@ -1979,6 +1985,8 @@ html[data-corners="sharp"] .reelv .rlive { border-radius: 0 }
     const first = reduce ? null : new Map(ovTiles.map(o => [o.t, o.t.getBoundingClientRect()]));
     const deck = [...ovGrid.children];
     for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    { const it = new Map(ovTiles.map(o => [o.t, items[+o.t.dataset.i]])), sp = spread(deck.filter(t => !t.hidden).map(t => ({ t: (it.get(t) || {}).t, el: t })));   // series stay apart after a shuffle too (among the pieces showing)
+      let q = 0; deck.forEach((t, k) => { if (!t.hidden) deck[k] = sp[q++].el; }); }
     const keep = ov.scrollTop; deck.forEach(t => ovGrid.appendChild(t)); ov.scrollTop = keep;   // the deal happens where you are: no jump to the top
     air();
     if (first) deck.forEach(t => { if (t.hidden) return; const a = first.get(t), z = t.getBoundingClientRect(), dx = a.left - z.left, dy = a.top - z.top;
