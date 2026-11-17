@@ -507,8 +507,8 @@ ov.style.transition = 'none'; document.body.classList.add('all');
 var cols = mob ? 2 : 4, g = mob ? 12 : 22, gw = grid.clientWidth; if (!gw || !T.length) return;
 var w = (gw - g * (cols - 1)) / cols;
 T.forEach(function (t) { var r = parseFloat(t.style.getPropertyValue('--r')) || .8; t.style.setProperty('--sp', String(Math.round(w / r + g))); });
-var SIZED = /(^|\/)assets\/(designs\/[^/]+|uploads\/(?!(?:thumbs|sm|md)\/)[\w\/.-]+)\.webp$/, sized = function (u, d) { return u.replace(/assets\/(designs|uploads)\//, 'assets/$1/' + d + '/'); };
-var sharp = function (el, u) { var px = (el.offsetWidth || gw / cols || 400) * (devicePixelRatio || 1); return !SIZED.test(u) ? u : px <= 520 ? sized(u, 'sm') : px <= 760 ? sized(u, 'md') : u; };
+var SIZED = /(^|\/)assets\/(designs\/[^/]+|uploads\/(?!(?:thumbs|sm|md|lg|th2)\/)[\w\/.-]+)\.webp$/, sized = function (u, d) { return u.replace(/assets\/(designs|uploads)\//, 'assets/$1/' + d + '/'); };
+var sharp = function (el, u) { var px = (el.offsetWidth || gw / cols || 400) * (devicePixelRatio || 1); return !SIZED.test(u) ? u : px <= 520 ? sized(u, 'sm') : px <= 760 ? sized(u, 'md') : px <= 1400 ? sized(u, 'lg') : u; };
 var spread = cols === 4 ? [-350, -117, 117, 350] : [-120, 120], top0 = T[0].offsetTop, left0 = T[0].offsetLeft, lim = innerHeight * 1.4;
 var geo = T.map(function (t) { return [t.offsetTop, t.offsetLeft, t.offsetWidth, t.offsetHeight]; }), onS = [];
 T.forEach(function (t, k) { var ot = geo[k][0], ol = geo[k][1], ow = geo[k][2]; if (ot > lim) return;
@@ -630,11 +630,12 @@ onS.forEach(put);
   const okDraw = im => !(im && im.dataset && im.dataset.nox);
   // the 1000px copy of a design (made by the build next to each WebP) for places that show it small: the All grid and the tap ripple
   // the case studies' covers (assets/uploads/…) get the same three copies from the build, so they load as fast as the rest
-  const SIZED = /(^|\/)assets\/(designs\/[^/]+|uploads\/(?!(?:thumbs|sm|md)\/)[\w\/.-]+)\.webp$/;
+  const SIZED = /(^|\/)assets\/(designs\/[^/]+|uploads\/(?!(?:thumbs|sm|md|lg|th2)\/)[\w\/.-]+)\.webp$/;
   const sized = (u, d) => u.replace(/assets\/(designs|uploads)\//, `assets/$1/${d}/`);
   const thOf = u => (u && SIZED.test(u)) ? sized(u, 'thumbs') : mdOf(u);
   const smOf = u => (u && SIZED.test(u)) ? sized(u, 'sm') : u;   // 640px, for the grid tiles
   const mdOf = u => (u && SIZED.test(u)) ? sized(u, 'md') : u;
+  const lgOf = u => (u && SIZED.test(u)) ? sized(u, 'lg') : u;   // 1600px, for big tiles on 3K/4K screens
   const row = $('row');
   const slots = items.map((it, i) => {
     const s = document.createElement('div'); s.className = 'slot' + (it.video && !it.dark ? ' white' : '') + (it.cs ? ' cs' : '');
@@ -1936,12 +1937,12 @@ onS.forEach(put);
   // each tile's sharp grid picture is fetched as it nears the screen; the 240px thumbnail shows until then.
   // The copy is picked by the tile's real size in screen pixels: 640px on phones, 1000px on laptops, the full original on large
   // and 4K displays, so the picture is never stretched past its own pixels.
-  const sharpFor = (el, u) => { const w = (el.offsetWidth || ovGrid.offsetWidth / 4 || 400) * (devicePixelRatio || 1); return w <= 520 ? smOf(u) : w <= 760 ? mdOf(u) : u; };   // a copy at least ~1.3x the tile, so the browser only ever scales down
+  const sharpFor = (el, u) => { const w = (el.offsetWidth || ovGrid.offsetWidth / 4 || 400) * (devicePixelRatio || 1); return w <= 520 ? smOf(u) : w <= 760 ? mdOf(u) : w <= 1400 ? lgOf(u) : u; };   // a copy at least ~1.3x the tile, so the browser only ever scales down
   const warmTile = o => { if (o.load) { o.load(); o.load = null; } if (o.im.dataset.th) { o.im.style.setProperty('--th', `url(${o.im.dataset.th})`); o.im.removeAttribute('data-th'); } if (o.im.dataset.bg) { o.im.style.setProperty('--bg', `url(${sharpFor(o.im, o.im.dataset.bg)})`); o.im.removeAttribute('data-bg'); } };
   // until the page has loaded only the tiles on screen fetch; after that, the next screen's worth too
   const gridIO = m => new IntersectionObserver((es, io) => es.forEach(e => { if (!e.isIntersecting) return; const o = ovTiles.find(x => x.t === e.target); if (o) warmTile(o); io.unobserve(e.target); }), { root: ov, rootMargin: m });
   if ('IntersectionObserver' in window) { const io0 = gridIO('0px'); ovTiles.forEach(o => io0.observe(o.t));
-    const later = () => { io0.disconnect(); const io1 = gridIO('100% 0px'); ovTiles.forEach(o => { if (o.im.dataset.bg) io1.observe(o.t); }); };
+    const later = () => { io0.disconnect(); const io1 = gridIO('150% 0px'); ovTiles.forEach(o => { if (o.im.dataset.bg) io1.observe(o.t); }); };
     if (document.readyState === 'complete') setTimeout(later, 300); else addEventListener('load', () => setTimeout(later, 300)); }
   else ovTiles.forEach(warmTile);
   // animated pieces play right in the grid: a muted loop over the still, running only while the tile is on screen

@@ -237,6 +237,12 @@ try:
                     if not os.path.exists(_md) or os.path.getmtime(_md) < os.path.getmtime(_src):
                         os.makedirs(os.path.dirname(_md), exist_ok=True)
                         _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((1000, 1000 * 4)); _m.save(_md, 'WEBP', quality=80, method=6)
+                    # "lg" (1600px) for big grid tiles (3K/4K screens): sharp at 1.7x the tile, a fraction of the 3200px original
+                    _lg = f'{REPO}/assets/designs/lg/' + os.path.basename(_out)
+                    if not os.path.exists(_lg) or os.path.getmtime(_lg) < os.path.getmtime(_src):
+                        os.makedirs(os.path.dirname(_lg), exist_ok=True)
+                        _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((1600, 1600 * 4)); _m.save(_lg, 'WEBP', quality=84, method=6)
+                        if os.path.getsize(_lg) > os.path.getsize(_out): import shutil as _sh; _sh.copyfile(_out, _lg)   # a picture already under 1600px: its own WebP is lighter
                     # "sm" (640px) for the Designs grid tiles: about a third of md's weight, still sharp on a 3x phone screen
                     _sm = f'{REPO}/assets/designs/sm/' + os.path.basename(_out)
                     if not os.path.exists(_sm) or os.path.getmtime(_sm) < os.path.getmtime(_src):
@@ -257,21 +263,22 @@ try:
                 if isinstance(_c.get(_k), str): _up.add(_c[_k])
         for _p in json.load(open(f'{REPO}/content/designs.json', encoding='utf-8'))['projects']:
             for _x in _p.get('images', [])[:1]: _up.add(_x.get('src') or '')
-        for _rel in sorted(u for u in _up if re.match(r'assets/uploads/(?!(?:thumbs|sm|md)/).+\.(?:jpe?g|png|webp)$', u, re.I)):
+        for _rel in sorted(u for u in _up if re.match(r'assets/uploads/(?!(?:thumbs|sm|md|lg|th2)/).+\.(?:jpe?g|png|webp)$', u, re.I)):
             _src = f'{REPO}/{_rel}'
             if not os.path.exists(_src): continue
             _stem = re.sub(r'\.(?:jpe?g|png|webp)$', '.webp', _rel[len('assets/uploads/'):], flags=re.I)
-            for _d, _w, _q in (('thumbs', 300, 80), ('sm', 640, 78), ('md', 1000, 80)):
+            for _d, _w, _q in (('thumbs', 300, 80), ('sm', 640, 78), ('md', 1000, 80), ('lg', 1600, 84)):
                 _o = f'{REPO}/assets/uploads/{_d}/{_stem}'
                 if os.path.exists(_o) and os.path.getmtime(_o) >= os.path.getmtime(_src): continue
                 os.makedirs(os.path.dirname(_o), exist_ok=True)
                 _m = _Im.open(_src); _m = _m.convert('RGBA' if _m.mode in ('RGBA', 'LA', 'P') else 'RGB'); _m.thumbnail((_w, _w * 4)); _m.save(_o, 'WEBP', quality=_q, method=6)
+                if _d == 'lg' and _src.lower().endswith('.webp') and os.path.getsize(_o) > os.path.getsize(_src): import shutil as _sh; _sh.copyfile(_src, _o)
     except Exception as _e: print('grid copies skipped', _e)
     # WebPs uploaded as-is (no JPG/PNG beside them) can be huge lossless files: one 360 KB picture held the Shop back
     # past 2 s on a phone. Over 250 KB they're re-saved lossy once; the smaller copy is kept only if it saves 40%+, so a
     # file is never squeezed twice.
     for _dp, _dn, _fn in os.walk(f'{REPO}/assets'):
-        if '/md' in _dp or '/sm' in _dp or '/thumbs' in _dp: continue
+        if '/md' in _dp or '/lg' in _dp or '/th2' in _dp or '/sm' in _dp or '/thumbs' in _dp: continue
         for _n in _fn:
             if not _n.lower().endswith('.webp'): continue
             _f = os.path.join(_dp, _n); _stem = _f[:-5]
