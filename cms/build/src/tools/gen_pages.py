@@ -22,7 +22,9 @@ def make(fq, nm, stmt, h2, sub, tag, CH, out, post=None):
     i = s.index('  const CH = ['); j = s.index('  ];', i) + 4
     rows = ',\n'.join('    ' + repr(list(c)) for c in CH)
     s = s[:i] + '  const CH = [\n' + rows + '\n  ];' + s[j:]
-    rep("const SECN = ['About', 'Band', 'Skills', 'On air'], secEls = ['s-band', 's-desk', 's-air'].map($);",
+    cut('/* ---------- 5 · past broadcasts', '/* ---------- 5 · how I work ---------- */')   # the talks styles and script: About only
+    cut('<script>\n/* ---------- 5 · past broadcasts', '<!--__POPKIT__-->')
+    rep("const SECN = ['About', 'Band', 'Skills', 'Talks', 'On air'], secEls = ['s-band', 's-desk', 's-talks', 's-air'].map($);",
         f"const SECN = ['{nm}', '{h2 if len(h2) < 14 else tag}'], secEls = ['s-band'].map($);")
     rep("['#bcard', 24], ['.bruler', 9], ['#skills', 16], ['.onair', 10], ['.call', 6], ['.foot', 4]]", "['#bcard', 24], ['.bruler', 9], ['.foot', 4]]")
     if post: s = post(s, rep)
