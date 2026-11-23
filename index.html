@@ -18,7 +18,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-latin.woff2) format("woff2")}@font-face{font-family:"Geist Mono";font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/geist-mono-latin.woff2) format("woff2")}@font-face{font-family:"Jockey One";font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/jockey-one-latin.woff2) format("woff2")}</style>
 <script>
-  var BUILD = "202611221922";   // changes every build so browsers fetch the new Designs page
+  var BUILD = "202611231105";   // changes every build so browsers fetch the new Designs page
   // Theme: the visitor's saved pick, else dark. Shared by every page.
   (function () { var t; try { if (!localStorage.getItem('km-theme-v2')) { localStorage.removeItem('km-theme'); localStorage.setItem('km-theme-v2', '1'); } t = localStorage.getItem('km-theme'); } catch (e) {}   /* v2: forget the dark choice Designs used to save on its own (Nov 2026) */
     if (!t) t = 'dark';   // dark unless the visitor picks light with a theme button (a pick is the only thing ever saved)
@@ -1856,6 +1856,27 @@ h1.typer { position: relative }
   clock();
   // Pill widths change once Geist loads, so re-check the spacing then.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+})();
+</script>
+<!-- Awwwards nominee: a small readout beside "For recruiters" (Home only) -->
+<a class="aw-tag" href="https://www.awwwards.com/sites/kingsley-mkpandiok" target="_blank" rel="noopener" aria-label="Awwwards nominee"><b></b><svg viewBox="16.2 16.6 24.6 15.8" aria-hidden="true"><path fill="currentColor" d="M35.481 16.926l-4.782 14.969h-3.266l-2.584-9.682-2.584 9.682h-3.268l-4.781-14.969h3.713l2.673 10.276 2.524-10.276h3.445l2.524 10.276 2.674-10.276zM37.979 27.083c1.426 0 2.495 1.068 2.495 2.495 0 1.425-1.069 2.495-2.495 2.495-1.425 0-2.495-1.07-2.495-2.495-.001-1.427 1.07-2.495 2.495-2.495"/></svg><span>Nominee</span></a>
+<script>
+(function () {
+  // sits 18px after the "For recruiters" pill, at the same height; on a very narrow phone it drops the word and keeps the W.
+  var st = document.createElement('style'); st.textContent = '.aw-tag { position: fixed; z-index: 150; top: calc(48px + env(safe-area-inset-top, 0px)); left: 200px; display: inline-flex; align-items: center; gap: 8px; height: 36px; color: var(--muted, #8a8a8a); font: 600 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent; opacity: 0; transition: color .2s ease-out, opacity .3s ease-out } .aw-tag.on { opacity: 1 } .aw-tag b { width: 6px; height: 6px; border-radius: 50%; background: var(--red, #fb233b); flex: none } .aw-tag svg { display: block; width: 16px; height: auto; flex: none; color: var(--ink, #fff) } .aw-tag.tight span { display: none } @media (hover: hover) { .aw-tag:hover { color: var(--ink, #fff) } }'; document.head.appendChild(st);   // the tag's styles
+  var tag = document.querySelector('.aw-tag'), tries = 0;
+  function place() {
+    var rec = document.querySelector('.pt-rec'); if (!rec) return false;
+    var r = rec.getBoundingClientRect(); if (!r.width) return false;
+    tag.style.top = r.top + 'px'; tag.style.left = (r.right + 18) + 'px';
+    tag.classList.remove('tight');
+    var m = document.querySelector('.kmn-mb, .pt-q'), q = m && m.getBoundingClientRect();
+    if (q && q.width && tag.getBoundingClientRect().right > q.left - 12) tag.classList.add('tight');
+    tag.classList.add('on'); return true;
+  }
+  (function wait() { if (!place() && tries++ < 80) setTimeout(wait, 100); })();
+  addEventListener('resize', place, { passive: true });
+  addEventListener('load', function () { setTimeout(place, 300); });
 })();
 </script>
 <button class="sound-btn" id="soundBtn" type="button" aria-label="Mute sound" aria-pressed="true"><svg viewBox="0 0 16 16" id="soundIco" aria-hidden="true"></svg></button><button class="theme-btn" id="themeBtn" type="button" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 16 16" id="themeIco" aria-hidden="true"></svg></button>

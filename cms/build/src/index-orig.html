@@ -1687,5 +1687,26 @@ h1.typer { cursor: pointer; -webkit-user-select: none; user-select: none }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 })();
 </script>
+<!-- Awwwards nominee: a small readout beside "For recruiters" (Home only) -->
+<a class="aw-tag" href="https://www.awwwards.com/sites/kingsley-mkpandiok" target="_blank" rel="noopener" aria-label="Awwwards nominee"><b></b><svg viewBox="16.2 16.6 24.6 15.8" aria-hidden="true"><path fill="currentColor" d="M35.481 16.926l-4.782 14.969h-3.266l-2.584-9.682-2.584 9.682h-3.268l-4.781-14.969h3.713l2.673 10.276 2.524-10.276h3.445l2.524 10.276 2.674-10.276zM37.979 27.083c1.426 0 2.495 1.068 2.495 2.495 0 1.425-1.069 2.495-2.495 2.495-1.425 0-2.495-1.07-2.495-2.495-.001-1.427 1.07-2.495 2.495-2.495"/></svg><span>Nominee</span></a>
+<script>
+(function () {
+  // sits 18px after the "For recruiters" pill, at the same height; on a very narrow phone it drops the word and keeps the W.
+  var st = document.createElement('style'); st.textContent = '.aw-tag { position: fixed; z-index: 150; top: calc(48px + env(safe-area-inset-top, 0px)); left: 200px; display: inline-flex; align-items: center; gap: 8px; height: 36px; color: var(--muted, #8a8a8a); font: 600 11px "Geist Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent; opacity: 0; transition: color .2s ease-out, opacity .3s ease-out } .aw-tag.on { opacity: 1 } .aw-tag b { width: 6px; height: 6px; border-radius: 50%; background: var(--red, #fb233b); flex: none } .aw-tag svg { display: block; width: 16px; height: auto; flex: none; color: var(--ink, #fff) } .aw-tag.tight span { display: none } @media (hover: hover) { .aw-tag:hover { color: var(--ink, #fff) } }'; document.head.appendChild(st);   // the tag's styles
+  var tag = document.querySelector('.aw-tag'), tries = 0;
+  function place() {
+    var rec = document.querySelector('.pt-rec'); if (!rec) return false;
+    var r = rec.getBoundingClientRect(); if (!r.width) return false;
+    tag.style.top = r.top + 'px'; tag.style.left = (r.right + 18) + 'px';
+    tag.classList.remove('tight');
+    var m = document.querySelector('.kmn-mb, .pt-q'), q = m && m.getBoundingClientRect();
+    if (q && q.width && tag.getBoundingClientRect().right > q.left - 12) tag.classList.add('tight');
+    tag.classList.add('on'); return true;
+  }
+  (function wait() { if (!place() && tries++ < 80) setTimeout(wait, 100); })();
+  addEventListener('resize', place, { passive: true });
+  addEventListener('load', function () { setTimeout(place, 300); });
+})();
+</script>
 </body>
 </html>
