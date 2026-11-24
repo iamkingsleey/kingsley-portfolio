@@ -118,6 +118,8 @@ nav button i { width: 6px; height: 6px; border-radius: 50%; background: var(--re
 .rank li { position: relative; display: flex; justify-content: space-between; gap: 12px; padding: 7px 10px; border-radius: 6px; overflow: hidden; font-size: 13.5px }
 .rank li i { position: absolute; inset: 0 auto 0 0; background: var(--soft); z-index: 0 } .rank li span, .rank li b { position: relative; z-index: 1 } .rank li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .rank li b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums }
+.rank-more { margin-top: 8px; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--soft); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: background-color .15s ease-out }
+.rank-more:hover { background: var(--hover) } .rank-more:active { transform: scale(.97) }
 .chart { width: 100%; height: 160px; display: block } .chart rect { fill: var(--ink) } .chart rect.z { fill: var(--chartz) } .chart text { fill: var(--muted); font: 10px var(--mono) }
 .empty { padding: 26px; border: 1px dashed var(--strong); border-radius: 14px; color: var(--muted) } .empty h2 { font-size: 17px; margin-bottom: 8px } .empty ol { margin: 10px 0 0; padding-left: 18px; color: var(--text); line-height: 1.8 }
 .note { padding: 12px 14px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 13px }

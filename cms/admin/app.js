@@ -1032,6 +1032,7 @@
     { id: 'instagram', n: 'Instagram', g: 'IG', m: /^((www\.|l\.)?instagram\.com|instagram|ig)$/i },
     { id: 'medium', n: 'Medium', g: 'M', m: /^((\w+\.)?medium\.com|medium)$/i },
     { id: 'youtube', n: 'YouTube', g: 'YT', m: /^((www\.|m\.)?youtube\.com|youtu\.be|youtube)$/i },
+    { id: 'tiktok', n: 'TikTok', g: 'TT', m: /^((www\.|m\.|vm\.|vt\.)?tiktok\.com|com\.zhiliaoapp\.musically|com\.ss\.android\.ugc\.(trill|aweme)|tiktok)$/i },
     { id: 'dribbble', n: 'Dribbble', g: 'Dr', m: /^((www\.)?dribbble\.com|dribbble)$/i },
     { id: 'github', n: 'GitHub', g: 'GH', m: /^((www\.)?github\.com|github)$/i }];
   const socialOf = refs => { const rows = SOCIAL.map(p => ({ ...p, tagged: 0, app: 0, count: 0 })), other = [];
@@ -1041,7 +1042,14 @@
   const niceP = p => { const m = { '/': 'Home', '/index.html': 'Home', '/about.html': 'About', '/engineering.html': 'Engineering', '/projects.html': 'Projects', '/designs.html': 'Designs' }; if (m[p]) return m[p]; const h = (p || '').match(/(case|brand)\.html#(.+)/); return h ? 'Case study · ' + h[2] : p; };
   function rank(t, rows, name) {
     rows = rows || []; const max = Math.max(1, ...rows.map(r => r.count));
-    return el('div', { class: 'panel' }, el('h3', { text: t }), rows.length ? el('ul', { class: 'rank' }, rows.slice(0, 10).map(r => el('li', {}, el('i', { style: `width:${(r.count / max * 100).toFixed(1)}%` }), el('span', { text: name ? name(r) : r.name }), el('b', { text: fmt(r.count) })))) : el('div', { class: 'mono', text: 'No data yet' }));
+    // the top 10, with a button to see the rest (Countries can run past 10)
+    const li = r => el('li', {}, el('i', { style: `width:${(r.count / max * 100).toFixed(1)}%` }), el('span', { text: name ? name(r) : r.name }), el('b', { text: fmt(r.count) }));
+    if (!rows.length) return el('div', { class: 'panel' }, el('h3', { text: t }), el('div', { class: 'mono', text: 'No data yet' }));
+    const ul = el('ul', { class: 'rank' }, rows.slice(0, 10).map(li)), panel = el('div', { class: 'panel' }, el('h3', { text: t }), ul);
+    if (rows.length > 10) { let open = false; const more = el('button', { type: 'button', class: 'rank-more', text: `Show all ${rows.length}` });
+      more.addEventListener('click', () => { open = !open; ul.replaceChildren(...(open ? rows : rows.slice(0, 10)).map(li)); more.textContent = open ? 'Show top 10' : `Show all ${rows.length}`; });
+      panel.append(more); }
+    return panel;
   }
   function chart(daily) {
     const W = 1000, H = 160, n = Math.max(1, daily.length), max = Math.max(1, ...daily.map(d => d.count)), bw = W / n;
